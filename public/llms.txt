@@ -1,0 +1,27 @@
+# Turfzo - Turf Booking Platform
+# https://turfzo.com
+
+## Core Pages
+- Home: https://turfzo.com
+- Explore Turfs: https://turfzo.com/explore
+- How It Works: https://turfzo.com/how-it-works
+- Contact: https://turfzo.com/contact
+
+## City Pages
+- Bangalore: https://turfzo.com/cities/bangalore
+- Mumbai: https://turfzo.com/cities/mumbai
+- Delhi: https://turfzo.com/cities/delhi
+- Hyderabad: https://turfzo.com/cities/hyderabad
+- Pune: https://turfzo.com/cities/pune
+
+## Sports Pages
+- Football: https://turfzo.com/sports/football
+- Cricket: https://turfzo.com/sports/cricket
+- Badminton: https://turfzo.com/sports/badminton
+
+## Tournaments
+- Tournaments: https://turfzo.com/tournaments
+
+## API
+- Turfs query: convex query turfs:getAvailable
+- Auth: convex action auth:syncFirebaseUser

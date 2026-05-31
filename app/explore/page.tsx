@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Search as SearchIcon, 
   MapPin, 
   ChevronDown, 
   Star, 
@@ -28,95 +27,57 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { convexClient } from "@/lib/convex";
+import type { Turf as ConvexTurf } from "@/lib/types";
+import { FAQPageSchema } from "@/lib/schema";
 
-// Interface for turf venues
-interface Turf {
+const exploreFaqItems = [
+  { question: "How do I find a football turf near me?", answer: "Visit turfzo.com/explore, select your city, and browse available football turfs. You can filter by location, price, amenities, and availability. Real-time slots are shown for each venue." },
+  { question: "What is the average turf booking price in India?", answer: "Turf booking prices in India range from ₹500 to ₹2000 per hour. Football turfs typically cost ₹800-1500/hour in metro cities like Bangalore, Mumbai, and Delhi. Prices vary by location, amenities, and time of day." },
+  { question: "Can I book a turf for tonight?", answer: "Yes, Turfzo shows real-time availability. If a turf has open slots for tonight, you can book it instantly. The booking is confirmed immediately with a QR code ticket." },
+  { question: "How many turfs are available on Turfzo?", answer: "Turfzo has 50+ verified turfs across 8 major Indian cities including Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, and Ahmedabad." },
+  { question: "What sports can I book on Turfzo?", answer: "Turfzo supports football, cricket, badminton, tennis, and multipurpose sports venues. Each sport has dedicated filters to help you find the right venue." },
+  { question: "Is there a cancellation policy?", answer: "Yes, you can cancel your booking up to 6 hours before the scheduled time for a full refund. Cancellations within 6 hours receive a 50% refund." },
+];
+
+interface TurfDisplay {
   id: string;
   name: string;
   location: string;
   rating: number;
   reviews: number;
   price: number;
-  sport: "Football" | "Cricket" | "Multipurpose";
+  sport: string;
   size: string;
   premium: boolean;
   facilities: string[];
   image: string;
 }
 
-const INITIAL_TURFS: Turf[] = [
-  {
-    id: "turf-1",
-    name: "Playo Turf, HSR Layout",
-    location: "HSR Layout, Bengaluru, Karnataka",
-    rating: 4.8,
-    reviews: 230,
-    price: 1000,
-    sport: "Football",
-    size: "7v7",
-    premium: true,
-    facilities: ["Flood Lights", "Parking", "Changing Room"],
-    image: "/stadium_turf_bg.png"
-  },
-  {
-    id: "turf-2",
-    name: "Kickoff Arena, Koramangala",
-    location: "Koramangala, Bengaluru, Karnataka",
-    rating: 4.6,
-    reviews: 180,
-    price: 900,
-    sport: "Football",
-    size: "7v7",
-    premium: false,
-    facilities: ["Flood Lights", "Parking"],
-    image: "/stadium_turf_bg.png"
-  },
-  {
-    id: "turf-3",
-    name: "ScoreField Turf, Marathahalli",
-    location: "Marathahalli, Bengaluru, Karnataka",
-    rating: 4.5,
-    reviews: 150,
-    price: 800,
-    sport: "Football",
-    size: "7v7",
-    premium: false,
-    facilities: ["Flood Lights", "Parking", "Cafeteria"],
-    image: "/stadium_turf_bg.png"
-  },
-  {
-    id: "turf-4",
-    name: "Indiranagar Cricket Club",
-    location: "Indiranagar, Bengaluru, Karnataka",
-    rating: 4.7,
-    reviews: 95,
-    price: 1200,
-    sport: "Cricket",
-    size: "8v8 Nets",
-    premium: true,
-    facilities: ["Flood Lights", "Parking", "Cafeteria", "Changing Room"],
-    image: "/stadium_turf_bg.png"
-  },
-  {
-    id: "turf-5",
-    name: "Golden Sports Arena",
-    location: "Whitefield, Bengaluru, Karnataka",
-    rating: 4.4,
-    reviews: 82,
-    price: 1500,
-    sport: "Multipurpose",
-    size: "9v9",
-    premium: false,
-    facilities: ["Flood Lights", "Parking", "Changing Room"],
-    image: "/stadium_turf_bg.png"
-  }
-];
+function mapTurf(t: ConvexTurf): TurfDisplay {
+  const location = [t.city, t.state].filter(Boolean).join(", ");
+  return {
+    id: t._id,
+    name: t.name,
+    location: location || t.address || "Location not set",
+    rating: t.rating ?? 0,
+    reviews: t.review_count ?? 0,
+    price: t.price_per_hour,
+    sport: t.sport_type ?? "Multipurpose",
+    size: t.format ?? "N/A",
+    premium: t.tier === "premium",
+    facilities: t.amenities ?? [],
+    image: t.image_url || "/stadium_turf_bg.png",
+  };
+}
 
 export default function ExplorePage() {
   // Booking Flow Steps State: 'listing' | 'slots' | 'checkout' | 'processing' | 'confirmed'
   const [flowStep, setFlowStep] = useState<'listing' | 'slots' | 'checkout' | 'processing' | 'confirmed'>('listing');
-  const [selectedTurf, setSelectedTurf] = useState<Turf | null>(null);
+  const [selectedTurf, setSelectedTurf] = useState<TurfDisplay | null>(null);
   const [wishlist, setWishlist] = useState<string[]>([]);
+  const [allTurfs, setAllTurfs] = useState<TurfDisplay[]>([]);
+  const [loading, setLoading] = useState(true);
   
   // Search state
   const [searchLocation, setSearchLocation] = useState("Bengaluru, Karnataka");
@@ -136,12 +97,27 @@ export default function ExplorePage() {
   const [selectedPayment, setSelectedPayment] = useState("upi");
   const [bookingId, setBookingId] = useState("");
 
+  // Fetch turfs from Convex on mount
+  useEffect(() => {
+    async function fetchTurfs() {
+      try {
+        const data = await convexClient.query<ConvexTurf[]>("turfs:getAvailable", {});
+        setAllTurfs(data.map(mapTurf));
+      } catch (err) {
+        console.error("Failed to fetch turfs:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTurfs();
+  }, []);
+
   // Filtered turfs
-  const [filteredTurfs, setFilteredTurfs] = useState<Turf[]>(INITIAL_TURFS);
+  const [filteredTurfs, setFilteredTurfs] = useState<TurfDisplay[]>([]);
 
   // Apply filters whenever states change
   useEffect(() => {
-    let result = INITIAL_TURFS;
+    let result = allTurfs;
 
     // Filter by sports selection
     if (selectedSports.length > 0) {
@@ -168,7 +144,7 @@ export default function ExplorePage() {
     }
 
     setFilteredTurfs(result);
-  }, [selectedSports, priceRange, selectedFacilities, sortBy]);
+  }, [selectedSports, priceRange, selectedFacilities, sortBy, allTurfs]);
 
   // Wishlist toggle helper
   const toggleWishlist = (id: string) => {
@@ -188,7 +164,7 @@ export default function ExplorePage() {
   };
 
   // Select slots helper
-  const handleOpenSlots = (turf: Turf) => {
+  const handleOpenSlots = (turf: TurfDisplay) => {
     setSelectedTurf(turf);
     setSelectedTimeSlot(null);
     setFlowStep('slots');
@@ -233,6 +209,15 @@ export default function ExplorePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+      <head>
+        <title>Explore Turfs Near You | Book Football, Cricket & More | Turfzo</title>
+        <meta name="description" content="Browse 50+ verified football turfs, cricket grounds, and sports venues across India. Filter by sport, price, and amenities. Real-time availability, instant booking, and secure online payment." />
+        <link rel="canonical" href="https://turfzo.com/explore" />
+        <meta property="og:title" content="Explore Turfs Near You | Turfzo" />
+        <meta property="og:description" content="Browse 50+ verified turfs across India. Book football, cricket, badminton, and tennis venues instantly." />
+        <meta property="og:url" content="https://turfzo.com/explore" />
+      </head>
+      <FAQPageSchema items={exploreFaqItems} />
       <Navbar />
 
       <main className="flex-grow pt-24 pb-16">
@@ -258,7 +243,7 @@ export default function ExplorePage() {
                   The <span className="text-brand-lime">Best Turfs</span>
                 </h1>
                 <p className="mt-2 text-text-muted text-sm font-sans">
-                  Top quality turfs near you. Anytime, Anywhere.
+                  Browse 50+ verified turfs across India. Filter by sport, price, and amenities. Book in 2 minutes with instant confirmation and secure online payment.
                 </p>
               </div>
 
@@ -449,7 +434,13 @@ export default function ExplorePage() {
 
                 {/* Cards List */}
                 <div className="flex flex-col gap-5">
-                  {filteredTurfs.length === 0 ? (
+                  {loading ? (
+                    <div className="bg-surface-dark border border-white/5 rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
+                      <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
+                      <h3 className="font-poppins font-bold text-lg text-text-main">Loading Turfs</h3>
+                      <p className="text-text-muted text-sm font-sans max-w-xs">Fetching the best venues near you...</p>
+                    </div>
+                  ) : filteredTurfs.length === 0 ? (
                     <div className="bg-surface-dark border border-white/5 rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
                       <SlidersHorizontal className="w-12 h-12 text-text-muted opacity-50" />
                       <h3 className="font-poppins font-bold text-lg text-text-main">No Venues Found</h3>
@@ -889,7 +880,7 @@ export default function ExplorePage() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
             className="max-w-xl mx-auto px-6 md:px-8 w-full text-center flex flex-col items-center mt-12"
           >
             
@@ -1024,6 +1015,31 @@ export default function ExplorePage() {
         )}
 
       </main>
+
+      {/* FAQ Section for AI Citations */}
+      {flowStep === 'listing' && (
+        <div className="max-w-3xl mx-auto px-6 md:px-8 pb-16">
+          <h2 className="font-poppins font-bold text-2xl text-text-main mb-8 text-center">
+            Frequently Asked Questions About Turf Booking
+          </h2>
+          <div className="flex flex-col gap-4">
+            {exploreFaqItems.map((item, idx) => (
+              <details
+                key={idx}
+                className="bg-surface-dark border border-white/5 rounded-md p-5 group"
+              >
+                <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
+                  {item.question}
+                  <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />
+                </summary>
+                <p className="mt-3 text-xs text-text-muted font-sans leading-relaxed">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

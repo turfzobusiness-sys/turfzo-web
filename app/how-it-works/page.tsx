@@ -15,10 +15,30 @@ import {
   ArrowRight,
   Play,
   CheckCircle2,
-  Lock
+  Lock,
+  ChevronDown
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { HowToSchema, FAQPageSchema } from "@/lib/schema";
+
+const howToSteps = [
+  { name: "Search & Discover", text: "Find verified premium pitches near you that support your sport, formatting, and timing. Filter by floodlights, parking, and amenities." },
+  { name: "Select Date & Time Slot", text: "Choose your preferred date and available time slot from real-time availability. No phone calls needed." },
+  { name: "Split & Pay Online", text: "Reserve the slot instantly. Add your teammates' contacts at checkout to split the bill, allowing everyone to pay their share directly via UPI or card." },
+  { name: "Show Up & Play", text: "Access the pitch by scanning your receipt QR code at the entrance gates. Floodlights activate automatically according to your booking slot." },
+];
+
+const faqItems = [
+  { question: "How do I book a turf on Turfzo?", answer: "Visit turfzo.com/explore, select your city, browse available turfs, choose your date and time slot, and complete payment online. Your booking is confirmed instantly with a QR code ticket." },
+  { question: "How much does turf booking cost?", answer: "Turf booking prices in India range from ₹500 to ₹2000 per hour depending on the city, sport, and facilities. Football turfs typically cost ₹800-1500/hour in metro cities." },
+  { question: "Can I cancel my booking?", answer: "Yes, you can cancel your booking up to 6 hours before the scheduled time for a full refund. Cancellations within 6 hours receive a 50% refund." },
+  { question: "How does bill splitting work?", answer: "When you book a turf on Turfzo, you can add your teammates' phone numbers at checkout. Each teammate receives a payment request for their share. Everyone pays their portion online." },
+  { question: "What sports can I book on Turfzo?", answer: "Turfzo supports football, cricket, badminton, tennis, and multipurpose sports venues. We have 50+ turfs across 8 major Indian cities." },
+  { question: "Is online payment safe on Turfzo?", answer: "Yes, Turfzo uses Razorpay for payment processing, which is PCI DSS compliant. We support UPI, credit cards, debit cards, and net banking." },
+  { question: "Do I need to download an app to book?", answer: "No, you can book directly on turfzo.com from any browser. We also have a mobile app for Android and iOS if you prefer." },
+  { question: "What happens if it rains on my booking day?", answer: "If the turf is outdoor and weather conditions prevent play, you can reschedule or get a full refund. Indoor turfs are not affected by weather." },
+];
 
 export default function HowItWorksPage() {
   const [activeTab, setActiveTab] = useState<"player" | "owner">("player");
@@ -143,6 +163,21 @@ export default function HowItWorksPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+      <head>
+        <title>How It Works | Book a Turf in 2 Minutes | Turfzo</title>
+        <meta name="description" content="Learn how to book a football turf, cricket ground, or sports venue on Turfzo. Search, select your slot, pay online, and show up to play. It takes 2 minutes." />
+        <link rel="canonical" href="https://turfzo.com/how-it-works" />
+        <meta property="og:title" content="How It Works | Turfzo" />
+        <meta property="og:description" content="Book a turf in 2 minutes. Search, pick a slot, pay online, and show up to play." />
+        <meta property="og:url" content="https://turfzo.com/how-it-works" />
+      </head>
+      <HowToSchema
+        name="How to Book a Turf on Turfzo"
+        description="Book a football turf, cricket ground, or sports venue in 2 minutes on Turfzo. Search, select your slot, pay online, and show up to play."
+        totalTime="PT2M"
+        steps={howToSteps}
+      />
+      <FAQPageSchema items={faqItems} />
       <Navbar />
 
       <main className="flex-grow pt-24 pb-16">
@@ -157,7 +192,7 @@ export default function HowItWorksPage() {
               Discover How <span className="text-brand-lime">Turfzo Works</span>
             </h1>
             <p className="mt-4 text-text-muted text-sm sm:text-base font-sans max-w-xl mx-auto leading-relaxed">
-              Step onto the court with zero friction. We connect passionate players with luxury venues through automated, high-end booking workflows.
+              Book a turf in 2 minutes. Search for available venues near you, select your time slot, pay online, and show up to play. No phone calls, no hassle.
             </p>
 
             {/* Toggle Tab Buttons */}
@@ -275,6 +310,29 @@ export default function HowItWorksPage() {
 
           </div>
 
+        </div>
+
+        {/* FAQ Section */}
+        <div className="max-w-3xl mx-auto px-6 md:px-8 mt-16">
+          <h2 className="font-poppins font-bold text-2xl text-text-main mb-8 text-center">
+            Frequently Asked Questions
+          </h2>
+          <div className="flex flex-col gap-4">
+            {faqItems.map((item, idx) => (
+              <details
+                key={idx}
+                className="bg-surface-dark border border-white/5 rounded-md p-5 group"
+              >
+                <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
+                  {item.question}
+                  <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />
+                </summary>
+                <p className="mt-3 text-xs text-text-muted font-sans leading-relaxed">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
+          </div>
         </div>
       </main>
 

@@ -23,7 +23,7 @@ export default function Hero() {
       opacity: 1,
       transition: {
         duration: 0.8,
-        ease: [0.16, 1, 0.3, 1], // Apple-level smoothness cubic-bezier
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     },
   };
@@ -142,7 +142,7 @@ export default function Hero() {
           <motion.div
             initial={{ scale: 0.9, opacity: 0, rotateY: 15, rotateX: 5 }}
             animate={{ scale: 1, opacity: 1, rotateY: 0, rotateX: 0 }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] as const, delay: 0.3 }}
             className="relative transform hover:scale-102 hover:-rotate-1 hover:translate-y-[-5px] transition-all duration-500 ease-out"
           >
             {/* Dynamic visual spotlight under the phone */}

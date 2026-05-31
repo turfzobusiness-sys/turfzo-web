@@ -12,10 +12,20 @@ import {
   Check, 
   Loader2, 
   Compass,
-  MessageSquare
+  MessageSquare,
+  ChevronDown
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { FAQPageSchema } from "@/lib/schema";
+
+const contactFaqItems = [
+  { question: "How do I contact Turfzo support?", answer: "You can reach us via email at support@turfzo.com, call us at +91 (80) 4567-8900, or use the contact form on this page. We respond within 24 hours." },
+  { question: "How do I cancel a booking?", answer: "You can cancel a booking from your booking history in the app or website. Cancellations up to 6 hours before the slot get a full refund." },
+  { question: "I have a partnership inquiry. Who do I contact?", answer: "For turf owner partnerships, venue listings, or business inquiries, email us at partnerships@turfzo.com or use the contact form with subject 'Partnership Inquiry'." },
+  { question: "How do I list my turf on Turfzo?", answer: "Turf owners can list their venue by contacting us at owners@turfzo.com. We'll guide you through the onboarding process which takes about 24 hours." },
+  { question: "What cities does Turfzo operate in?", answer: "Turfzo currently operates in Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, and Ahmedabad. We're expanding to more cities soon." },
+];
 
 export default function ContactPage() {
   // Form State: 'form' | 'submitting' | 'submitted'
@@ -47,6 +57,15 @@ export default function ContactPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+      <head>
+        <title>Contact Us | Get in Touch with Turfzo</title>
+        <meta name="description" content="Have questions about turf booking? Contact Turfzo support via email, phone, or our contact form. We're here to help with bookings, cancellations, and partnerships." />
+        <link rel="canonical" href="https://turfzo.com/contact" />
+        <meta property="og:title" content="Contact Us | Turfzo" />
+        <meta property="og:description" content="Get in touch with Turfzo for booking support, partnerships, and general inquiries." />
+        <meta property="og:url" content="https://turfzo.com/contact" />
+      </head>
+      <FAQPageSchema items={contactFaqItems} />
       <Navbar />
 
       <main className="flex-grow pt-24 pb-16">
@@ -296,6 +315,29 @@ export default function ContactPage() {
 
         </div>
       </main>
+
+      {/* FAQ Section */}
+      <div className="max-w-3xl mx-auto px-6 md:px-8 pb-16">
+        <h2 className="font-poppins font-bold text-2xl text-text-main mb-8 text-center">
+          Frequently Asked Questions
+        </h2>
+        <div className="flex flex-col gap-4">
+          {contactFaqItems.map((item, idx) => (
+            <details
+              key={idx}
+              className="bg-surface-dark border border-white/5 rounded-md p-5 group"
+            >
+              <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
+                {item.question}
+                <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />
+              </summary>
+              <p className="mt-3 text-xs text-text-muted font-sans leading-relaxed">
+                {item.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+      </div>
 
       <Footer />
     </div>
