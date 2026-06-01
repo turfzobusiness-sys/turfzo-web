@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Trophy, Users, Shield, Calendar } from "lucide-react";
+import { ArrowRight, Trophy, Users, Calendar } from "lucide-react";
 import PhoneMockup from "./PhoneMockup";
 
 export default function Hero() {

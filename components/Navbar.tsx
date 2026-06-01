@@ -11,37 +11,28 @@ import { useAuth } from "@/lib/auth-context";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeLink, setActiveLink] = useState("Home");
   const pathname = usePathname();
   const { status, convexUser, signOut } = useAuth();
   const isAuthed = status === "authenticated";
 
+  const activeLink = (() => {
+    if (pathname === "/explore") return "Explore Turfs";
+    if (pathname === "/tournaments") return "Tournaments";
+    if (pathname === "/how-it-works") return "How It Works";
+    if (pathname === "/contact") return "Contact Us";
+    if (pathname?.startsWith("/profile")) return "Profile";
+    if (pathname?.startsWith("/bookings")) return "Bookings";
+    return "Home";
+  })();
+
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Update active navigation item based on current route
-  useEffect(() => {
-    if (pathname === "/explore") {
-      setActiveLink("Explore Turfs");
-    } else if (pathname === "/tournaments") {
-      setActiveLink("Tournaments");
-    } else if (pathname === "/how-it-works") {
-      setActiveLink("How It Works");
-    } else if (pathname === "/contact") {
-      setActiveLink("Contact Us");
-    } else {
-      setActiveLink("Home");
-    }
-  }, [pathname]);
 
   const navLinks = [
     { name: "Home", href: "/" },

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
+import "@/lib/env-init";
 import { AuthProvider } from "@/lib/auth-context";
 import { OrganizationSchema, WebSiteSchema } from "@/lib/schema";
+import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800"],
@@ -116,7 +118,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-bg-dark text-text-main selection:bg-brand-lime selection:text-black">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <AnalyticsProvider>{children}</AnalyticsProvider>
+        </AuthProvider>
       </body>
     </html>
   );

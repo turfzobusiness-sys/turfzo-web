@@ -183,7 +183,7 @@ export default function HowToBookTurfOnline() {
           <div className="bg-surface-dark border border-brand-lime/10 rounded-md p-6 mb-12">
             <h2 className="font-poppins font-bold text-base text-brand-lime mb-2">Quick Answer</h2>
             <p className="text-sm text-text-main font-sans leading-relaxed">
-              To book a turf on Turfzo: (1) Visit turfzo.com/explore and select your city, (2) Browse available turfs and click "View Slots", (3) Pick your date and time slot, (4) Pay online via UPI or card, (5) Receive your QR code ticket. The entire process takes about 2 minutes.
+              To book a turf on Turfzo: (1) Visit turfzo.com/explore and select your city, (2) Browse available turfs and click &ldquo;View Slots&rdquo;, (3) Pick your date and time slot, (4) Pay online via UPI or card, (5) Receive your QR code ticket. The entire process takes about 2 minutes.
             </p>
           </div>
 
