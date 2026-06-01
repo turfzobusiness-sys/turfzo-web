@@ -1,23 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Clock, 
-  Send, 
-  Check, 
-  Loader2, 
-  Compass,
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
+  Send,
+  Check,
+  Loader2,
   MessageSquare,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FAQPageSchema } from "@/lib/schema";
+import { convexClient } from "@/lib/convex";
+import { useAuth } from "@/lib/auth-context";
 
 const contactFaqItems = [
   { question: "How do I contact Turfzo support?", answer: "You can reach us via email at support@turfzo.com, call us at +91 (80) 4567-8900, or use the contact form on this page. We respond within 24 hours." },
@@ -28,23 +28,30 @@ const contactFaqItems = [
 ];
 
 export default function ContactPage() {
-  // Form State: 'form' | 'submitting' | 'submitted'
-  const [formStep, setFormStep] = useState<'form' | 'submitting' | 'submitted'>('form');
+  const { firebaseUser } = useAuth();
+  const [formStep, setFormStep] = useState<'form' | 'submitting' | 'submitted' | 'error'>('form');
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("General Inquiry");
   const [message, setMessage] = useState("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
-
     setFormStep('submitting');
-
-    // Simulate submission request
-    setTimeout(() => {
+    setErrorMsg(null);
+    try {
+      await convexClient.mutation(
+        "contact:submitContact",
+        { name, email, subject, message },
+        firebaseUser ? await firebaseUser.getIdToken() : undefined
+      );
       setFormStep('submitted');
-    }, 2000);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to send message");
+      setFormStep('error');
+    }
   };
 
   const handleReset = () => {
@@ -266,18 +273,28 @@ export default function ContactPage() {
                   </motion.form>
                 )}
 
-                {/* Submitting Loading screen */}
-                {formStep === 'submitting' && (
-                  <motion.div 
-                    key="contact-submitting"
+                {/* Error state */}
+                {formStep === 'error' && (
+                  <motion.div
+                    key="contact-error"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="py-20 flex flex-col items-center justify-center gap-3 text-center"
+                    className="py-16 flex flex-col items-center justify-center gap-4 text-center"
                   >
-                    <Loader2 className="w-10 h-10 text-brand-lime animate-spin stroke-[2.5]" />
-                    <h3 className="font-poppins font-bold text-lg text-text-main mt-2">Sending Message</h3>
-                    <p className="text-xs text-text-muted max-w-xs font-sans">Uploading inquiry data to secure support channel...</p>
+                    <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center border-2 border-red-500/30">
+                      <span className="text-red-400 text-2xl">!</span>
+                    </div>
+                    <h3 className="font-poppins font-bold text-lg text-text-main">Could not send</h3>
+                    <p className="text-xs text-text-muted max-w-xs font-sans leading-relaxed">
+                      {errorMsg ?? "Something went wrong. Please try again or email us directly at support@turfzo.com."}
+                    </p>
+                    <button
+                      onClick={() => setFormStep('form')}
+                      className="bg-surface-dark border border-white/10 hover:border-brand-lime/30 text-text-main font-semibold text-xs px-6 py-2.5 rounded-pill transition-all"
+                    >
+                      Try again
+                    </button>
                   </motion.div>
                 )}
 
