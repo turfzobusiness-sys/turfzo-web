@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Auto-generated Convex stubs (overwritten by `npx convex dev`).
+    "convex/_generated/**",
   ]),
 ]);
 
