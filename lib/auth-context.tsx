@@ -42,6 +42,7 @@ interface AuthContextValue extends AuthState {
     password: string;
     role?: string;
     displayName?: string;
+    turnstileToken?: string;
   }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -106,6 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string;
     role?: string;
     displayName?: string;
+    turnstileToken?: string;
   }) => {
     setState((prev) => ({ ...prev, status: "loading", error: null }));
     try {
@@ -120,6 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         {
           role: opts.role ?? "player",
           displayName: opts.displayName,
+          turnstileToken: opts.turnstileToken,
         },
         token
       );

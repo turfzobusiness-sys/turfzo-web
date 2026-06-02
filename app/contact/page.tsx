@@ -18,6 +18,7 @@ import Footer from "@/components/Footer";
 import { FAQPageSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 
 const contactFaqItems = [
   { question: "How do I contact Turfzo support?", answer: "You can reach us via email at support@turfzo.com, call us at +91 (80) 4567-8900, or use the contact form on this page. We respond within 24 hours." },
@@ -35,16 +36,21 @@ export default function ContactPage() {
   const [subject, setSubject] = useState("General Inquiry");
   const [message, setMessage] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
+    if (!turnstileToken) {
+      setErrorMsg("Please complete the bot check before submitting.");
+      return;
+    }
     setFormStep('submitting');
     setErrorMsg(null);
     try {
       await convexClient.mutation(
         "contact:submitContact",
-        { name, email, subject, message },
+        { name, email, subject, message, turnstileToken },
         firebaseUser ? await firebaseUser.getIdToken() : undefined
       );
       setFormStep('submitted');
@@ -59,6 +65,7 @@ export default function ContactPage() {
     setEmail("");
     setSubject("General Inquiry");
     setMessage("");
+    setTurnstileToken(null);
     setFormStep('form');
   };
 
@@ -251,20 +258,29 @@ export default function ContactPage() {
                     {/* Message comments */}
                     <div className="flex flex-col gap-1.5">
                       <label className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Message Details</label>
-                      <textarea 
-                        required
-                        rows={5}
-                        placeholder="Write your details here..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        className="bg-elevated-dark border border-white/5 rounded px-4 py-3 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30 resize-none leading-relaxed"
-                      />
-                    </div>
+                    <textarea
+                      required
+                      rows={5}
+                      placeholder="Write your details here..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="bg-elevated-dark border border-white/5 rounded px-4 py-3 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30 resize-none leading-relaxed"
+                    />
+                  </div>
 
-                    {/* Submit Button */}
+                  {/* Bot protection */}
+                  <div className="flex justify-center">
+                    <TurnstileWidget
+                      onVerify={setTurnstileToken}
+                      onExpire={() => setTurnstileToken(null)}
+                    />
+                  </div>
+
+                  {/* Submit Button */}
                     <button
                       type="submit"
-                      className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold text-sm py-3.5 rounded-md transition-all duration-300 hover:scale-102 flex items-center justify-center gap-1.5"
+                      disabled={!turnstileToken}
+                      className="bg-brand-lime hover:bg-brand-lime-hover disabled:bg-brand-lime/30 disabled:cursor-not-allowed text-black font-poppins font-bold text-sm py-3.5 rounded-md transition-all duration-300 hover:scale-102 flex items-center justify-center gap-1.5"
                     >
                       Send Message
                       <Send className="w-4 h-4" />
