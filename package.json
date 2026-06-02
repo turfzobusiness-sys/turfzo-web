@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "convex:dev": "convex dev",
     "convex:deploy": "convex deploy",
-    "seed": "convex run seed:seedAll"
+    "seed": "convex run seed:seedAll",
+    "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "@types/qrcode": "^1.5.6",
