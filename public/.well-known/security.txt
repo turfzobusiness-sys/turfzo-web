@@ -1,0 +1,22 @@
+Contact: mailto:security@turfzo.com
+Expires: 2027-12-31T23:59:59z
+Preferred-Languages: en
+Canonical: https://turfzo.com/.well-known/security.txt
+
+# Responsible Disclosure Policy
+
+We take security seriously. If you discover a vulnerability, please report
+it to security@turfzo.com with the subject "Security Disclosure".
+
+We will:
+- Acknowledge your report within 48 hours
+- Provide a triage assessment within 5 business days
+- Keep you informed of remediation progress
+
+We request that you:
+- Do not exploit the vulnerability beyond demonstrating it
+- Do not access or modify user data without permission
+- Do not disclose the issue publicly until we have remediated it
+
+We commit to not pursuing legal action against security researchers who
+follow this policy in good faith.
