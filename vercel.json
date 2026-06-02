@@ -5,7 +5,7 @@
   "devCommand": "npm run dev",
   "installCommand": "npm ci",
   "outputDirectory": ".next",
-  "regions": ["bom1", "sin1"],
+  "regions": ["bom1"],
   "github": {
     "silent": false,
     "autoAlias": true
