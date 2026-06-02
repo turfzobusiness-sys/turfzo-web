@@ -58,6 +58,7 @@ Add each one. Choose the right **Environment** scope for each:
 | `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | All | Public |
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | All | Public |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | All | Public |
+| `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID` | All | Public |
 | `NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL` | All | Public (your prod deployment URL) |
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | All | Public key (live, not test!) |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | All | Public |
@@ -72,6 +73,31 @@ Add each one. Choose the right **Environment** scope for each:
 **Pro tip:** Use different values for Preview vs Production. Vercel will deploy every PR to a unique preview URL — use your **test** Razorpay keys there.
 
 **To make a value Preview-only or Production-only**, uncheck the other scopes.
+
+### 2.2.1 Three ways to manage env vars (pick one)
+
+**Option A — Manual in Vercel dashboard** (safest, recommended for first deploy)
+- Go to Vercel → Project → Settings → Environment Variables
+- Add each key from `.env.example` one at a time
+- Toggle "Sensitive" on for any secret
+
+**Option B — Bulk sync from `.env.local` with the script** (fast, re-runnable)
+```bash
+vercel login
+vercel link
+npm run env:sync
+```
+- Reads `.env.local` and adds missing keys to Vercel
+- Skips keys that already exist (won't overwrite)
+- Public keys go to all 3 envs, secrets go to Production only
+- After running, manually edit secrets in the dashboard to use LIVE values for Production
+
+**Option C — Vercel CLI per-key** (mid-effort)
+```bash
+vercel env add RAZORPAY_KEY_SECRET production
+# paste value when prompted
+```
+
 
 ### 2.3 Connect Domain
 
