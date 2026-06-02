@@ -36,6 +36,20 @@ function generateSlots(openHour: string, closeHour: string): string[] {
   return slots;
 }
 
+// Mirror of idempotency key generation in app/explore/page.tsx + app/tournaments/page.tsx
+function generateClientRequestId(prefix: string, uid: string): string {
+  return `${prefix}_${uid}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// Mirror of input validation in convex/contact.ts:submitContact
+function validateContactInput(name: string, email: string, message: string, subject?: string): string | null {
+  if (name.length < 2 || name.length > 100) return "Name must be 2-100 characters";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email address";
+  if (message.length < 10 || message.length > 5000) return "Message must be 10-5000 characters";
+  if (subject && subject.length > 200) return "Subject must be under 200 characters";
+  return null;
+}
+
 describe("calculateRefundStatus", () => {
   const now = new Date("2026-06-01T12:00:00Z").getTime();
 
@@ -111,5 +125,66 @@ describe("generateSlots", () => {
   it("returns empty array when close is at or before open", () => {
     expect(generateSlots("10:00", "10:00")).toEqual([]);
     expect(generateSlots("12:00", "10:00")).toEqual([]);
+  });
+});
+
+describe("generateClientRequestId (idempotency key)", () => {
+  it("returns a string with the expected prefix and parts", () => {
+    const id = generateClientRequestId("turf", "user_abc123");
+    expect(id).toMatch(/^turf_user_abc123_\d+_[a-z0-9]{6}$/);
+  });
+
+  it("produces different IDs on consecutive calls", () => {
+    const a = generateClientRequestId("tour", "user_abc");
+    const b = generateClientRequestId("tour", "user_abc");
+    expect(a).not.toBe(b);
+  });
+
+  it("uses the right prefix for turf vs tournament", () => {
+    const turf = generateClientRequestId("turf", "u1");
+    const tour = generateClientRequestId("tour", "u1");
+    expect(turf.startsWith("turf_")).toBe(true);
+    expect(tour.startsWith("tour_")).toBe(true);
+  });
+});
+
+describe("validateContactInput", () => {
+  it("accepts a valid contact submission", () => {
+    const err = validateContactInput(
+      "Akram",
+      "akram@example.com",
+      "I would like to know more about your tournament offerings."
+    );
+    expect(err).toBeNull();
+  });
+
+  it("rejects names shorter than 2 chars", () => {
+    expect(validateContactInput("A", "a@b.co", "1234567890")).toBe("Name must be 2-100 characters");
+  });
+
+  it("rejects names longer than 100 chars", () => {
+    expect(validateContactInput("A".repeat(101), "a@b.co", "1234567890")).toBe("Name must be 2-100 characters");
+  });
+
+  it("rejects invalid email addresses", () => {
+    expect(validateContactInput("Akram", "not-an-email", "1234567890")).toBe("Invalid email address");
+    expect(validateContactInput("Akram", "a@b", "1234567890")).toBe("Invalid email address");
+  });
+
+  it("rejects messages shorter than 10 chars", () => {
+    expect(validateContactInput("Akram", "a@b.co", "short")).toBe("Message must be 10-5000 characters");
+  });
+
+  it("rejects messages longer than 5000 chars", () => {
+    expect(validateContactInput("Akram", "a@b.co", "A".repeat(5001))).toBe("Message must be 10-5000 characters");
+  });
+
+  it("rejects subjects over 200 chars", () => {
+    const long = "A".repeat(201);
+    expect(validateContactInput("Akram", "a@b.co", "1234567890", long)).toBe("Subject must be under 200 characters");
+  });
+
+  it("accepts submissions without a subject", () => {
+    expect(validateContactInput("Akram", "a@b.co", "1234567890")).toBeNull();
   });
 });
