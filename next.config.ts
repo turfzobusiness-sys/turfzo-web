@@ -23,9 +23,9 @@ const securityHeaders = [
 
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://*.razorpay.com https://*.convex.cloud",
-  "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://*.razorpay.com",
-  "connect-src 'self' https://*.convex.cloud https://*.convex.site https://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.razorpay.com https://*.razorpay.com https://us.i.posthog.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://*.razorpay.com https://*.convex.cloud https://challenges.cloudflare.com",
+  "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://*.razorpay.com https://challenges.cloudflare.com",
+  "connect-src 'self' https://*.convex.cloud https://*.convex.site https://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.razorpay.com https://*.razorpay.com https://us.i.posthog.com https://challenges.cloudflare.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
