@@ -13,7 +13,10 @@
     "convex:dev": "convex dev",
     "convex:deploy": "convex deploy",
     "seed": "convex run seed:seedAll",
-    "preflight": "node scripts/preflight.mjs"
+    "preflight": "node scripts/preflight.mjs",
+    "env:diff": "node scripts/env-diff.mjs",
+    "env:diff:strict": "node scripts/env-diff.mjs --strict",
+    "env:sync": "node scripts/vercel-env-sync.mjs"
   },
   "dependencies": {
     "@types/qrcode": "^1.5.6",
