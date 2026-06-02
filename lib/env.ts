@@ -11,11 +11,15 @@ type EnvKey =
   | "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
   | "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"
   | "NEXT_PUBLIC_FIREBASE_APP_ID"
+  | "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID"
   | "NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL"
+  | "CONVEX_DEPLOY_KEY"
   | "NEXT_PUBLIC_RAZORPAY_KEY_ID"
   | "RAZORPAY_KEY_ID"
   | "RAZORPAY_KEY_SECRET"
   | "RAZORPAY_WEBHOOK_SECRET"
+  | "NEXT_PUBLIC_TURNSTILE_SITE_KEY"
+  | "TURNSTILE_SECRET_KEY"
   | "NEXT_PUBLIC_SENTRY_DSN"
   | "SENTRY_AUTH_TOKEN"
   | "NEXT_PUBLIC_POSTHOG_KEY"
@@ -38,15 +42,23 @@ const PROD_REQUIRED: EnvKey[] = [
 
 const OPTIONAL_BUT_RECOMMENDED: EnvKey[] = [
   "RAZORPAY_WEBHOOK_SECRET",
+  "TURNSTILE_SECRET_KEY",
   "NEXT_PUBLIC_SENTRY_DSN",
   "NEXT_PUBLIC_POSTHOG_KEY",
   "EMAIL_PROVIDER_API_KEY",
 ];
 
+const SECRET_PREFIXES = ["rzp_live_", "rzp_test_", "0x4AAAAAAA"];
+
 function readEnv(key: EnvKey): string | undefined {
   const v = process.env[key];
   if (v && v.trim().length > 0) return v.trim();
   return undefined;
+}
+
+function maskSecret(value: string): string {
+  if (value.length <= 8) return "***";
+  return `${value.slice(0, 4)}...${value.slice(-4)}`;
 }
 
 let warnedOnce = false;
@@ -109,3 +121,80 @@ export function getRazorpayCredentials(): { keyId: string; keySecret: string } {
 export function isRazorpayConfigured(): boolean {
   return Boolean(readEnv("RAZORPAY_KEY_ID") && readEnv("RAZORPAY_KEY_SECRET"));
 }
+
+export function isRazorpayLiveMode(): boolean {
+  const keyId = readEnv("RAZORPAY_KEY_ID") || readEnv("NEXT_PUBLIC_RAZORPAY_KEY_ID");
+  return Boolean(keyId?.startsWith("rzp_live_"));
+}
+
+export function isTurnstileConfigured(): boolean {
+  return Boolean(readEnv("TURNSTILE_SECRET_KEY"));
+}
+
+export function getConvexEnvironment(): "dev" | "prod" | "unknown" {
+  const url = readEnv("NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL");
+  if (!url) return "unknown";
+  if (url.includes(".convex.cloud")) return "prod";
+  if (url.includes(".convex.site")) return "dev";
+  return "unknown";
+}
+
+export type EnvironmentInfo = {
+  nodeEnv: string;
+  isProduction: boolean;
+  isVercel: boolean;
+  vercelEnv: string | null;
+  vercelRegion: string | null;
+  convexEnvironment: "dev" | "prod" | "unknown";
+  razorpayConfigured: boolean;
+  razorpayMode: "live" | "test" | "none";
+  turnstileConfigured: boolean;
+  sentryConfigured: boolean;
+  posthogConfigured: boolean;
+};
+
+export function getEnvironmentInfo(): EnvironmentInfo {
+  const razorpayKeyId = readEnv("RAZORPAY_KEY_ID") || readEnv("NEXT_PUBLIC_RAZORPAY_KEY_ID");
+  return {
+    nodeEnv: process.env.NODE_ENV || "development",
+    isProduction: process.env.NODE_ENV === "production",
+    isVercel: Boolean(process.env.VERCEL),
+    vercelEnv: process.env.VERCEL_ENV || null,
+    vercelRegion: process.env.VERCEL_REGION || null,
+    convexEnvironment: getConvexEnvironment(),
+    razorpayConfigured: isRazorpayConfigured(),
+    razorpayMode: razorpayKeyId?.startsWith("rzp_live_")
+      ? "live"
+      : razorpayKeyId?.startsWith("rzp_test_")
+        ? "test"
+        : "none",
+    turnstileConfigured: isTurnstileConfigured(),
+    sentryConfigured: Boolean(readEnv("NEXT_PUBLIC_SENTRY_DSN")),
+    posthogConfigured: Boolean(readEnv("NEXT_PUBLIC_POSTHOG_KEY")),
+  };
+}
+
+export function logEnvironmentInfo(): void {
+  const info = getEnvironmentInfo();
+  const lines = [
+    `\n[env] Environment summary:`,
+    `  Node:           ${info.nodeEnv}${info.isVercel ? ` (Vercel: ${info.vercelEnv}, region: ${info.vercelRegion})` : ""}`,
+    `  Convex:         ${info.convexEnvironment}`,
+    `  Razorpay:       ${info.razorpayConfigured ? info.razorpayMode : "not configured"}`,
+    `  Turnstile:      ${info.turnstileConfigured ? "configured" : "not configured (bot protection disabled)"}`,
+    `  Sentry:         ${info.sentryConfigured ? "configured" : "not configured"}`,
+    `  PostHog:        ${info.posthogConfigured ? "configured" : "not configured"}`,
+  ];
+  console.log(lines.join("\n"));
+}
+
+export function assertNoSecretInPublicKey(key: EnvKey): void {
+  if (!key.startsWith("NEXT_PUBLIC_")) return;
+  const value = readEnv(key);
+  if (!value) return;
+  for (const prefix of SECRET_PREFIXES) {
+    if (value.startsWith(prefix) && key === "NEXT_PUBLIC_RAZORPAY_KEY_ID") continue;
+  }
+}
+
+export { maskSecret };
