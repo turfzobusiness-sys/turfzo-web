@@ -1,6 +1,7 @@
 import { mutation, query, MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { requireRole } from "./_helpers";
+import { verifyTurnstileToken } from "../lib/turnstile";
 
 // In-memory rate limit using a `rate_limits` table. This is per-deployment
 // (good enough for MVP). For production scale, use a dedicated edge service.
@@ -47,8 +48,19 @@ export const submitContact = mutation({
     email: v.string(),
     subject: v.optional(v.string()),
     message: v.string(),
+    turnstileToken: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Verify Turnstile bot-protection token first.
+    if (args.turnstileToken) {
+      const result = await verifyTurnstileToken(args.turnstileToken);
+      if (!result.ok) {
+        throw new Error(
+          `Bot verification failed (${result.errorCodes.join(", ")}). Please try again.`
+        );
+      }
+    }
+
     // Validate inputs
     const name = args.name.trim();
     const email = args.email.trim().toLowerCase();

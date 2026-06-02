@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { requireUser, getCurrentUserId } from "./_helpers";
+import { verifyTurnstileToken } from "../lib/turnstile";
 
 export const getCurrentUser = query({
   args: {},
@@ -15,11 +16,21 @@ export const syncFirebaseUser = mutation({
   args: {
     role: v.optional(v.union(v.literal("player"), v.literal("owner"))),
     displayName: v.optional(v.string()),
+    turnstileToken: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
+    }
+    // Verify Turnstile (only for new signups, not for existing-user sync)
+    if (args.turnstileToken) {
+      const result = await verifyTurnstileToken(args.turnstileToken);
+      if (!result.ok) {
+        throw new Error(
+          `Bot verification failed (${result.errorCodes.join(", ")}). Please try again.`
+        );
+      }
     }
     const now = new Date().toISOString();
     const existing = await ctx.db
