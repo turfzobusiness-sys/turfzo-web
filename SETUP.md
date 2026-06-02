@@ -20,6 +20,7 @@ Everything you can do with just code is done. Below is what **you** must do exte
 ✅ GitHub Actions CI (lint + typecheck + test + build)
 ✅ Admin dashboard (`/admin` for `role === "admin"`)
 ✅ Optional Sentry + PostHog skeletons (lazy-load if env vars set)
+✅ Cloudflare Turnstile bot protection on contact, signup, and forgot-password
 ✅ Env validation that throws in production, warns in dev
 
 ---
