@@ -102,9 +102,9 @@ for (const [key, value] of local) {
 
   const envs = isSecret ? "production" : "production preview development";
   const cmd = `vercel env add ${key} ${envs} <<< "${value.replace(/"/g, '\\"')}"`;
-  const result = shell(cmd);
+  const ok = shell(cmd);
 
-  if (result !== null) {
+  if (ok !== null) {
     const masked = value.length > 8 ? `${value.slice(0, 4)}...${value.slice(-4)}` : "***";
     console.log(`  ✅ ${key}  = ${masked}  (added to ${envs})`);
     added++;

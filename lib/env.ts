@@ -48,17 +48,10 @@ const OPTIONAL_BUT_RECOMMENDED: EnvKey[] = [
   "EMAIL_PROVIDER_API_KEY",
 ];
 
-const SECRET_PREFIXES = ["rzp_live_", "rzp_test_", "0x4AAAAAAA"];
-
 function readEnv(key: EnvKey): string | undefined {
   const v = process.env[key];
   if (v && v.trim().length > 0) return v.trim();
   return undefined;
-}
-
-function maskSecret(value: string): string {
-  if (value.length <= 8) return "***";
-  return `${value.slice(0, 4)}...${value.slice(-4)}`;
 }
 
 let warnedOnce = false;
@@ -187,14 +180,3 @@ export function logEnvironmentInfo(): void {
   ];
   console.log(lines.join("\n"));
 }
-
-export function assertNoSecretInPublicKey(key: EnvKey): void {
-  if (!key.startsWith("NEXT_PUBLIC_")) return;
-  const value = readEnv(key);
-  if (!value) return;
-  for (const prefix of SECRET_PREFIXES) {
-    if (value.startsWith(prefix) && key === "NEXT_PUBLIC_RAZORPAY_KEY_ID") continue;
-  }
-}
-
-export { maskSecret };

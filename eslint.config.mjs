@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Auto-generated Convex stubs (overwritten by `npx convex dev`).
     "convex/_generated/**",
+    // Tooling scripts (preflight, env-diff, vercel sync) — run with node, not the app.
+    "scripts/**",
   ]),
 ]);
 
