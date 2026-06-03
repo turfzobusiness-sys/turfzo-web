@@ -43,8 +43,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-bg-dark flex items-center justify-center p-4">
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-brand-lime/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-brand-lime/10 rounded-full blur-[130px] pointer-events-none" />
+
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -57,8 +56,8 @@ export default function LoginPage() {
               <Image
                 src="/turfzo_mascot.svg"
                 alt="Turfzo"
-                width={32}
-                height={32}
+                width={40}
+                height={40}
               />
               <span className="font-poppins font-bold text-xl text-text-main">
                 turf<span className="text-brand-lime">zo</span>
