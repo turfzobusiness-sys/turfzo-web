@@ -124,7 +124,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-bg text-text-main selection:bg-brand-lime selection:text-black">
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-bg text-text-main selection:bg-brand-lime selection:text-black">
         <ThemeProvider>
           <AuthProvider>
             <AnalyticsProvider>{children}</AnalyticsProvider>

@@ -7,7 +7,6 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { TurnstileWidget } from "@/components/TurnstileWidget";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -17,11 +16,9 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!turnstileToken) return;
     setLoading(true);
     try {
       await signUp({
@@ -29,7 +26,6 @@ export default function SignUpPage() {
         password,
         role: "player",
         displayName: name,
-        turnstileToken,
       });
       router.push("/");
     } catch {
@@ -150,16 +146,9 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            <div className="flex justify-center">
-              <TurnstileWidget
-                onVerify={setTurnstileToken}
-                onExpire={() => setTurnstileToken(null)}
-              />
-            </div>
-
             <button
               type="submit"
-              disabled={loading || !turnstileToken}
+              disabled={loading}
               className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated disabled:text-text-muted/40 text-black font-poppins font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
             >
               {loading ? (
