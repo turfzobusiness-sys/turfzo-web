@@ -14,10 +14,9 @@ type EnvKey =
   | "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID"
   | "NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL"
   | "CONVEX_DEPLOY_KEY"
-  | "NEXT_PUBLIC_RAZORPAY_KEY_ID"
-  | "RAZORPAY_KEY_ID"
-  | "RAZORPAY_KEY_SECRET"
-  | "RAZORPAY_WEBHOOK_SECRET"
+  | "NEXT_PUBLIC_CASHFREE_APP_ID"
+  | "CASHFREE_SECRET_KEY"
+  | "CASHFREE_WEBHOOK_SECRET"
   | "NEXT_PUBLIC_TURNSTILE_SITE_KEY"
   | "TURNSTILE_SECRET_KEY"
   | "NEXT_PUBLIC_SENTRY_DSN"
@@ -35,13 +34,12 @@ const PROD_REQUIRED: EnvKey[] = [
   "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
   "NEXT_PUBLIC_FIREBASE_APP_ID",
   "NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL",
-  "NEXT_PUBLIC_RAZORPAY_KEY_ID",
-  "RAZORPAY_KEY_ID",
-  "RAZORPAY_KEY_SECRET",
+  "NEXT_PUBLIC_CASHFREE_APP_ID",
+  "CASHFREE_SECRET_KEY",
 ];
 
 const OPTIONAL_BUT_RECOMMENDED: EnvKey[] = [
-  "RAZORPAY_WEBHOOK_SECRET",
+  "CASHFREE_WEBHOOK_SECRET",
   "TURNSTILE_SECRET_KEY",
   "NEXT_PUBLIC_SENTRY_DSN",
   "NEXT_PUBLIC_POSTHOG_KEY",
@@ -104,20 +102,20 @@ export function getOptionalEnv(key: EnvKey): string | undefined {
   return readEnv(key);
 }
 
-export function getRazorpayCredentials(): { keyId: string; keySecret: string } {
+export function getCashfreeCredentials(): { appId: string; secretKey: string } {
   return {
-    keyId: getEnv("RAZORPAY_KEY_ID"),
-    keySecret: getEnv("RAZORPAY_KEY_SECRET"),
+    appId: getEnv("NEXT_PUBLIC_CASHFREE_APP_ID"),
+    secretKey: getEnv("CASHFREE_SECRET_KEY"),
   };
 }
 
-export function isRazorpayConfigured(): boolean {
-  return Boolean(readEnv("RAZORPAY_KEY_ID") && readEnv("RAZORPAY_KEY_SECRET"));
+export function isCashfreeConfigured(): boolean {
+  return Boolean(readEnv("NEXT_PUBLIC_CASHFREE_APP_ID") && readEnv("CASHFREE_SECRET_KEY"));
 }
 
-export function isRazorpayLiveMode(): boolean {
-  const keyId = readEnv("RAZORPAY_KEY_ID") || readEnv("NEXT_PUBLIC_RAZORPAY_KEY_ID");
-  return Boolean(keyId?.startsWith("rzp_live_"));
+export function isCashfreeProdMode(): boolean {
+  const appId = readEnv("NEXT_PUBLIC_CASHFREE_APP_ID");
+  return Boolean(appId && !appId.includes("test")); // Very basic check, you could configure NEXT_PUBLIC_CASHFREE_ENVIRONMENT
 }
 
 export function isTurnstileConfigured(): boolean {
@@ -139,15 +137,15 @@ export type EnvironmentInfo = {
   vercelEnv: string | null;
   vercelRegion: string | null;
   convexEnvironment: "dev" | "prod" | "unknown";
-  razorpayConfigured: boolean;
-  razorpayMode: "live" | "test" | "none";
+  cashfreeConfigured: boolean;
+  cashfreeMode: "prod" | "test" | "none";
   turnstileConfigured: boolean;
   sentryConfigured: boolean;
   posthogConfigured: boolean;
 };
 
 export function getEnvironmentInfo(): EnvironmentInfo {
-  const razorpayKeyId = readEnv("RAZORPAY_KEY_ID") || readEnv("NEXT_PUBLIC_RAZORPAY_KEY_ID");
+  const isProdMode = isCashfreeProdMode();
   return {
     nodeEnv: process.env.NODE_ENV || "development",
     isProduction: process.env.NODE_ENV === "production",
@@ -155,12 +153,8 @@ export function getEnvironmentInfo(): EnvironmentInfo {
     vercelEnv: process.env.VERCEL_ENV || null,
     vercelRegion: process.env.VERCEL_REGION || null,
     convexEnvironment: getConvexEnvironment(),
-    razorpayConfigured: isRazorpayConfigured(),
-    razorpayMode: razorpayKeyId?.startsWith("rzp_live_")
-      ? "live"
-      : razorpayKeyId?.startsWith("rzp_test_")
-        ? "test"
-        : "none",
+    cashfreeConfigured: isCashfreeConfigured(),
+    cashfreeMode: isCashfreeConfigured() ? (isProdMode ? "prod" : "test") : "none",
     turnstileConfigured: isTurnstileConfigured(),
     sentryConfigured: Boolean(readEnv("NEXT_PUBLIC_SENTRY_DSN")),
     posthogConfigured: Boolean(readEnv("NEXT_PUBLIC_POSTHOG_KEY")),
@@ -173,7 +167,7 @@ export function logEnvironmentInfo(): void {
     `\n[env] Environment summary:`,
     `  Node:           ${info.nodeEnv}${info.isVercel ? ` (Vercel: ${info.vercelEnv}, region: ${info.vercelRegion})` : ""}`,
     `  Convex:         ${info.convexEnvironment}`,
-    `  Razorpay:       ${info.razorpayConfigured ? info.razorpayMode : "not configured"}`,
+    `  Cashfree:       ${info.cashfreeConfigured ? info.cashfreeMode : "not configured"}`,
     `  Turnstile:      ${info.turnstileConfigured ? "configured" : "not configured (bot protection disabled)"}`,
     `  Sentry:         ${info.sentryConfigured ? "configured" : "not configured"}`,
     `  PostHog:        ${info.posthogConfigured ? "configured" : "not configured"}`,

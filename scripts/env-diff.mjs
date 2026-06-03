@@ -95,7 +95,7 @@ if (missingRequired > 0) {
   console.log("   Get values from:");
   console.log("   - Firebase Console  → https://console.firebase.google.com/");
   console.log("   - Convex Dashboard  → https://dashboard.convex.dev/");
-  console.log("   - Razorpay Dashboard → https://dashboard.razorpay.com/");
+  console.log("   - Cashfree Dashboard → https://merchant.cashfree.com/");
   console.log("   - Cloudflare        → https://dash.cloudflare.com/?to=/:account/turnstile");
   process.exit(1);
 }

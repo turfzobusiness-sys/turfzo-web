@@ -78,9 +78,9 @@ export interface Booking {
   attendees?: number;
   notes?: string;
   cancellation_reason?: string;
-  razorpay_order_id?: string;
-  razorpay_payment_id?: string;
-  razorpay_signature?: string;
+  pg_order_id?: string;
+  pg_payment_id?: string;
+  pg_signature?: string;
 }
 
 export interface Review {
