@@ -6,111 +6,91 @@ import {
   MapPin, 
   ChevronDown, 
   Star, 
-  Calendar, 
-  Percent, 
+  Clock, 
+  Tag,
   Award,
   Home, 
-  Compass, 
-  BookOpen, 
   User, 
   Bell,
-  Activity
+  ArrowRight,
+  CalendarDays
 } from "lucide-react";
 
 export default function PhoneMockup() {
-  // Sports category chips inside the app
-  const categories = ["Football", "Cricket", "Badminton", "Tennis"];
-
   return (
-    <div className="relative mx-auto w-[290px] sm:w-[310px] h-[610px] sm:h-[650px] bg-[#0c0c0e] rounded-[50px] p-[10px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] border-[4px] border-[#313639] flex flex-col justify-between overflow-hidden group select-none">
-      {/* Outer steel shine border */}
-      <div className="absolute inset-0 rounded-[46px] border border-white/5 pointer-events-none" />
+    <div className="relative mx-auto w-[300px] sm:w-[320px] h-[630px] sm:h-[670px] bg-[#0c0c0e] rounded-[50px] p-[10px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] border-[4px] border-[#2a2d30] flex flex-col justify-between overflow-hidden group select-none">
+      {/* Outer steel shine */}
+      <div className="absolute inset-0 rounded-[46px] border border-white/[0.04] pointer-events-none" />
 
-      {/* Screen container */}
-      <div className="relative flex flex-col w-full h-full bg-bg-dark rounded-[38px] overflow-hidden border border-white/10">
+      {/* Screen */}
+      <div className="relative flex flex-col w-full h-full bg-[#0a0a0a] rounded-[38px] overflow-hidden border border-white/[0.08]">
         
-        {/* Top Status Bar & Notch */}
-        <div className="absolute top-0 inset-x-0 h-10 bg-bg-dark z-20 flex items-center justify-between px-6 pointer-events-none">
-          <span className="text-[11px] font-sans font-semibold text-text-main">9:41</span>
-          
-          {/* Dynamic Island */}
-          <div className="w-[85px] h-[18px] bg-black rounded-full absolute left-1/2 -translate-x-1/2 top-2 flex items-center justify-end pr-2.5">
-            <span className="w-1.5 h-1.5 bg-[#17171d] rounded-full mr-1" />
-            <span className="w-1 h-1 bg-[#12121a] rounded-full" />
-          </div>
-
-          {/* Network/Battery Icons */}
-          <div className="flex items-center gap-1.5">
-            {/* Signal */}
-            <div className="flex gap-[1px] items-end h-2.5">
-              <span className="w-[2px] h-[3px] bg-text-main rounded-sm" />
-              <span className="w-[2px] h-[5px] bg-text-main rounded-sm" />
-              <span className="w-[2px] h-[7px] bg-text-main rounded-sm" />
-              <span className="w-[2px] h-[9px] bg-text-main/30 rounded-sm" />
+        {/* Status Bar */}
+        <div className="absolute top-0 inset-x-0 h-9 bg-[#0a0a0a] z-20 flex items-center justify-between px-7 pointer-events-none">
+          <span className="text-[10px] font-sans font-semibold text-white/80">9:41</span>
+          <div className="w-[80px] h-[16px] bg-black rounded-full absolute left-1/2 -translate-x-1/2 top-[6px]" />
+          <div className="flex items-center gap-1">
+            <div className="flex gap-[1px] items-end h-2">
+              <span className="w-[2px] h-[3px] bg-white/70 rounded-sm" />
+              <span className="w-[2px] h-[4px] bg-white/70 rounded-sm" />
+              <span className="w-[2px] h-[6px] bg-white/70 rounded-sm" />
+              <span className="w-[2px] h-[8px] bg-white/25 rounded-sm" />
             </div>
-            {/* Battery */}
-            <div className="w-5 h-2.5 border border-text-main/50 rounded-[4px] p-[1px] flex items-center">
-              <div className="h-full w-[85%] bg-brand-lime rounded-[2px]" />
+            <div className="w-[18px] h-[9px] border border-white/40 rounded-[3px] p-[1px] flex items-center ml-0.5">
+              <div className="h-full w-[80%] bg-brand-lime rounded-[1.5px]" />
             </div>
           </div>
         </div>
 
-        {/* Mobile Header (Starts under status bar) */}
-        <div className="pt-11 px-4 pb-3 bg-surface-dark border-b border-white/5 flex items-center justify-between">
-          <div className="flex items-center gap-1">
+        {/* App Header */}
+        <div className="pt-10 px-4 pb-2 bg-[#101010] flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
             <Image
               src="/turfzo_mascot.svg"
-              alt="Turfzo Logo"
-              width={20}
-              height={20}
-              className="w-5 h-5 shrink-0"
+              alt="Turfzo"
+              width={24}
+              height={24}
+              className="w-6 h-6 shrink-0"
             />
-            <span className="font-poppins font-bold text-sm tracking-tight text-text-main">
+            <span className="font-poppins font-bold text-[16px] tracking-tight text-white">
               turf<span className="text-brand-lime">zo</span>
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="w-7 h-7 bg-elevated-dark rounded-full flex items-center justify-center text-text-muted hover:text-brand-lime transition-colors">
-              <Bell className="w-3.5 h-3.5" />
-            </button>
+          <div className="flex items-center gap-2.5">
+            <Bell className="w-[18px] h-[18px] text-white/40" />
             <div className="w-7 h-7 bg-brand-lime rounded-full flex items-center justify-center text-black font-poppins font-bold text-[10px]">
               JD
             </div>
           </div>
         </div>
 
-        {/* Mobile Main Content Scroll Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-4 scrollbar-none pb-20">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-4 pt-2 pb-[72px] flex flex-col gap-3 scrollbar-none">
           
-          {/* Location selector */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1 text-[11px] text-text-muted">
-              <MapPin className="w-3 h-3 text-brand-lime" />
-              <span>Bengaluru, Karnataka</span>
-              <ChevronDown className="w-3 h-3" />
-            </div>
-            
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
-              <input 
-                type="text" 
-                placeholder="Search for turfs, sports..." 
-                disabled
-                className="w-full bg-surface-dark border border-white/5 rounded-pill pl-9 pr-4 py-2 text-xs text-text-main placeholder-text-muted/60 focus:outline-none"
-              />
+          {/* Location */}
+          <div className="flex items-center gap-1 text-[11px] text-white/50">
+            <MapPin className="w-3 h-3 text-brand-lime" />
+            <span className="font-sans">Bengaluru, Karnataka</span>
+            <ChevronDown className="w-3 h-3 text-white/30" />
+          </div>
+          
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/25" />
+            <div className="w-full bg-[#161616] border border-white/[0.06] rounded-full pl-9 pr-4 py-2.5 text-[11px] text-white/25 font-sans">
+              Search for turfs, sports...
             </div>
           </div>
 
-          {/* Sports Filter Chips */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1">
-            {categories.map((cat, i) => (
+          {/* Sport Chips */}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none -mx-0.5 px-0.5">
+            {["⚽ Football", "Cricket", "Badminton", "Te.."].map((cat, i) => (
               <span
                 key={cat}
-                className={`text-[10px] font-sans font-medium px-3 py-1 rounded-pill whitespace-nowrap border transition-all ${
+                className={`text-[10px] font-sans font-medium px-3.5 py-1.5 rounded-full whitespace-nowrap shrink-0 ${
                   i === 0 
-                    ? "bg-brand-lime text-black border-brand-lime font-semibold" 
-                    : "bg-surface-dark text-text-muted border-white/5 hover:text-text-main"
+                    ? "bg-brand-lime text-black font-bold border border-brand-lime" 
+                    : "bg-[#161616] text-white/40 border border-white/[0.06]"
                 }`}
               >
                 {cat}
@@ -118,123 +98,136 @@ export default function PhoneMockup() {
             ))}
           </div>
 
-          {/* Popular Turfs List */}
-          <div className="flex flex-col gap-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-poppins font-semibold text-text-main">Popular Turfs</span>
-              <span className="text-[10px] font-sans text-brand-lime hover:underline cursor-pointer">View all</span>
-            </div>
-
-            {/* Popular Turf Card */}
-            <div className="bg-surface-dark border border-white/5 rounded-[20px] overflow-hidden flex flex-col shadow-md">
-              {/* Turf Image simulation */}
-              <div className="relative h-28 w-full bg-gradient-to-t from-black via-black/30 to-black/20 overflow-hidden flex items-end">
-                {/* Simulated turf grid under floodlights background in CSS */}
-                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('/stadium_turf_bg.png')` }} />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-dark via-transparent to-black/30" />
-                
-                {/* Premium Badge */}
-                <div className="absolute top-2 right-2 bg-brand-lime/95 text-black font-sans font-bold text-[9px] px-2 py-0.5 rounded-pill flex items-center gap-0.5">
-                  <Award className="w-2.5 h-2.5 fill-black" />
-                  Premium
-                </div>
-
-                {/* Rating Badge */}
-                <div className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-md text-brand-lime font-sans font-bold text-[9px] px-2 py-0.5 rounded-pill flex items-center gap-0.5">
-                  <Star className="w-2.5 h-2.5 fill-brand-lime text-brand-lime" />
-                  4.8
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-3 flex flex-col gap-1.5">
-                <div>
-                  <h4 className="text-xs font-poppins font-semibold text-text-main">Playo Turf, HSR Layout</h4>
-                  <p className="text-[10px] text-text-muted flex items-center gap-0.5 mt-0.5">
-                    <MapPin className="w-2.5 h-2.5 text-brand-lime" /> HSR Layout, Bengaluru
-                  </p>
-                </div>
-
-                {/* Amenities and Price */}
-                <div className="flex items-center justify-between pt-1.5 border-t border-white/5">
-                  <div className="flex items-center gap-1.5 text-[9px] text-text-muted">
-                    <span className="bg-elevated-dark px-1.5 py-0.5 rounded">Football</span>
-                    <span className="bg-elevated-dark px-1.5 py-0.5 rounded">7v7</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-bold text-brand-lime">₹1,000</span>
-                    <span className="text-[8px] text-text-muted">/hr</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Second Turf Card (Compact view) */}
-            <div className="bg-surface-dark border border-white/5 rounded-[20px] p-2.5 flex items-center gap-3">
-              <div className="w-16 h-16 bg-elevated-dark rounded-md overflow-hidden relative flex-shrink-0">
-                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('/stadium_turf_bg.png')` }} />
-              </div>
-              <div className="flex-1 flex flex-col gap-1">
-                <div className="flex items-center justify-between">
-                  <h5 className="text-[11px] font-poppins font-semibold text-text-main">KickOff Arena</h5>
-                  <span className="text-[9px] text-brand-lime font-bold flex items-center gap-0.5">
-                    <Star className="w-2 h-2 fill-brand-lime" /> 4.6
-                  </span>
-                </div>
-                <p className="text-[9px] text-text-muted flex items-center gap-0.5">
-                  <MapPin className="w-2 h-2 text-brand-lime" /> Indiranagar, Bengaluru
-                </p>
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-[9px] text-text-muted bg-elevated-dark px-1 py-0.5 rounded">Cricket · 8v8</span>
-                  <span className="text-[10px] font-bold text-text-main">₹1,200/hr</span>
-                </div>
-              </div>
-            </div>
+          {/* Section Header */}
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-[14px] font-poppins font-bold text-white">Popular Turfs</span>
+            <span className="text-[11px] font-sans text-brand-lime font-semibold">View all</span>
           </div>
 
-          {/* Why Choose Turfzo widgets inside the mobile screen */}
-          <div className="flex flex-col gap-2 mt-1">
-            <span className="text-xs font-poppins font-semibold text-text-main">Why Choose Turfzo?</span>
-            <div className="grid grid-cols-3 gap-1.5">
-              <div className="bg-surface-dark border border-white/5 rounded-xl p-2 flex flex-col items-center text-center gap-1">
-                <div className="w-6 h-6 bg-brand-lime/10 rounded-full flex items-center justify-center text-brand-lime">
-                  <Calendar className="w-3.5 h-3.5" />
-                </div>
-                <span className="text-[8px] font-medium text-text-main">Easy Booking</span>
+          {/* =============================== */}
+          {/*    TURF CARD — APP ACCURATE     */}
+          {/* =============================== */}
+          <div className="bg-[#141414] border border-white/[0.06] rounded-[22px] overflow-hidden flex flex-col">
+            
+            {/* Card Top Section */}
+            <div className="px-4 pt-4 pb-3 flex flex-col gap-2">
+              {/* Location Pill */}
+              <div className="flex items-center gap-1.5 w-fit bg-white/[0.04] border border-white/[0.08] rounded-full px-2.5 py-[5px]">
+                <svg className="w-2.5 h-2.5 text-brand-lime" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                <span className="text-[9px] text-white/50 font-sans font-medium tracking-wide">Mumbai, Maharashtra</span>
               </div>
-              <div className="bg-surface-dark border border-white/5 rounded-xl p-2 flex flex-col items-center text-center gap-1">
-                <div className="w-6 h-6 bg-brand-lime/10 rounded-full flex items-center justify-center text-brand-lime">
-                  <Percent className="w-3.5 h-3.5" />
-                </div>
-                <span className="text-[8px] font-medium text-text-main">Best Prices</span>
+              
+              {/* Title + Verified */}
+              <div className="flex items-start justify-between">
+                <h4 className="text-[18px] font-poppins font-bold text-white leading-tight tracking-tight">
+                  Olympic Arena
+                </h4>
+                <svg className="w-[22px] h-[22px] text-brand-lime shrink-0 mt-0.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
               </div>
-              <div className="bg-surface-dark border border-white/5 rounded-xl p-2 flex flex-col items-center text-center gap-1">
-                <div className="w-6 h-6 bg-brand-lime/10 rounded-full flex items-center justify-center text-brand-lime">
-                  <Activity className="w-3.5 h-3.5" />
-                </div>
-                <span className="text-[8px] font-medium text-text-main">Premium Turfs</span>
+
+              {/* Rating */}
+              <div className="flex items-center gap-1.5">
+                <Star className="w-4 h-4 fill-[#F5A623] text-[#F5A623]" />
+                <span className="text-[12px] font-bold text-white">4.8</span>
+                <span className="text-[11px] text-white/35 font-sans">(25 reviews)</span>
               </div>
             </div>
+
+            {/* ======================== */}
+            {/*  TURF IMAGE — BIG & TALL */}
+            {/* ======================== */}
+            <div className="relative mx-3 h-[170px] rounded-[14px] overflow-hidden">
+              <div 
+                className="absolute inset-0 bg-cover bg-center scale-[1.05]" 
+                style={{ backgroundImage: `url('/stadium_turf_bg.png')` }} 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10" />
+              
+              {/* Discount Badge — Bottom Center */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
+                <div className="bg-[#0f1f0f] border border-brand-lime/30 text-brand-lime font-sans font-bold text-[9px] px-4 py-[6px] rounded-full tracking-wider whitespace-nowrap shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
+                  UP TO 20% OFF
+                </div>
+              </div>
+            </div>
+
+            {/* Info Rows */}
+            <div className="px-4 pt-4 pb-1 flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-[22px] h-[22px] rounded-full bg-brand-lime/[0.08] flex items-center justify-center shrink-0">
+                  <Award className="w-3 h-3 text-brand-lime" />
+                </div>
+                <span className="text-[12px] text-white/60 font-sans">Football • 5-a-side</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-[22px] h-[22px] rounded-full bg-brand-lime/[0.08] flex items-center justify-center shrink-0">
+                  <Clock className="w-3 h-3 text-brand-lime" />
+                </div>
+                <span className="text-[12px] text-white/60 font-sans">6:00 AM - 11:00 PM</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-[22px] h-[22px] rounded-full bg-brand-lime/[0.08] flex items-center justify-center shrink-0">
+                  <Tag className="w-3 h-3 text-brand-lime" />
+                </div>
+                <span className="text-[12px] text-white/60 font-sans">₹1200/hr</span>
+              </div>
+            </div>
+
+            {/* View Details Button */}
+            <div className="px-3.5 pb-4 pt-2.5">
+              <button className="w-full bg-[#0f1f0f] border border-brand-lime/25 text-white font-sans font-semibold text-[12px] py-3.5 rounded-[14px] flex items-center justify-center relative hover:border-brand-lime/40 transition-colors">
+                View Details
+                <div className="absolute right-3 w-[28px] h-[28px] rounded-full border border-white/10 bg-[#0a0a0a] flex items-center justify-center">
+                  <ArrowRight className="w-3.5 h-3.5 text-white/50" />
+                </div>
+              </button>
+            </div>
           </div>
+          {/* END CARD */}
+
         </div>
 
-        {/* Mobile Navigation Bar */}
-        <div className="absolute bottom-0 inset-x-0 h-16 bg-surface-dark/95 backdrop-blur-md border-t border-white/5 flex items-center justify-around px-4 pb-2 z-20">
-          <button className="flex flex-col items-center gap-1 text-brand-lime">
-            <Home className="w-4 h-4" />
-            <span className="text-[8px] font-medium">Home</span>
+        {/* ================== */}
+        {/*   BOTTOM NAV BAR  */}
+        {/* ================== */}
+        <div className="absolute bottom-0 inset-x-0 h-[60px] bg-[#0a0a0a] border-t border-white/[0.04] flex items-center justify-around px-3 z-20">
+          <button className="flex flex-col items-center gap-[3px] w-11">
+            <Home className="w-[20px] h-[20px] text-brand-lime" />
+            <span className="text-[8px] font-semibold text-brand-lime">Home</span>
           </button>
-          <button className="flex flex-col items-center gap-1 text-text-muted hover:text-text-main transition-colors">
-            <Compass className="w-4 h-4" />
-            <span className="text-[8px] font-medium">Explore</span>
+          <button className="flex flex-col items-center gap-[3px] w-11">
+            <Search className="w-[20px] h-[20px] text-white/30" />
+            <span className="text-[8px] font-medium text-white/30">Explore</span>
           </button>
-          <button className="flex flex-col items-center gap-1 text-text-muted hover:text-text-main transition-colors">
-            <BookOpen className="w-4 h-4" />
-            <span className="text-[8px] font-medium">Bookings</span>
+
+          {/* Center Floating Trophy */}
+          <div className="relative w-11 flex items-center justify-center">
+            <div className="absolute -top-[34px] left-1/2 -translate-x-1/2">
+              <div className="w-[48px] h-[48px] rounded-full bg-[#0a0a0a] p-[3px]">
+                <div className="w-full h-full rounded-full bg-brand-lime flex items-center justify-center shadow-[0_0_16px_rgba(159,232,112,0.3)]">
+                  <Image
+                    src="/turfzo_mascot.svg"
+                    alt="Turfzo"
+                    width={26}
+                    height={26}
+                    className="w-[26px] h-[26px]"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button className="flex flex-col items-center gap-[3px] w-11">
+            <CalendarDays className="w-[20px] h-[20px] text-white/30" />
+            <span className="text-[8px] font-medium text-white/30">Bookings</span>
           </button>
-          <button className="flex flex-col items-center gap-1 text-text-muted hover:text-text-main transition-colors">
-            <User className="w-4 h-4" />
-            <span className="text-[8px] font-medium">Profile</span>
+          <button className="flex flex-col items-center gap-[3px] w-11">
+            <User className="w-[20px] h-[20px] text-white/30" />
+            <span className="text-[8px] font-medium text-white/30">Profile</span>
           </button>
         </div>
 
