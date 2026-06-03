@@ -43,7 +43,7 @@ export const createPending = mutation({
     service_fee: v.number(),
     attendees: v.optional(v.number()),
     notes: v.optional(v.string()),
-    razorpay_order_id: v.string(),
+    pg_order_id: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);
@@ -73,7 +73,7 @@ export const createPending = mutation({
       payment_status: "pending",
       attendees: args.attendees,
       notes: args.notes,
-      razorpay_order_id: args.razorpay_order_id,
+      pg_order_id: args.pg_order_id,
     });
     return await ctx.db.get(bookingId);
   },
@@ -82,8 +82,8 @@ export const createPending = mutation({
 export const confirmPaid = mutation({
   args: {
     booking_id: v.id("bookings"),
-    razorpay_payment_id: v.string(),
-    razorpay_signature: v.string(),
+    pg_payment_id: v.string(),
+    pg_signature: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);
@@ -94,8 +94,8 @@ export const confirmPaid = mutation({
     await ctx.db.patch(args.booking_id, {
       status: "confirmed",
       payment_status: "paid",
-      razorpay_payment_id: args.razorpay_payment_id,
-      razorpay_signature: args.razorpay_signature,
+      pg_payment_id: args.pg_payment_id,
+      pg_signature: args.pg_signature,
     });
     return await ctx.db.get(args.booking_id);
   },

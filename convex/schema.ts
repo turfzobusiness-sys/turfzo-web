@@ -93,6 +93,10 @@ export default defineSchema({
     attendees: v.optional(v.number()),
     notes: v.optional(v.string()),
     cancellation_reason: v.optional(v.string()),
+    pg_order_id: v.optional(v.string()),
+    pg_payment_id: v.optional(v.string()),
+    pg_signature: v.optional(v.string()),
+    // Legacy fields
     razorpay_order_id: v.optional(v.string()),
     razorpay_payment_id: v.optional(v.string()),
     razorpay_signature: v.optional(v.string()),
@@ -126,7 +130,7 @@ export default defineSchema({
     user_id: v.string(),
     booking_id: v.optional(v.id("bookings")),
     tournament_id: v.optional(v.string()),
-    razorpay_order_id: v.string(),
+    pg_order_id: v.string(),
     client_request_id: v.string(),
     type: v.union(v.literal("turf_booking"), v.literal("tournament_registration")),
     amount: v.number(),
@@ -138,13 +142,17 @@ export default defineSchema({
       v.literal("failed"),
       v.literal("refunded")
     ),
+    pg_payment_id: v.optional(v.string()),
+    pg_signature: v.optional(v.string()),
+    // Legacy fields
+    razorpay_order_id: v.optional(v.string()),
     razorpay_payment_id: v.optional(v.string()),
     razorpay_signature: v.optional(v.string()),
     source: v.optional(v.union(v.literal("client"), v.literal("webhook"))),
     created_at: v.string(),
     paid_at: v.optional(v.string()),
   })
-    .index("by_order_id", ["razorpay_order_id"])
+    .index("by_order_id", ["pg_order_id"])
     .index("by_user", ["user_id"])
     .index("by_booking", ["booking_id"])
     .index("by_idempotency", ["user_id", "client_request_id"]),

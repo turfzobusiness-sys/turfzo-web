@@ -23,7 +23,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
-import { openRazorpayCheckout } from "@/lib/razorpay";
+import { openCashfreeCheckout } from "@/lib/cashfree";
 import QRCode from "qrcode";
 
 interface Tournament {
@@ -129,27 +129,23 @@ export default function TournamentsPage() {
     const clientRequestId = `tour_${firebaseUser?.uid ?? "anon"}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     try {
-      const order = await convexClient.action<{ id: string; key_id: string; amount: number; mock?: boolean; idempotent_replay?: boolean }>(
-        "payments:createRazorpayOrder",
+      const order = await convexClient.action<{ id: string; payment_session_id?: string; amount: number; mock?: boolean; idempotent_replay?: boolean }>(
+        "payments:createCashfreeOrder",
         { amount: amountInPaise, currency: "INR", receipt, client_request_id: clientRequestId, type: "tournament_registration" }
       );
 
-      const paymentResponse = await openRazorpayCheckout({
-        orderId: order.id,
-        amountInPaise,
-        description: `Registration: ${selectedTournament.title}`,
-        customerName: captainName,
-        customerEmail: captainEmail,
-        customerPhone: captainPhone,
-        notes: { tournament_id: selectedTournament._id, team_name: teamName },
+      if (!order.payment_session_id) {
+        throw new Error("Failed to initialize payment session");
+      }
+
+      await openCashfreeCheckout({
+        paymentSessionId: order.payment_session_id,
       });
 
-      const verify = await convexClient.action<{ verified: boolean; mock?: boolean }>(
-        "payments:verifyRazorpayPayment",
+      const verify = await convexClient.action<{ verified: boolean; payment_id?: string; mock?: boolean }>(
+        "payments:verifyCashfreePayment",
         {
-          order_id: paymentResponse.razorpay_order_id,
-          payment_id: paymentResponse.razorpay_payment_id,
-          signature: paymentResponse.razorpay_signature,
+          order_id: order.id,
         }
       );
       if (!verify.verified) throw new Error("Payment verification failed.");

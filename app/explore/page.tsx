@@ -31,7 +31,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
-import { openRazorpayCheckout } from "@/lib/razorpay";
+import { openCashfreeCheckout } from "@/lib/cashfree";
 import type { Turf as ConvexTurf, Booking } from "@/lib/types";
 import { FAQPageSchema } from "@/lib/schema";
 import QRCode from "qrcode";
@@ -248,11 +248,11 @@ export default function ExplorePage() {
     try {
       const order = await convexClient.action<{
         id: string;
-        key_id: string;
+        payment_session_id?: string;
         amount: number;
         mock?: boolean;
         idempotent_replay?: boolean;
-      }>("payments:createRazorpayOrder", {
+      }>("payments:createCashfreeOrder", {
         amount: totalPaise,
         currency: "INR",
         receipt,
@@ -260,22 +260,18 @@ export default function ExplorePage() {
         type: "turf_booking",
       });
 
-      const paymentResponse = await openRazorpayCheckout({
-        orderId: order.id,
-        amountInPaise: totalPaise,
-        description: `Turf booking at ${selectedTurf.name}`,
-        customerName: convexUser?.display_name ?? convexUser?.full_name ?? firebaseUser.displayName ?? undefined,
-        customerEmail: convexUser?.email ?? firebaseUser.email ?? undefined,
-        customerPhone: convexUser?.phone_number ?? undefined,
-        notes: { turf_id: selectedTurf.id, date: selectedDate },
+      if (!order.payment_session_id) {
+        throw new Error("Failed to initialize payment session");
+      }
+
+      await openCashfreeCheckout({
+        paymentSessionId: order.payment_session_id,
       });
 
-      const verifyResult = await convexClient.action<{ verified: boolean; mock?: boolean }>(
-        "payments:verifyRazorpayPayment",
+      const verifyResult = await convexClient.action<{ verified: boolean; payment_id?: string; mock?: boolean }>(
+        "payments:verifyCashfreePayment",
         {
-          order_id: paymentResponse.razorpay_order_id,
-          payment_id: paymentResponse.razorpay_payment_id,
-          signature: paymentResponse.razorpay_signature,
+          order_id: order.id,
         }
       );
 
@@ -290,13 +286,13 @@ export default function ExplorePage() {
         total_price: total,
         service_fee: convenience + gst,
         attendees,
-        razorpay_order_id: paymentResponse.razorpay_order_id,
+        pg_order_id: order.id,
       });
 
       const confirmed = await convexClient.mutation<Booking>("bookings:confirmPaid", {
         booking_id: pendingBooking._id,
-        razorpay_payment_id: paymentResponse.razorpay_payment_id,
-        razorpay_signature: paymentResponse.razorpay_signature,
+        pg_payment_id: verifyResult.payment_id || "mock_payment_id",
+        pg_signature: "verified_by_api",
       });
 
       setConfirmedBooking(confirmed);
@@ -933,7 +929,7 @@ export default function ExplorePage() {
                 <div className="mt-6 flex flex-col gap-3">
                   <p className="text-[10px] text-text-muted font-sans flex items-center justify-center gap-1 select-none">
                     <ShieldCheck className="w-3.5 h-3.5 text-brand-lime shrink-0" />
-                    Payments are encrypted & secured by Razorpay.
+                    Payments are encrypted & secured by Cashfree.
                   </p>
                   <button
                     onClick={handlePayNow}
