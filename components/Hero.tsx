@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { ArrowRight, Trophy, Users, Calendar } from "lucide-react";
 import PhoneMockup from "./PhoneMockup";
 
@@ -126,6 +127,20 @@ export default function Hero() {
                 Tournaments
               </span>
             </div>
+          </motion.div>
+
+          {/* Mobile Mascot */}
+          <motion.div
+            variants={itemVariants}
+            className="lg:hidden mt-12 flex justify-center w-full"
+          >
+            <Image
+              src="/turfzo_mascot.svg"
+              alt="Turfzo Mascot"
+              width={96}
+              height={96}
+              className="w-24 h-24 opacity-80"
+            />
           </motion.div>
 
         </motion.div>
