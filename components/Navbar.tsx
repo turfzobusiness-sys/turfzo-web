@@ -69,6 +69,9 @@ export default function Navbar() {
               <span className="font-poppins font-extrabold text-[22px] text-text-main tracking-tight flex items-center">
                 turf<span className="text-brand-lime">zo</span>
               </span>
+              <span className="text-[7px] tracking-[0.2em] font-sans text-text-muted mt-1 uppercase font-bold">
+                Book • Play • Enjoy.
+              </span>
             </div>
           </Link>
 
