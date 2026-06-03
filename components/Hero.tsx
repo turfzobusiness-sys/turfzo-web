@@ -10,29 +10,27 @@ export default function Hero() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
+        staggerChildren: 0.06,
+        delayChildren: 0.1,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
+    hidden: { y: 12, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.8,
-        ease: [0.16, 1, 0.3, 1] as const,
+        duration: 0.4,
+        ease: "easeOut" as const,
       },
     },
   };
 
   return (
     <section id="home" className="relative min-h-screen pt-28 pb-16 flex items-center justify-center overflow-hidden bg-bg-dark">
-      {/* Background glowing ambient light rings */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-brand-lime/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[500px] h-[500px] bg-brand-lime/10 rounded-full blur-[130px] pointer-events-none" />
+
 
       {/* Grid Layout Container */}
       <div className="max-w-7xl mx-auto px-6 md:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center z-10">
@@ -47,21 +45,19 @@ export default function Hero() {
           {/* Badge */}
           <motion.div 
             variants={itemVariants}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-pill bg-surface-dark border border-white/10 w-fit mx-auto lg:mx-0 mb-6"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-[8px] bg-surface-dark border border-white/10 w-fit mx-auto lg:mx-0 mb-6 text-xs text-text-muted font-sans font-medium uppercase tracking-wider"
           >
-            <span className="w-2 h-2 rounded-full bg-brand-lime animate-pulse" />
-            <span className="text-xs font-sans font-semibold tracking-wider uppercase text-text-main">
-              Premium Turf Booking Experience
-            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-lime" />
+            <span>Now Live in 8+ Cities</span>
           </motion.div>
 
           {/* Heading */}
           <motion.h1 
             variants={itemVariants}
-            className="font-poppins text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-text-main max-w-2xl"
+            className="font-poppins text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight text-text-main max-w-2xl"
           >
-            Book Premium Turfs.<br />
-            <span className="text-brand-lime">Play.</span> Enjoy. <span className="text-brand-lime">Repeat.</span>
+            Your game<br />
+            starts <span className="text-brand-lime">here</span>
           </motion.h1>
 
           {/* Subheading */}
@@ -69,17 +65,17 @@ export default function Hero() {
             variants={itemVariants}
             className="mt-6 text-base sm:text-lg text-text-muted font-sans font-normal max-w-lg mx-auto lg:mx-0 leading-relaxed"
           >
-            Turfzo makes it simple to discover and book the best turfs near you. Anytime. Anywhere. Step onto professional grass under bright floodlights today.
+            Find available turfs near you, pick a time slot, and book instantly. No phone calls required.
           </motion.p>
 
           {/* CTA Buttons */}
           <motion.div 
             variants={itemVariants}
-            className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+            className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full max-w-sm mx-auto lg:mx-0 lg:max-w-none"
           >
             <a 
               href="#explore"
-              className="group bg-brand-lime text-black font-poppins font-semibold px-8 py-4 rounded-pill hover:bg-brand-lime-hover hover:shadow-glow-lime hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 w-full sm:w-auto justify-center"
+              className="group bg-brand-lime text-black font-poppins font-semibold px-8 py-4 rounded-[12px] hover:bg-brand-lime-hover transition-all duration-300 flex items-center gap-2 w-full sm:w-auto justify-center"
             >
               Book a Turf
               <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -87,9 +83,9 @@ export default function Hero() {
             
             <a 
               href="#how-it-works"
-              className="bg-transparent border border-white/15 text-text-main hover:bg-white/5 font-poppins font-semibold px-8 py-4 rounded-pill hover:scale-105 active:scale-95 transition-all duration-300 w-full sm:w-auto justify-center flex items-center"
+              className="bg-surface-dark border border-white/10 text-text-main hover:bg-white/5 font-poppins font-semibold px-8 py-4 rounded-[12px] transition-all duration-300 w-full sm:w-auto justify-center flex items-center"
             >
-              Explore Turfs
+              How it works
             </a>
           </motion.div>
 
@@ -105,7 +101,7 @@ export default function Hero() {
                 <span className="font-poppins text-lg sm:text-xl font-bold text-text-main">500+</span>
               </div>
               <span className="text-[10px] sm:text-xs font-sans text-text-muted tracking-wide uppercase">
-                Premium Turfs
+                Turfs Listed
               </span>
             </div>
 
@@ -134,19 +130,14 @@ export default function Hero() {
 
         </motion.div>
 
-        {/* Right Column (iPhone Mockup Showcase) */}
-        <div className="lg:col-span-5 flex items-center justify-center relative w-full h-[650px] lg:h-auto">
-          {/* Intense Glow Circle behind mockup */}
-          <div className="absolute w-[320px] h-[320px] bg-brand-lime/10 rounded-full blur-[80px] pointer-events-none animate-pulse" />
-          
+        {/* Right Column (iPhone Mockup Showcase) - Hidden on mobile, only on desktop */}
+        <div className="hidden lg:flex lg:col-span-5 items-center justify-center relative w-full lg:h-auto">
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, rotateY: 15, rotateX: 5 }}
-            animate={{ scale: 1, opacity: 1, rotateY: 0, rotateX: 0 }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] as const, delay: 0.3 }}
-            className="relative transform hover:scale-102 hover:-rotate-1 hover:translate-y-[-5px] transition-all duration-500 ease-out"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" as const, delay: 0.2 }}
+            className="relative"
           >
-            {/* Dynamic visual spotlight under the phone */}
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-48 h-6 bg-black/60 rounded-full blur-[20px] pointer-events-none" />
             <PhoneMockup />
           </motion.div>
         </div>

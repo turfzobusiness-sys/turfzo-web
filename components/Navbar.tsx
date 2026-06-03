@@ -63,14 +63,11 @@ export default function Navbar() {
               alt="Turfzo Logo"
               width={38}
               height={38}
-              className="w-9.5 h-9.5 transition-transform duration-500 group-hover:rotate-6"
+              className="w-9.5 h-9.5"
             />
             <div className="flex flex-col justify-center leading-none">
               <span className="font-poppins font-extrabold text-[22px] text-text-main tracking-tight flex items-center">
                 turf<span className="text-brand-lime">zo</span>
-              </span>
-              <span className="text-[7.5px] font-sans font-bold text-text-muted tracking-[0.25em] mt-0.5 uppercase">
-                book • play • enjoy.
               </span>
             </div>
           </Link>
@@ -100,12 +97,12 @@ export default function Navbar() {
           {/* Desktop Right Actions (Search, Bell, Auth) */}
           <div className="hidden md:flex items-center gap-4">
             {/* Search Button */}
-            <button className="p-2.5 bg-surface-dark border border-white/5 hover:border-brand-lime/20 rounded-[12px] text-text-muted hover:text-brand-lime transition-all duration-300">
+            <button className="p-2.5 bg-surface-dark border border-white/5 hover:border-white/20 rounded-[12px] text-text-muted hover:text-text-main transition-all duration-300">
               <Search className="w-4 h-4" />
             </button>
 
             {/* Notification Bell */}
-            <button className="relative p-2.5 bg-surface-dark border border-white/5 hover:border-brand-lime/20 rounded-[12px] text-text-muted hover:text-brand-lime transition-all duration-300">
+            <button className="relative p-2.5 bg-surface-dark border border-white/5 hover:border-white/20 rounded-[12px] text-text-muted hover:text-text-main transition-all duration-300">
               <Bell className="w-4 h-4" />
               <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-brand-lime rounded-full" />
             </button>
@@ -134,7 +131,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/auth/login"
-                className="bg-brand-lime text-black font-poppins font-semibold px-6 py-2.5 rounded-[12px] hover:bg-brand-lime-hover hover:shadow-glow-lime transition-all duration-300 hover:scale-102 active:scale-98"
+                className="bg-brand-lime text-black font-poppins font-semibold px-6 py-2.5 rounded-[12px] hover:bg-brand-lime-hover transition-all duration-300 active:scale-98"
               >
                 Login / Sign Up
               </Link>
@@ -143,10 +140,10 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-3">
-            <button className="p-2 bg-surface-dark border border-white/5 rounded-[10px] text-text-muted hover:text-brand-lime">
+            <button className="p-2 bg-surface-dark border border-white/5 rounded-[10px] text-text-muted hover:text-text-main">
               <Search className="w-4 h-4" />
             </button>
-            <button className="relative p-2 bg-surface-dark border border-white/5 rounded-[10px] text-text-muted hover:text-brand-lime">
+            <button className="relative p-2 bg-surface-dark border border-white/5 rounded-[10px] text-text-muted hover:text-text-main">
               <Bell className="w-4 h-4" />
               <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-brand-lime rounded-full" />
             </button>
@@ -160,61 +157,61 @@ export default function Navbar() {
           </div>
 
         </div>
-      </motion.header>
 
-      {/* Mobile Drawer Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed top-[72px] left-0 right-0 z-40 bg-surface-dark/95 backdrop-blur-lg border-b border-white/5 md:hidden overflow-hidden shadow-card-shadow"
-          >
-            <div className="px-6 py-8 flex flex-col gap-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`font-poppins text-lg font-medium tracking-wide transition-colors ${
-                    activeLink === link.name ? "text-brand-lime" : "text-text-muted hover:text-text-main"
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
-              {isAuthed ? (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2 px-1">
-                    <div className="w-8 h-8 rounded-full bg-brand-lime/20 flex items-center justify-center">
-                      <User className="w-4 h-4 text-brand-lime" />
-                    </div>
-                    <span className="font-sans text-sm text-text-muted">
-                      {convexUser?.display_name ?? convexUser?.email ?? "User"}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => { setIsOpen(false); signOut(); }}
-                    className="bg-surface-dark border border-white/5 text-text-muted text-center font-poppins font-semibold py-3.5 rounded-pill hover:text-red-400 transition-all duration-300 w-full"
+        {/* Mobile Drawer Menu */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="absolute top-full left-0 right-0 z-40 bg-surface-dark/95 backdrop-blur-lg border-b border-white/5 md:hidden overflow-hidden shadow-card-shadow"
+            >
+              <div className="px-6 py-8 flex flex-col gap-6">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`font-poppins text-lg font-medium tracking-wide transition-colors ${
+                      activeLink === link.name ? "text-brand-lime" : "text-text-muted hover:text-text-main"
+                    }`}
                   >
-                    Sign Out
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  href="/auth/login"
-                  onClick={() => setIsOpen(false)}
-                  className="bg-brand-lime text-black text-center font-poppins font-semibold py-3.5 rounded-pill hover:bg-brand-lime-hover hover:shadow-glow-lime transition-all duration-300 w-full block"
-                >
-                  Login / Sign Up
-                </Link>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                    {link.name}
+                  </Link>
+                ))}
+                {isAuthed ? (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2 px-1">
+                      <div className="w-8 h-8 rounded-full bg-brand-lime/20 flex items-center justify-center">
+                        <User className="w-4 h-4 text-brand-lime" />
+                      </div>
+                      <span className="font-sans text-sm text-text-muted">
+                        {convexUser?.display_name ?? convexUser?.email ?? "User"}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => { setIsOpen(false); signOut(); }}
+                      className="bg-surface-dark border border-white/5 text-text-muted text-center font-poppins font-semibold py-3.5 rounded-pill hover:text-red-400 transition-all duration-300 w-full"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setIsOpen(false)}
+                    className="bg-brand-lime text-black text-center font-poppins font-semibold py-3 rounded-[12px] hover:bg-brand-lime-hover transition-all duration-300 w-full block"
+                  >
+                    Login / Sign Up
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.header>
     </>
   );
 }

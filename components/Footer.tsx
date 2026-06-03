@@ -55,10 +55,9 @@ export default function Footer() {
   ];
 
   return (
-    <footer id="contact" className="relative bg-[#080b0a] border-t border-white/5 pt-20 pb-8 overflow-hidden">
-      {/* Background glow ambient reflection */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-brand-lime/[0.015] rounded-full blur-[80px] pointer-events-none" />
 
+
+    <footer id="contact" className="relative bg-[#080b0a] border-t border-white/5 pt-20 pb-8 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10">
         
         {/* Main Columns Grid */}
@@ -72,14 +71,14 @@ export default function Footer() {
                 alt="Turfzo Logo"
                 width={28}
                 height={28}
-                className="w-7 h-7 group-hover:rotate-6 transition-transform duration-500"
+                className="w-7 h-7"
               />
               <span className="font-poppins font-bold text-xl text-text-main tracking-tight">
                 turf<span className="text-brand-lime">zo</span>
               </span>
             </a>
             <p className="text-text-muted text-sm font-sans leading-relaxed max-w-sm">
-              Discover and book premier, floodlight-covered sport venues and pitches. Turfzo is the ultimate luxury turf booking software for players.
+              Book football turfs, cricket grounds, and badminton courts instantly.
             </p>
             
             {/* Newsletter Subscription input */}
@@ -94,7 +93,7 @@ export default function Footer() {
                   className="w-full max-w-sm bg-surface-dark border border-white/5 focus:border-brand-lime/30 rounded-pill py-3 pl-5 pr-12 text-sm text-text-main placeholder-text-muted/50 focus:outline-none transition-colors duration-300"
                 />
                 <button 
-                  className="absolute right-1.5 p-2 bg-brand-lime hover:bg-brand-lime-hover text-black rounded-full transition-colors duration-300 focus:outline-none hover:scale-105 active:scale-95"
+                  className="absolute right-1.5 p-2 bg-brand-lime hover:bg-brand-lime-hover text-black rounded-full transition-colors duration-300 focus:outline-none active:scale-95"
                   aria-label="Subscribe"
                 >
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -188,7 +187,7 @@ export default function Footer() {
                   <a
                     key={social.label}
                     href={social.href}
-                    className="w-9 h-9 rounded-full bg-surface-dark border border-white/5 hover:border-brand-lime/20 flex items-center justify-center text-text-muted hover:text-brand-lime hover:shadow-glow-lime transition-all duration-300 hover:-translate-y-0.5"
+                    className="w-9 h-9 rounded-full bg-surface-dark border border-white/5 hover:border-white/20 flex items-center justify-center text-text-muted hover:text-text-main transition-all duration-300"
                     aria-label={social.label}
                   >
                     <IconComp className="w-4 h-4" />

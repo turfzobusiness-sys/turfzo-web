@@ -18,9 +18,8 @@
   --radius-lg: 32px;
   --radius-pill: 999px;
 
-  --shadow-glow-lime: 0 0 25px rgba(159, 232, 112, 0.18);
-  --shadow-glow-lime-intense: 0 0 35px rgba(159, 232, 112, 0.3);
-  --shadow-card-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  --shadow-glow-lime: 0 0 12px rgba(159, 232, 112, 0.12);
+  --shadow-card-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* Base custom resets */
@@ -36,17 +35,11 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom Liquid Glass & Premium Styling Utilities */
-.liquid-glass {
-  background: linear-gradient(135deg, rgba(23, 31, 27, 0.6) 0%, rgba(17, 23, 20, 0.85) 100%);
-  border: 1px solid rgba(159, 232, 112, 0.08);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-}
-
-.liquid-glass-glow {
-  border-color: rgba(159, 232, 112, 0.2);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(159, 232, 112, 0.12);
+/* Custom Solid Surface Card & Premium Styling Utilities */
+.surface-card {
+  background-color: var(--color-surface-dark);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: var(--shadow-card-shadow);
 }
 
 /* Scrollbar customizations */
