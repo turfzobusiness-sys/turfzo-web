@@ -113,7 +113,7 @@ export default function ProfilePage() {
 
   if (status === "initial" || status === "loading" || status === "unauthenticated") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-dark">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
       </div>
     );
@@ -127,7 +127,7 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>My Profile | Turfzo</title>
         <meta name="description" content="Manage your Turfzo profile, view your bookings, and update your favorite sports." />
@@ -151,7 +151,7 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1 flex flex-col gap-6">
-              <div className="bg-surface-dark border border-white/5 rounded-md p-6 shadow-card-shadow">
+              <div className="bg-surface border border-border-default rounded-md p-6 shadow-card-shadow">
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="font-poppins font-bold text-lg text-text-main flex items-center gap-2">
                     <User className="w-5 h-5 text-brand-lime" /> Account
@@ -184,7 +184,7 @@ export default function ProfilePage() {
                 </div>
 
                 {saveError && (
-                  <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-xs font-sans flex items-center gap-2">
+                  <div className="mb-4 p-3 bg-error/10 border border-error/20 rounded text-error text-xs font-sans flex items-center gap-2">
                     <AlertCircle className="w-4 h-4" /> {saveError}
                   </div>
                 )}
@@ -194,7 +194,7 @@ export default function ProfilePage() {
                     <label className="text-[10px] text-text-muted uppercase font-sans font-semibold">Full Name</label>
                     {editMode ? (
                       <input value={fullName} onChange={(e) => setFullName(e.target.value)}
-                        className="bg-elevated-dark border border-white/5 rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30" />
+                        className="bg-elevated border border-border-subtle rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30" />
                     ) : (
                       <div className="text-sm text-text-main font-semibold flex items-center gap-2">
                         <User className="w-4 h-4 text-text-muted" /> {convexUser?.full_name ?? convexUser?.display_name ?? "—"}
@@ -213,7 +213,7 @@ export default function ProfilePage() {
                     <label className="text-[10px] text-text-muted uppercase font-sans font-semibold">Phone</label>
                     {editMode ? (
                       <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Add phone"
-                        className="bg-elevated-dark border border-white/5 rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30" />
+                        className="bg-elevated border border-border-subtle rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30" />
                     ) : (
                       <div className="text-sm text-text-muted flex items-center gap-2">
                         <Phone className="w-4 h-4" /> {convexUser?.phone_number ?? "Not added"}
@@ -226,7 +226,7 @@ export default function ProfilePage() {
                       <label className="text-[10px] text-text-muted uppercase font-sans font-semibold">City</label>
                       {editMode ? (
                         <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City"
-                          className="bg-elevated-dark border border-white/5 rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30" />
+                          className="bg-elevated border border-border-subtle rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30" />
                       ) : (
                         <div className="text-sm text-text-muted flex items-center gap-2">
                           <MapPin className="w-4 h-4" /> {convexUser?.city ?? "—"}
@@ -237,7 +237,7 @@ export default function ProfilePage() {
                       <label className="text-[10px] text-text-muted uppercase font-sans font-semibold">State</label>
                       {editMode ? (
                         <input value={stateName} onChange={(e) => setStateName(e.target.value)} placeholder="State"
-                          className="bg-elevated-dark border border-white/5 rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30" />
+                          className="bg-elevated border border-border-subtle rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30" />
                       ) : (
                         <div className="text-sm text-text-muted">{convexUser?.state ?? "—"}</div>
                       )}
@@ -258,7 +258,7 @@ export default function ProfilePage() {
                               className={`text-xs font-semibold px-3 py-1.5 rounded-pill border transition-colors ${
                                 isSelected
                                   ? "bg-brand-lime text-black border-brand-lime"
-                                  : "bg-elevated-dark text-text-muted border-white/5 hover:text-text-main"
+                                  : "bg-elevated text-text-muted border-border-subtle hover:text-text-main"
                               }`}
                             >
                               {sport}
@@ -284,7 +284,7 @@ export default function ProfilePage() {
 
                 <button
                   onClick={signOut}
-                  className="w-full mt-6 bg-elevated-dark hover:bg-red-500/10 border border-white/5 hover:border-red-500/30 text-text-muted hover:text-red-400 font-sans text-sm py-2.5 rounded-md transition-colors"
+                  className="w-full mt-6 bg-elevated hover:bg-error/10 border border-border-subtle hover:border-error/30 text-text-muted hover:text-error font-sans text-sm py-2.5 rounded-md transition-colors"
                 >
                   Sign Out
                 </button>
@@ -293,24 +293,24 @@ export default function ProfilePage() {
 
             <div className="lg:col-span-2 flex flex-col gap-6">
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div className="bg-surface-dark border border-white/5 rounded-md p-5 text-center">
+                <div className="bg-surface border border-border-default rounded-md p-5 text-center">
                   <Ticket className="w-6 h-6 text-brand-lime mx-auto" />
                   <span className="block font-poppins font-extrabold text-2xl text-text-main mt-2">{upcomingBookings.length}</span>
                   <span className="text-[10px] text-text-muted uppercase tracking-wider">Upcoming</span>
                 </div>
-                <div className="bg-surface-dark border border-white/5 rounded-md p-5 text-center">
+                <div className="bg-surface border border-border-default rounded-md p-5 text-center">
                   <Check className="w-6 h-6 text-brand-lime mx-auto" />
                   <span className="block font-poppins font-extrabold text-2xl text-text-main mt-2">{pastBookings.length}</span>
                   <span className="text-[10px] text-text-muted uppercase tracking-wider">Completed</span>
                 </div>
-                <div className="bg-surface-dark border border-white/5 rounded-md p-5 text-center">
+                <div className="bg-surface border border-border-default rounded-md p-5 text-center">
                   <Trophy className="w-6 h-6 text-brand-lime mx-auto" />
                   <span className="block font-poppins font-extrabold text-2xl text-text-main mt-2">{bookings.length}</span>
                   <span className="text-[10px] text-text-muted uppercase tracking-wider">Total</span>
                 </div>
               </div>
 
-              <div className="bg-surface-dark border border-white/5 rounded-md p-6 shadow-card-shadow">
+              <div className="bg-surface border border-border-default rounded-md p-6 shadow-card-shadow">
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="font-poppins font-bold text-lg text-text-main flex items-center gap-2">
                     <Ticket className="w-5 h-5 text-brand-lime" /> Recent Bookings
@@ -340,7 +340,7 @@ export default function ProfilePage() {
                         key={booking._id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-elevated-dark border border-white/5 rounded-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        className="bg-elevated border border-border-subtle rounded-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div className="flex flex-col gap-1">
                           <span className="font-poppins font-bold text-sm text-text-main">
@@ -363,8 +363,8 @@ export default function ProfilePage() {
                             booking.status === "confirmed" && new Date(booking.start_time) > new Date()
                               ? "bg-brand-lime/10 text-brand-lime border-brand-lime/20"
                               : booking.status === "cancelled"
-                                ? "bg-red-500/10 text-red-400 border-red-500/20"
-                                : "bg-white/5 text-text-muted border-white/10"
+                                ? "bg-error/10 text-error border-error/20"
+                                : "bg-white/5 text-text-muted border-border-default"
                           }`}
                         >
                           {booking.status}

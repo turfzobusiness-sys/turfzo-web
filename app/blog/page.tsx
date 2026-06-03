@@ -52,7 +52,7 @@ const blogPosts = [
 
 export default function BlogIndex() {
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>Turfzo Blog | Turf Booking Tips, Guides & City Guides</title>
         <meta
@@ -67,7 +67,7 @@ export default function BlogIndex() {
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
           {/* Hero */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface-dark border border-white/10 text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
               <Tag className="w-3.5 h-3.5" /> Turfzo Blog
             </span>
             <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight">
@@ -89,9 +89,9 @@ export default function BlogIndex() {
               >
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="group block bg-surface-dark border border-white/5 hover:border-brand-lime/10 rounded-md overflow-hidden transition-all duration-300 hover:shadow-card-shadow"
+                  className="group block bg-surface border border-border-default hover:border-brand-lime/10 rounded-md overflow-hidden transition-all duration-300 hover:shadow-card-shadow"
                 >
-                  <div className="relative h-48 bg-elevated-dark overflow-hidden">
+                  <div className="relative h-48 bg-elevated overflow-hidden">
                     <Image
                       src={post.image}
                       alt={post.title}

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RefundPolicyPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <Navbar />
       <main className="flex-grow pt-24 pb-16">
         <article className="max-w-3xl mx-auto px-6 md:px-8">
@@ -35,23 +35,23 @@ export default function RefundPolicyPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/10">
+                  <tr className="border-b border-border-default">
                     <th className="text-left py-2 font-semibold text-text-main">Time Before Slot</th>
                     <th className="text-left py-2 font-semibold text-text-main">Refund</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-border-subtle">
                     <td className="py-2">24+ hours</td>
                     <td className="py-2 text-brand-lime font-semibold">100% refund</td>
                   </tr>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-border-subtle">
                     <td className="py-2">6 to 24 hours</td>
-                    <td className="py-2 text-yellow-400 font-semibold">50% refund</td>
+                    <td className="py-2 text-warning font-semibold">50% refund</td>
                   </tr>
                   <tr>
                     <td className="py-2">Less than 6 hours</td>
-                    <td className="py-2 text-red-400 font-semibold">No refund</td>
+                    <td className="py-2 text-error font-semibold">No refund</td>
                   </tr>
                 </tbody>
               </table>

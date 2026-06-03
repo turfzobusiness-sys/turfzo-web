@@ -70,7 +70,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>Contact Us | Get in Touch with Turfzo</title>
         <meta name="description" content="Have questions about turf booking? Contact Turfzo support via email, phone, or our contact form. We're here to help with bookings, cancellations, and partnerships." />
@@ -87,7 +87,7 @@ export default function ContactPage() {
           
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface-dark border border-white/10 text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
               <MessageSquare className="w-3.5 h-3.5" /> Support Center
             </span>
             <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight tracking-tight">
@@ -103,13 +103,13 @@ export default function ContactPage() {
             
             {/* Left Column: Contact Cards & Custom SVG Map (5 Cols) */}
             <div className="lg:col-span-5 flex flex-col gap-6 w-full">
-              <h2 className="font-poppins font-bold text-xl text-text-main pb-2 border-b border-white/5 mb-2">
+              <h2 className="font-poppins font-bold text-xl text-text-main pb-2 border-b border-border-subtle mb-2">
                 Office Information
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Mail Card */}
-                <div className="bg-surface-dark border border-white/5 rounded-md p-5 flex flex-col gap-3">
+                <div className="bg-surface border border-border-default rounded-md p-5 flex flex-col gap-3">
                   <div className="w-9 h-9 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime">
                     <Mail className="w-4.5 h-4.5" />
                   </div>
@@ -120,7 +120,7 @@ export default function ContactPage() {
                 </div>
 
                 {/* Phone Card */}
-                <div className="bg-surface-dark border border-white/5 rounded-md p-5 flex flex-col gap-3">
+                <div className="bg-surface border border-border-default rounded-md p-5 flex flex-col gap-3">
                   <div className="w-9 h-9 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime">
                     <Phone className="w-4.5 h-4.5" />
                   </div>
@@ -131,7 +131,7 @@ export default function ContactPage() {
                 </div>
 
                 {/* Address Card */}
-                <div className="bg-surface-dark border border-white/5 rounded-md p-5 flex flex-col gap-3 sm:col-span-2">
+                <div className="bg-surface border border-border-default rounded-md p-5 flex flex-col gap-3 sm:col-span-2">
                   <div className="w-9 h-9 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime">
                     <MapPin className="w-4.5 h-4.5" />
                   </div>
@@ -144,7 +144,7 @@ export default function ContactPage() {
                 </div>
 
                 {/* Hours Card */}
-                <div className="bg-surface-dark border border-white/5 rounded-md p-5 flex flex-col gap-3 sm:col-span-2">
+                <div className="bg-surface border border-border-default rounded-md p-5 flex flex-col gap-3 sm:col-span-2">
                   <div className="w-9 h-9 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime">
                     <Clock className="w-4.5 h-4.5" />
                   </div>
@@ -159,14 +159,14 @@ export default function ContactPage() {
               </div>
 
               {/* Custom-Styled Dark Vector Map in SVG */}
-              <div className="relative rounded-md overflow-hidden border border-white/5 bg-surface-dark h-52 w-full flex items-center justify-center shadow-md">
+              <div className="relative rounded-md overflow-hidden border border-border-default bg-surface h-52 w-full flex items-center justify-center shadow-md">
                 
                 {/* SVG Dark Map Representation */}
                 <svg viewBox="0 0 400 200" className="w-full h-full opacity-60 text-white/5">
                   <defs>
                     <radialGradient id="mapRadar" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor="#9FE870" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#9FE870" stopOpacity="0" />
+                      <stop offset="0%" stopColor="#6DB631" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#6DB631" stopOpacity="0" />
                     </radialGradient>
                   </defs>
 
@@ -179,11 +179,11 @@ export default function ContactPage() {
                   
                   {/* Radar pulse at coordinates */}
                   <circle cx="200" cy="100" r="30" fill="url(#mapRadar)" className="animate-pulse" />
-                  <circle cx="200" cy="100" r="1.5" fill="#9FE870" />
+                  <circle cx="200" cy="100" r="1.5" fill="#6DB631" />
                 </svg>
 
                 {/* Floating GPS Indicator Card */}
-                <div className="absolute bg-black/80 backdrop-blur-md border border-white/10 rounded px-3 py-1.5 flex items-center gap-2">
+                <div className="absolute bg-overlay-heavy backdrop-blur-md border border-border-default rounded px-3 py-1.5 flex items-center gap-2">
                   <div className="w-2.5 h-2.5 bg-brand-lime rounded-full animate-ping" />
                   <span className="text-[10px] font-sans font-bold tracking-wide text-text-main uppercase">
                     Turfzo HQ · HSR Layout
@@ -194,8 +194,8 @@ export default function ContactPage() {
             </div>
 
             {/* Right Column: Contact Message Form (7 Cols) */}
-            <div className="lg:col-span-7 bg-surface-dark border border-white/5 rounded-md p-6 sm:p-8 shadow-card-shadow w-full">
-              <h2 className="font-poppins font-bold text-xl text-text-main pb-2 border-b border-white/5 mb-6">
+            <div className="lg:col-span-7 bg-surface border border-border-default rounded-md p-6 sm:p-8 shadow-card-shadow w-full">
+              <h2 className="font-poppins font-bold text-xl text-text-main pb-2 border-b border-border-subtle mb-6">
                 Send a Message
               </h2>
 
@@ -219,7 +219,7 @@ export default function ContactPage() {
                           placeholder="Your name"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          className="bg-elevated-dark border border-white/5 rounded px-4 py-3 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30"
+                          className="bg-elevated border border-border-subtle rounded px-4 py-3 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30"
                         />
                       </div>
 
@@ -232,7 +232,7 @@ export default function ContactPage() {
                           placeholder="Your email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="bg-elevated-dark border border-white/5 rounded px-4 py-3 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30"
+                          className="bg-elevated border border-border-subtle rounded px-4 py-3 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30"
                         />
                       </div>
                     </div>
@@ -244,7 +244,7 @@ export default function ContactPage() {
                         <select
                           value={subject}
                           onChange={(e) => setSubject(e.target.value)}
-                          className="w-full bg-elevated-dark border border-white/5 text-text-main py-3 pl-4 pr-10 rounded font-semibold focus:outline-none appearance-none cursor-pointer"
+                          className="w-full bg-elevated border border-border-subtle text-text-main py-3 pl-4 pr-10 rounded font-semibold focus:outline-none appearance-none cursor-pointer"
                         >
                           <option>General Inquiry</option>
                           <option>Booking Issue</option>
@@ -264,7 +264,7 @@ export default function ContactPage() {
                       placeholder="Write your details here..."
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="bg-elevated-dark border border-white/5 rounded px-4 py-3 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30 resize-none leading-relaxed"
+                      className="bg-elevated border border-border-subtle rounded px-4 py-3 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30 resize-none leading-relaxed"
                     />
                   </div>
 
@@ -298,8 +298,8 @@ export default function ContactPage() {
                     exit={{ opacity: 0 }}
                     className="py-16 flex flex-col items-center justify-center gap-4 text-center"
                   >
-                    <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center border-2 border-red-500/30">
-                      <span className="text-red-400 text-2xl">!</span>
+                    <div className="w-14 h-14 bg-error/10 rounded-full flex items-center justify-center border-2 border-error/30">
+                      <span className="text-error text-2xl">!</span>
                     </div>
                     <h3 className="font-poppins font-bold text-lg text-text-main">Could not send</h3>
                     <p className="text-xs text-text-muted max-w-xs font-sans leading-relaxed">
@@ -307,7 +307,7 @@ export default function ContactPage() {
                     </p>
                     <button
                       onClick={() => setFormStep('form')}
-                      className="bg-surface-dark border border-white/10 hover:border-brand-lime/30 text-text-main font-semibold text-xs px-6 py-2.5 rounded-pill transition-all"
+                      className="bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-semibold text-xs px-6 py-2.5 rounded-pill transition-all"
                     >
                       Try again
                     </button>
@@ -358,7 +358,7 @@ export default function ContactPage() {
           {contactFaqItems.map((item, idx) => (
             <details
               key={idx}
-              className="bg-surface-dark border border-white/5 rounded-md p-5 group"
+              className="bg-surface border border-border-default rounded-md p-5 group"
             >
               <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                 {item.question}

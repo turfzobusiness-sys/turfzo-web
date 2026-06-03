@@ -42,7 +42,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-dark flex items-center justify-center p-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
 
 
       <motion.div
@@ -50,7 +50,7 @@ export default function LoginPage() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-surface-dark border border-white/5 rounded-md p-8 shadow-card-shadow">
+        <div className="bg-surface border border-border-default rounded-md p-8 shadow-card-shadow">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2 mb-6">
               <Image
@@ -72,7 +72,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm font-sans">
+            <div className="mb-4 p-3 bg-error/10 border border-error/20 rounded-md text-error text-sm font-sans">
               {error}
             </div>
           )}
@@ -90,7 +90,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  className="w-full bg-elevated-dark border border-white/5 rounded-md py-3 pl-10 pr-4 text-sm text-text-main placeholder-text-muted/50 focus:outline-none focus:border-brand-lime/30 transition-colors"
+                  className="w-full bg-elevated border border-border-subtle rounded-md py-3 pl-10 pr-4 text-sm text-text-main placeholder-text-muted/50 focus:outline-none focus:border-brand-lime/30 transition-colors"
                 />
               </div>
             </div>
@@ -107,7 +107,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  className="w-full bg-elevated-dark border border-white/5 rounded-md py-3 pl-10 pr-10 text-sm text-text-main placeholder-text-muted/50 focus:outline-none focus:border-brand-lime/30 transition-colors"
+                  className="w-full bg-elevated border border-border-subtle rounded-md py-3 pl-10 pr-10 text-sm text-text-main placeholder-text-muted/50 focus:outline-none focus:border-brand-lime/30 transition-colors"
                 />
                 <button
                   type="button"
@@ -126,7 +126,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated-dark disabled:text-text-muted/40 text-black font-poppins font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated disabled:text-text-muted/40 text-black font-poppins font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -138,10 +138,10 @@ export default function LoginPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/5" />
+              <div className="w-full border-t border-border-subtle" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-surface-dark px-3 text-text-muted font-sans">
+              <span className="bg-surface px-3 text-text-muted font-sans">
                 or continue with
               </span>
             </div>
@@ -150,7 +150,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full bg-elevated-dark hover:bg-white/5 border border-white/5 text-text-main font-sans font-semibold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+            className="w-full bg-elevated hover:bg-elevated border border-border-subtle text-text-main font-sans font-semibold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path

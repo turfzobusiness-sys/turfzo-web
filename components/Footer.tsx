@@ -57,11 +57,11 @@ export default function Footer() {
   return (
 
 
-    <footer id="contact" className="relative bg-[#080b0a] border-t border-white/5 pt-20 pb-8 overflow-hidden">
+    <footer id="contact" className="relative bg-bg border-t border-border-subtle pt-20 pb-8 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10">
         
         {/* Main Columns Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-white/5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-border-subtle">
           
           {/* Brand Info & Newsletter (Lg: 4 columns) */}
           <div className="lg:col-span-4 flex flex-col gap-6">
@@ -90,7 +90,7 @@ export default function Footer() {
                 <input 
                   type="email" 
                   placeholder="Enter your email" 
-                  className="w-full max-w-sm bg-surface-dark border border-white/5 focus:border-brand-lime/30 rounded-pill py-3 pl-5 pr-12 text-sm text-text-main placeholder-text-muted/50 focus:outline-none transition-colors duration-300"
+                  className="w-full max-w-sm bg-surface border border-border-subtle focus:border-brand-lime/30 rounded-pill py-3 pl-5 pr-12 text-sm text-text-main placeholder-text-muted/50 focus:outline-none transition-colors duration-300"
                 />
                 <button 
                   className="absolute right-1.5 p-2 bg-brand-lime hover:bg-brand-lime-hover text-black rounded-full transition-colors duration-300 focus:outline-none active:scale-95"
@@ -187,7 +187,7 @@ export default function Footer() {
                   <a
                     key={social.label}
                     href={social.href}
-                    className="w-9 h-9 rounded-full bg-surface-dark border border-white/5 hover:border-white/20 flex items-center justify-center text-text-muted hover:text-text-main transition-all duration-300"
+                    className="w-9 h-9 rounded-full bg-surface border border-border-default hover:border-border-strong flex items-center justify-center text-text-muted hover:text-text-main transition-all duration-300"
                     aria-label={social.label}
                   >
                     <IconComp className="w-4 h-4" />

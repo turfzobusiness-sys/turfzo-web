@@ -85,12 +85,12 @@ export default function HowItWorksPage() {
     {
       title: "Search & Match",
       phoneScreen: (
-        <div className="flex flex-col gap-2 p-3 text-left bg-bg-dark h-full text-[10px]">
+        <div className="flex flex-col gap-2 p-3 text-left bg-bg h-full text-[10px]">
           <span className="text-[8px] font-bold text-brand-lime uppercase">Step 01</span>
           <h4 className="font-poppins font-bold text-xs text-text-main">Find local turfs</h4>
-          <div className="bg-surface-dark border border-white/5 p-2 rounded flex flex-col gap-1.5 mt-1">
+          <div className="bg-surface border border-border-subtle p-2 rounded flex flex-col gap-1.5 mt-1">
             <span className="text-[8px] text-text-muted">Enter Location</span>
-            <div className="bg-bg-dark p-1.5 rounded border border-white/10 text-text-main flex items-center justify-between">
+            <div className="bg-bg p-1.5 rounded border border-border-default text-text-main flex items-center justify-between">
               <span>HSR Layout, Bengaluru</span>
               <span className="text-brand-lime">✓</span>
             </div>
@@ -102,14 +102,14 @@ export default function HowItWorksPage() {
     {
       title: "Select Time Slot",
       phoneScreen: (
-        <div className="flex flex-col gap-2 p-3 text-left bg-bg-dark h-full text-[10px]">
+        <div className="flex flex-col gap-2 p-3 text-left bg-bg h-full text-[10px]">
           <span className="text-[8px] font-bold text-brand-lime uppercase">Step 02</span>
           <h4 className="font-poppins font-bold text-xs text-text-main">Choose your hour</h4>
           <div className="grid grid-cols-2 gap-1.5 mt-2">
-            <span className="bg-elevated-dark text-text-muted p-1 text-center rounded border border-white/5 line-through">05:00 PM</span>
-            <span className="bg-elevated-dark text-text-muted p-1 text-center rounded border border-white/5 line-through">06:00 PM</span>
+            <span className="bg-elevated text-text-muted p-1 text-center rounded border border-border-subtle line-through">05:00 PM</span>
+            <span className="bg-elevated text-text-muted p-1 text-center rounded border border-border-subtle line-through">06:00 PM</span>
             <span className="bg-brand-lime text-black font-bold p-1 text-center rounded border border-brand-lime">07:00 PM</span>
-            <span className="bg-elevated-dark text-text-main p-1 text-center rounded border border-white/5">08:00 PM</span>
+            <span className="bg-elevated text-text-main p-1 text-center rounded border border-border-subtle">08:00 PM</span>
           </div>
           <span className="text-[7px] text-text-muted text-center mt-2">Slot: 24 May, Fri · 07:00 PM</span>
         </div>
@@ -118,11 +118,11 @@ export default function HowItWorksPage() {
     {
       title: "Bill Splitting",
       phoneScreen: (
-        <div className="flex flex-col gap-2 p-3 text-left bg-bg-dark h-full text-[10px]">
+        <div className="flex flex-col gap-2 p-3 text-left bg-bg h-full text-[10px]">
           <span className="text-[8px] font-bold text-brand-lime uppercase">Step 03</span>
           <h4 className="font-poppins font-bold text-xs text-text-main">Split with team</h4>
-          <div className="bg-surface-dark border border-white/5 p-2 rounded flex flex-col gap-2 mt-1">
-            <div className="flex justify-between border-b border-white/5 pb-1">
+          <div className="bg-surface border border-border-subtle p-2 rounded flex flex-col gap-2 mt-1">
+            <div className="flex justify-between border-b border-border-subtle pb-1">
               <span>Slot Fare</span>
               <span>₹1,000</span>
             </div>
@@ -138,10 +138,10 @@ export default function HowItWorksPage() {
     {
       title: "QR Pass Gate Access",
       phoneScreen: (
-        <div className="flex flex-col items-center justify-center gap-1.5 p-3 text-center bg-bg-dark h-full text-[10px]">
+        <div className="flex flex-col items-center justify-center gap-1.5 p-3 text-center bg-bg h-full text-[10px]">
           <span className="text-[8px] font-bold text-brand-lime uppercase">Step 04</span>
           <h4 className="font-poppins font-bold text-xs text-text-main">Entrance Ticket</h4>
-          <div className="bg-white p-1.5 rounded mt-1">
+          <div className="bg-qr-bg p-1.5 rounded mt-1">
             <svg viewBox="0 0 100 100" className="w-16 h-16 text-black">
               <rect x="0" y="0" width="30" height="30" fill="black" />
               <rect x="5" y="5" width="20" height="20" fill="white" />
@@ -162,7 +162,7 @@ export default function HowItWorksPage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>How It Works | Book a Turf in 2 Minutes | Turfzo</title>
         <meta name="description" content="Learn how to book a football turf, cricket ground, or sports venue on Turfzo. Search, select your slot, pay online, and show up to play. It takes 2 minutes." />
@@ -185,7 +185,7 @@ export default function HowItWorksPage() {
           
           {/* Page Hero Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface-dark border border-white/10 text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
               <Sparkles className="w-3.5 h-3.5" /> Simplifying Sports Bookings
             </span>
             <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight tracking-tight">
@@ -196,7 +196,7 @@ export default function HowItWorksPage() {
             </p>
 
             {/* Toggle Tab Buttons */}
-            <div className="mt-8 flex justify-center bg-surface-dark border border-white/5 p-1 rounded-pill max-w-xs mx-auto">
+            <div className="mt-8 flex justify-center bg-surface border border-border-subtle p-1 rounded-pill max-w-xs mx-auto">
               <button 
                 onClick={() => setActiveTab("player")}
                 className={`flex-1 font-poppins font-semibold text-xs py-2.5 rounded-pill transition-all ${
@@ -234,7 +234,7 @@ export default function HowItWorksPage() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.5, delay: idx * 0.1 }}
-                      className="bg-surface-dark border border-white/5 hover:border-brand-lime/10 rounded-md p-6 flex gap-5 transition-all duration-300 hover:shadow-card-shadow"
+                      className="bg-surface border border-border-subtle hover:border-brand-lime/10 rounded-md p-6 flex gap-5 transition-all duration-300 hover:shadow-card-shadow"
                     >
                       <div className="w-12 h-12 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime border border-brand-lime/10 shrink-0">
                         <Icon className="w-5 h-5" />
@@ -250,16 +250,16 @@ export default function HowItWorksPage() {
             </div>
 
             {/* Right Interactive Simulator Mockup: 5 Cols */}
-            <div className="lg:col-span-5 flex flex-col items-center justify-center relative min-h-[460px] bg-surface-dark border border-white/5 rounded-md p-8 shadow-card-shadow">
+            <div className="lg:col-span-5 flex flex-col items-center justify-center relative min-h-[460px] bg-surface border border-border-subtle rounded-md p-8 shadow-card-shadow">
               <div className="absolute top-4 left-4 bg-brand-lime/10 border border-brand-lime/20 text-brand-lime font-sans font-bold text-[9px] px-2 py-0.5 rounded uppercase">
                 Interactive simulator
               </div>
 
               {/* Simulated mini phone mockup container */}
-              <div className="relative w-48 h-96 bg-black rounded-[36px] p-2 shadow-2xl border-[3px] border-[#313639] overflow-hidden flex flex-col mt-4">
+              <div className="relative w-48 h-96 bg-black rounded-[36px] p-2 shadow-2xl border-[3px] border-border-default overflow-hidden flex flex-col mt-4">
                 
                 {/* Phone screen inner view */}
-                <div className="relative flex-1 bg-bg-dark rounded-[28px] overflow-hidden flex flex-col justify-between border border-white/10">
+                <div className="relative flex-1 bg-bg rounded-[28px] overflow-hidden flex flex-col justify-between border border-border-default">
                   
                   {/* Status & Island mock */}
                   <div className="h-6 bg-black flex items-center justify-center relative select-none">
@@ -275,7 +275,7 @@ export default function HowItWorksPage() {
                   </div>
 
                   {/* Bottom navigator bar */}
-                  <div className="h-7 bg-surface-dark border-t border-white/5 flex items-center justify-around pb-1 select-none">
+                  <div className="h-7 bg-surface border-t border-border-subtle flex items-center justify-around pb-1 select-none">
                     <span className="w-1.5 h-1.5 bg-brand-lime rounded-full" />
                     <span className="w-1.5 h-1.5 bg-white/25 rounded-full" />
                     <span className="w-1.5 h-1.5 bg-white/25 rounded-full" />
@@ -297,7 +297,7 @@ export default function HowItWorksPage() {
                       className={`py-2 px-3 text-[10px] font-sans font-semibold rounded border text-center transition-all ${
                         simStep === idx
                           ? "bg-brand-lime text-black border-brand-lime font-bold"
-                          : "bg-bg-dark text-text-muted border-white/5 hover:text-text-main"
+                          : "bg-bg text-text-muted border-border-subtle hover:text-text-main"
                       }`}
                     >
                       {idx + 1}. {step.title}
@@ -321,7 +321,7 @@ export default function HowItWorksPage() {
             {faqItems.map((item, idx) => (
               <details
                 key={idx}
-                className="bg-surface-dark border border-white/5 rounded-md p-5 group"
+                className="bg-surface border border-border-subtle rounded-md p-5 group"
               >
                 <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                   {item.question}

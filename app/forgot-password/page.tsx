@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-dark flex items-center justify-center p-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
 
 
       <motion.div
@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-surface-dark border border-white/5 rounded-md p-8 shadow-card-shadow">
+        <div className="bg-surface border border-border-default rounded-md p-8 shadow-card-shadow">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2 mb-6">
               <Image src="/turfzo_mascot.svg" alt="Turfzo" width={40} height={40} />
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm font-sans flex items-center gap-2">
+            <div className="mb-4 p-3 bg-error/10 border border-error/20 rounded-md text-error text-sm font-sans flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" /> {error}
             </div>
           )}
@@ -82,7 +82,7 @@ export default function ForgotPasswordPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     required
-                    className="w-full bg-elevated-dark border border-white/5 rounded-md py-3 pl-10 pr-4 text-sm text-text-main placeholder-text-muted/50 focus:outline-none focus:border-brand-lime/30 transition-colors"
+                    className="w-full bg-elevated border border-border-subtle rounded-md py-3 pl-10 pr-4 text-sm text-text-main placeholder-text-muted/50 focus:outline-none focus:border-brand-lime/30 transition-colors"
                   />
                 </div>
               </div>
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
-                className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated-dark disabled:text-text-muted/40 text-black font-poppins font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated disabled:text-text-muted/40 text-black font-poppins font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Reset Link"}
               </button>

@@ -203,7 +203,7 @@ export default function TournamentsPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>Sports Tournaments | Find & Join Local Tournaments | Turfzo</title>
         <meta name="description" content="Discover and join football, cricket, and badminton tournaments in your city. Register your team, compete, and win prizes on Turfzo." />
@@ -216,13 +216,13 @@ export default function TournamentsPage() {
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
-          <div className="relative rounded-lg overflow-hidden border border-white/10 shadow-card-shadow p-8 sm:p-12 mb-12 min-h-[240px] flex flex-col justify-end">
+          <div className="relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow p-8 sm:p-12 mb-12 min-h-[240px] flex flex-col justify-end">
             <div className="absolute inset-0 bg-cover bg-center z-0 opacity-40" style={{ backgroundImage: `url('/stadium_turf_bg.png')` }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg-dark via-bg-dark/70 to-transparent z-0" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-transparent z-0" />
             <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-brand-lime/5 rounded-full blur-[100px] pointer-events-none" />
 
             <div className="relative z-10 text-left">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-surface-dark border border-white/10 text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime mb-4">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime mb-4">
                 <Trophy className="w-3.5 h-3.5" /> Compete With The Best
               </span>
               <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main leading-tight tracking-tight">
@@ -235,25 +235,25 @@ export default function TournamentsPage() {
           </div>
 
           {loadError && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-md p-4 flex items-center gap-3 mb-8">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
-              <p className="text-sm text-red-400 font-sans">{loadError}</p>
+            <div className="bg-error/10 border border-error/20 rounded-md p-4 flex items-center gap-3 mb-8">
+              <AlertCircle className="w-5 h-5 text-error shrink-0" />
+              <p className="text-sm text-error font-sans">{loadError}</p>
             </div>
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 flex flex-col gap-6">
-              <h2 className="font-poppins font-bold text-xl text-text-main text-left pb-2 border-b border-white/5 flex items-center gap-2">
+              <h2 className="font-poppins font-bold text-xl text-text-main text-left pb-2 border-b border-border-subtle flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-brand-lime" /> Open Registrations
               </h2>
 
               {loading ? (
-                <div className="bg-surface-dark border border-white/5 rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
+                <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
                   <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
                   <h3 className="font-poppins font-bold text-lg text-text-main">Loading Tournaments</h3>
                 </div>
               ) : tournaments.length === 0 ? (
-                <div className="bg-surface-dark border border-white/5 rounded-md p-16 text-center flex flex-col items-center justify-center gap-3">
+                <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center justify-center gap-3">
                   <Trophy className="w-12 h-12 text-text-muted opacity-50" />
                   <h3 className="font-poppins font-bold text-lg text-text-main">No Open Registrations</h3>
                   <p className="text-text-muted text-sm font-sans max-w-xs">Check back soon for upcoming tournaments in your city.</p>
@@ -266,11 +266,11 @@ export default function TournamentsPage() {
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5 }}
-                      className="bg-surface-dark border border-white/5 hover:border-brand-lime/10 rounded-md p-6 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:shadow-card-shadow text-left"
+                      className="bg-surface border border-border-default hover:border-brand-lime/10 rounded-md p-6 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:shadow-card-shadow text-left"
                     >
-                      <div className="relative w-full md:w-56 h-40 bg-elevated-dark rounded-sm overflow-hidden flex-shrink-0">
+                      <div className="relative w-full md:w-56 h-40 bg-elevated rounded-sm overflow-hidden flex-shrink-0">
                         <Image src={t.image_url || "/stadium_turf_bg.png"} alt={t.title} fill className="object-cover" />
-                        <div className="absolute top-3 left-3 bg-black/80 border border-white/10 text-text-main font-sans font-bold text-[10px] px-2.5 py-1 rounded-pill uppercase tracking-wider select-none">
+                        <div className="absolute top-3 left-3 bg-overlay-heavy border border-border-default text-text-main font-sans font-bold text-[10px] px-2.5 py-1 rounded-pill uppercase tracking-wider select-none">
                           {t.sport}
                         </div>
                       </div>
@@ -290,7 +290,7 @@ export default function TournamentsPage() {
                             <MapPin className="w-3.5 h-3.5 text-brand-lime shrink-0" /> {t.venue}
                           </p>
 
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4 border-t border-white/5 pt-4 text-xs font-sans text-text-muted">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4 border-t border-border-subtle pt-4 text-xs font-sans text-text-muted">
                             <div className="flex flex-col gap-0.5">
                               <span className="text-[9px] uppercase tracking-wider">Schedule</span>
                               <span className="font-semibold text-text-main">Starts {formatDate(t.start_date)}</span>
@@ -306,7 +306,7 @@ export default function TournamentsPage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-6">
+                        <div className="flex items-center justify-between border-t border-border-subtle pt-4 mt-6">
                           <div>
                             <span className="text-[9px] uppercase text-text-muted block leading-none font-sans">Registration Fee</span>
                             <span className="text-lg font-poppins font-extrabold text-brand-lime mt-1 block">
@@ -317,7 +317,7 @@ export default function TournamentsPage() {
                           <button
                             onClick={() => handleOpenRegistration(t)}
                             disabled={t.registered_teams >= t.max_teams}
-                            className="bg-brand-lime disabled:bg-elevated-dark disabled:text-text-muted/30 hover:bg-brand-lime-hover text-black font-poppins font-bold text-xs py-3 px-6 rounded-md transition-all duration-300 hover:scale-102 flex items-center gap-1"
+                            className="bg-brand-lime disabled:bg-elevated disabled:text-text-muted/30 hover:bg-brand-lime-hover text-black font-poppins font-bold text-xs py-3 px-6 rounded-md transition-all duration-300 hover:scale-102 flex items-center gap-1"
                           >
                             {t.registered_teams >= t.max_teams ? "Slots Full" : "Register Team"}
                             <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -331,14 +331,14 @@ export default function TournamentsPage() {
             </div>
 
             <div className="lg:col-span-4 flex flex-col gap-8 sticky top-24">
-              <div className="bg-surface-dark border border-white/5 rounded-md p-6 text-left shadow-card-shadow">
-                <h3 className="font-poppins font-bold text-base text-text-main flex items-center gap-2 pb-3.5 border-b border-white/5 mb-4">
+              <div className="bg-surface border border-border-default rounded-md p-6 text-left shadow-card-shadow">
+                <h3 className="font-poppins font-bold text-base text-text-main flex items-center gap-2 pb-3.5 border-b border-border-subtle mb-4">
                   <Award className="w-5 h-5 text-brand-lime" /> League Standings
                 </h3>
                 <div className="overflow-x-auto scrollbar-none">
                   <table className="w-full text-xs font-sans">
                     <thead>
-                      <tr className="text-text-muted border-b border-white/5 font-semibold text-[10px] uppercase tracking-wider text-left">
+                      <tr className="text-text-muted border-b border-border-subtle font-semibold text-[10px] uppercase tracking-wider text-left">
                         <th className="py-2.5">Rank</th>
                         <th className="py-2.5">Team</th>
                         <th className="py-2.5 text-center">P</th>
@@ -348,7 +348,7 @@ export default function TournamentsPage() {
                     </thead>
                     <tbody>
                       {leagueStandings.map((row) => (
-                        <tr key={row.rank} className="border-b border-white/5 hover:bg-elevated-dark/30 transition-colors">
+                        <tr key={row.rank} className="border-b border-border-subtle hover:bg-elevated/30 transition-colors">
                           <td className="py-3 font-bold text-text-muted pl-1">{row.rank}</td>
                           <td className="py-3 font-semibold text-text-main">{row.team}</td>
                           <td className="py-3 text-center text-text-muted">{row.played}</td>
@@ -361,15 +361,15 @@ export default function TournamentsPage() {
                 </div>
               </div>
 
-              <div className="bg-surface-dark border border-white/5 rounded-md p-6 text-left shadow-card-shadow">
-                <h3 className="font-poppins font-bold text-base text-text-main flex items-center gap-2 pb-3.5 border-b border-white/5 mb-4">
+              <div className="bg-surface border border-border-default rounded-md p-6 text-left shadow-card-shadow">
+                <h3 className="font-poppins font-bold text-base text-text-main flex items-center gap-2 pb-3.5 border-b border-border-subtle mb-4">
                   <Trophy className="w-4 h-4 text-brand-lime" /> Golden Boot Leaderboard
                 </h3>
                 <div className="flex flex-col gap-3.5">
                   {topScorers.map((scorer, i) => (
-                    <div key={i} className="flex items-center justify-between border-b border-white/5 pb-2.5 last:border-b-0 last:pb-0">
+                    <div key={i} className="flex items-center justify-between border-b border-border-subtle pb-2.5 last:border-b-0 last:pb-0">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-elevated-dark border border-white/10 flex items-center justify-center font-poppins font-bold text-[11px] text-text-main">
+                        <div className="w-8 h-8 rounded-full bg-elevated border border-border-default flex items-center justify-center font-poppins font-bold text-[11px] text-text-main">
                           {scorer.name.split(" ").map((n) => n[0]).join("")}
                         </div>
                         <div className="flex flex-col leading-none">
@@ -391,15 +391,15 @@ export default function TournamentsPage() {
 
       <AnimatePresence>
         {regStep !== "closed" && selectedTournament && (
-          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-overlay-heavy backdrop-blur-md flex items-center justify-center p-4">
             {regStep === "form" && (
               <motion.div
                 initial={{ scale: 0.95, y: 15, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.95, y: 15, opacity: 0 }}
-                className="bg-surface-dark border border-white/10 rounded-md max-w-md w-full p-6 relative shadow-card-shadow text-left"
+                className="bg-surface border border-border-default rounded-md max-w-md w-full p-6 relative shadow-card-shadow text-left"
               >
-                <button onClick={() => setRegStep("closed")} className="absolute top-4 right-4 p-1.5 bg-elevated-dark hover:bg-white/10 rounded-full text-text-muted hover:text-text-main transition-colors">
+                <button onClick={() => setRegStep("closed")} className="absolute top-4 right-4 p-1.5 bg-elevated hover:bg-elevated rounded-full text-text-muted hover:text-text-main transition-colors">
                   <X className="w-5 h-5" />
                 </button>
 
@@ -410,7 +410,7 @@ export default function TournamentsPage() {
                 </div>
 
                 {regError && (
-                  <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-xs font-sans flex items-center gap-2">
+                  <div className="mb-4 p-3 bg-error/10 border border-error/20 rounded text-error text-xs font-sans flex items-center gap-2">
                     <AlertCircle className="w-4 h-4" /> {regError}
                   </div>
                 )}
@@ -419,14 +419,14 @@ export default function TournamentsPage() {
                   <div className="flex flex-col gap-1.5">
                     <label className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Team Name</label>
                     <input type="text" required placeholder="Enter team name" value={teamName} onChange={(e) => setTeamName(e.target.value)}
-                      className="bg-elevated-dark border border-white/5 rounded px-4 py-2.5 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
+                      className="bg-elevated border border-border-subtle rounded px-4 py-2.5 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Captain Name</label>
                     <div className="relative flex items-center">
                       <User className="absolute left-3 w-4 h-4 text-text-muted" />
                       <input type="text" required placeholder="Enter captain name" value={captainName} onChange={(e) => setCaptainName(e.target.value)}
-                        className="bg-elevated-dark border border-white/5 rounded pl-10 pr-4 py-2.5 w-full text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
+                        className="bg-elevated border border-border-subtle rounded pl-10 pr-4 py-2.5 w-full text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -434,7 +434,7 @@ export default function TournamentsPage() {
                     <div className="relative flex items-center">
                       <Phone className="absolute left-3 w-4 h-4 text-text-muted" />
                       <input type="tel" required placeholder="Enter phone number" value={captainPhone} onChange={(e) => setCaptainPhone(e.target.value)}
-                        className="bg-elevated-dark border border-white/5 rounded pl-10 pr-4 py-2.5 w-full text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
+                        className="bg-elevated border border-border-subtle rounded pl-10 pr-4 py-2.5 w-full text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -442,11 +442,11 @@ export default function TournamentsPage() {
                     <div className="relative flex items-center">
                       <Mail className="absolute left-3 w-4 h-4 text-text-muted" />
                       <input type="email" required placeholder="Enter email address" value={captainEmail} onChange={(e) => setCaptainEmail(e.target.value)}
-                        className="bg-elevated-dark border border-white/5 rounded pl-10 pr-4 py-2.5 w-full text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
+                        className="bg-elevated border border-border-subtle rounded pl-10 pr-4 py-2.5 w-full text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
                     </div>
                   </div>
 
-                  <div className="bg-elevated-dark p-3.5 rounded border border-white/5 flex justify-between items-center mt-2">
+                  <div className="bg-elevated p-3.5 rounded border border-border-subtle flex justify-between items-center mt-2">
                     <span className="font-semibold text-text-muted">Total Registration Fee</span>
                     <span className="font-poppins font-extrabold text-sm text-brand-lime">₹{selectedTournament.entry_fee.toLocaleString("en-IN")}</span>
                   </div>
@@ -471,7 +471,7 @@ export default function TournamentsPage() {
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-surface-dark border border-white/10 rounded-md max-w-md w-full p-6 relative shadow-card-shadow text-center flex flex-col items-center"
+                className="bg-surface border border-border-default rounded-md max-w-md w-full p-6 relative shadow-card-shadow text-center flex flex-col items-center"
               >
                 <div className="w-16 h-16 bg-brand-lime/10 rounded-full flex items-center justify-center border-2 border-brand-lime/30 shadow-glow-lime select-none mb-4">
                   <Check className="w-8 h-8 text-brand-lime stroke-[3]" />
@@ -479,11 +479,11 @@ export default function TournamentsPage() {
                 <h3 className="font-poppins font-bold text-xl text-text-main">Team Registered!</h3>
                 <p className="text-xs text-text-muted font-sans mt-1">Your team has been successfully placed in the brackets.</p>
 
-                <div className="relative w-full bg-elevated-dark border border-white/5 rounded p-5 mt-6 text-left flex flex-col gap-4 overflow-hidden">
-                  <div className="absolute top-1/2 -left-3 w-6 h-6 bg-surface-dark rounded-full border-r border-white/10" />
-                  <div className="absolute top-1/2 -right-3 w-6 h-6 bg-surface-dark rounded-full border-l border-white/10" />
+                <div className="relative w-full bg-elevated border border-border-subtle rounded p-5 mt-6 text-left flex flex-col gap-4 overflow-hidden">
+                  <div className="absolute top-1/2 -left-3 w-6 h-6 bg-surface rounded-full border-r border-border-default" />
+                  <div className="absolute top-1/2 -right-3 w-6 h-6 bg-surface rounded-full border-l border-border-default" />
 
-                  <div className="flex justify-between items-center pb-3.5 border-b border-dashed border-white/10 font-sans">
+                  <div className="flex justify-between items-center pb-3.5 border-b border-dashed border-border-default font-sans">
                     <div className="flex flex-col">
                       <span className="text-[9px] text-text-muted uppercase">Tournament Pass ID</span>
                       <span className="font-poppins font-bold text-brand-lime text-sm tracking-wide">{registrationCode}</span>
@@ -496,7 +496,7 @@ export default function TournamentsPage() {
                     <span className="font-poppins font-extrabold text-sm text-text-main">{selectedTournament.title}</span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-3.5 text-xs font-sans">
+                  <div className="grid grid-cols-2 gap-4 border-t border-border-subtle pt-3.5 text-xs font-sans">
                     <div className="flex flex-col gap-0.5">
                       <span className="text-[9px] text-text-muted uppercase">Team Name</span>
                       <span className="font-semibold text-text-main">{teamName}</span>
@@ -511,12 +511,12 @@ export default function TournamentsPage() {
                     </div>
                   </div>
 
-                  <div className="border-t border-dashed border-white/10 pt-4 flex flex-col items-center justify-center gap-2">
+                  <div className="border-t border-dashed border-border-default pt-4 flex flex-col items-center justify-center gap-2">
                     {qrCodeUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={qrCodeUrl} alt="Tournament Pass QR" className="w-32 h-32 rounded bg-white p-2" />
+                      <img src={qrCodeUrl} alt="Tournament Pass QR" className="w-32 h-32 rounded bg-qr-bg p-2" />
                     ) : (
-                      <div className="w-32 h-32 bg-bg-dark animate-pulse rounded" />
+                      <div className="w-32 h-32 bg-bg animate-pulse rounded" />
                     )}
                     <span className="text-[8px] font-sans font-bold uppercase tracking-wider text-text-muted">SCAN AT VENUE GATE TO CHECK IN</span>
                   </div>
@@ -524,7 +524,7 @@ export default function TournamentsPage() {
 
                 <div className="mt-6 flex flex-col gap-3.5 w-full">
                   <button onClick={handleDownloadTicket}
-                    className="w-full bg-elevated-dark hover:bg-white/5 border border-white/10 text-text-main font-semibold py-3 rounded-md flex items-center justify-center gap-2">
+                    className="w-full bg-elevated hover:bg-elevated border border-border-default text-text-main font-semibold py-3 rounded-md flex items-center justify-center gap-2">
                     <Download className="w-4 h-4" /> Download Ticket Pass
                   </button>
                   <button onClick={() => setRegStep("closed")} className="w-full bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold py-3 rounded-md transition-all">
@@ -535,15 +535,15 @@ export default function TournamentsPage() {
             )}
 
             {regStep === "error" && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-surface-dark border border-red-500/30 rounded-md max-w-md w-full p-6 text-center">
-                <AlertCircle className="w-10 h-10 text-red-400 mx-auto" />
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-surface border border-error/30 rounded-md max-w-md w-full p-6 text-center">
+                <AlertCircle className="w-10 h-10 text-error mx-auto" />
                 <h3 className="font-poppins font-bold text-lg text-text-main mt-4">Registration Failed</h3>
                 <p className="text-xs text-text-muted mt-2 font-sans">{regError}</p>
                 <div className="mt-6 flex gap-3 justify-center">
                   <button onClick={() => setRegStep("form")} className="bg-brand-lime text-black font-poppins font-bold text-sm py-2.5 px-6 rounded-md">
                     Try Again
                   </button>
-                  <button onClick={() => setRegStep("closed")} className="bg-elevated-dark border border-white/10 text-text-main font-sans text-sm py-2.5 px-6 rounded-md">
+                  <button onClick={() => setRegStep("closed")} className="bg-elevated border border-border-default text-text-main font-sans text-sm py-2.5 px-6 rounded-md">
                     Close
                   </button>
                 </div>

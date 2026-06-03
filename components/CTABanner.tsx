@@ -5,17 +5,17 @@ import { ArrowUpRight } from "lucide-react";
 
 export default function CTABanner() {
   return (
-    <section id="tournaments" className="relative py-20 px-6 md:px-8 bg-bg-dark overflow-hidden">
+    <section id="tournaments" className="relative py-20 px-6 md:px-8 bg-bg overflow-hidden">
       {/* Outer container to hold the background image and card */}
-      <div className="max-w-7xl mx-auto relative rounded-lg overflow-hidden border border-white/10 shadow-card-shadow min-h-[420px] flex items-center">
+      <div className="max-w-7xl mx-auto relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow min-h-[420px] flex items-center">
         
         {/* Background Image with Dark Overlays */}
         <div 
           className="absolute inset-0 bg-cover bg-center z-0" 
           style={{ backgroundImage: `url('/stadium_turf_bg.png')` }}
         />
-        <div className="absolute inset-0 bg-black/60 z-0" />
-        <div className="absolute inset-0 bg-gradient-to-r from-bg-dark via-bg-dark/80 to-transparent z-0" />
+        <div className="absolute inset-0 bg-overlay z-0" />
+        <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-transparent z-0" />
         
         {/* Content Centered Container */}
         <div className="relative z-10 w-full max-w-3xl mx-auto text-center flex flex-col items-center justify-center p-8 sm:p-12 md:p-16">
@@ -26,7 +26,7 @@ export default function CTABanner() {
             Your next game is <span className="text-brand-lime">one tap away</span>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-text-muted max-w-md font-sans leading-relaxed">
-            Pick a turf, pick a time. We'll handle the rest.
+            Pick a turf, pick a time. We&apos;ll handle the rest.
           </p>
 
           {/* CTAs */}
@@ -40,7 +40,7 @@ export default function CTABanner() {
             </a>
             <a 
               href="#explore"
-              className="bg-surface-dark border border-white/10 text-text-main hover:bg-white/5 font-poppins font-semibold px-8 py-3.5 rounded-[12px] transition-all duration-300 flex items-center justify-center"
+              className="bg-surface border border-border-default text-text-main hover:bg-elevated font-poppins font-semibold px-8 py-3.5 rounded-[12px] transition-all duration-300 flex items-center justify-center"
             >
               Explore Turfs
             </a>

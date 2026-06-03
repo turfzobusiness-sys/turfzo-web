@@ -60,7 +60,7 @@ export function TurnstileWidget({
   if (error) {
     return (
       <div
-        className={`text-xs text-red-400 font-sans p-3 rounded border border-red-500/20 bg-red-500/5 ${
+        className={`text-xs text-error font-sans p-3 rounded border border-error/20 bg-error/5 ${
           className ?? ""
         }`}
       >

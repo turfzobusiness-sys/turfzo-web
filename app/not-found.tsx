@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 
 export default function NotFound() {
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <Navbar />
       <main className="flex-grow flex items-center justify-center px-6 py-16">
         <div className="max-w-md w-full text-center">
@@ -35,7 +35,7 @@ export default function NotFound() {
             </Link>
             <Link
               href="/explore"
-              className="bg-surface-dark border border-white/10 hover:border-brand-lime/30 text-text-main font-semibold text-sm px-6 py-3 rounded-md transition-all flex items-center justify-center gap-2"
+              className="bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-semibold text-sm px-6 py-3 rounded-md transition-all flex items-center justify-center gap-2"
             >
               <Search className="w-4 h-4" />
               Browse turfs

@@ -52,7 +52,7 @@ export default function HowItWorks() {
   return (
 
 
-    <section id="how-it-works" className="relative py-20 bg-bg-dark border-t border-white/5">
+    <section id="how-it-works" className="relative py-20 bg-bg border-t border-border-subtle">
       <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10">
         
         {/* Section Header */}
@@ -76,7 +76,7 @@ export default function HowItWorks() {
         >
           {/* Connector Line (Desktop Horizontal) */}
           <div className="hidden lg:block absolute top-[32px] left-[12%] right-[12%] h-[1px] pointer-events-none z-0">
-            <div className="w-full h-full border-t border-dashed border-white/10" />
+            <div className="w-full h-full border-t border-dashed border-border-default" />
           </div>
 
           {steps.map((step, idx) => {
@@ -88,7 +88,7 @@ export default function HowItWorks() {
                 className="flex flex-col items-center text-center relative z-10 group"
               >
                 {/* Clean step indicator icon */}
-                <div className="relative w-16 h-16 rounded-[12px] flex items-center justify-center bg-surface-dark border border-white/10 group-hover:border-white/20 transition-all duration-300">
+                <div className="relative w-16 h-16 rounded-[12px] flex items-center justify-center bg-surface border border-border-default group-hover:border-border-strong transition-all duration-300">
                   <Icon className="w-6 h-6 text-text-main group-hover:text-brand-lime transition-colors duration-300" />
                   
                   {/* Absolute Step Badge */}

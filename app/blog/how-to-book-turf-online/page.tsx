@@ -100,7 +100,7 @@ const steps = [
 
 export default function HowToBookTurfOnline() {
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>
           How to Book a Turf Online in 2 Minutes [Step-by-Step Guide] | Turfzo
@@ -180,7 +180,7 @@ export default function HowToBookTurfOnline() {
           </motion.div>
 
           {/* Quick Answer */}
-          <div className="bg-surface-dark border border-brand-lime/10 rounded-md p-6 mb-12">
+          <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
             <h2 className="font-poppins font-bold text-base text-brand-lime mb-2">Quick Answer</h2>
             <p className="text-sm text-text-main font-sans leading-relaxed">
               To book a turf on Turfzo: (1) Visit turfzo.com/explore and select your city, (2) Browse available turfs and click &ldquo;View Slots&rdquo;, (3) Pick your date and time slot, (4) Pay online via UPI or card, (5) Receive your QR code ticket. The entire process takes about 2 minutes.
@@ -201,7 +201,7 @@ export default function HowToBookTurfOnline() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: idx * 0.1 }}
-                    className="bg-surface-dark border border-white/5 hover:border-brand-lime/10 rounded-md p-6 flex gap-5 transition-all duration-300"
+                    className="bg-surface border border-border-subtle hover:border-brand-lime/10 rounded-md p-6 flex gap-5 transition-all duration-300"
                   >
                     <div className="w-12 h-12 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime border border-brand-lime/10 shrink-0">
                       <span className="font-poppins font-bold text-sm">{idx + 1}</span>
@@ -238,7 +238,7 @@ export default function HowToBookTurfOnline() {
                 { name: "Debit Card", apps: "All Indian banks" },
                 { name: "Net Banking", apps: "All major banks" },
               ].map((method) => (
-                <div key={method.name} className="bg-surface-dark border border-white/5 rounded-md p-4 text-center">
+                <div key={method.name} className="bg-surface border border-border-subtle rounded-md p-4 text-center">
                   <h3 className="font-poppins font-bold text-sm text-text-main">{method.name}</h3>
                   <p className="text-[10px] text-text-muted font-sans mt-1">{method.apps}</p>
                 </div>
@@ -260,7 +260,7 @@ export default function HowToBookTurfOnline() {
                 { tip: "Arrive 5-10 minutes early to find parking and get settled" },
                 { tip: "Save your favorite turfs for quick rebooking next time" },
               ].map((item, idx) => (
-                <div key={idx} className="bg-surface-dark border border-white/5 rounded-md p-4 flex gap-3">
+                <div key={idx} className="bg-surface border border-border-subtle rounded-md p-4 flex gap-3">
                   <CheckCircle2 className="w-4 h-4 text-brand-lime shrink-0 mt-0.5" />
                   <p className="text-xs text-text-muted font-sans">{item.tip}</p>
                 </div>
@@ -282,7 +282,7 @@ export default function HowToBookTurfOnline() {
             <h2 className="font-poppins font-bold text-2xl text-text-main mb-8">Frequently Asked Questions</h2>
             <div className="flex flex-col gap-4">
               {faqItems.map((item, idx) => (
-                <details key={idx} className="bg-surface-dark border border-white/5 rounded-md p-5 group">
+                <details key={idx} className="bg-surface border border-border-subtle rounded-md p-5 group">
                   <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}
                     <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />

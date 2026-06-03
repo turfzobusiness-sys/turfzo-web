@@ -149,14 +149,14 @@ export default function BookingsPage() {
 
   if (status === "initial" || status === "loading" || status === "unauthenticated") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-dark">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>My Bookings | Turfzo</title>
         <meta name="description" content="View and manage your turf bookings on Turfzo. See upcoming slots, past bookings, and download tickets." />
@@ -179,7 +179,7 @@ export default function BookingsPage() {
             </Link>
           </div>
 
-          <div className="flex gap-2 mb-6 bg-surface-dark border border-white/5 rounded-pill p-1 w-fit">
+          <div className="flex gap-2 mb-6 bg-surface border border-border-subtle rounded-pill p-1 w-fit">
             {(["all", "upcoming", "past", "cancelled"] as const).map((f) => (
               <button
                 key={f}
@@ -194,19 +194,19 @@ export default function BookingsPage() {
           </div>
 
           {error && (
-            <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-md p-4 flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
-              <p className="text-sm text-red-400 font-sans">{error}</p>
+            <div className="mb-6 bg-error/10 border border-error/20 rounded-md p-4 flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-error shrink-0" />
+              <p className="text-sm text-error font-sans">{error}</p>
             </div>
           )}
 
           {loading ? (
-            <div className="bg-surface-dark border border-white/5 rounded-md p-16 text-center flex flex-col items-center gap-4">
+            <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center gap-4">
               <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
               <h3 className="font-poppins font-bold text-lg text-text-main">Loading Bookings</h3>
             </div>
           ) : filteredBookings.length === 0 ? (
-            <div className="bg-surface-dark border border-white/5 rounded-md p-16 text-center flex flex-col items-center gap-3">
+            <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center gap-3">
               <Ticket className="w-12 h-12 text-text-muted opacity-50" />
               <h3 className="font-poppins font-bold text-lg text-text-main">No Bookings Found</h3>
               <p className="text-text-muted text-sm font-sans max-w-xs">
@@ -226,9 +226,9 @@ export default function BookingsPage() {
                     key={booking._id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-surface-dark border border-white/5 hover:border-brand-lime/10 rounded-md p-5 flex flex-col md:flex-row gap-5"
+                    className="bg-surface border border-border-default hover:border-brand-lime/10 rounded-md p-5 flex flex-col md:flex-row gap-5"
                   >
-                    <div className="w-full md:w-40 h-28 bg-elevated-dark rounded-sm overflow-hidden flex-shrink-0 relative">
+                    <div className="w-full md:w-40 h-28 bg-elevated rounded-sm overflow-hidden flex-shrink-0 relative">
                       {turf?.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={turf.image_url} alt={turf.name} className="w-full h-full object-cover" />
@@ -246,8 +246,8 @@ export default function BookingsPage() {
                             booking.status === "confirmed" && isUpcoming
                               ? "bg-brand-lime/10 text-brand-lime border-brand-lime/30"
                               : booking.status === "cancelled"
-                                ? "bg-red-500/10 text-red-400 border-red-500/20"
-                                : "bg-white/5 text-text-muted border-white/10"
+                                ? "bg-error/10 text-error border-error/20"
+                                : "bg-white/5 text-text-muted border-border-default"
                           }`}>
                             {booking.status}
                           </span>
@@ -281,7 +281,7 @@ export default function BookingsPage() {
                             </button>
                             <button
                               onClick={() => handleCancel(booking._id)}
-                              className="bg-elevated-dark hover:bg-red-500/10 border border-white/5 hover:border-red-500/30 text-text-muted hover:text-red-400 font-sans text-xs py-2 px-4 rounded-md transition-colors"
+                              className="bg-elevated hover:bg-error/10 border border-border-subtle hover:border-error/30 text-text-muted hover:text-error font-sans text-xs py-2 px-4 rounded-md transition-colors"
                             >
                               Cancel
                             </button>
@@ -299,18 +299,18 @@ export default function BookingsPage() {
 
       {activeQR && qrUrls[activeQR] && (
         <div
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-overlay-heavy backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => setActiveQR(null)}
         >
-          <div className="bg-surface-dark border border-white/10 rounded-md max-w-sm w-full p-6 text-center" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface border border-border-default rounded-md max-w-sm w-full p-6 text-center" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-poppins font-bold text-lg text-text-main">Booking QR Code</h3>
-              <button onClick={() => setActiveQR(null)} className="p-1.5 hover:bg-white/10 rounded-full">
+              <button onClick={() => setActiveQR(null)} className="p-1.5 hover:bg-elevated rounded-full">
                 <X className="w-5 h-5 text-text-muted" />
               </button>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qrUrls[activeQR]} alt="Booking QR" className="w-56 h-56 mx-auto rounded bg-white p-2" />
+            <img src={qrUrls[activeQR]} alt="Booking QR" className="w-56 h-56 mx-auto rounded bg-qr-bg p-2" />
             <p className="text-xs text-text-muted font-sans mt-4">
               Show this QR at the venue entrance to check in.
             </p>

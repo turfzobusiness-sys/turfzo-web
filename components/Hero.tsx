@@ -30,7 +30,7 @@ export default function Hero() {
   };
 
   return (
-    <section id="home" className="relative min-h-screen pt-28 pb-16 flex items-center justify-center overflow-hidden bg-bg-dark">
+    <section id="home" className="relative min-h-screen pt-28 pb-16 flex items-center justify-center overflow-hidden bg-bg">
 
 
       {/* Grid Layout Container */}
@@ -46,7 +46,7 @@ export default function Hero() {
           {/* Badge */}
           <motion.div 
             variants={itemVariants}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-[8px] bg-surface-dark border border-white/10 w-fit mx-auto lg:mx-0 mb-6 text-xs text-text-muted font-sans font-medium uppercase tracking-wider"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-[8px] bg-surface border border-border-default w-fit mx-auto lg:mx-0 mb-6 text-xs text-text-muted font-sans font-medium uppercase tracking-wider"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-brand-lime" />
             <span>Now Live in 8+ Cities</span>
@@ -84,7 +84,7 @@ export default function Hero() {
             
             <a 
               href="#how-it-works"
-              className="bg-surface-dark border border-white/10 text-text-main hover:bg-white/5 font-poppins font-semibold px-8 py-4 rounded-[12px] transition-all duration-300 w-full sm:w-auto justify-center flex items-center"
+              className="bg-surface border border-border-default text-text-main hover:bg-elevated font-poppins font-semibold px-8 py-4 rounded-[12px] transition-all duration-300 w-full sm:w-auto justify-center flex items-center"
             >
               How it works
             </a>
@@ -93,7 +93,7 @@ export default function Hero() {
           {/* Stats Bar */}
           <motion.div 
             variants={itemVariants}
-            className="mt-12 pt-8 border-t border-white/10 grid grid-cols-3 gap-4"
+            className="mt-12 pt-8 border-t border-border-default grid grid-cols-3 gap-4"
           >
             {/* Stat 1 */}
             <div className="flex flex-col items-center lg:items-start text-center lg:text-left gap-1">
@@ -107,7 +107,7 @@ export default function Hero() {
             </div>
 
             {/* Stat 2 */}
-            <div className="flex flex-col items-center lg:items-start text-center lg:text-left gap-1 border-x border-white/10 px-2 sm:px-4">
+            <div className="flex flex-col items-center lg:items-start text-center lg:text-left gap-1 border-x border-border-default px-2 sm:px-4">
               <div className="flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-brand-lime stroke-[2.5]" />
                 <span className="font-poppins text-lg sm:text-xl font-bold text-text-main">50K+</span>

@@ -351,7 +351,7 @@ export default function ExplorePage() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>Explore Turfs Near You | Book Football, Cricket & More | Turfzo</title>
         <meta name="description" content="Browse 50+ verified football turfs, cricket grounds, and sports venues across India. Filter by sport, price, and amenities. Real-time availability, instant booking, and secure online payment." />
@@ -366,12 +366,12 @@ export default function ExplorePage() {
       <main className="flex-grow pt-24 pb-16">
         {flowStep === "listing" && (
           <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
-            <div className="relative rounded-lg overflow-hidden border border-white/10 shadow-card-shadow p-8 sm:p-12 mb-10 min-h-[220px] flex flex-col justify-end">
+            <div className="relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow p-8 sm:p-12 mb-10 min-h-[220px] flex flex-col justify-end">
               <div
                 className="absolute inset-0 bg-cover bg-center z-0 opacity-40"
                 style={{ backgroundImage: `url('/stadium_turf_bg.png')` }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg-dark via-bg-dark/70 to-transparent z-0" />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-transparent z-0" />
 
               <div className="relative z-10 text-left mb-6">
                 <span className="text-xs font-poppins font-extrabold tracking-widest text-brand-lime uppercase">
@@ -386,8 +386,8 @@ export default function ExplorePage() {
                 </p>
               </div>
 
-              <div className="relative z-10 w-full bg-surface-dark/90 backdrop-blur-md border border-white/10 rounded-pill p-2 pl-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-center shadow-card-shadow mt-4">
-                <div className="flex items-center gap-3 border-r border-white/5 pr-4 py-2">
+              <div className="relative z-10 w-full bg-surface/90 backdrop-blur-md border border-border-default rounded-pill p-2 pl-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-center shadow-card-shadow mt-4">
+                <div className="flex items-center gap-3 border-r border-border-subtle pr-4 py-2">
                   <MapPin className="w-5 h-5 text-brand-lime shrink-0" />
                   <div className="flex flex-col text-left leading-none">
                     <span className="text-[10px] text-text-muted font-sans font-semibold uppercase tracking-wider">Location</span>
@@ -400,7 +400,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 border-r border-white/5 pr-4 py-2">
+                <div className="flex items-center gap-3 border-r border-border-subtle pr-4 py-2">
                   <CalendarIcon className="w-5 h-5 text-brand-lime shrink-0" />
                   <div className="flex flex-col text-left leading-none">
                     <span className="text-[10px] text-text-muted font-sans font-semibold uppercase tracking-wider">Date</span>
@@ -413,7 +413,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 border-r border-white/5 pr-4 py-2">
+                <div className="flex items-center gap-3 border-r border-border-subtle pr-4 py-2">
                   <Clock className="w-5 h-5 text-brand-lime shrink-0" />
                   <div className="flex flex-col text-left leading-none">
                     <span className="text-[10px] text-text-muted font-sans font-semibold uppercase tracking-wider">Sport</span>
@@ -428,8 +428,8 @@ export default function ExplorePage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              <div className="lg:col-span-3 bg-surface-dark border border-white/5 rounded-md p-6 flex flex-col gap-6 sticky top-24">
-                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+              <div className="lg:col-span-3 bg-surface border border-border-default rounded-md p-6 flex flex-col gap-6 sticky top-24">
+                <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                   <div className="flex items-center gap-2">
                     <SlidersHorizontal className="w-4 h-4 text-brand-lime" />
                     <span className="font-poppins font-bold text-base text-text-main">Filters</span>
@@ -473,7 +473,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3 border-t border-white/5 pt-5">
+                <div className="flex flex-col gap-3 border-t border-border-subtle pt-5">
                   <div className="flex justify-between items-center text-xs font-poppins font-bold uppercase text-text-main tracking-wider">
                     <span>Max Price</span>
                     <span className="text-brand-lime font-sans font-bold text-sm">₹{priceRange}</span>
@@ -485,7 +485,7 @@ export default function ExplorePage() {
                     step="100"
                     value={priceRange}
                     onChange={(e) => setPriceRange(Number(e.target.value))}
-                    className="w-full h-1.5 bg-elevated-dark rounded-lg appearance-none cursor-pointer accent-brand-lime"
+                    className="w-full h-1.5 bg-elevated rounded-lg appearance-none cursor-pointer accent-brand-lime"
                   />
                   <div className="flex justify-between text-[10px] text-text-muted font-sans">
                     <span>₹500</span>
@@ -493,7 +493,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3 border-t border-white/5 pt-5">
+                <div className="flex flex-col gap-3 border-t border-border-subtle pt-5">
                   <span className="text-xs font-poppins font-bold uppercase text-text-main tracking-wider">Facilities</span>
                   <div className="flex flex-col gap-2">
                     {["Flood Lights", "Parking", "Changing Room", "Cafeteria"].map((facility) => {
@@ -532,7 +532,7 @@ export default function ExplorePage() {
                         <select
                           value={sortBy}
                           onChange={(e) => setSortBy(e.target.value)}
-                          className="bg-surface-dark border border-white/5 text-text-main py-1.5 pl-3 pr-8 rounded-md font-semibold focus:outline-none appearance-none cursor-pointer"
+                          className="bg-surface border border-border-subtle text-text-main py-1.5 pl-3 pr-8 rounded-md font-semibold focus:outline-none appearance-none cursor-pointer"
                         >
                           <option>Popular</option>
                           <option>Price: Low to High</option>
@@ -541,29 +541,29 @@ export default function ExplorePage() {
                         <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
                       </div>
                     </div>
-                    <div className="flex items-center bg-surface-dark border border-white/5 rounded-md p-1 gap-1">
-                      <button className="p-1 bg-elevated-dark text-brand-lime rounded"><List className="w-4 h-4" /></button>
+                    <div className="flex items-center bg-surface border border-border-subtle rounded-md p-1 gap-1">
+                      <button className="p-1 bg-elevated text-brand-lime rounded"><List className="w-4 h-4" /></button>
                       <button className="p-1 text-text-muted hover:text-brand-lime rounded"><Grid className="w-4 h-4" /></button>
                     </div>
                   </div>
                 </div>
 
                 {loadError && (
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-md p-4 flex items-center gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
-                    <p className="text-sm text-red-400 font-sans">{loadError}</p>
+                  <div className="bg-error/10 border border-error/20 rounded-md p-4 flex items-center gap-3">
+                    <AlertCircle className="w-5 h-5 text-error shrink-0" />
+                    <p className="text-sm text-error font-sans">{loadError}</p>
                   </div>
                 )}
 
                 <div className="flex flex-col gap-5">
                   {loading ? (
-                    <div className="bg-surface-dark border border-white/5 rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
+                    <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
                       <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
                       <h3 className="font-poppins font-bold text-lg text-text-main">Loading Turfs</h3>
                       <p className="text-text-muted text-sm font-sans max-w-xs">Fetching the best venues near you...</p>
                     </div>
                   ) : filteredTurfs.length === 0 ? (
-                    <div className="bg-surface-dark border border-white/5 rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
+                    <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
                       <SlidersHorizontal className="w-12 h-12 text-text-muted opacity-50" />
                       <h3 className="font-poppins font-bold text-lg text-text-main">No Venues Found</h3>
                       <p className="text-text-muted text-sm font-sans max-w-xs">Try adjusting your filters or resetting the form to discover matches.</p>
@@ -576,9 +576,9 @@ export default function ExplorePage() {
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
-                        className="bg-surface-dark border border-white/5 hover:border-brand-lime/10 rounded-md p-5 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:shadow-card-shadow"
+                        className="bg-surface border border-border-default hover:border-brand-lime/10 rounded-md p-5 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:shadow-card-shadow"
                       >
-                        <div className="relative w-full md:w-60 h-40 bg-elevated-dark rounded-sm overflow-hidden flex-shrink-0">
+                        <div className="relative w-full md:w-60 h-40 bg-elevated rounded-sm overflow-hidden flex-shrink-0">
                           <Image
                             src={turf.image}
                             alt={turf.name}
@@ -586,14 +586,14 @@ export default function ExplorePage() {
                             className="object-cover transition-transform duration-500 hover:scale-105"
                           />
                           {turf.premium && (
-                            <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-sm border border-brand-lime/30 text-brand-lime font-poppins font-bold text-[10px] px-2.5 py-1 rounded-pill flex items-center gap-1 select-none">
+                            <div className="absolute top-3 left-3 bg-overlay-heavy backdrop-blur-sm border border-brand-lime/30 text-brand-lime font-poppins font-bold text-[10px] px-2.5 py-1 rounded-pill flex items-center gap-1 select-none">
                               <Award className="w-3.5 h-3.5 fill-brand-lime text-brand-lime" />
                               Premium
                             </div>
                           )}
                           <button
                             onClick={() => toggleWishlist(turf.id)}
-                            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center text-text-main hover:text-brand-lime transition-colors"
+                            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-overlay backdrop-blur-sm flex items-center justify-center text-text-main hover:text-brand-lime transition-colors"
                           >
                             <Heart className={`w-4 h-4 ${wishlist.includes(turf.id) ? "fill-brand-lime text-brand-lime" : ""}`} />
                           </button>
@@ -613,7 +613,7 @@ export default function ExplorePage() {
                               {turf.location}
                             </p>
 
-                            <div className="flex items-center gap-5 mt-4 text-xs text-text-muted border-t border-white/5 pt-4 flex-wrap">
+                            <div className="flex items-center gap-5 mt-4 text-xs text-text-muted border-t border-border-subtle pt-4 flex-wrap">
                               <div className="flex flex-col text-left">
                                 <span className="text-[9px] uppercase tracking-wider text-text-muted">Sport</span>
                                 <span className="font-semibold text-text-main mt-0.5">{turf.sport} ({turf.size})</span>
@@ -636,7 +636,7 @@ export default function ExplorePage() {
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-4 md:mt-0">
+                          <div className="flex items-center justify-between border-t border-border-subtle pt-4 mt-4 md:mt-0">
                             <div>
                               <span className="text-[10px] text-text-muted block leading-none font-sans uppercase">Starting from</span>
                               <span className="text-xl font-poppins font-extrabold text-brand-lime mt-1 block">
@@ -667,17 +667,17 @@ export default function ExplorePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+              className="fixed inset-0 z-50 bg-overlay-heavy backdrop-blur-md flex items-center justify-center p-4"
             >
               <motion.div
                 initial={{ scale: 0.95, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 20 }}
-                className="bg-surface-dark border border-white/10 rounded-md max-w-xl w-full p-6 relative shadow-card-shadow max-h-[90vh] overflow-y-auto"
+                className="bg-surface border border-border-default rounded-md max-w-xl w-full p-6 relative shadow-card-shadow max-h-[90vh] overflow-y-auto"
               >
                 <button
                   onClick={() => setFlowStep("listing")}
-                  className="absolute top-4 right-4 p-1.5 bg-elevated-dark hover:bg-white/10 rounded-full text-text-muted hover:text-text-main transition-colors"
+                  className="absolute top-4 right-4 p-1.5 bg-elevated hover:bg-elevated rounded-full text-text-muted hover:text-text-main transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -704,7 +704,7 @@ export default function ExplorePage() {
                         className={`flex flex-col items-center justify-center p-3 rounded-md border min-w-16 transition-all ${
                           selectedDate === d.value
                             ? "bg-brand-lime text-black border-brand-lime font-bold shadow-glow-lime"
-                            : "bg-elevated-dark text-text-muted border-white/5 hover:text-text-main"
+                            : "bg-elevated text-text-muted border-border-subtle hover:text-text-main"
                         }`}
                       >
                         <span className="text-xs">{d.weekday}</span>
@@ -723,8 +723,8 @@ export default function ExplorePage() {
                         onClick={() => setSelectedPitch(pitch)}
                         className={`p-3 text-xs rounded-md border text-center font-sans font-semibold transition-all ${
                           selectedPitch === pitch
-                            ? "bg-elevated-dark text-brand-lime border-brand-lime/50"
-                            : "bg-elevated-dark text-text-muted border-white/5 hover:text-text-main"
+                            ? "bg-elevated text-brand-lime border-brand-lime/50"
+                            : "bg-elevated text-text-muted border-border-subtle hover:text-text-main"
                         }`}
                       >
                         {pitch}
@@ -755,10 +755,10 @@ export default function ExplorePage() {
                               onClick={() => setSelectedTimeSlot(slot.time)}
                               className={`p-2.5 rounded-md border text-xs font-semibold text-center transition-all ${
                                 !slot.available
-                                  ? "bg-bg-dark/40 text-text-muted/30 border-white/5 line-through cursor-not-allowed"
+                                  ? "bg-bg/40 text-text-muted/30 border-border-subtle line-through cursor-not-allowed"
                                   : isSelected
                                     ? "bg-brand-lime text-black border-brand-lime shadow-glow-lime font-bold"
-                                    : "bg-elevated-dark text-text-muted border-white/5 hover:text-text-main"
+                                    : "bg-elevated text-text-muted border-border-subtle hover:text-text-main"
                               }`}
                             >
                               {slot.time}
@@ -770,7 +770,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
 
-                <div className="mt-8 pt-5 border-t border-white/5 flex items-center justify-between">
+                <div className="mt-8 pt-5 border-t border-border-subtle flex items-center justify-between">
                   <div className="text-left">
                     <span className="text-[10px] text-text-muted uppercase">Selected Slot</span>
                     <span className="text-xs font-bold text-text-main block mt-1">
@@ -780,7 +780,7 @@ export default function ExplorePage() {
                   <button
                     disabled={!selectedTimeSlot}
                     onClick={handleProceedToCheckout}
-                    className="bg-brand-lime disabled:bg-elevated-dark disabled:text-text-muted/40 text-black font-poppins font-bold text-sm py-3 px-8 rounded-md transition-all duration-300 hover:scale-102 flex items-center gap-1.5"
+                    className="bg-brand-lime disabled:bg-elevated disabled:text-text-muted/40 text-black font-poppins font-bold text-sm py-3 px-8 rounded-md transition-all duration-300 hover:scale-102 flex items-center gap-1.5"
                   >
                     Proceed to Checkout
                     <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -797,23 +797,23 @@ export default function ExplorePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+              className="fixed inset-0 z-50 bg-overlay-heavy backdrop-blur-md flex items-center justify-center p-4"
             >
               <motion.div
                 initial={{ scale: 0.95, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 20 }}
-                className="bg-surface-dark border border-white/10 rounded-md max-w-xl w-full p-6 relative shadow-card-shadow max-h-[90vh] overflow-y-auto"
+                className="bg-surface border border-border-default rounded-md max-w-xl w-full p-6 relative shadow-card-shadow max-h-[90vh] overflow-y-auto"
               >
                 <button
                   onClick={() => setFlowStep("slots")}
-                  className="absolute top-4 left-4 p-1.5 bg-elevated-dark hover:bg-white/10 rounded-full text-text-muted hover:text-text-main transition-colors"
+                  className="absolute top-4 left-4 p-1.5 bg-elevated hover:bg-elevated rounded-full text-text-muted hover:text-text-main transition-colors"
                 >
                   <X className="w-5 h-5 rotate-45" />
                 </button>
                 <button
                   onClick={() => setFlowStep("listing")}
-                  className="absolute top-4 right-4 p-1.5 bg-elevated-dark hover:bg-white/10 rounded-full text-text-muted hover:text-text-main transition-colors"
+                  className="absolute top-4 right-4 p-1.5 bg-elevated hover:bg-elevated rounded-full text-text-muted hover:text-text-main transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -827,8 +827,8 @@ export default function ExplorePage() {
                   </h2>
                 </div>
 
-                <div className="mt-6 bg-elevated-dark rounded-md p-4 border border-white/5 text-left flex flex-col gap-3">
-                  <div className="flex justify-between items-center pb-3 border-b border-white/5">
+                <div className="mt-6 bg-elevated rounded-md p-4 border border-border-subtle text-left flex flex-col gap-3">
+                  <div className="flex justify-between items-center pb-3 border-b border-border-subtle">
                     <div>
                       <h4 className="font-poppins font-bold text-sm text-text-main">{selectedTurf.name}</h4>
                       <p className="text-[11px] text-text-muted flex items-center gap-0.5 mt-0.5 font-sans">
@@ -861,7 +861,7 @@ export default function ExplorePage() {
                         max={selectedTurf.premium ? 22 : 14}
                         value={attendees}
                         onChange={(e) => setAttendees(Math.max(2, Math.min(22, Number(e.target.value))))}
-                        className="bg-bg-dark border border-white/5 rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30"
+                        className="bg-bg border border-border-subtle rounded px-3 py-2 text-sm text-text-main focus:outline-none focus:border-brand-lime/30"
                       />
                     </div>
                   </div>
@@ -871,7 +871,7 @@ export default function ExplorePage() {
                   <span className="text-xs font-poppins font-bold uppercase text-text-main tracking-wider">Select Payment Method</span>
                   <div className="flex flex-col gap-2">
                     <label className={`p-4 rounded-md border flex items-center justify-between cursor-pointer select-none transition-colors ${
-                      selectedPayment === 'upi' ? 'bg-elevated-dark border-brand-lime/50' : 'bg-surface-dark border-white/5'
+                      selectedPayment === 'upi' ? 'bg-elevated border-brand-lime/50' : 'bg-surface border-border-subtle'
                     }`}>
                       <div className="flex items-center gap-3">
                         <input type="radio" checked={selectedPayment === 'upi'} onChange={() => setSelectedPayment('upi')} className="accent-brand-lime" />
@@ -881,12 +881,12 @@ export default function ExplorePage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-[8px] font-sans text-text-muted">GPay</span>
-                        <span className="bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-[8px] font-sans text-text-muted">Paytm</span>
+                        <span className="bg-white/5 border border-border-default px-1.5 py-0.5 rounded text-[8px] font-sans text-text-muted">GPay</span>
+                        <span className="bg-white/5 border border-border-default px-1.5 py-0.5 rounded text-[8px] font-sans text-text-muted">Paytm</span>
                       </div>
                     </label>
                     <label className={`p-4 rounded-md border flex items-center justify-between cursor-pointer select-none transition-colors ${
-                      selectedPayment === 'card' ? 'bg-elevated-dark border-brand-lime/50' : 'bg-surface-dark border-white/5'
+                      selectedPayment === 'card' ? 'bg-elevated border-brand-lime/50' : 'bg-surface border-border-subtle'
                     }`}>
                       <div className="flex items-center gap-3">
                         <input type="radio" checked={selectedPayment === 'card'} onChange={() => setSelectedPayment('card')} className="accent-brand-lime" />
@@ -898,7 +898,7 @@ export default function ExplorePage() {
                       <CreditCard className="w-5 h-5 text-text-muted shrink-0" />
                     </label>
                     <label className={`p-4 rounded-md border flex items-center justify-between cursor-pointer select-none transition-colors ${
-                      selectedPayment === 'netbanking' ? 'bg-elevated-dark border-brand-lime/50' : 'bg-surface-dark border-white/5'
+                      selectedPayment === 'netbanking' ? 'bg-elevated border-brand-lime/50' : 'bg-surface border-border-subtle'
                     }`}>
                       <div className="flex items-center gap-3">
                         <input type="radio" checked={selectedPayment === 'netbanking'} onChange={() => setSelectedPayment('netbanking')} className="accent-brand-lime" />
@@ -911,7 +911,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
 
-                <div className="mt-6 border-t border-white/5 pt-5 flex flex-col gap-2.5 text-xs font-sans text-left">
+                <div className="mt-6 border-t border-border-subtle pt-5 flex flex-col gap-2.5 text-xs font-sans text-left">
                   <div className="flex justify-between items-center text-text-muted">
                     <span>Base Fare (1 Hour)</span>
                     <span>{formatPrice(pricing.subtotal)}</span>
@@ -920,7 +920,7 @@ export default function ExplorePage() {
                     <span>Convenience Fee (1.8%)</span>
                     <span>{formatPrice(pricing.convenience)}</span>
                   </div>
-                  <div className="flex justify-between items-center text-text-muted pb-2 border-b border-white/5">
+                  <div className="flex justify-between items-center text-text-muted pb-2 border-b border-border-subtle">
                     <span>GST (18%)</span>
                     <span>{formatPrice(pricing.gst)}</span>
                   </div>
@@ -953,7 +953,7 @@ export default function ExplorePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center gap-4"
+              className="fixed inset-0 z-50 bg-overlay-heavy backdrop-blur-md flex flex-col items-center justify-center gap-4"
             >
               <Loader2 className="w-10 h-10 text-brand-lime animate-spin stroke-[2.5]" />
               <h3 className="font-poppins font-bold text-lg text-text-main mt-2">Processing Your Booking</h3>
@@ -968,10 +968,10 @@ export default function ExplorePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+              className="fixed inset-0 z-50 bg-overlay-heavy backdrop-blur-md flex items-center justify-center p-4"
             >
-              <div className="bg-surface-dark border border-red-500/30 rounded-md max-w-md w-full p-6 text-center">
-                <AlertCircle className="w-10 h-10 text-red-400 mx-auto" />
+              <div className="bg-surface border border-error/30 rounded-md max-w-md w-full p-6 text-center">
+                <AlertCircle className="w-10 h-10 text-error mx-auto" />
                 <h3 className="font-poppins font-bold text-lg text-text-main mt-4">Payment Failed</h3>
                 <p className="text-xs text-text-muted mt-2 font-sans">{bookingError}</p>
                 <div className="mt-6 flex gap-3 justify-center">
@@ -983,7 +983,7 @@ export default function ExplorePage() {
                   </button>
                   <button
                     onClick={() => setFlowStep("listing")}
-                    className="bg-elevated-dark border border-white/10 text-text-main font-sans text-sm py-2.5 px-6 rounded-md"
+                    className="bg-elevated border border-border-default text-text-main font-sans text-sm py-2.5 px-6 rounded-md"
                   >
                     Browse Other Turfs
                   </button>
@@ -1011,11 +1011,11 @@ export default function ExplorePage() {
               Your slot is successfully reserved. Present the digital ticket QR code when arriving.
             </p>
 
-            <div className="relative w-full bg-surface-dark border border-white/10 rounded-md p-6 mt-8 shadow-card-shadow text-left flex flex-col gap-6 overflow-hidden">
-              <div className="absolute top-1/2 -left-3 w-6 h-6 bg-bg-dark rounded-full border-r border-white/10" />
-              <div className="absolute top-1/2 -right-3 w-6 h-6 bg-bg-dark rounded-full border-l border-white/10" />
+            <div className="relative w-full bg-surface border border-border-default rounded-md p-6 mt-8 shadow-card-shadow text-left flex flex-col gap-6 overflow-hidden">
+              <div className="absolute top-1/2 -left-3 w-6 h-6 bg-bg rounded-full border-r border-border-default" />
+              <div className="absolute top-1/2 -right-3 w-6 h-6 bg-bg rounded-full border-l border-border-default" />
 
-              <div className="flex justify-between items-center pb-4 border-b border-dashed border-white/10">
+              <div className="flex justify-between items-center pb-4 border-b border-dashed border-border-default">
                 <div className="flex flex-col">
                   <span className="text-[10px] text-text-muted uppercase tracking-wider font-sans">Booking Receipt ID</span>
                   <span className="font-poppins font-bold text-base text-brand-lime tracking-wide">{confirmedBooking.booking_code}</span>
@@ -1033,7 +1033,7 @@ export default function ExplorePage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 text-xs font-sans">
+              <div className="grid grid-cols-2 gap-4 border-t border-border-subtle pt-4 text-xs font-sans">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] text-text-muted uppercase">Date</span>
                   <span className="font-semibold text-text-main">{selectedDate}</span>
@@ -1052,12 +1052,12 @@ export default function ExplorePage() {
                 </div>
               </div>
 
-              <div className="border-t border-dashed border-white/10 pt-6 flex flex-col items-center justify-center gap-3">
+              <div className="border-t border-dashed border-border-default pt-6 flex flex-col items-center justify-center gap-3">
                 {qrCodeUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={qrCodeUrl} alt="Booking QR Code" className="w-40 h-40 rounded-md bg-white p-2" />
+                  <img src={qrCodeUrl} alt="Booking QR Code" className="w-40 h-40 rounded-md bg-qr-bg p-2" />
                 ) : (
-                  <div className="w-40 h-40 bg-elevated-dark animate-pulse rounded" />
+                  <div className="w-40 h-40 bg-elevated animate-pulse rounded" />
                 )}
                 <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-text-muted select-none">
                   Scan Ticket Receipt At Entrance
@@ -1068,7 +1068,7 @@ export default function ExplorePage() {
             <div className="mt-8 flex flex-col sm:flex-row gap-4 w-full justify-center">
               <button
                 onClick={handleDownloadTicket}
-                className="bg-surface-dark hover:bg-elevated-dark border border-white/10 text-text-main font-poppins font-semibold py-3.5 px-8 rounded-pill flex items-center justify-center gap-2 transition-all hover:scale-102"
+                className="bg-surface hover:bg-elevated border border-border-default text-text-main font-poppins font-semibold py-3.5 px-8 rounded-pill flex items-center justify-center gap-2 transition-all hover:scale-102"
               >
                 <Download className="w-4 h-4" /> Download Ticket
               </button>
@@ -1100,7 +1100,7 @@ export default function ExplorePage() {
             {exploreFaqItems.map((item, idx) => (
               <details
                 key={idx}
-                className="bg-surface-dark border border-white/5 rounded-md p-5 group"
+                className="bg-surface border border-border-default rounded-md p-5 group"
               >
                 <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                   {item.question}

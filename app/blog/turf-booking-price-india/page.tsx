@@ -64,7 +64,7 @@ const faqItems = [
 
 export default function TurfBookingPriceIndia() {
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>
           Turf Booking Price in India [2026 Data] | City-wise Pricing | Turfzo
@@ -138,7 +138,7 @@ export default function TurfBookingPriceIndia() {
           </motion.div>
 
           {/* Quick Answer */}
-          <div className="bg-surface-dark border border-brand-lime/10 rounded-md p-6 mb-12">
+          <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
             <h2 className="font-poppins font-bold text-base text-brand-lime mb-2">Quick Answer</h2>
             <p className="text-sm text-text-main font-sans leading-relaxed">
               Turf booking in India costs ₹400 to ₹2500 per hour depending on the city and sport. Football turfs average ₹800-1200/hr, cricket grounds ₹500-1500/hr, and badminton courts ₹300-800/hr. Mumbai and Bangalore are the most expensive cities, while Kolkata and Ahmedabad are the most affordable.
@@ -150,10 +150,10 @@ export default function TurfBookingPriceIndia() {
             <h2 className="font-poppins font-bold text-xl text-text-main mb-6">
               City-wise Turf Booking Prices (Football)
             </h2>
-            <div className="bg-surface-dark border border-white/5 rounded-md overflow-hidden">
+            <div className="bg-surface border border-border-subtle rounded-md overflow-hidden">
               <table className="w-full text-xs font-sans">
                 <thead>
-                  <tr className="bg-elevated-dark border-b border-white/5">
+                  <tr className="bg-elevated border-b border-border-subtle">
                     <th className="text-left py-3 px-4 text-text-main font-poppins font-bold">City</th>
                     <th className="text-left py-3 px-4 text-text-main font-poppins font-bold">Min Price</th>
                     <th className="text-left py-3 px-4 text-text-main font-poppins font-bold">Max Price</th>
@@ -163,7 +163,7 @@ export default function TurfBookingPriceIndia() {
                 </thead>
                 <tbody className="text-text-muted">
                   {cityPricing.map((row) => (
-                    <tr key={row.city} className="border-b border-white/5 hover:bg-elevated-dark/50 transition-colors">
+                    <tr key={row.city} className="border-b border-border-subtle hover:bg-elevated/50 transition-colors">
                       <td className="py-3 px-4 font-semibold text-text-main">{row.city}</td>
                       <td className="py-3 px-4">₹{row.min}/hr</td>
                       <td className="py-3 px-4">₹{row.max}/hr</td>
@@ -187,7 +187,7 @@ export default function TurfBookingPriceIndia() {
                 { sport: "Cricket", price: "₹500 - ₹1500/hr", desc: "Nets, nets with bowling machine, grounds", icon: "🏏" },
                 { sport: "Badminton", price: "₹300 - ₹800/hr", desc: "Indoor wooden courts, outdoor synthetic", icon: "🏸" },
               ].map((item) => (
-                <div key={item.sport} className="bg-surface-dark border border-white/5 rounded-md p-5">
+                <div key={item.sport} className="bg-surface border border-border-subtle rounded-md p-5">
                   <span className="text-2xl">{item.icon}</span>
                   <h3 className="font-poppins font-bold text-sm text-text-main mt-2">{item.sport}</h3>
                   <p className="text-lg font-poppins font-extrabold text-brand-lime mt-1">{item.price}</p>
@@ -211,10 +211,10 @@ export default function TurfBookingPriceIndia() {
                 { factor: "Turf Quality", impact: "High", desc: "FIFA-rated artificial grass turfs cost more than basic synthetic grass surfaces." },
                 { factor: "Sport Type", impact: "Medium", desc: "Football turfs are generally more expensive than badminton courts due to larger playing area." },
               ].map((item) => (
-                <div key={item.factor} className="bg-surface-dark border border-white/5 rounded-md p-4 flex gap-4">
+                <div key={item.factor} className="bg-surface border border-border-subtle rounded-md p-4 flex gap-4">
                   <div className="w-16 shrink-0">
                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded-pill ${
-                      item.impact === "High" ? "bg-red-500/10 text-red-400" : "bg-yellow-500/10 text-yellow-400"
+                      item.impact === "High" ? "bg-error/10 text-error" : "bg-warning/10 text-warning"
                     }`}>
                       {item.impact}
                     </span>
@@ -242,7 +242,7 @@ export default function TurfBookingPriceIndia() {
             <h2 className="font-poppins font-bold text-2xl text-text-main mb-8">Frequently Asked Questions</h2>
             <div className="flex flex-col gap-4">
               {faqItems.map((item, idx) => (
-                <details key={idx} className="bg-surface-dark border border-white/5 rounded-md p-5 group">
+                <details key={idx} className="bg-surface border border-border-subtle rounded-md p-5 group">
                   <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}
                     <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />

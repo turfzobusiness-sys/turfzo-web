@@ -53,7 +53,7 @@ export default function Features() {
   };
 
   return (
-    <section id="explore" className="relative py-20 bg-bg-dark border-t border-white/5">
+    <section id="explore" className="relative py-20 bg-bg border-t border-border-subtle">
       <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10">
         
         {/* Section Header */}
@@ -81,11 +81,11 @@ export default function Features() {
               <motion.div
                 key={idx}
                 variants={cardVariants}
-                className="group relative bg-surface-dark border border-white/5 hover:border-white/15 rounded-[12px] p-6 transition-all duration-300 flex flex-col justify-between h-full"
+                className="group relative bg-surface border border-border-default hover:border-border-strong rounded-[12px] p-6 transition-all duration-300 flex flex-col justify-between h-full"
               >
                 <div>
                   {/* Icon container */}
-                  <div className="w-12 h-12 rounded-[8px] flex items-center justify-center bg-elevated-dark border border-white/5 transition-all duration-300">
+                  <div className="w-12 h-12 rounded-[8px] flex items-center justify-center bg-elevated border border-border-default transition-all duration-300">
                     <IconComponent className="w-5 h-5 text-brand-lime" />
                   </div>
 
@@ -101,7 +101,7 @@ export default function Features() {
                 </div>
 
                 {/* Subtext info */}
-                <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] font-sans font-medium tracking-wider text-text-muted uppercase">
+                <div className="mt-6 pt-4 border-t border-border-subtle flex items-center justify-between text-[10px] font-sans font-medium tracking-wider text-text-muted uppercase">
                   <span>{item.subText}</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-lime" />
                 </div>

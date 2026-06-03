@@ -18,15 +18,16 @@ import {
 
 export default function PhoneMockup() {
   return (
-    <div className="relative mx-auto w-[300px] sm:w-[320px] h-[630px] sm:h-[670px] bg-[#0c0c0e] rounded-[50px] p-[10px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] border-[4px] border-[#2a2d30] flex flex-col justify-between overflow-hidden group select-none">
+    <div className="dark">
+      <div className="relative mx-auto w-[300px] sm:w-[320px] h-[630px] sm:h-[670px] bg-bg rounded-[50px] p-[10px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] border-[4px] border-white/10 flex flex-col justify-between overflow-hidden group select-none">
       {/* Outer steel shine */}
       <div className="absolute inset-0 rounded-[46px] border border-white/[0.04] pointer-events-none" />
 
       {/* Screen */}
-      <div className="relative flex flex-col w-full h-full bg-[#0a0a0a] rounded-[38px] overflow-hidden border border-white/[0.08]">
+      <div className="relative flex flex-col w-full h-full bg-bg rounded-[38px] overflow-hidden border border-white/[0.08]">
         
         {/* Status Bar */}
-        <div className="absolute top-0 inset-x-0 h-9 bg-[#0a0a0a] z-20 flex items-center justify-between px-7 pointer-events-none">
+        <div className="absolute top-0 inset-x-0 h-9 bg-bg z-20 flex items-center justify-between px-7 pointer-events-none">
           <span className="text-[10px] font-sans font-semibold text-white/80">9:41</span>
           <div className="w-[80px] h-[16px] bg-black rounded-full absolute left-1/2 -translate-x-1/2 top-[6px]" />
           <div className="flex items-center gap-1">
@@ -43,7 +44,7 @@ export default function PhoneMockup() {
         </div>
 
         {/* App Header */}
-        <div className="pt-10 px-4 pb-2 bg-[#101010] flex items-center justify-between">
+        <div className="pt-10 px-4 pb-2 bg-surface flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Image
               src="/turfzo_mascot.svg"
@@ -77,7 +78,7 @@ export default function PhoneMockup() {
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/25" />
-            <div className="w-full bg-[#161616] border border-white/[0.06] rounded-full pl-9 pr-4 py-2.5 text-[11px] text-white/25 font-sans">
+            <div className="w-full bg-elevated border border-white/[0.06] rounded-full pl-9 pr-4 py-2.5 text-[11px] text-white/25 font-sans">
               Search for turfs, sports...
             </div>
           </div>
@@ -90,7 +91,7 @@ export default function PhoneMockup() {
                 className={`text-[10px] font-sans font-medium px-3.5 py-1.5 rounded-full whitespace-nowrap shrink-0 ${
                   i === 0 
                     ? "bg-brand-lime text-black font-bold border border-brand-lime" 
-                    : "bg-[#161616] text-white/40 border border-white/[0.06]"
+                    : "bg-elevated text-white/40 border border-white/[0.06]"
                 }`}
               >
                 {cat}
@@ -107,7 +108,7 @@ export default function PhoneMockup() {
           {/* =============================== */}
           {/*    TURF CARD — APP ACCURATE     */}
           {/* =============================== */}
-          <div className="bg-[#141414] border border-white/[0.06] rounded-[22px] overflow-hidden flex flex-col">
+          <div className="bg-surface border border-white/[0.06] rounded-[22px] overflow-hidden flex flex-col">
             
             {/* Card Top Section */}
             <div className="px-4 pt-4 pb-3 flex flex-col gap-2">
@@ -181,7 +182,7 @@ export default function PhoneMockup() {
             <div className="px-3.5 pb-4 pt-2.5">
               <button className="w-full bg-[#0f1f0f] border border-brand-lime/25 text-white font-sans font-semibold text-[12px] py-3.5 rounded-[14px] flex items-center justify-center relative hover:border-brand-lime/40 transition-colors">
                 View Details
-                <div className="absolute right-3 w-[28px] h-[28px] rounded-full border border-white/10 bg-[#0a0a0a] flex items-center justify-center">
+                <div className="absolute right-3 w-[28px] h-[28px] rounded-full border border-white/10 bg-bg flex items-center justify-center">
                   <ArrowRight className="w-3.5 h-3.5 text-white/50" />
                 </div>
               </button>
@@ -194,7 +195,7 @@ export default function PhoneMockup() {
         {/* ================== */}
         {/*   BOTTOM NAV BAR  */}
         {/* ================== */}
-        <div className="absolute bottom-0 inset-x-0 h-[60px] bg-[#0a0a0a] border-t border-white/[0.04] flex items-center justify-around px-3 z-20">
+        <div className="absolute bottom-0 inset-x-0 h-[60px] bg-bg border-t border-white/[0.04] flex items-center justify-around px-3 z-20">
           <button className="flex flex-col items-center gap-[3px] w-11">
             <Home className="w-[20px] h-[20px] text-brand-lime" />
             <span className="text-[8px] font-semibold text-brand-lime">Home</span>
@@ -207,7 +208,7 @@ export default function PhoneMockup() {
           {/* Center Floating Trophy */}
           <div className="relative w-11 flex items-center justify-center">
             <div className="absolute -top-[34px] left-1/2 -translate-x-1/2">
-              <div className="w-[48px] h-[48px] rounded-full bg-[#0a0a0a] p-[3px]">
+              <div className="w-[48px] h-[48px] rounded-full bg-bg p-[3px]">
                 <div className="w-full h-full rounded-full bg-brand-lime flex items-center justify-center shadow-[0_0_16px_rgba(159,232,112,0.3)]">
                   <Image
                     src="/turfzo_mascot.svg"
@@ -232,6 +233,7 @@ export default function PhoneMockup() {
         </div>
 
       </div>
+    </div>
     </div>
   );
 }

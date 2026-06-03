@@ -24,7 +24,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-bg-dark flex items-center justify-center p-6">
+    <div className="min-h-screen bg-bg flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center">
         <div className="flex justify-center mb-6">
           <Image
@@ -56,7 +56,7 @@ export default function GlobalError({
           </button>
           <Link
             href="/"
-            className="bg-surface-dark border border-white/10 hover:border-brand-lime/30 text-text-main font-semibold text-sm px-6 py-3 rounded-md transition-all flex items-center justify-center gap-2"
+            className="bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-semibold text-sm px-6 py-3 rounded-md transition-all flex items-center justify-center gap-2"
           >
             <Home className="w-4 h-4" />
             Go home

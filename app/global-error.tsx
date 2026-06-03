@@ -11,8 +11,8 @@ export default function GlobalErrorBoundary({
     <html>
       <body
         style={{
-          backgroundColor: "#0a0a0a",
-          color: "#fafafa",
+          backgroundColor: "#0C100E",
+          color: "#F4F7F4",
           fontFamily: "system-ui, sans-serif",
           minHeight: "100vh",
           display: "flex",
@@ -25,7 +25,7 @@ export default function GlobalErrorBoundary({
           <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>
             Something went wrong
           </h1>
-          <p style={{ color: "#a0a0a0", fontSize: 14, marginBottom: 24 }}>
+          <p style={{ color: "#8B9E93", fontSize: 14, marginBottom: 24 }}>
             A critical error occurred. Please refresh the page.
           </p>
           {error.digest && (
@@ -36,7 +36,7 @@ export default function GlobalErrorBoundary({
           <button
             onClick={reset}
             style={{
-              backgroundColor: "#9FE870",
+              backgroundColor: "#6DB631",
               color: "#000",
               border: "none",
               padding: "12px 24px",

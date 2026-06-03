@@ -125,7 +125,7 @@ const faqItems = [
 
 export default function BestFootballTurfsBangalore() {
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>
           Best Football Turfs in Bangalore [2026 Guide] | Prices & Booking |
@@ -222,7 +222,7 @@ export default function BestFootballTurfsBangalore() {
           </div>
 
           {/* Direct Answer Block (for AI citation) */}
-          <div className="bg-surface-dark border border-brand-lime/10 rounded-md p-6 mb-12">
+          <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
             <h2 className="font-poppins font-bold text-base text-brand-lime mb-2">
               Quick Answer
             </h2>
@@ -249,7 +249,7 @@ export default function BestFootballTurfsBangalore() {
               {turfs.map((turf) => (
                 <div
                   key={turf.name}
-                  className="bg-surface-dark border border-white/5 rounded-md p-4 hover:border-brand-lime/10 transition-all"
+                  className="bg-surface border border-border-subtle rounded-md p-4 hover:border-brand-lime/10 transition-all"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-poppins font-bold text-sm text-text-main">
@@ -278,7 +278,7 @@ export default function BestFootballTurfsBangalore() {
                     {turf.facilities.map((f) => (
                       <span
                         key={f}
-                        className="text-[9px] bg-elevated-dark text-text-muted px-2 py-0.5 rounded border border-white/5 flex items-center gap-1"
+                        className="text-[9px] bg-elevated text-text-muted px-2 py-0.5 rounded border border-border-subtle flex items-center gap-1"
                       >
                         <CheckCircle2 className="w-2.5 h-2.5 text-brand-lime" />{" "}
                         {f}
@@ -295,10 +295,10 @@ export default function BestFootballTurfsBangalore() {
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-4">
               Football turf prices in Bangalore vary by location and amenities:
             </p>
-            <div className="bg-surface-dark border border-white/5 rounded-md p-5 my-6">
+            <div className="bg-surface border border-border-subtle rounded-md p-5 my-6">
               <table className="w-full text-xs font-sans">
                 <thead>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-border-subtle">
                     <th className="text-left py-2 text-text-main font-poppins font-bold">
                       Area
                     </th>
@@ -311,22 +311,22 @@ export default function BestFootballTurfsBangalore() {
                   </tr>
                 </thead>
                 <tbody className="text-text-muted">
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-border-subtle">
                     <td className="py-2">Electronic City</td>
                     <td className="py-2">₹700 - ₹900/hr</td>
                     <td className="py-2">Budget-friendly games</td>
                   </tr>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-border-subtle">
                     <td className="py-2">HSR Layout</td>
                     <td className="py-2">₹1000 - ₹1400/hr</td>
                     <td className="py-2">Best variety & quality</td>
                   </tr>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-border-subtle">
                     <td className="py-2">Koramangala</td>
                     <td className="py-2">₹900 - ₹1200/hr</td>
                     <td className="py-2">Central location</td>
                   </tr>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-border-subtle">
                     <td className="py-2">Indiranagar</td>
                     <td className="py-2">₹1200 - ₹1500/hr</td>
                     <td className="py-2">Premium facilities</td>
@@ -405,7 +405,7 @@ export default function BestFootballTurfsBangalore() {
               {faqItems.map((item, idx) => (
                 <details
                   key={idx}
-                  className="bg-surface-dark border border-white/5 rounded-md p-5 group"
+                  className="bg-surface border border-border-subtle rounded-md p-5 group"
                 >
                   <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}

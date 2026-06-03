@@ -94,7 +94,7 @@ export default function AdminPage() {
 
   if (status === "initial" || status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-dark">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <Loader2 className="w-8 h-8 text-brand-lime animate-spin" />
       </div>
     );
@@ -102,7 +102,7 @@ export default function AdminPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-bg-dark text-text-main p-6">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-bg text-text-main p-6">
         <Shield className="w-16 h-16 text-text-muted mb-4" />
         <h1 className="font-poppins text-2xl font-extrabold mb-2">Access denied</h1>
         <p className="text-text-muted text-sm mb-6">
@@ -119,7 +119,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <Navbar />
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
@@ -143,7 +143,7 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="flex gap-2 mb-6 border-b border-white/10">
+          <div className="flex gap-2 mb-6 border-b border-border-default">
             <TabButton
               active={tab === "messages"}
               onClick={() => setTab("messages")}
@@ -160,7 +160,7 @@ export default function AdminPage() {
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-md p-4 mb-6 text-sm text-red-400">
+            <div className="bg-error/10 border border-error/30 rounded-md p-4 mb-6 text-sm text-error">
               {error}
             </div>
           )}
@@ -217,7 +217,7 @@ function TabButton({
 function MessagesList({ messages }: { messages: ContactMessage[] }) {
   if (messages.length === 0) {
     return (
-      <div className="bg-surface-dark border border-white/5 rounded-md p-12 text-center">
+      <div className="bg-surface border border-border-subtle rounded-md p-12 text-center">
         <MessageSquare className="w-12 h-12 text-text-muted mx-auto mb-3" />
         <p className="text-text-muted">No messages yet.</p>
       </div>
@@ -228,7 +228,7 @@ function MessagesList({ messages }: { messages: ContactMessage[] }) {
       {messages.map((msg) => (
         <div
           key={msg._id}
-          className="bg-surface-dark border border-white/5 rounded-md p-5"
+          className="bg-surface border border-border-subtle rounded-md p-5"
         >
           <div className="flex items-start justify-between gap-4 mb-2">
             <div>
@@ -274,16 +274,16 @@ function MessagesList({ messages }: { messages: ContactMessage[] }) {
 function UsersList({ users }: { users: AdminUser[] }) {
   if (users.length === 0) {
     return (
-      <div className="bg-surface-dark border border-white/5 rounded-md p-12 text-center">
+      <div className="bg-surface border border-border-subtle rounded-md p-12 text-center">
         <Users className="w-12 h-12 text-text-muted mx-auto mb-3" />
         <p className="text-text-muted">No users yet.</p>
       </div>
     );
   }
   return (
-    <div className="bg-surface-dark border border-white/5 rounded-md overflow-hidden">
+    <div className="bg-surface border border-border-subtle rounded-md overflow-hidden">
       <table className="w-full text-sm">
-        <thead className="bg-elevated-dark">
+        <thead className="bg-elevated">
           <tr>
             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase">
               User
@@ -301,7 +301,7 @@ function UsersList({ users }: { users: AdminUser[] }) {
         </thead>
         <tbody>
           {users.map((u) => (
-            <tr key={u._id} className="border-t border-white/5">
+            <tr key={u._id} className="border-t border-border-subtle">
               <td className="px-4 py-3">
                 <div className="font-semibold text-text-main">
                   {u.full_name || "—"}
@@ -319,7 +319,7 @@ function UsersList({ users }: { users: AdminUser[] }) {
                     Approved
                   </span>
                 ) : (
-                  <span className="text-yellow-400 text-xs font-semibold">
+                  <span className="text-warning text-xs font-semibold">
                     Pending
                   </span>
                 )}

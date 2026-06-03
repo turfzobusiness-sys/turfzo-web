@@ -61,7 +61,7 @@ const comparisonData = [
 
 export default function TurfVsGround() {
   return (
-    <div className="flex flex-col min-h-screen bg-bg-dark text-text-main">
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
         <title>
           Turf vs Ground: Which is Better for Football? [2026 Comparison] |
@@ -136,7 +136,7 @@ export default function TurfVsGround() {
           </motion.div>
 
           {/* Quick Answer */}
-          <div className="bg-surface-dark border border-brand-lime/10 rounded-md p-6 mb-12">
+          <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
             <h2 className="font-poppins font-bold text-base text-brand-lime mb-2">Quick Answer</h2>
             <p className="text-sm text-text-main font-sans leading-relaxed">
               Turf is better for consistency, availability, and convenience — it plays the same regardless of weather and is bookable online year-round. Natural ground is better for playing feel and lower joint impact. For most casual and competitive players, turf is the more practical choice due to floodlights, instant booking, and consistent surface quality.
@@ -148,10 +148,10 @@ export default function TurfVsGround() {
             <h2 className="font-poppins font-bold text-xl text-text-main mb-6">
               Turf vs Ground: Side-by-Side Comparison
             </h2>
-            <div className="bg-surface-dark border border-white/5 rounded-md overflow-hidden">
+            <div className="bg-surface border border-border-subtle rounded-md overflow-hidden">
               <table className="w-full text-xs font-sans">
                 <thead>
-                  <tr className="bg-elevated-dark border-b border-white/5">
+                  <tr className="bg-elevated border-b border-border-subtle">
                     <th className="text-left py-3 px-4 text-text-main font-poppins font-bold w-1/4">Factor</th>
                     <th className="text-left py-3 px-4 text-brand-lime font-poppins font-bold w-[37.5%]">⚽ Turf</th>
                     <th className="text-left py-3 px-4 text-text-main font-poppins font-bold w-[37.5%]">🌿 Ground</th>
@@ -159,7 +159,7 @@ export default function TurfVsGround() {
                 </thead>
                 <tbody className="text-text-muted">
                   {comparisonData.map((row) => (
-                    <tr key={row.factor} className="border-b border-white/5">
+                    <tr key={row.factor} className="border-b border-border-subtle">
                       <td className="py-3 px-4 font-semibold text-text-main">{row.factor}</td>
                       <td className="py-3 px-4">{row.turf}</td>
                       <td className="py-3 px-4">{row.ground}</td>
@@ -172,7 +172,7 @@ export default function TurfVsGround() {
 
           {/* Pros and Cons */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
-            <div className="bg-surface-dark border border-white/5 rounded-md p-6">
+            <div className="bg-surface border border-border-subtle rounded-md p-6">
               <h3 className="font-poppins font-bold text-base text-brand-lime mb-4">⚽ Turf — Pros</h3>
               <ul className="space-y-2">
                 {[
@@ -184,14 +184,14 @@ export default function TurfVsGround() {
                   "Available 6 AM to 11 PM daily",
                 ].map((item) => (
                   <li key={item} className="text-xs text-text-muted font-sans flex items-start gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-green-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-surface-dark border border-white/5 rounded-md p-6">
-              <h3 className="font-poppins font-bold text-base text-red-400 mb-4">🌿 Ground — Pros</h3>
+            <div className="bg-surface border border-border-subtle rounded-md p-6">
+              <h3 className="font-poppins font-bold text-base text-error mb-4">🌿 Ground — Pros</h3>
               <ul className="space-y-2">
                 {[
                   "Natural playing feel and ball control",
@@ -202,7 +202,7 @@ export default function TurfVsGround() {
                   "Often cheaper to book",
                 ].map((item) => (
                   <li key={item} className="text-xs text-text-muted font-sans flex items-start gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-green-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
@@ -223,7 +223,7 @@ export default function TurfVsGround() {
                 { scenario: "Corporate events", reason: "Professional setup with amenities" },
                 { scenario: "Regular practice sessions", reason: "Consistent surface for skill development" },
               ].map((item) => (
-                <div key={item.scenario} className="bg-surface-dark border border-white/5 rounded-md p-4 flex gap-4">
+                <div key={item.scenario} className="bg-surface border border-border-subtle rounded-md p-4 flex gap-4">
                   <CheckCircle2 className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-poppins font-bold text-sm text-text-main">{item.scenario}</h3>
@@ -245,8 +245,8 @@ export default function TurfVsGround() {
                 { scenario: "Daytime games in cool weather", reason: "Natural grass is cooler than artificial turf" },
                 { scenario: "Budget constraints", reason: "Ground booking is often 20-40% cheaper" },
               ].map((item) => (
-                <div key={item.scenario} className="bg-surface-dark border border-white/5 rounded-md p-4 flex gap-4">
-                  <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
+                <div key={item.scenario} className="bg-surface border border-border-subtle rounded-md p-4 flex gap-4">
+                  <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-poppins font-bold text-sm text-text-main">{item.scenario}</h3>
                     <p className="text-[10px] text-text-muted font-sans mt-1">{item.reason}</p>
@@ -270,7 +270,7 @@ export default function TurfVsGround() {
             <h2 className="font-poppins font-bold text-2xl text-text-main mb-8">Frequently Asked Questions</h2>
             <div className="flex flex-col gap-4">
               {faqItems.map((item, idx) => (
-                <details key={idx} className="bg-surface-dark border border-white/5 rounded-md p-5 group">
+                <details key={idx} className="bg-surface border border-border-subtle rounded-md p-5 group">
                   <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}
                     <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />
