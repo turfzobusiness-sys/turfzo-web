@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
 export default function GlobalError({
@@ -25,8 +26,14 @@ export default function GlobalError({
   return (
     <div className="min-h-screen bg-bg-dark flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center">
-        <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center border-2 border-red-500/30">
-          <AlertTriangle className="w-8 h-8 text-red-400" />
+        <div className="flex justify-center mb-6">
+          <Image
+            src="/turfzo_mascot.svg"
+            alt="Something went wrong"
+            width={80}
+            height={80}
+            className="w-20 h-20 opacity-60 grayscale-[0.3]"
+          />
         </div>
         <h1 className="font-poppins text-3xl font-extrabold text-text-main mb-2">
           Something went wrong

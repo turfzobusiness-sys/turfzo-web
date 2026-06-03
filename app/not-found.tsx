@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Home, Search } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -9,9 +10,15 @@ export default function NotFound() {
       <Navbar />
       <main className="flex-grow flex items-center justify-center px-6 py-16">
         <div className="max-w-md w-full text-center">
-          <p className="font-poppins text-8xl font-extrabold text-brand-lime mb-4">
-            404
-          </p>
+          <div className="flex justify-center mb-6">
+            <Image
+              src="/turfzo_mascot.svg"
+              alt="Mascot couldn't find the page"
+              width={192}
+              height={192}
+              className="w-48 h-48 drop-shadow-xl"
+            />
+          </div>
           <h1 className="font-poppins text-3xl font-extrabold text-text-main mb-3">
             Page not found
           </h1>
