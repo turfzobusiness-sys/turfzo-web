@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Search, Bell, User, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,7 +51,7 @@ export default function Navbar() {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-bg-dark/85 backdrop-blur-md border-b border-white/5 py-4 shadow-card-shadow"
+            ? "bg-bg/85 backdrop-blur-md border-b border-border-subtle py-4 shadow-card-shadow"
             : "bg-transparent py-6 border-b border-transparent"
         }`}
       >
@@ -99,13 +100,16 @@ export default function Navbar() {
 
           {/* Desktop Right Actions (Search, Bell, Auth) */}
           <div className="hidden md:flex items-center gap-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Search Button */}
-            <button className="p-2.5 bg-surface-dark border border-white/5 hover:border-white/20 rounded-[12px] text-text-muted hover:text-text-main transition-all duration-300">
+            <button className="p-2.5 bg-surface border border-border-default hover:border-border-strong rounded-[12px] text-text-muted hover:text-text-main transition-all duration-300">
               <Search className="w-4 h-4" />
             </button>
 
             {/* Notification Bell */}
-            <button className="relative p-2.5 bg-surface-dark border border-white/5 hover:border-white/20 rounded-[12px] text-text-muted hover:text-text-main transition-all duration-300">
+            <button className="relative p-2.5 bg-surface border border-border-default hover:border-border-strong rounded-[12px] text-text-muted hover:text-text-main transition-all duration-300">
               <Bell className="w-4 h-4" />
               <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-brand-lime rounded-full" />
             </button>
@@ -114,7 +118,7 @@ export default function Navbar() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/profile"
-                  className="flex items-center gap-2 bg-surface-dark border border-white/5 hover:border-brand-lime/20 rounded-[12px] px-4 py-2 transition-all duration-300"
+                  className="flex items-center gap-2 bg-surface border border-border-default hover:border-brand-lime/20 rounded-[12px] px-4 py-2 transition-all duration-300"
                 >
                   <div className="w-7 h-7 rounded-full bg-brand-lime/20 flex items-center justify-center">
                     <User className="w-4 h-4 text-brand-lime" />
@@ -125,7 +129,7 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={signOut}
-                  className="p-2.5 bg-surface-dark border border-white/5 hover:border-red-500/20 rounded-[12px] text-text-muted hover:text-red-400 transition-all duration-300"
+                  className="p-2.5 bg-surface border border-border-default hover:border-error/20 rounded-[12px] text-text-muted hover:text-error transition-all duration-300"
                   title="Sign out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -143,10 +147,11 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-3">
-            <button className="p-2 bg-surface-dark border border-white/5 rounded-[10px] text-text-muted hover:text-text-main">
+            <ThemeToggle />
+            <button className="p-2 bg-surface border border-border-default rounded-[10px] text-text-muted hover:text-text-main">
               <Search className="w-4 h-4" />
             </button>
-            <button className="relative p-2 bg-surface-dark border border-white/5 rounded-[10px] text-text-muted hover:text-text-main">
+            <button className="relative p-2 bg-surface border border-border-default rounded-[10px] text-text-muted hover:text-text-main">
               <Bell className="w-4 h-4" />
               <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-brand-lime rounded-full" />
             </button>
@@ -169,7 +174,7 @@ export default function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="absolute top-full left-0 right-0 z-40 bg-surface-dark/95 backdrop-blur-lg border-b border-white/5 md:hidden overflow-hidden shadow-card-shadow"
+              className="absolute top-full left-0 right-0 z-40 bg-surface/95 backdrop-blur-lg border-b border-border-subtle md:hidden overflow-hidden shadow-card-shadow"
             >
               <div className="px-6 py-8 flex flex-col gap-6">
                 {navLinks.map((link) => (
@@ -196,7 +201,7 @@ export default function Navbar() {
                     </div>
                     <button
                       onClick={() => { setIsOpen(false); signOut(); }}
-                      className="bg-surface-dark border border-white/5 text-text-muted text-center font-poppins font-semibold py-3.5 rounded-pill hover:text-red-400 transition-all duration-300 w-full"
+                      className="bg-surface border border-border-default text-text-muted text-center font-poppins font-semibold py-3.5 rounded-pill hover:text-error transition-all duration-300 w-full"
                     >
                       Sign Out
                     </button>

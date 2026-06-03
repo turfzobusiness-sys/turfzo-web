@@ -3,6 +3,7 @@ import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import "@/lib/env-init";
 import { AuthProvider } from "@/lib/auth-context";
+import { ThemeProvider } from "@/lib/theme-context";
 import { OrganizationSchema, WebSiteSchema } from "@/lib/schema";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 
@@ -94,8 +95,14 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${poppins.variable} ${inter.variable} h-full antialiased scroll-smooth`}
+      suppressHydrationWarning
     >
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('turfzo-theme');if(t==='light'||t==='dark'){document.documentElement.classList.add(t)}else{document.documentElement.classList.add(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')}}catch(e){document.documentElement.classList.add('dark')}})()`,
+          }}
+        />
         <OrganizationSchema
           name="Turfzo"
           url={SITE_URL}
@@ -117,10 +124,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-bg-dark text-text-main selection:bg-brand-lime selection:text-black">
-        <AuthProvider>
-          <AnalyticsProvider>{children}</AnalyticsProvider>
-        </AuthProvider>
+      <body className="min-h-full flex flex-col bg-bg text-text-main selection:bg-brand-lime selection:text-black">
+        <ThemeProvider>
+          <AuthProvider>
+            <AnalyticsProvider>{children}</AnalyticsProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
