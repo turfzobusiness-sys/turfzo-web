@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 type ThemeMode = "dark" | "light" | "system";
 type ResolvedTheme = "dark" | "light";
@@ -48,20 +48,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setResolved(r);
   }, []);
 
-  // Initialize from localStorage after mount (matches the blocking script)
-  const [initialized, setInitialized] = useState(false);
-  if (!initialized && typeof window !== "undefined") {
+  useEffect(() => {
     const stored = getStoredMode();
     const r = resolveTheme(stored);
-    // Apply synchronously on first render to avoid flash
+    setModeState(stored);
+    setResolved(r);
     applyClass(r);
-    // Defer state update to avoid setState during render
-    Promise.resolve().then(() => {
-      setModeState(stored);
-      setResolved(r);
-      setInitialized(true);
-    });
-  }
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ mode, resolved, setMode }}>
