@@ -1,6 +1,10 @@
-const DEPLOYMENT_URL =
-  process.env.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL ??
-  "https://woozy-husky-516.eu-west-1.convex.cloud";
+const DEPLOYMENT_URL = process.env.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL;
+
+if (!DEPLOYMENT_URL && process.env.NODE_ENV === "production") {
+  throw new Error("NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL is not set. Refusing to fallback to dev URL in production.");
+}
+
+const FINAL_DEPLOYMENT_URL = DEPLOYMENT_URL ?? "https://woozy-husky-516.eu-west-1.convex.cloud";
 
 export class ConvexApiException extends Error {
   code?: string;
@@ -35,7 +39,7 @@ export class ConvexHttpClient {
   authToken?: string | null;
 
   constructor(opts?: ConvexClientOptions) {
-    this.deploymentUrl = (opts?.deploymentUrl ?? DEPLOYMENT_URL).replace(
+    this.deploymentUrl = (opts?.deploymentUrl ?? FINAL_DEPLOYMENT_URL).replace(
       /\/+$/,
       ""
     );
