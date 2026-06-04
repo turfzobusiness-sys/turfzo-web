@@ -35,6 +35,7 @@ if (!getApps().length) {
 }
 
 export {
+  app,
   auth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
