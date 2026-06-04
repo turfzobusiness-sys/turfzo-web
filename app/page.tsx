@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Turfzo | Book Premium Turfs & Sports Venues Instantly",
+  description: "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly.",
+  alternates: { canonical: "https://turfzo.app" }
+};
+
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";

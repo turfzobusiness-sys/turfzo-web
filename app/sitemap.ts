@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const SITE_URL = "https://turfzo.com";
+const SITE_URL = "https://turfzo.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
@@ -23,12 +23,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  const sportPages = ["football", "cricket", "badminton", "tennis"].map((sport) => ({
-    url: `${SITE_URL}/sports/${sport}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
-
-  return [...staticPages, ...cityPages, ...sportPages];
+  return [...staticPages, ...cityPages];
 }

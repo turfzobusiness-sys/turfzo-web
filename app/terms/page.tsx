@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Terms of Service",
   description:
     "Terms of Service for using Turfzo — India's premium turf and sports venue booking platform.",
-  alternates: { canonical: "https://turfzo.com/terms" },
+  alternates: { canonical: "https://turfzo.app/terms" },
 };
 
 export default function TermsPage() {
@@ -108,7 +108,7 @@ export default function TermsPage() {
               <Link href="/contact" className="text-brand-lime underline">
                 Contact us
               </Link>{" "}
-              or email legal@turfzo.com.
+              or email legal@turfzo.app.
             </p>
           </Section>
         </article>

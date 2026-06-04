@@ -128,11 +128,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>My Profile | Turfzo</title>
-        <meta name="description" content="Manage your Turfzo profile, view your bookings, and update your favorite sports." />
-        <link rel="canonical" href="https://turfzo.com/profile" />
-      </head>
+
       <Navbar />
 
       <main className="flex-grow pt-24 pb-16">

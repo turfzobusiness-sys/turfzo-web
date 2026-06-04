@@ -18,7 +18,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const SITE_URL = "https://turfzo.com";
+const SITE_URL = "https://turfzo.app";
 
 export const metadata: Metadata = {
   title: {

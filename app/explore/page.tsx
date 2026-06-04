@@ -348,14 +348,7 @@ export default function ExplorePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>Explore Turfs Near You | Book Football, Cricket & More | Turfzo</title>
-        <meta name="description" content="Browse 50+ verified football turfs, cricket grounds, and sports venues across India. Filter by sport, price, and amenities. Real-time availability, instant booking, and secure online payment." />
-        <link rel="canonical" href="https://turfzo.com/explore" />
-        <meta property="og:title" content="Explore Turfs Near You | Turfzo" />
-        <meta property="og:description" content="Browse 50+ verified turfs across India. Book football, cricket, badminton, and tennis venues instantly." />
-        <meta property="og:url" content="https://turfzo.com/explore" />
-      </head>
+
       <FAQPageSchema items={exploreFaqItems} />
       <Navbar />
 

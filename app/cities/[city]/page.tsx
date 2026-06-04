@@ -20,7 +20,7 @@ const CITY_DATA: Record<string, { name: string; state: string; venues: string; a
 
 const CITY_FAQS = [
   { question: "How much does turf booking cost in {city}?", answer: "Turf booking in {city} typically costs ₹{avgPrice} depending on the venue, sport, and time of day. Premium turfs with floodlights and changing rooms may charge more, while off-peak hours (mornings, late nights) are usually discounted." },
-  { question: "How do I book a football turf in {city}?", answer: "Visit turfzo.com/explore, select {city} as your city, browse available football turfs, pick a date and time slot, and pay securely online. Your booking is confirmed instantly with a QR code ticket." },
+  { question: "How do I book a football turf in {city}?", answer: "Visit turfzo.app/explore, select {city} as your city, browse available football turfs, pick a date and time slot, and pay securely online. Your booking is confirmed instantly with a QR code ticket." },
   { question: "Which are the best areas to play in {city}?", answer: "The most popular areas for turf sports in {city} are: {highlights}. These neighborhoods offer easy access, ample parking, and quality floodlit venues." },
   { question: "Can I cancel my booking?", answer: "Yes, you can cancel your booking up to 24 hours before the slot for a full refund, 6-24 hours for a 50% refund, and no refund within 6 hours of the slot." },
   { question: "What sports are available in {city}?", answer: "Turfzo lists football, cricket, badminton, and multipurpose sports venues across {city}. Use the sport filter on the explore page to see only relevant turfs." },
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `Book Turfs in ${data.name} | Football, Cricket & More | Turfzo`,
     description: `Book football turfs, cricket grounds, and sports venues in ${data.name} starting at ${data.avgPrice}. ${data.venues} verified turfs across ${data.highlights.slice(0, 3).join(", ")} and more. Real-time availability, secure payment, instant confirmation.`,
     keywords: [`turf booking ${data.name}`, `football turf ${data.name}`, `cricket ground ${data.name}`, `book turf ${data.name}`, `${data.name} sports venue`],
-    alternates: { canonical: `https://turfzo.com/cities/${city}` },
+    alternates: { canonical: `https://turfzo.app/cities/${city}` },
   };
 }
 
@@ -57,15 +57,15 @@ export default async function CityPage({ params }: Props) {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <head>
-        <link rel="canonical" href={`https://turfzo.com/cities/${city}`} />
+        <link rel="canonical" href={`https://turfzo.app/cities/${city}`} />
         <meta property="og:title" content={`Book Turfs in ${data.name} | Turfzo`} />
         <meta property="og:description" content={`${data.venues} verified turfs in ${data.name}. Book instantly with real-time availability.`} />
-        <meta property="og:url" content={`https://turfzo.com/cities/${city}`} />
+        <meta property="og:url" content={`https://turfzo.app/cities/${city}`} />
       </head>
       <BreadcrumbListSchema items={[
-        { name: "Home", url: "https://turfzo.com" },
-        { name: "Explore", url: "https://turfzo.com/explore" },
-        { name: data.name, url: `https://turfzo.com/cities/${city}` },
+        { name: "Home", url: "https://turfzo.app" },
+        { name: "Explore", url: "https://turfzo.app/explore" },
+        { name: data.name, url: `https://turfzo.app/cities/${city}` },
       ]} />
       <FAQPageSchema items={faqs} />
       <SportsActivityLocationSchema
