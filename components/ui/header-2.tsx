@@ -19,7 +19,7 @@ type NavLink = { label: string; href: string };
 const NAV_LINKS: NavLink[] = [
   { label: "Explore Turfs", href: "/explore" },
   { label: "Tournaments", href: "/tournaments" },
-  { label: "How It Works", href: "/how-it-works" },
+  { label: "List Your Turf", href: "/owners" },
   { label: "Contact", href: "/contact" },
 ];
 

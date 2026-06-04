@@ -48,10 +48,10 @@ export default function Footer() {
   ];
 
   const supportLinks = [
+    { name: "List Your Turf", href: "/owners" },
     { name: "Help Center", href: "#" },
-    { name: "Safety & Rules", href: "#" },
-    { name: "Refund Policy", href: "#" },
-    { name: "Contact Support", href: "#" },
+    { name: "Refund Policy", href: "/refund-policy" },
+    { name: "Contact Support", href: "/contact" },
   ];
 
   return (
