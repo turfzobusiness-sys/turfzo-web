@@ -30,7 +30,7 @@ export default function Hero() {
   };
 
   return (
-    <section id="home" className="relative min-h-screen pt-28 pb-16 flex items-center justify-center overflow-hidden bg-bg">
+    <section id="home" className="relative min-h-[auto] pt-24 pb-12 lg:min-h-screen lg:py-0 flex items-center justify-center overflow-hidden bg-bg">
 
 
       {/* Grid Layout Container */}
@@ -129,32 +129,15 @@ export default function Hero() {
             </div>
           </motion.div>
 
-          {/* Mobile Mascot */}
-          <motion.div
-            variants={itemVariants}
-            className="lg:hidden mt-12 flex justify-center w-full"
-          >
-            <Image
-              src="/turfzo_mascot.svg"
-              alt="Turfzo Mascot"
-              width={96}
-              height={96}
-              className="w-24 h-24 opacity-80"
-            />
-          </motion.div>
+
 
         </motion.div>
 
-        {/* Right Column (iPhone Mockup Showcase) - Hidden on mobile, only on desktop */}
-        <div className="hidden lg:flex lg:col-span-5 items-center justify-center relative w-full lg:h-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" as const, delay: 0.2 }}
-            className="relative"
-          >
+        {/* Right Column (iPhone Mockup Showcase) - Shown below content on mobile, side-by-side on desktop */}
+        <div className="flex lg:col-span-5 items-center justify-center relative w-full lg:h-auto mt-8 lg:mt-0">
+          <div className="relative scale-90 sm:scale-100 origin-center w-full flex justify-center">
             <PhoneMockup />
-          </motion.div>
+          </div>
         </div>
 
       </div>
