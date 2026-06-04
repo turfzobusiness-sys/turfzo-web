@@ -1,21 +1,58 @@
-// Stub types for Convex _generated/dataModel until `npx convex dev` runs.
-// This file will be overwritten by Convex codegen with real types.
-// We use index signatures to avoid union-type narrowing issues during local typecheck.
+/* eslint-disable */
+/**
+ * Generated data model types.
+ *
+ * THIS CODE IS AUTOMATICALLY GENERATED.
+ *
+ * To regenerate, run `npx convex dev`.
+ * @module
+ */
 
-export type Id<TableName extends string> = string & { __tableName: TableName };
+import { AnyDataModel } from "convex/server";
+import type { GenericId } from "convex/values";
 
-export interface DataModel {
-  users: Record<string, any>;
-  turfs: Record<string, any>;
-  bookings: Record<string, any>;
-  reviews: Record<string, any>;
-  favorites: Record<string, any>;
-  payment_orders: Record<string, any>;
-  tournaments: Record<string, any>;
-  tournament_registrations: Record<string, any>;
-  contact_messages: Record<string, any>;
-  rate_limits: Record<string, any>;
-}
+/**
+ * No `schema.ts` file found!
+ *
+ * This generated code has permissive types like `Doc = any` because
+ * Convex doesn't know your schema. If you'd like more type safety, see
+ * https://docs.convex.dev/using/schemas for instructions on how to add a
+ * schema file.
+ *
+ * After you change a schema, rerun codegen with `npx convex dev`.
+ */
 
-export const schema: any = null;
-export const tables: any = null;
+/**
+ * The names of all of your Convex tables.
+ */
+export type TableNames = string;
+
+/**
+ * The type of a document stored in Convex.
+ */
+export type Doc = any;
+
+/**
+ * An identifier for a document in Convex.
+ *
+ * Convex documents are uniquely identified by their `Id`, which is accessible
+ * on the `_id` field. To learn more, see [Document IDs](https://docs.convex.dev/using/document-ids).
+ *
+ * Documents can be loaded using `db.get(tableName, id)` in query and mutation functions.
+ *
+ * IDs are just strings at runtime, but this type can be used to distinguish them from other
+ * strings when type checking.
+ */
+export type Id<TableName extends TableNames = TableNames> =
+  GenericId<TableName>;
+
+/**
+ * A type describing your Convex data model.
+ *
+ * This type includes information about what tables you have, the type of
+ * documents stored in those tables, and the indexes defined on them.
+ *
+ * This type is used to parameterize methods like `queryGeneric` and
+ * `mutationGeneric` to make them type-safe.
+ */
+export type DataModel = AnyDataModel;
