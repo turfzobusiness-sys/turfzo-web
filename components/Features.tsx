@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ShieldCheck, Zap, CircleDollarSign, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const FEATURES = [
@@ -9,25 +9,33 @@ const FEATURES = [
     num: "01",
     title: "Verified Venues Only",
     desc: "Every listing on Turfzo is personally inspected. We verify location accuracy, amenities, lighting quality, and turf conditions so you play exactly what you see.",
-    tag: "100% Verified"
+    tag: "100% Verified",
+    icon: ShieldCheck,
+    colorClass: "text-[#6DB631] bg-[#6DB631]/10"
   },
   {
     num: "02",
     title: "Instant Confirmation",
     desc: "Check real-time slots and get confirmed in under 60 seconds. Our direct integration with venue management software eliminates double bookings.",
-    tag: "Real-time"
+    tag: "Real-time",
+    icon: Zap,
+    colorClass: "text-[#E4B66A] bg-[#E4B66A]/10"
   },
   {
     num: "03",
     title: "Zero Hidden Fees",
     desc: "What you see is what you pay. Transparent booking pricing with absolute zero convenience charges or hidden administrative fees.",
-    tag: "No Booking Fees"
+    tag: "No Booking Fees",
+    icon: CircleDollarSign,
+    colorClass: "text-[#5B91C8] bg-[#5B91C8]/10"
   },
   {
     num: "04",
     title: "Flexible Refunds & Cancellations",
     desc: "Plans changed? Cancel with confidence. Receive automatic refunds directly to your account based on the venue's cancellation window.",
-    tag: "Hassle-free"
+    tag: "Hassle-free",
+    icon: RotateCcw,
+    colorClass: "text-[#E05A47] bg-[#E05A47]/10"
   }
 ];
 
@@ -111,37 +119,39 @@ export default function Features() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Minimal timeline list */}
-          <div className="divide-y divide-border-default border-t border-b border-border-default">
+          {/* RIGHT COLUMN: Premium interactive glassmorphic cards */}
+          <div className="flex flex-col gap-6">
             {FEATURES.map((feature, idx) => {
               const isHovered = hoveredIdx === idx;
               const isAnyHovered = hoveredIdx !== null;
+              const Icon = feature.icon;
               
               return (
                 <div
                   key={idx}
                   onMouseEnter={() => setHoveredIdx(idx)}
                   onMouseLeave={() => setHoveredIdx(null)}
-                  className="py-10 transition-all duration-300 cursor-pointer relative group"
+                  className={cn(
+                    "relative p-6 sm:p-8 rounded-2xl cursor-pointer select-none transition-all duration-300 ease-out",
+                    "bg-surface/30 dark:bg-surface/10 border border-border-default/40 backdrop-blur-xs",
+                    "hover:scale-[1.01] hover:border-brand-lime/80 hover:bg-surface/60 dark:hover:bg-surface/20",
+                    "hover:shadow-[0_8px_30px_rgba(109,182,49,0.08)]",
+                    isAnyHovered && !isHovered ? "opacity-60 scale-[0.99]" : "opacity-100"
+                  )}
                 >
-                  <div 
-                    className={cn(
-                      "flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 transition-opacity duration-300",
-                      isAnyHovered && !isHovered ? "opacity-30" : "opacity-100"
-                    )}
-                  >
-                    {/* Index Number */}
-                    <div className="font-poppins text-sm sm:text-base font-bold text-brand-lime tracking-wider shrink-0 w-8">
-                      {feature.num}
+                  <div className="flex gap-5 sm:gap-6 items-start">
+                    {/* Glowing Icon Container */}
+                    <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110", feature.colorClass)}>
+                      <Icon className="w-6 h-6 stroke-[2]" />
                     </div>
 
-                    {/* Content Section */}
-                    <div className="flex-1 space-y-3">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                        <h3 className="font-poppins text-lg sm:text-xl font-bold text-text-main tracking-tight group-hover:text-brand-lime transition-colors">
+                    {/* Content */}
+                    <div className="flex-grow space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2.5">
+                        <h3 className="font-poppins text-lg sm:text-xl font-bold text-text-main tracking-tight transition-colors duration-200 group-hover:text-brand-lime">
                           {feature.title}
                         </h3>
-                        <span className="self-start sm:self-auto text-[9px] font-sans font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-elevated text-text-muted border border-border-subtle">
+                        <span className="text-[9px] font-sans font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-elevated text-text-muted border border-border-subtle">
                           {feature.tag}
                         </span>
                       </div>
@@ -152,8 +162,11 @@ export default function Features() {
                     </div>
 
                     {/* Subtle micro-interaction arrow */}
-                    <div className="hidden sm:flex self-start pt-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
-                      <ArrowUpRight className="w-5 h-5 text-brand-lime" />
+                    <div className={cn(
+                      "self-start pt-1.5 opacity-30 transition-all duration-300",
+                      isHovered && "opacity-100 translate-x-1 -translate-y-1 text-brand-lime"
+                    )}>
+                      <ArrowUpRight className="w-5 h-5" />
                     </div>
                   </div>
                 </div>
