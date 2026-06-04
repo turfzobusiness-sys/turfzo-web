@@ -1,7 +1,5 @@
-"use client";
-
-import { SignInPage } from "@/components/ui/sign-in-page";
+import { AuthModalRedirect } from "@/components/auth/auth-modal-redirect";
 
 export default function LoginPage() {
-  return <SignInPage />;
+  return <AuthModalRedirect mode="signin" />;
 }
