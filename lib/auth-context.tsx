@@ -42,7 +42,8 @@ interface AuthContextValue extends AuthState {
     password: string;
     role?: string;
     displayName?: string;
-    turnstileToken?: string;
+    phoneNumber?: string;
+    city?: string;
   }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -63,13 +64,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (firebaseUser: FirebaseUser) => {
       try {
         const token = await getIdToken(firebaseUser);
-        const user = await convexClient.action<AppUser>(
-          "auth:syncFirebaseUser",
-          {},
-          token
-        );
+        const response = await convexClient.action<{
+          success: boolean;
+          user: AppUser;
+          session_token: string;
+        }>("auth:syncFirebaseUser", {}, token);
         convexClient.authToken = token;
-        return user;
+        if (response.success && response.user) {
+          return response.user;
+        }
+        return null;
       } catch {
         convexClient.authToken = null;
         return null;
@@ -107,7 +111,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string;
     role?: string;
     displayName?: string;
-    turnstileToken?: string;
+    phoneNumber?: string;
+    city?: string;
   }) => {
     setState((prev) => ({ ...prev, status: "loading", error: null }));
     try {
@@ -117,12 +122,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         opts.password
       );
       const token = await getIdToken(cred.user);
-      await convexClient.action<AppUser>(
+      await convexClient.action<{
+        success: boolean;
+        user: AppUser;
+      }>(
         "auth:syncFirebaseUser",
         {
           role: opts.role ?? "player",
           displayName: opts.displayName,
-          turnstileToken: opts.turnstileToken,
+          phoneNumber: opts.phoneNumber,
+          city: opts.city,
         },
         token
       );
