@@ -3,9 +3,11 @@ import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import "@/lib/env-init";
 import { AuthProvider } from "@/lib/auth-context";
+import { AuthModalProvider } from "@/lib/auth-modal-context";
 import { ThemeProvider } from "@/lib/theme-context";
 import { OrganizationSchema, WebSiteSchema } from "@/lib/schema";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
+import { AuthModal } from "@/components/ui/auth-modal";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800"],
@@ -127,7 +129,10 @@ export default function RootLayout({
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-bg text-text-main selection:bg-brand-lime selection:text-black">
         <ThemeProvider>
           <AuthProvider>
-            <AnalyticsProvider>{children}</AnalyticsProvider>
+            <AuthModalProvider>
+              <AnalyticsProvider>{children}</AnalyticsProvider>
+              <AuthModal />
+            </AuthModalProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

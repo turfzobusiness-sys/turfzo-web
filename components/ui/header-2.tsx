@@ -10,6 +10,7 @@ import { MenuToggleIcon } from "@/components/ui/menu-toggle-icon";
 import { useScroll } from "@/components/ui/use-scroll";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
+import { useAuthModal } from "@/lib/auth-modal-context";
 import { useTheme } from "@/lib/theme-context";
 
 type NavLink = { label: string; href: string };
@@ -64,6 +65,7 @@ export function Header() {
   const scrolled = useScroll(10);
   const pathname = usePathname();
   const { status, convexUser, signOut } = useAuth();
+  const { openAuthModal } = useAuthModal();
   const isAuthed = status === "authenticated";
 
   React.useEffect(() => {
@@ -87,6 +89,16 @@ export function Header() {
     setOpen(false);
     await signOut();
   }, [signOut]);
+
+  const handleSignInClick = React.useCallback(() => {
+    setOpen(false);
+    openAuthModal("signin");
+  }, [openAuthModal]);
+
+  const handleSignUpClick = React.useCallback(() => {
+    setOpen(false);
+    openAuthModal("signup");
+  }, [openAuthModal]);
 
   return (
     <header
@@ -181,24 +193,26 @@ export function Header() {
             </>
           ) : (
             <>
-              <Link
-                href="/auth/login"
+              <button
+                type="button"
+                onClick={handleSignInClick}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "h-12 px-6 text-base"
                 )}
               >
                 Sign In
-              </Link>
-              <Link
-                href="/auth/signup"
+              </button>
+              <button
+                type="button"
+                onClick={handleSignUpClick}
                 className={cn(
                   buttonVariants({ variant: "default" }),
                   "h-12 px-6 text-base"
                 )}
               >
                 Get Started
-              </Link>
+              </button>
             </>
           )}
         </div>
@@ -283,26 +297,26 @@ export function Header() {
               </>
             ) : (
               <>
-                <Link
-                  href="/auth/login"
-                  onClick={() => setOpen(false)}
+                <button
+                  type="button"
+                  onClick={handleSignInClick}
                   className={cn(
                     buttonVariants({ variant: "outline", className: "w-full" }),
                     "h-14 text-base"
                   )}
                 >
                   Sign In
-                </Link>
-                <Link
-                  href="/auth/signup"
-                  onClick={() => setOpen(false)}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSignUpClick}
                   className={cn(
                     buttonVariants({ variant: "default", className: "w-full" }),
                     "h-14 text-base"
                   )}
                 >
                   Get Started
-                </Link>
+                </button>
               </>
             )}
           </div>
