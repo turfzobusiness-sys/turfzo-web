@@ -1,13 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Home, Search } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 
 export default function NotFound() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <Navbar />
+      <Header />
       <main className="flex-grow flex items-center justify-center px-6 py-16">
         <div className="max-w-md w-full text-center">
           <div className="flex justify-center mb-6">

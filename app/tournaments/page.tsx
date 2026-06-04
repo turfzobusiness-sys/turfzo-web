@@ -19,7 +19,7 @@ import {
   Download,
   AlertCircle,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
@@ -208,7 +208,7 @@ export default function TournamentsPage() {
         <meta property="og:description" content="Find and join local sports tournaments. Register your team and compete." />
         <meta property="og:url" content="https://turfzo.com/tournaments" />
       </head>
-      <Navbar />
+      <Header />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">

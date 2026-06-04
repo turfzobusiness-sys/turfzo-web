@@ -20,7 +20,7 @@ import {
   Ticket,
   ArrowRight,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/lib/auth-context";
 import { convexClient } from "@/lib/convex";
@@ -129,7 +129,7 @@ export default function ProfilePage() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
 
-      <Navbar />
+      <Header />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">

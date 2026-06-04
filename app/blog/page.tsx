@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Calendar, Clock, ArrowRight, Tag } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 
 const blogPosts = [
@@ -61,7 +61,7 @@ export default function BlogIndex() {
         />
         <link rel="canonical" href="https://turfzo.com/blog" />
       </head>
-      <Navbar />
+      <Header />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">

@@ -18,7 +18,7 @@ import {
   Lock,
   ChevronDown
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { HowToSchema, FAQPageSchema } from "@/lib/schema";
 
@@ -178,7 +178,7 @@ export default function HowItWorksPage() {
         steps={howToSteps}
       />
       <FAQPageSchema items={faqItems} />
-      <Navbar />
+      <Header />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">

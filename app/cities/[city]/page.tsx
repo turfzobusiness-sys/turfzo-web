@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Star, ChevronRight, Trophy, CheckCircle2 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, BreadcrumbListSchema, SportsActivityLocationSchema } from "@/lib/schema";
 
@@ -77,7 +77,7 @@ export default async function CityPage({ params }: Props) {
         image="/stadium_turf_bg.png"
         openingHours="Mo-Su 06:00-23:00"
       />
-      <Navbar />
+      <Header />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">

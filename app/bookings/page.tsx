@@ -16,7 +16,7 @@ import {
   X,
   Check,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/lib/auth-context";
 import { convexClient } from "@/lib/convex";
@@ -162,7 +162,7 @@ export default function BookingsPage() {
         <meta name="description" content="View and manage your turf bookings on Turfzo. See upcoming slots, past bookings, and download tickets." />
         <link rel="canonical" href="https://turfzo.com/bookings" />
       </head>
-      <Navbar />
+      <Header />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-5xl mx-auto px-6 md:px-8 w-full">

@@ -13,7 +13,7 @@ import {
   MessageSquare,
   ChevronDown,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
@@ -80,7 +80,7 @@ export default function ContactPage() {
         <meta property="og:url" content="https://turfzo.com/contact" />
       </head>
       <FAQPageSchema items={contactFaqItems} />
-      <Navbar />
+      <Header />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">

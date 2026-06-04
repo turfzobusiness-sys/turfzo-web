@@ -13,7 +13,7 @@ import {
   Smartphone,
   QrCode,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, ArticleSchema, HowToSchema } from "@/lib/schema";
 
@@ -145,7 +145,7 @@ export default function HowToBookTurfOnline() {
         steps={steps.map((s) => ({ name: s.title, text: s.description }))}
       />
       <FAQPageSchema items={faqItems} />
-      <Navbar />
+      <Header />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-6 md:px-8 w-full">

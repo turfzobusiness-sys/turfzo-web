@@ -27,7 +27,7 @@ import {
   ArrowRight,
   AlertCircle,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
@@ -350,7 +350,7 @@ export default function ExplorePage() {
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
 
       <FAQPageSchema items={exploreFaqItems} />
-      <Navbar />
+      <Header />
 
       <main className="flex-grow pt-24 pb-16">
         {flowStep === "listing" && (

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function RefundPolicyPage() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <Navbar />
+      <Header />
       <main className="flex-grow pt-24 pb-16">
         <article className="max-w-3xl mx-auto px-6 md:px-8">
           <h1 className="font-poppins text-4xl font-extrabold mb-2">
