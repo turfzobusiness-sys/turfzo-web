@@ -23,15 +23,15 @@ const securityHeaders = [
 
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sdk.cashfree.com https://*.cashfree.com https://*.convex.cloud https://challenges.cloudflare.com",
-  "frame-src 'self' https://api.cashfree.com https://sandbox.cashfree.com https://*.cashfree.com https://challenges.cloudflare.com",
-  "connect-src 'self' https://*.cashfree.com https://api.cashfree.com https://sandbox.cashfree.com https://*.convex.cloud https://*.convex.site wss://*.convex.cloud https://*.googleapis.com https://challenges.cloudflare.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sdk.cashfree.com https://*.cashfree.com https://*.convex.cloud https://challenges.cloudflare.com https://apis.google.com",
+  "frame-src 'self' https://api.cashfree.com https://sandbox.cashfree.com https://*.cashfree.com https://challenges.cloudflare.com https://*.firebaseapp.com https://*.firebaseauth.com",
+  "connect-src 'self' https://*.cashfree.com https://api.cashfree.com https://sandbox.cashfree.com https://*.convex.cloud https://*.convex.site wss://*.convex.cloud https://*.googleapis.com https://challenges.cloudflare.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.firebaseauth.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  "form-action 'self' https://*.firebaseapp.com https://*.firebaseauth.com",
 ].join("; ");
 
 const nextConfig: NextConfig = {
