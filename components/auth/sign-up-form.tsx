@@ -120,8 +120,8 @@ export function SignUpForm({ onSuccess }: { onSuccess?: () => void }) {
         type="submit"
         disabled={loading}
         className={cn(
-          "w-full inline-flex items-center justify-center gap-2 rounded-md bg-brand-lime px-4 py-2.5 font-poppins font-bold text-sm text-black transition-all duration-300",
-          "hover:bg-brand-lime-hover active:scale-[0.99]",
+          "w-full inline-flex items-center justify-center gap-2 rounded-md bg-[#0f1f0f] border border-brand-lime/25 px-4 py-2.5 font-poppins font-bold text-sm text-white transition-all duration-300",
+          "hover:border-brand-lime/40 active:scale-[0.99]",
           "disabled:cursor-not-allowed disabled:bg-elevated disabled:text-text-muted/50"
         )}
       >

@@ -606,7 +606,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                 className="font-poppins font-semibold px-8 py-3.5 h-auto text-base"
               >
                 {loading ? "Submitting..." : "Submit Registration"}
-                {!loading && <HiSparkles className="w-4 h-4 ml-1.5 text-black" />}
+                {!loading && <HiSparkles className="w-4 h-4 ml-1.5" />}
               </Button>
             </div>
           </motion.div>
@@ -661,7 +661,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
               </Button>
               <a
                 href="/"
-                className="inline-flex items-center justify-center bg-brand-lime text-black hover:bg-brand-lime-hover font-poppins font-semibold px-6 py-3 rounded-md transition-colors text-sm shadow-glow-lime"
+                className="inline-flex items-center justify-center bg-[#0f1f0f] border border-brand-lime/25 text-white hover:border-brand-lime/40 font-poppins font-semibold px-6 py-3 rounded-md transition-colors text-sm"
               >
                 Go to Homepage
               </a>

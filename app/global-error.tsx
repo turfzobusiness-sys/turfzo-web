@@ -11,7 +11,7 @@ export default function GlobalErrorBoundary({
     <html>
       <body
         style={{
-          backgroundColor: "#0C100E",
+          backgroundColor: "#000000",
           color: "#F4F7F4",
           fontFamily: "system-ui, sans-serif",
           minHeight: "100vh",
@@ -36,7 +36,7 @@ export default function GlobalErrorBoundary({
           <button
             onClick={reset}
             style={{
-              backgroundColor: "#6DB631",
+              backgroundColor: "#9FE870",
               color: "#000",
               border: "none",
               padding: "12px 24px",

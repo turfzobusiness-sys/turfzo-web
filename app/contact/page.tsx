@@ -165,8 +165,8 @@ export default function ContactPage() {
                 <svg viewBox="0 0 400 200" className="w-full h-full opacity-60 text-white/5">
                   <defs>
                     <radialGradient id="mapRadar" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor="#6DB631" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#6DB631" stopOpacity="0" />
+                      <stop offset="0%" stopColor="var(--color-brand-lime)" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="var(--color-brand-lime)" stopOpacity="0" />
                     </radialGradient>
                   </defs>
 
@@ -179,7 +179,7 @@ export default function ContactPage() {
                   
                   {/* Radar pulse at coordinates */}
                   <circle cx="200" cy="100" r="30" fill="url(#mapRadar)" className="animate-pulse" />
-                  <circle cx="200" cy="100" r="1.5" fill="#6DB631" />
+                  <circle cx="200" cy="100" r="1.5" fill="var(--color-brand-lime)" />
                 </svg>
 
                 {/* Floating GPS Indicator Card */}
@@ -280,7 +280,7 @@ export default function ContactPage() {
                     <button
                       type="submit"
                       disabled={!turnstileToken}
-                      className="bg-brand-lime hover:bg-brand-lime-hover disabled:bg-brand-lime/30 disabled:cursor-not-allowed text-black font-poppins font-bold text-sm py-3.5 rounded-md transition-all duration-300 hover:scale-102 flex items-center justify-center gap-1.5"
+                      className="bg-[#0f1f0f] border border-brand-lime/25 text-white hover:border-brand-lime/40 disabled:bg-elevated disabled:text-text-muted/50 disabled:border-border-default disabled:cursor-not-allowed font-poppins font-bold text-sm py-3.5 rounded-md transition-all duration-300 hover:scale-102 flex items-center justify-center gap-1.5"
                     >
                       Send Message
                       <Send className="w-4 h-4" />
@@ -334,7 +334,7 @@ export default function ContactPage() {
 
                     <button 
                       onClick={handleReset}
-                      className="bg-brand-lime hover:bg-brand-lime-hover text-black font-semibold text-xs px-6 py-2.5 rounded-pill transition-all mt-4 hover:scale-102"
+                      className="bg-[#0f1f0f] border border-brand-lime/25 text-white hover:border-brand-lime/40 font-semibold text-xs px-6 py-2.5 rounded-pill transition-all mt-4 hover:scale-102"
                     >
                       Send Another Message
                     </button>

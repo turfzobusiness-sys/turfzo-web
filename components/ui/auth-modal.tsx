@@ -79,7 +79,7 @@ export function AuthModal() {
             {/* Left Panel — Brand */}
             <div className="relative hidden lg:flex items-center justify-center overflow-hidden border-r border-border-default min-h-[440px]">
               <div className="absolute inset-0 bg-gradient-to-br from-surface via-bg to-elevated" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(109,182,49,0.08),transparent_55%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(159,232,112,0.08),transparent_55%)]" />
 
               <div className="relative z-10 flex flex-col items-center text-center px-6">
                 <motion.div
