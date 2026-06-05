@@ -76,7 +76,7 @@ export default function Hero() {
           >
             <a 
               href="#explore"
-              className="group bg-brand-lime text-black font-poppins font-semibold px-8 py-4 rounded-[12px] hover:bg-brand-lime-hover transition-all duration-300 flex items-center gap-2 w-full sm:w-auto justify-center"
+              className="group bg-[#0f1f0f] border border-brand-lime/25 text-white font-poppins font-semibold px-8 py-4 rounded-[12px] hover:border-brand-lime/40 transition-all duration-300 flex items-center gap-2 w-full sm:w-auto justify-center"
             >
               Book a Turf
               <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />

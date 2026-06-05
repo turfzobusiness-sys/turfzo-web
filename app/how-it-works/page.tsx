@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
       desc: "Find verified premium pitches near you that support your sport, formatting, and timing. Filter by floodlights, parking, and amenities.",
       tag: "Discover",
       visual: (
-        <div className="bg-[#111613] border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
+        <div className="bg-surface border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
           <span className="text-[9px] font-bold text-brand-lime uppercase tracking-wider block">Real-time Search</span>
           <div className="bg-bg border border-border-subtle p-3 rounded-lg flex flex-col gap-1 shadow-inner">
             <span className="text-[8px] text-text-muted">Enter Location</span>
@@ -76,7 +76,7 @@ export default function HowItWorksPage() {
       desc: "Choose your preferred date and available hour from real-time availability. Check live slot pricing, peak hours, and lock your spot instantly.",
       tag: "Slot Select",
       visual: (
-        <div className="bg-[#111613] border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
+        <div className="bg-surface border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
           <span className="text-[9px] font-bold text-brand-lime uppercase tracking-wider block">Live Booking Grid</span>
           <div className="grid grid-cols-2 gap-2 text-[10px] text-center">
             <span className="bg-elevated text-text-muted p-2 rounded border border-border-subtle line-through">05:00 PM (Booked)</span>
@@ -94,7 +94,7 @@ export default function HowItWorksPage() {
       desc: "Reserve the slot instantly. Add your teammates' contacts at checkout to split the bill, allowing everyone to pay their share directly.",
       tag: "Secure Pay",
       visual: (
-        <div className="bg-[#111613] border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
+        <div className="bg-surface border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
           <span className="text-[9px] font-bold text-brand-lime uppercase tracking-wider block">Teammate Bill Split</span>
           <div className="bg-bg border border-border-subtle p-3.5 rounded-lg flex flex-col gap-2 shadow-inner text-[10px]">
             <div className="flex justify-between border-b border-border-subtle pb-1.5 text-text-muted">
@@ -120,7 +120,7 @@ export default function HowItWorksPage() {
       desc: "Access the pitch by scanning your receipt QR code pass at the entrance gates. Floodlights activate automatically according to your schedule.",
       tag: "Access Pass",
       visual: (
-        <div className="bg-[#111613] border border-border-default rounded-2xl p-6 w-full max-w-sm flex flex-col items-center justify-center space-y-3">
+        <div className="bg-surface border border-border-default rounded-2xl p-6 w-full max-w-sm flex flex-col items-center justify-center space-y-3">
           <span className="text-[9px] font-bold text-brand-lime uppercase tracking-wider self-start">Gate Entrance QR Pass</span>
           <div className="bg-white p-3 rounded-xl shadow-md">
             <svg viewBox="0 0 100 100" className="w-20 h-20 text-black">
@@ -150,7 +150,7 @@ export default function HowItWorksPage() {
       desc: "List your venue with photographs, grass specifications, location, amenities, and available pitches in minutes.",
       tag: "Setup",
       visual: (
-        <div className="bg-[#111613] border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
+        <div className="bg-surface border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
           <span className="text-[9px] font-bold text-brand-lime uppercase tracking-wider block">Pitch Specifications</span>
           <div className="bg-bg border border-border-subtle p-3 rounded-lg flex flex-col gap-2 text-[10px]">
             <div className="flex justify-between border-b border-border-subtle pb-1">
@@ -172,7 +172,7 @@ export default function HowItWorksPage() {
       desc: "Set booking hours, seasonal pricing, and automate floodlight activation. Integrate slot syncing to prevent double bookings.",
       tag: "Controls",
       visual: (
-        <div className="bg-[#111613] border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
+        <div className="bg-surface border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
           <span className="text-[9px] font-bold text-brand-lime uppercase tracking-wider block">Auto-scheduler Controls</span>
           <div className="bg-bg border border-border-subtle p-3.5 rounded-lg flex flex-col gap-1.5">
             <div className="flex items-center justify-between text-[10px]">
@@ -194,7 +194,7 @@ export default function HowItWorksPage() {
       desc: "Track earnings, average occupancy rates, and player reviews in real time via a secure owner dashboard. Payouts arrive in 24 hours.",
       tag: "Analytics",
       visual: (
-        <div className="bg-[#111613] border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
+        <div className="bg-surface border border-border-default rounded-2xl p-6 w-full max-w-sm font-sans text-xs space-y-3">
           <span className="text-[9px] font-bold text-brand-lime uppercase tracking-wider block">Payout Dashboard</span>
           <div className="bg-bg border border-border-subtle p-3 rounded-lg flex items-center justify-between shadow-inner">
             <div className="flex flex-col">

@@ -101,33 +101,33 @@ export default function HowItWorks() {
             >
               {/* Grass Patterns / Stripes */}
               <g opacity="0.15">
-                <rect x="0" y="0" width="75" height="400" fill="#6DB631" />
-                <rect x="150" y="0" width="75" height="400" fill="#6DB631" />
-                <rect x="300" y="0" width="75" height="400" fill="#6DB631" />
-                <rect x="450" y="0" width="75" height="400" fill="#6DB631" />
+                <rect x="0" y="0" width="75" height="400" fill="var(--color-brand-lime)" />
+                <rect x="150" y="0" width="75" height="400" fill="var(--color-brand-lime)" />
+                <rect x="300" y="0" width="75" height="400" fill="var(--color-brand-lime)" />
+                <rect x="450" y="0" width="75" height="400" fill="var(--color-brand-lime)" />
               </g>
 
               {/* Boundary Line */}
-              <rect x="20" y="20" width="560" height="360" fill="none" stroke="rgba(109, 182, 49, 0.4)" strokeWidth="1.5" />
+              <rect x="20" y="20" width="560" height="360" fill="none" stroke="rgba(159, 232, 112, 0.4)" strokeWidth="1.5" />
               
               {/* Halfway Line */}
-              <line x1="300" y1="20" x2="300" y2="380" stroke="rgba(109, 182, 49, 0.4)" strokeWidth="1.5" />
+              <line x1="300" y1="20" x2="300" y2="380" stroke="rgba(159, 232, 112, 0.4)" strokeWidth="1.5" />
               
               {/* Center Circle */}
-              <circle cx="300" cy="200" r="50" fill="none" stroke="rgba(109, 182, 49, 0.4)" strokeWidth="1.5" />
-              <circle cx="300" cy="200" r="2.5" fill="rgba(109, 182, 49, 0.4)" />
+              <circle cx="300" cy="200" r="50" fill="none" stroke="rgba(159, 232, 112, 0.4)" strokeWidth="1.5" />
+              <circle cx="300" cy="200" r="2.5" fill="rgba(159, 232, 112, 0.4)" />
 
               {/* Left Penalty Area */}
-              <rect x="20" y="100" width="80" height="200" fill="none" stroke="rgba(109, 182, 49, 0.4)" strokeWidth="1.5" />
-              <rect x="20" y="150" width="30" height="100" fill="none" stroke="rgba(109, 182, 49, 0.4)" strokeWidth="1.5" />
-              <circle cx="100" cy="200" r="1.5" fill="rgba(109, 182, 49, 0.4)" />
-              <path d="M 100 160 A 50 50 0 0 1 100 240" fill="none" stroke="rgba(109, 182, 49, 0.4)" strokeWidth="1.5" />
+              <rect x="20" y="100" width="80" height="200" fill="none" stroke="rgba(159, 232, 112, 0.4)" strokeWidth="1.5" />
+              <rect x="20" y="150" width="30" height="100" fill="none" stroke="rgba(159, 232, 112, 0.4)" strokeWidth="1.5" />
+              <circle cx="100" cy="200" r="1.5" fill="rgba(159, 232, 112, 0.4)" />
+              <path d="M 100 160 A 50 50 0 0 1 100 240" fill="none" stroke="rgba(159, 232, 112, 0.4)" strokeWidth="1.5" />
 
               {/* Right Penalty Area */}
-              <rect x="500" y="100" width="80" height="200" fill="none" stroke="rgba(109, 182, 49, 0.4)" strokeWidth="1.5" />
-              <rect x="550" y="150" width="30" height="100" fill="none" stroke="rgba(109, 182, 49, 0.4)" strokeWidth="1.5" />
-              <circle cx="500" cy="200" r="1.5" fill="rgba(109, 182, 49, 0.4)" />
-              <path d="M 500 160 A 50 50 0 0 0 500 240" fill="none" stroke="rgba(109, 182, 49, 0.4)" strokeWidth="1.5" />
+              <rect x="500" y="100" width="80" height="200" fill="none" stroke="rgba(159, 232, 112, 0.4)" strokeWidth="1.5" />
+              <rect x="550" y="150" width="30" height="100" fill="none" stroke="rgba(159, 232, 112, 0.4)" strokeWidth="1.5" />
+              <circle cx="500" cy="200" r="1.5" fill="rgba(159, 232, 112, 0.4)" />
+              <path d="M 500 160 A 50 50 0 0 0 500 240" fill="none" stroke="rgba(159, 232, 112, 0.4)" strokeWidth="1.5" />
 
               {/* Goal Posts */}
               <rect x="8" y="170" width="12" height="60" fill="none" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="1.5" />
@@ -137,7 +137,7 @@ export default function HowItWorks() {
               <path 
                 d="M 90 200 Q 165 140 240 120 T 390 280 Q 450 230 510 200" 
                 fill="none" 
-                stroke="#6DB631" 
+                stroke="var(--color-brand-lime)" 
                 strokeWidth="2" 
                 strokeDasharray="6, 6" 
                 className="opacity-60"
@@ -166,7 +166,7 @@ export default function HowItWorks() {
                     <div className={cn(
                       "w-10 h-10 -ml-5 -mt-5 rounded-full flex items-center justify-center border-2 font-poppins text-xs font-extrabold transition-all duration-300",
                       isActive 
-                        ? "bg-[#16211B] border-brand-lime text-brand-lime shadow-[0_0_15px_rgba(109,182,49,0.35)] scale-110" 
+                        ? "bg-[#16211B] border-brand-lime text-brand-lime shadow-[0_0_15px_rgba(159,232,112,0.35)] scale-110" 
                         : "bg-surface border-border-default text-text-muted hover:border-border-strong hover:text-text-main hover:scale-105"
                     )}>
                       {step.num}

@@ -93,7 +93,7 @@ export default function Footer() {
                   className="w-full max-w-sm bg-surface border border-border-subtle focus:border-brand-lime/30 rounded-pill py-3 pl-5 pr-12 text-sm text-text-main placeholder-text-muted/50 focus:outline-none transition-colors duration-300"
                 />
                 <button 
-                  className="absolute right-1.5 p-2 bg-brand-lime hover:bg-brand-lime-hover text-black rounded-full transition-colors duration-300 focus:outline-none active:scale-95"
+                  className="absolute right-1.5 p-2 bg-[#0f1f0f] border border-brand-lime/25 text-white hover:border-brand-lime/40 rounded-full transition-colors duration-300 focus:outline-none active:scale-95"
                   aria-label="Subscribe"
                 >
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />

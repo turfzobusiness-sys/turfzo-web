@@ -11,7 +11,7 @@ const FEATURES = [
     desc: "Every listing on Turfzo is personally inspected. We verify location accuracy, amenities, lighting quality, and turf conditions so you play exactly what you see.",
     tag: "100% Verified",
     icon: ShieldCheck,
-    colorClass: "text-[#6DB631] bg-[#6DB631]/10"
+    colorClass: "text-brand-lime bg-brand-lime/10"
   },
   {
     num: "02",
@@ -135,7 +135,7 @@ export default function Features() {
                     "relative p-6 sm:p-8 rounded-2xl cursor-pointer select-none transition-all duration-300 ease-out",
                     "bg-surface/30 dark:bg-surface/10 border border-border-default/40 backdrop-blur-xs",
                     "hover:scale-[1.01] hover:border-brand-lime/80 hover:bg-surface/60 dark:hover:bg-surface/20",
-                    "hover:shadow-[0_8px_30px_rgba(109,182,49,0.08)]",
+                    "hover:shadow-[0_8px_30px_rgba(159,232,112,0.08)]",
                     isAnyHovered && !isHovered ? "opacity-60 scale-[0.99]" : "opacity-100"
                   )}
                 >

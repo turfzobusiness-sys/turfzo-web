@@ -30,11 +30,11 @@ export default function CTABanner() {
           </p>
 
           {/* CTAs */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-            <a 
-              href="#explore"
-              className="bg-brand-lime text-black font-poppins font-semibold px-8 py-3.5 rounded-[12px] hover:bg-brand-lime-hover transition-all duration-300 flex items-center justify-center gap-1.5"
-            >
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
+              <a 
+                href="#explore"
+                className="bg-[#0f1f0f] border border-brand-lime/25 text-white font-poppins font-semibold px-8 py-3.5 rounded-[12px] hover:border-brand-lime/40 transition-all duration-300 flex items-center justify-center gap-1.5"
+              >
               Book Now
               <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
             </a>

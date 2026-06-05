@@ -180,7 +180,7 @@ export default function PhoneMockup() {
 
             {/* View Details Button */}
             <div className="px-3.5 pb-4 pt-2.5">
-              <button className="w-full bg-[#0f1f0f] border border-brand-lime/25 text-white font-sans font-semibold text-[12px] py-3.5 rounded-[14px] flex items-center justify-center relative hover:border-brand-lime/40 transition-colors">
+              <button className="w-full bg-[#0f1f0f] border border-brand-lime/25 text-white font-sans font-semibold text-[12px] py-3.5 rounded-[14px] flex items-center justify-center relative hover:border-brand-lime/40 transition-colors cursor-pointer">
                 View Details
                 <div className="absolute right-3 w-[28px] h-[28px] rounded-full border border-white/10 bg-bg flex items-center justify-center">
                   <ArrowRight className="w-3.5 h-3.5 text-white/50" />
