@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (firebaseUser: FirebaseUser) => {
       try {
         const token = await getIdToken(firebaseUser);
-        const response = await convexClient.action<{
+        const response = await convexClient.mutation<{
           success: boolean;
           user: AppUser;
           session_token: string;
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         opts.password
       );
       const token = await getIdToken(cred.user);
-      await convexClient.action<{
+      await convexClient.mutation<{
         success: boolean;
         user: AppUser;
       }>(

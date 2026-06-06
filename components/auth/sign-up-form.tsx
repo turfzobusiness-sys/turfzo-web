@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useAuthModal } from "@/lib/auth-modal-context";
 import { cn } from "@/lib/utils";
 
-export function SignUpForm({ onSuccess }: { onSuccess?: () => void }) {
+export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?: string }) {
   const { signUp, signInWithGoogle, error } = useAuth();
   const { closeAuthModal } = useAuthModal();
 
@@ -24,7 +24,7 @@ export function SignUpForm({ onSuccess }: { onSuccess?: () => void }) {
       await signUp({
         email,
         password,
-        role: "player",
+        role: role ?? "player",
         displayName: name,
       });
       onSuccess?.();

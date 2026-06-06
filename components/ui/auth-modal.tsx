@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useAuthModal } from "@/lib/auth-modal-context";
@@ -12,6 +13,8 @@ import { AuthTabSwitcher } from "@/components/auth/auth-tab-switcher";
 import { cn } from "@/lib/utils";
 
 export function AuthModal() {
+  const pathname = usePathname();
+  const isOwnerPath = pathname?.startsWith("/owners");
   const { isOpen, mode, closeAuthModal, setMode } = useAuthModal();
   const panelRef = React.useRef<HTMLDivElement>(null);
 
@@ -144,12 +147,14 @@ export function AuthModal() {
                 {/* Heading */}
                 <div>
                   <h2 className="font-poppins text-xl sm:text-2xl font-extrabold text-text-main tracking-tight">
-                    {mode === "signin" ? "Welcome back" : "Create your account"}
+                    {mode === "signin" 
+                      ? (isOwnerPath ? "Welcome back, Partner" : "Welcome back") 
+                      : (isOwnerPath ? "Become a Turfzo Partner" : "Create your account")}
                   </h2>
                   <p className="mt-1 font-sans text-xs text-text-muted">
                     {mode === "signin"
-                      ? "Sign in to manage bookings."
-                      : "Join Turfzo to book turfs."}
+                      ? (isOwnerPath ? "Sign in to manage your venues and payouts." : "Sign in to manage bookings.")
+                      : (isOwnerPath ? "Register your sports facility and start earning." : "Join Turfzo to book turfs.")}
                   </p>
                 </div>
 
@@ -165,7 +170,11 @@ export function AuthModal() {
                     exit={{ opacity: 0, x: mode === "signin" ? 10 : -10 }}
                     transition={{ duration: 0.18, ease: "easeOut" }}
                   >
-                    {mode === "signin" ? <SignInForm /> : <SignUpForm />}
+                    {mode === "signin" ? (
+                      <SignInForm />
+                    ) : (
+                      <SignUpForm role={isOwnerPath ? "owner" : "player"} />
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </div>
