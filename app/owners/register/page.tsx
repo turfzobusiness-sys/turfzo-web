@@ -1,0 +1,142 @@
+"use client";
+
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Sparkles, Building, Calendar, CreditCard, ShieldCheck } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { SignUpForm } from "@/components/auth/sign-up-form";
+import { convexClient } from "@/lib/convex";
+import type { OnboardingState } from "@/lib/types";
+import { useAuthModal } from "@/lib/auth-modal-context";
+
+export default function OwnerRegisterPage() {
+  const { status, convexUser } = useAuth();
+  const { openAuthModal } = useAuthModal();
+  const router = useRouter();
+
+  useEffect(() => {
+    async function checkRedirect() {
+      if (status === "authenticated" && convexUser) {
+        if (convexUser.role === "owner") {
+          try {
+            const state = await convexClient.query<OnboardingState | null>("auth:getOwnerProfile");
+            if (state?.profile?.onboarding_completed) {
+              router.push("/owners/dashboard");
+            } else {
+              router.push("/owners/onboarding");
+            }
+          } catch {
+            router.push("/owners/onboarding");
+          }
+        } else {
+          // If a player logs in, redirect them to onboarding to show the upgrade option
+          router.push("/owners/onboarding");
+        }
+      }
+    }
+    checkRedirect();
+  }, [status, convexUser, router]);
+
+  return (
+    <main className="min-h-screen bg-bg flex flex-col md:flex-row">
+      {/* Left panel: Value Props (Hidden on mobile) */}
+      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-[#0c180c] via-[#050b05] to-bg p-12 lg:p-16 flex-col justify-between relative overflow-hidden border-r border-border-default">
+        {/* Background glow effects */}
+        <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[80%] rounded-full bg-brand-lime/5 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-brand-lime/3 blur-[100px]" />
+
+        {/* Logo/Header */}
+        <div className="flex items-center gap-2 relative z-10">
+          <span className="font-poppins text-lg font-black tracking-wider text-white">
+            TURFZO <span className="text-brand-lime font-medium text-xs tracking-widest ml-1 border border-brand-lime/30 px-1.5 py-0.5 rounded-[4px] bg-brand-lime/5">PARTNER</span>
+          </span>
+        </div>
+
+        {/* Marketing Copylist */}
+        <div className="space-y-8 max-w-md my-auto relative z-10">
+          <div className="space-y-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-lime/10 border border-brand-lime/25 text-brand-lime text-xs font-semibold tracking-wide">
+              <Sparkles className="h-3.5 w-3.5 fill-current" />
+              Self-Serve Registration
+            </span>
+            <h1 className="font-poppins text-3xl lg:text-4xl font-extrabold text-white leading-tight tracking-wide">
+              Grow your venue business with India's #1 booking platform
+            </h1>
+            <p className="font-sans text-sm text-text-muted/80 leading-relaxed">
+              Join hundreds of arena owners who use Turfzo to automate bookings, schedule slots, and accept instant digital payouts.
+            </p>
+          </div>
+
+          <div className="space-y-4 pt-4">
+            {[
+              {
+                icon: Building,
+                title: "Register in 10 Minutes",
+                desc: "Fill in your business details, add court specs, and provide bank info completely self-serve.",
+              },
+              {
+                icon: Calendar,
+                title: "Smart Calendar & Scheduling",
+                desc: "Enable online slot bookings, pricing variations, and offline blockouts with our dashboard.",
+              },
+              {
+                icon: CreditCard,
+                title: "Instant settlements",
+                desc: "Direct settlements into your bank account within 24 hours of booking completions.",
+              },
+            ].map((prop, idx) => (
+              <div key={idx} className="flex gap-4 items-start">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-brand-lime/10 border border-brand-lime/25 text-brand-lime">
+                  <prop.icon className="h-5 w-5" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-poppins text-sm font-semibold text-white tracking-wide">{prop.title}</h4>
+                  <p className="font-sans text-xs text-text-muted/70 leading-relaxed">{prop.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer info */}
+        <div className="text-xs font-sans text-text-muted/50 flex items-center gap-2 relative z-10">
+          <ShieldCheck className="h-4 w-4 text-brand-lime/60" />
+          <span>Secured partner connection. Standard terms of use apply.</span>
+        </div>
+      </div>
+
+      {/* Right panel: Sign Up Form */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 md:px-16 lg:px-24 bg-bg relative">
+        {/* Glow overlay for mobile */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[50%] rounded-full bg-brand-lime/2 blur-[80px] md:hidden -z-10" />
+
+        <div className="w-full max-w-sm mx-auto space-y-6">
+          <div className="space-y-2">
+            <h2 className="font-poppins text-2xl font-bold text-white tracking-wide">Get Started as Partner</h2>
+            <p className="font-sans text-xs text-text-muted">
+              Create your partner account to set up your turf business.
+            </p>
+          </div>
+
+          <div className="bg-surface border border-border-default rounded-[16px] p-6 shadow-xl shadow-brand-lime/1">
+            <SignUpForm role="owner" onSuccess={() => router.push("/owners/onboarding")} />
+          </div>
+
+          <p className="text-center font-sans text-xs text-text-muted">
+            Already registered?{" "}
+            <a
+              href="#"
+              className="text-brand-lime hover:underline font-semibold"
+              onClick={(e) => {
+                e.preventDefault();
+                openAuthModal("signin");
+              }}
+            >
+              Sign In to Resume →
+            </a>
+          </p>
+        </div>
+      </div>
+    </main>
+  );
+}

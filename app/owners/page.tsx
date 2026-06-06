@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { 
   TbCalendarTime, 
@@ -42,6 +44,7 @@ const OWNER_FAQS = [
 ];
 
 export default function OwnersPage() {
+  const router = useRouter();
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   
   // Interactive IoT Light Mockup State
@@ -95,20 +98,28 @@ export default function OwnersPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
+              className="mt-10 flex flex-col items-center gap-4"
             >
-              <button
-                onClick={scrollToRegister}
-                className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold px-8 py-4 rounded-[12px] transition-all shadow-glow-lime flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-              >
-                Register Your Venue
-                <HiArrowDown className="w-4 h-4" />
-              </button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => router.push("/owners/register")}
+                  className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold px-8 py-4 rounded-[12px] transition-all shadow-glow-lime flex items-center justify-center gap-2 cursor-pointer active:scale-95 text-sm md:text-base animate-pulse shadow-brand-lime/10"
+                >
+                  Get Started (Self-Serve)
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <a
+                  href="#features"
+                  className="bg-surface border border-border-default hover:bg-elevated text-text-main font-poppins font-bold px-8 py-4 rounded-[12px] transition-all flex items-center justify-center text-sm md:text-base"
+                >
+                  Explore Technology
+                </a>
+              </div>
               <a
-                href="#features"
-                className="bg-surface border border-border-default hover:bg-elevated text-text-main font-poppins font-bold px-8 py-4 rounded-[12px] transition-all flex items-center justify-center"
+                href="/owners/dashboard"
+                className="font-sans text-xs text-text-muted hover:text-brand-lime hover:underline transition-colors font-medium mt-1"
               >
-                Explore Technology
+                Already registered? Check your application status →
               </a>
             </motion.div>
           </div>
