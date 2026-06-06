@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Inter } from "next/font/google";
+import { Inter, Anton } from "next/font/google";
 import "./globals.css";
 import "@/lib/env-init";
 import { AuthProvider } from "@/lib/auth-context";
@@ -9,15 +9,15 @@ import { OrganizationSchema, WebSiteSchema } from "@/lib/schema";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { AuthModal } from "@/components/ui/auth-modal";
 
-const poppins = Poppins({
-  weight: ["400", "500", "600", "700", "800"],
-  subsets: ["latin"],
-  variable: "--font-poppins",
-});
-
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-anton",
 });
 
 const SITE_URL = "https://turfzo.app";
@@ -96,7 +96,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${inter.variable} h-full antialiased scroll-smooth`}
+      className={`${inter.variable} ${anton.variable} h-full antialiased scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
@@ -126,7 +126,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body suppressHydrationWarning className="min-h-full flex flex-col bg-bg text-text-main selection:bg-brand-lime selection:text-black">
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-bg text-text-main selection:bg-brand-lime/30 selection:text-text-main">
         <ThemeProvider>
           <AuthProvider>
             <AuthModalProvider>
