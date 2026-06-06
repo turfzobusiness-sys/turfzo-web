@@ -39,6 +39,8 @@ export interface Turf {
   has_drinking_water?: boolean;
   has_first_aid?: boolean;
   is_indoor?: boolean;
+  ground_count?: number;
+  status?: "pending" | "approved" | "rejected" | "active" | "inactive";
 }
 
 export interface AppUser {
@@ -112,4 +114,64 @@ export interface NotificationItem {
   type: string;
   data?: unknown;
   is_read: boolean;
+}
+
+export interface OwnerProfile {
+  _id: string;
+  _creationTime: number;
+  user_id: string;
+  business_name?: string;
+  phone_number?: string;
+  gst_number?: string;
+  pan_number?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  onboarding_step: number;
+  onboarding_completed: boolean;
+  onboarding_completed_at?: number;
+  agreement_accepted?: boolean;
+  agreement_accepted_at?: number;
+  venue_draft?: {
+    name?: string;
+    description?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
+    price_per_hour?: number;
+    sport_type?: string;
+    amenities?: string[];
+    operating_hours?: Record<string, { open: string; close: string }>;
+    max_players?: number;
+    has_floodlights?: boolean;
+    has_free_parking?: boolean;
+    has_changing_room?: boolean;
+    has_drinking_water?: boolean;
+    has_first_aid?: boolean;
+    is_indoor?: boolean;
+    ground_count?: number;
+  };
+}
+
+export interface PayoutDetails {
+  _id: string;
+  _creationTime: number;
+  owner_id: string;
+  bank_account_holder_name: string;
+  bank_account_number: string;
+  bank_ifsc_code: string;
+  bank_name: string;
+  bank_branch?: string;
+  upi_id?: string;
+  is_verified: boolean;
+  verified_at?: number;
+  verified_by?: string;
+}
+
+export interface OnboardingState {
+  user: AppUser;
+  profile: OwnerProfile | null;
+  payout: PayoutDetails | null;
 }
