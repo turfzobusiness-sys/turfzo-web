@@ -67,10 +67,10 @@ export default function BlogIndex() {
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
           {/* Hero */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
               <Tag className="w-3.5 h-3.5" /> Turfzo Blog
             </span>
-            <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight">
+            <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight">
               Turf Booking <span className="text-brand-lime">Guides & Tips</span>
             </h1>
             <p className="mt-4 text-text-muted text-sm sm:text-base font-sans max-w-xl mx-auto">
@@ -98,12 +98,12 @@ export default function BlogIndex() {
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute top-3 left-3 bg-brand-lime text-black font-poppins font-bold text-[10px] px-2.5 py-1 rounded-pill">
+                    <div className="absolute top-3 left-3 bg-brand-lime text-black font-sans font-bold text-[10px] px-2.5 py-1 rounded-md">
                       {post.category}
                     </div>
                   </div>
                   <div className="p-6">
-                    <h2 className="font-poppins font-bold text-lg text-text-main group-hover:text-brand-lime transition-colors">
+                    <h2 className="font-sans font-bold text-lg text-text-main group-hover:text-brand-lime transition-colors">
                       {post.title}
                     </h2>
                     <p className="mt-2 text-xs text-text-muted font-sans leading-relaxed line-clamp-2">
@@ -118,7 +118,7 @@ export default function BlogIndex() {
                           <Clock className="w-3 h-3" /> {post.readTime}
                         </span>
                       </div>
-                      <span className="text-brand-lime text-xs font-poppins font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                      <span className="text-brand-lime text-xs font-sans font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
                         Read <ArrowRight className="w-3.5 h-3.5" />
                       </span>
                     </div>

@@ -35,7 +35,7 @@ export default function GlobalError({
             className="w-20 h-20 opacity-60 grayscale-[0.3]"
           />
         </div>
-        <h1 className="font-poppins text-3xl font-extrabold text-text-main mb-2">
+        <h1 className="font-sans text-3xl font-extrabold text-text-main mb-2">
           Something went wrong
         </h1>
         <p className="text-text-muted text-sm font-sans mb-8 leading-relaxed">

@@ -10,32 +10,28 @@ const FEATURES = [
     title: "Verified Venues Only",
     desc: "Every listing on Turfzo is personally inspected. We verify location accuracy, amenities, lighting quality, and turf conditions so you play exactly what you see.",
     tag: "100% Verified",
-    icon: ShieldCheck,
-    colorClass: "text-brand-lime bg-brand-lime/10"
+    icon: ShieldCheck
   },
   {
     num: "02",
     title: "Instant Confirmation",
     desc: "Check real-time slots and get confirmed in under 60 seconds. Our direct integration with venue management software eliminates double bookings.",
     tag: "Real-time",
-    icon: Zap,
-    colorClass: "text-[#E4B66A] bg-[#E4B66A]/10"
+    icon: Zap
   },
   {
     num: "03",
     title: "Zero Hidden Fees",
     desc: "What you see is what you pay. Transparent booking pricing with absolute zero convenience charges or hidden administrative fees.",
     tag: "No Booking Fees",
-    icon: CircleDollarSign,
-    colorClass: "text-[#5B91C8] bg-[#5B91C8]/10"
+    icon: CircleDollarSign
   },
   {
     num: "04",
     title: "Flexible Refunds & Cancellations",
     desc: "Plans changed? Cancel with confidence. Receive automatic refunds directly to your account based on the venue's cancellation window.",
     tag: "Hassle-free",
-    icon: RotateCcw,
-    colorClass: "text-[#E05A47] bg-[#E05A47]/10"
+    icon: RotateCcw
   }
 ];
 
@@ -60,20 +56,17 @@ export default function Features() {
   const activeImgIdx = hoveredIdx !== null ? hoveredIdx : 0;
 
   return (
-    <section id="why-choose" className="py-24 sm:py-32 bg-bg border-t border-border-subtle relative overflow-hidden">
-      {/* Subtle ambient lighting */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-brand-lime/[0.02] blur-[150px] pointer-events-none" />
-
+    <section id="why-choose" className="py-24 sm:py-32 bg-bg border-t border-border-default relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-16 lg:gap-24 items-start">
           
           {/* LEFT COLUMN: Sticky context, dynamic image & stats */}
           <div className="lg:sticky lg:top-28 space-y-8">
             <div className="space-y-4">
-              <span className="text-xs font-semibold tracking-[0.2em] uppercase text-brand-lime">
+              <span className="text-xs font-medium tracking-wide uppercase text-text-muted">
                 Engineered for players
               </span>
-              <h2 className="font-poppins text-4xl sm:text-5xl font-extrabold tracking-tight text-text-main leading-[1.1]">
+              <h2 className="font-sans text-3xl sm:text-4xl font-bold tracking-tight text-text-main leading-[1.1]">
                 Better turf booking. <br />
                 <span className="text-text-muted">No friction.</span>
               </h2>
@@ -83,7 +76,7 @@ export default function Features() {
             </div>
 
             {/* DYNAMIC AESTHETIC IMAGE SLIDESHOW */}
-            <div className="relative h-60 sm:h-72 w-full rounded-2xl border border-border-default overflow-hidden bg-surface shadow-card-shadow">
+            <div className="relative h-60 sm:h-72 w-full rounded-md border border-border-default overflow-hidden bg-surface">
               {IMAGES.map((src, idx) => (
                 <div
                   key={idx}
@@ -99,7 +92,7 @@ export default function Features() {
                     alt={`Feature preview ${idx + 1}`}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+                  
                 </div>
               ))}
             </div>
@@ -108,10 +101,10 @@ export default function Features() {
             <div className="grid grid-cols-2 gap-x-8 gap-y-6 pt-6 border-t border-border-default">
               {STATS.map((stat, idx) => (
                 <div key={idx} className="space-y-1">
-                  <div className="font-poppins text-2xl sm:text-3xl font-extrabold text-text-main">
+                  <div className="font-sans text-2xl sm:text-3xl font-bold text-text-main">
                     {stat.value}
                   </div>
-                  <div className="font-sans text-[10px] text-text-muted font-semibold tracking-wider uppercase">
+                  <div className="font-sans text-[10px] text-text-muted font-medium tracking-wide uppercase">
                     {stat.label}
                   </div>
                 </div>
@@ -132,26 +125,25 @@ export default function Features() {
                   onMouseEnter={() => setHoveredIdx(idx)}
                   onMouseLeave={() => setHoveredIdx(null)}
                   className={cn(
-                    "relative p-6 sm:p-8 rounded-2xl cursor-pointer select-none transition-all duration-300 ease-out",
-                    "bg-surface/30 dark:bg-surface/10 border border-border-default/40 backdrop-blur-xs",
-                    "hover:scale-[1.01] hover:border-brand-lime/80 hover:bg-surface/60 dark:hover:bg-surface/20",
-                    "hover:shadow-[0_8px_30px_rgba(159,232,112,0.08)]",
-                    isAnyHovered && !isHovered ? "opacity-60 scale-[0.99]" : "opacity-100"
+                    "relative p-5 sm:p-6 rounded-md cursor-pointer select-none transition-all duration-200 ease-out",
+                    "bg-surface border border-border-default",
+                    "hover:border-border-strong hover:bg-elevated",
+                    isAnyHovered && !isHovered ? "opacity-70" : "opacity-100"
                   )}
                 >
-                  <div className="flex gap-5 sm:gap-6 items-start">
-                    {/* Glowing Icon Container */}
-                    <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110", feature.colorClass)}>
-                      <Icon className="w-6 h-6 stroke-[2]" />
+                  <div className="flex gap-4 sm:gap-5 items-start">
+                    {/* Icon Container */}
+                    <div className="mt-1 shrink-0 text-text-muted transition-colors duration-200 group-hover:text-text-main">
+                      <Icon className="w-5 h-5 stroke-[1.5]" />
                     </div>
 
                     {/* Content */}
-                    <div className="flex-grow space-y-2">
+                    <div className="flex-grow space-y-1.5">
                       <div className="flex flex-wrap items-center justify-between gap-2.5">
-                        <h3 className="font-poppins text-lg sm:text-xl font-bold text-text-main tracking-tight transition-colors duration-200 group-hover:text-brand-lime">
+                        <h3 className="font-sans text-base sm:text-lg font-semibold text-text-main tracking-tight transition-colors duration-200 group-hover:text-text-main">
                           {feature.title}
                         </h3>
-                        <span className="text-[9px] font-sans font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-elevated text-text-muted border border-border-subtle">
+                        <span className="text-[10px] font-sans font-medium px-2 py-0.5 rounded-sm bg-bg text-text-muted border border-border-default">
                           {feature.tag}
                         </span>
                       </div>
@@ -163,10 +155,10 @@ export default function Features() {
 
                     {/* Subtle micro-interaction arrow */}
                     <div className={cn(
-                      "self-start pt-1.5 opacity-30 transition-all duration-300",
-                      isHovered && "opacity-100 translate-x-1 -translate-y-1 text-brand-lime"
+                      "self-start pt-1.5 opacity-0 transition-all duration-200",
+                      isHovered && "opacity-100 text-text-muted"
                     )}>
-                      <ArrowUpRight className="w-5 h-5" />
+                      <ArrowUpRight className="w-4 h-4 stroke-[1.5]" />
                     </div>
                   </div>
                 </div>

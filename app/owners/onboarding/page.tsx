@@ -63,8 +63,8 @@ export default function OnboardingPage() {
         token
       );
       
-      // Reload page to re-trigger auth context hydration
-      window.location.reload();
+      // Hard redirect to re-trigger auth context hydration correctly without looping
+      window.location.href = "/owners/onboarding";
     } catch (err) {
       console.error("Failed to upgrade account role:", err);
       setUpgrading(false);
@@ -75,7 +75,7 @@ export default function OnboardingPage() {
     return (
       <div className="min-h-screen bg-bg flex flex-col items-center justify-center gap-3">
         <Loader2 className="h-8 w-8 animate-spin text-brand-lime" />
-        <span className="font-poppins text-sm text-text-muted">Verifying application status...</span>
+        <span className="font-sans text-sm text-text-muted">Verifying application status...</span>
       </div>
     );
   }
@@ -85,7 +85,7 @@ export default function OnboardingPage() {
     return (
       <main className="min-h-screen bg-bg flex items-center justify-center p-6 relative overflow-hidden">
         {/* Background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full bg-brand-lime/3 blur-[120px] -z-10" />
+        
 
         <div className="max-w-md w-full bg-surface border border-border-default rounded-[16px] p-6 md:p-8 space-y-6 shadow-xl shadow-brand-lime/1">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-lime/10 border border-brand-lime/30 text-brand-lime">
@@ -96,7 +96,7 @@ export default function OnboardingPage() {
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-brand-lime/10 border border-brand-lime/20 text-brand-lime text-[10px] font-semibold uppercase tracking-wider">
               Account Upgrade
             </span>
-            <h2 className="font-poppins text-xl font-bold text-white tracking-wide">Become a Turfzo Partner</h2>
+            <h2 className="font-sans text-xl font-bold text-white tracking-wide">Become a Turfzo Partner</h2>
             <p className="font-sans text-sm text-text-muted leading-relaxed">
               Your account is currently registered as a **Player**. Would you like to upgrade your profile to a **Turf Owner** to list your venues and manage bookings?
             </p>
@@ -118,17 +118,17 @@ export default function OnboardingPage() {
             <Button
               onClick={handleUpgradeRole}
               disabled={upgrading}
-              className="w-full inline-flex items-center justify-center gap-2 bg-brand-lime border border-brand-lime text-[#0c1b0c] hover:bg-[#b0f782] py-2.5 font-poppins font-bold text-sm tracking-wide rounded-[8px] transition-all"
+              className="w-full"
             >
               {upgrading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin text-[#0c1b0c]" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Upgrading Account...
                 </>
               ) : (
                 <>
                   Upgrade to Turf Owner
-                  <ArrowRight className="h-4 w-4 text-[#0c1b0c]" />
+                  <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </Button>
@@ -149,12 +149,12 @@ export default function OnboardingPage() {
   return (
     <main className="min-h-screen bg-bg relative py-12 px-6 md:py-20">
       {/* Background glow decorations */}
-      <div className="absolute top-0 right-0 w-[50%] h-[40%] rounded-full bg-brand-lime/2 blur-[120px] -z-10" />
-      <div className="absolute bottom-0 left-0 w-[40%] h-[40%] rounded-full bg-brand-lime/1 blur-[100px] -z-10" />
+      
+      
 
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="space-y-2 border-b border-border-default pb-5">
-          <h1 className="font-poppins text-2xl md:text-3xl font-extrabold text-white tracking-wide">
+          <h1 className="font-sans text-2xl md:text-3xl font-extrabold text-white tracking-wide">
             Partner Onboarding Flow
           </h1>
           <p className="font-sans text-sm text-text-muted/80">

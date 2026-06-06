@@ -214,7 +214,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
   return (
     <div className="w-full max-w-2xl mx-auto bg-surface border border-border-default rounded-md p-6 sm:p-8 md:p-10 shadow-card-shadow relative overflow-hidden">
       {/* Decorative top green glow line */}
-      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-brand-lime to-transparent" />
+      
       
       {step !== "success" && (
         <div className="mb-8">
@@ -252,7 +252,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
             className="space-y-6"
           >
             <div>
-              <h3 className="font-poppins text-lg font-bold text-text-main mb-1">Owner Profile</h3>
+              <h3 className="font-sans text-lg font-bold text-text-main mb-1">Owner Profile</h3>
               <p className="text-xs text-text-muted">Introduce yourself and your business email so we can verify your credentials.</p>
             </div>
 
@@ -344,7 +344,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
               <Button
                 type="button"
                 onClick={handleNext}
-                className="font-poppins font-semibold px-6 py-3 h-auto"
+                className="font-sans font-semibold px-6 py-3 h-auto"
               >
                 Next Step
                 <TbArrowRight className="w-4 h-4 ml-1.5" />
@@ -363,7 +363,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
             className="space-y-6"
           >
             <div>
-              <h3 className="font-poppins text-lg font-bold text-text-main mb-1">Venue Specifications</h3>
+              <h3 className="font-sans text-lg font-bold text-text-main mb-1">Venue Specifications</h3>
               <p className="text-xs text-text-muted">Tell us about your sports complex, courts, and supported amenities.</p>
             </div>
 
@@ -486,7 +486,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                 type="button"
                 variant="outline"
                 onClick={handleBack}
-                className="font-poppins font-semibold px-6 py-3 h-auto"
+                className="font-sans font-semibold px-6 py-3 h-auto"
               >
                 <TbArrowLeft className="w-4 h-4 mr-1.5" />
                 Back
@@ -494,7 +494,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
               <Button
                 type="button"
                 onClick={handleNext}
-                className="font-poppins font-semibold px-6 py-3 h-auto"
+                className="font-sans font-semibold px-6 py-3 h-auto"
               >
                 Next Step
                 <TbArrowRight className="w-4 h-4 ml-1.5" />
@@ -513,7 +513,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
             className="space-y-6"
           >
             <div>
-              <h3 className="font-poppins text-lg font-bold text-text-main mb-1">Operations & Pricing</h3>
+              <h3 className="font-sans text-lg font-bold text-text-main mb-1">Operations & Pricing</h3>
               <p className="text-xs text-text-muted">Enter scheduling timings, base rates, and complete the check to submit.</p>
             </div>
 
@@ -594,7 +594,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                 variant="outline"
                 onClick={handleBack}
                 disabled={loading}
-                className="font-poppins font-semibold px-6 py-3 h-auto"
+                className="font-sans font-semibold px-6 py-3 h-auto"
               >
                 <TbArrowLeft className="w-4 h-4 mr-1.5" />
                 Back
@@ -603,7 +603,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="font-poppins font-semibold px-8 py-3.5 h-auto text-base"
+                className="font-sans font-semibold px-8 py-3.5 h-auto text-base"
               >
                 {loading ? "Submitting..." : "Submit Registration"}
                 {!loading && <HiSparkles className="w-4 h-4 ml-1.5" />}
@@ -625,7 +625,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
             </div>
 
             <div>
-              <h2 className="font-poppins text-2xl font-extrabold text-text-main mb-2">
+              <h2 className="font-sans text-2xl font-extrabold text-text-main mb-2">
                 Registration Received!
               </h2>
               <p className="text-sm text-text-muted max-w-md mx-auto leading-relaxed">
@@ -655,13 +655,13 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                   setErrorMsg(null);
                   setStep(1);
                 }}
-                className="font-poppins font-semibold px-6 py-3 h-auto"
+                className="font-sans font-semibold px-6 py-3 h-auto"
               >
                 Submit Another Venue
               </Button>
               <a
                 href="/"
-                className="inline-flex items-center justify-center bg-[#0f1f0f] border border-brand-lime/25 text-white hover:border-brand-lime/40 font-poppins font-semibold px-6 py-3 rounded-md transition-colors text-sm"
+                className="inline-flex items-center justify-center bg-brand-btn-bg border border-brand-lime/25 text-white hover:border-brand-lime/40 hover:bg-brand-btn-bg-hover font-sans font-semibold px-6 py-3 rounded-md transition-colors text-sm"
               >
                 Go to Homepage
               </a>

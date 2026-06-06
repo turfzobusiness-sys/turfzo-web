@@ -38,9 +38,9 @@ export function AuthTabSwitcher({
             aria-selected={active}
             onClick={() => onChange(tab.mode)}
             className={cn(
-              "relative pb-2.5 font-sans text-sm font-semibold transition-colors focus-visible:outline-none cursor-pointer",
+              "relative pb-2.5 font-sans text-sm font-medium transition-colors focus-visible:outline-none cursor-pointer",
               active
-                ? "text-brand-lime"
+                ? "text-text-main"
                 : "text-text-muted hover:text-text-main"
             )}
           >
@@ -48,8 +48,8 @@ export function AuthTabSwitcher({
             {active && (
               <motion.span
                 layoutId="auth-tab-underline"
-                className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-brand-lime"
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-text-main"
+                transition={{ duration: 0.15, ease: "easeOut" }}
               />
             )}
           </button>

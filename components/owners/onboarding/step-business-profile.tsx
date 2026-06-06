@@ -77,7 +77,7 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
-        <h2 className="font-poppins text-xl font-bold text-white tracking-wide">Business Profile</h2>
+        <h2 className="font-sans text-xl font-bold text-white tracking-wide">Business Profile</h2>
         <p className="font-sans text-sm text-text-muted/70">
           Provide your basic business details. GST and PAN registration details are optional.
         </p>
@@ -257,7 +257,7 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
         <Button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center gap-2 bg-[#0f1f0f] border border-brand-lime/30 text-white py-2.5 px-6 font-poppins font-bold text-sm tracking-wide rounded-[8px] hover:border-brand-lime/60 hover:bg-brand-lime/5 transition-all active:scale-[0.98] disabled:opacity-50"
+          className="inline-flex items-center gap-2 bg-brand-btn-bg border border-brand-lime/30 text-white py-2.5 px-6 font-sans font-bold text-sm tracking-wide rounded-[8px] hover:border-brand-lime/60 hover:bg-brand-btn-bg-hover transition-all active:scale-[0.98] disabled:opacity-50"
         >
           {loading ? (
             <>

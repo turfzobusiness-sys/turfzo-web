@@ -63,7 +63,7 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
 
       {/* Name */}
       <div className="relative">
-        <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted/75 transition-colors" />
+        <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted transition-colors" />
         <input
           id="auth-signup-name"
           type="text"
@@ -72,13 +72,13 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
           placeholder="Full name"
           required
           autoComplete="name"
-          className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-10 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/50 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/15 transition-all duration-200"
+          className="w-full rounded-md border border-border-default bg-bg py-2.5 pl-10 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted focus:border-border-strong focus:outline-none focus:ring-1 focus:ring-border-strong transition-all duration-200"
         />
       </div>
 
       {/* Email */}
       <div className="relative">
-        <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted/75 transition-colors" />
+        <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted transition-colors" />
         <input
           id="auth-signup-email"
           type="email"
@@ -87,13 +87,13 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
           placeholder="Email address"
           required
           autoComplete="email"
-          className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-10 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/50 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/15 transition-all duration-200"
+          className="w-full rounded-md border border-border-default bg-bg py-2.5 pl-10 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted focus:border-border-strong focus:outline-none focus:ring-1 focus:ring-border-strong transition-all duration-200"
         />
       </div>
 
       {/* Password */}
       <div className="relative">
-        <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted/75 transition-colors" />
+        <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted transition-colors" />
         <input
           id="auth-signup-password"
           type={showPassword ? "text" : "password"}
@@ -103,13 +103,13 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
           required
           minLength={6}
           autoComplete="new-password"
-          className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-10 pr-10 font-sans text-sm text-text-main placeholder:text-text-muted/50 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/15 transition-all duration-200"
+          className="w-full rounded-md border border-border-default bg-bg py-2.5 pl-10 pr-10 font-sans text-sm text-text-main placeholder:text-text-muted focus:border-border-strong focus:outline-none focus:ring-1 focus:ring-border-strong transition-all duration-200"
         />
         <button
           type="button"
           onClick={() => setShowPassword((v) => !v)}
           aria-label={showPassword ? "Hide password" : "Show password"}
-          className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-[6px] text-text-muted hover:bg-surface hover:text-text-main transition-colors"
+          className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-text-muted hover:bg-elevated hover:text-text-main transition-colors"
         >
           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
@@ -119,11 +119,7 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
       <button
         type="submit"
         disabled={loading}
-        className={cn(
-          "w-full inline-flex items-center justify-center gap-2 rounded-md bg-[#0f1f0f] border border-brand-lime/25 px-4 py-2.5 font-poppins font-bold text-sm text-white transition-all duration-300",
-          "hover:border-brand-lime/40 active:scale-[0.99]",
-          "disabled:cursor-not-allowed disabled:bg-elevated disabled:text-text-muted/50"
-        )}
+        className="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-bg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-strong focus-visible:border-border-strong disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-text-main text-bg hover:bg-text-main/90 mt-2"
       >
         {loading ? (
           <>
@@ -136,12 +132,12 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
       </button>
 
       {/* Divider */}
-      <div className="relative my-1.5">
-        <div className="absolute inset-0 flex items-center">
+      <div className="relative my-1.5 pt-1">
+        <div className="absolute inset-0 flex items-center pt-1">
           <div className="w-full border-t border-border-default" />
         </div>
-        <div className="relative flex justify-center">
-          <span className="bg-bg px-2 font-sans text-[10px] uppercase tracking-wider text-text-muted">
+        <div className="relative flex justify-center pt-1">
+          <span className="bg-bg px-2 font-sans text-[10px] text-text-muted">
             or
           </span>
         </div>

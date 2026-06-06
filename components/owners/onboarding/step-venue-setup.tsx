@@ -136,7 +136,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
-        <h2 className="font-poppins text-xl font-bold text-white tracking-wide">Venue Setup</h2>
+        <h2 className="font-sans text-xl font-bold text-white tracking-wide">Venue Setup</h2>
         <p className="font-sans text-sm text-text-muted/70">
           Create details for your first turf venue. You can always add more venues later.
         </p>
@@ -145,7 +145,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Left Column: Details & Address */}
         <div className="space-y-4">
-          <h3 className="font-poppins text-xs font-bold text-brand-lime uppercase tracking-wider border-b border-border-default pb-1">
+          <h3 className="font-sans text-xs font-bold text-brand-lime uppercase tracking-wider border-b border-border-default pb-1">
             General Information
           </h3>
 
@@ -239,7 +239,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
 
         {/* Right Column: Pricing, Sports, & Specs */}
         <div className="space-y-4">
-          <h3 className="font-poppins text-xs font-bold text-brand-lime uppercase tracking-wider border-b border-border-default pb-1">
+          <h3 className="font-sans text-xs font-bold text-brand-lime uppercase tracking-wider border-b border-border-default pb-1">
             Specifications & Pricing
           </h3>
 
@@ -381,7 +381,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
           type="button"
           onClick={onBack}
           variant="ghost"
-          className="inline-flex items-center gap-2 py-2.5 px-4 font-poppins text-sm text-text-muted hover:text-text-main transition-all"
+          className="inline-flex items-center gap-2 py-2.5 px-4 font-sans text-sm text-text-muted hover:text-text-main transition-all"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -390,7 +390,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
         <Button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center gap-2 bg-[#0f1f0f] border border-brand-lime/30 text-white py-2.5 px-6 font-poppins font-bold text-sm tracking-wide rounded-[8px] hover:border-brand-lime/60 hover:bg-brand-lime/5 transition-all active:scale-[0.98] disabled:opacity-50"
+          className="inline-flex items-center gap-2 bg-brand-btn-bg border border-brand-lime/30 text-white py-2.5 px-6 font-sans font-bold text-sm tracking-wide rounded-[8px] hover:border-brand-lime/60 hover:bg-brand-btn-bg-hover transition-all active:scale-[0.98] disabled:opacity-50"
         >
           {loading ? (
             <>

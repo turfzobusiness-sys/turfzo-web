@@ -51,7 +51,7 @@ function HeaderThemeButton({ className }: { className?: string }) {
       title={label}
       aria-label={`Switch theme: currently ${label}`}
       className={cn(
-        "inline-flex h-12 w-12 items-center justify-center rounded-md border border-border-default bg-surface text-text-muted hover:border-border-strong hover:text-text-main transition-colors",
+        "inline-flex h-9 w-9 items-center justify-center rounded-md text-text-muted hover:bg-elevated hover:text-text-main transition-colors",
         className
       )}
     >
@@ -103,11 +103,12 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full border-b border-transparent transition-all ease-out",
+        "sticky top-0 z-50 w-full border-b transition-all ease-out",
         {
-          "lg:mx-auto bg-bg/90 supports-[backdrop-filter]:bg-bg/60 border-border-default backdrop-blur-lg lg:top-5 lg:w-fit lg:max-w-[1100px] lg:rounded-full lg:border lg:shadow-glow-lime":
+          "bg-bg/95 supports-[backdrop-filter]:bg-bg/80 border-border-default backdrop-blur-md":
             scrolled && !open,
-          "bg-bg/90": open,
+          "bg-bg/90 border-transparent": open,
+          "border-transparent": !scrolled && !open,
         }
       )}
     >
@@ -132,7 +133,7 @@ export function Header() {
             className="h-10 w-10 md:h-11 md:w-11"
             priority
           />
-          <span className="font-poppins font-extrabold text-[24px] md:text-[28px] text-text-main tracking-tight leading-none whitespace-nowrap">
+          <span className="font-sans font-bold text-xl md:text-2xl text-text-main tracking-tight leading-none whitespace-nowrap">
             turf<span className="text-brand-lime">zo</span>
           </span>
         </Link>
@@ -147,7 +148,7 @@ export function Header() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   buttonVariants({ variant: "ghost" }),
-                  "relative h-12 px-4 font-sans text-base font-medium",
+                  "relative h-12 px-4 font-sans text-sm font-medium",
                   active
                     ? "text-text-main"
                     : "text-text-muted hover:text-text-main"
@@ -155,7 +156,9 @@ export function Header() {
               >
                 {link.label}
                 {active && (
-                  <span className="absolute -bottom-1 left-1/2 h-[3px] w-8 -translate-x-1/2 rounded-full bg-brand-lime" />
+                  <span
+                    className="absolute inset-x-0 -bottom-[1px] h-[2px] bg-text-main"
+                  />
                 )}
               </Link>
             );

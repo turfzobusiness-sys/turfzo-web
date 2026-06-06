@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Sparkles, Building, Calendar, CreditCard, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { SignUpForm } from "@/components/auth/sign-up-form";
+import { SignInForm } from "@/components/auth/sign-in-form";
 import { convexClient } from "@/lib/convex";
 import type { OnboardingState } from "@/lib/types";
 import { useAuthModal } from "@/lib/auth-modal-context";
@@ -13,6 +14,7 @@ export default function OwnerRegisterPage() {
   const { status, convexUser } = useAuth();
   const { openAuthModal } = useAuthModal();
   const router = useRouter();
+  const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
     async function checkRedirect() {
@@ -40,14 +42,14 @@ export default function OwnerRegisterPage() {
   return (
     <main className="min-h-screen bg-bg flex flex-col md:flex-row">
       {/* Left panel: Value Props (Hidden on mobile) */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-[#0c180c] via-[#050b05] to-bg p-12 lg:p-16 flex-col justify-between relative overflow-hidden border-r border-border-default">
+      <div className="hidden md:flex md:w-1/2 bg-surface p-12 lg:p-16 flex-col justify-between relative overflow-hidden border-r border-border-default">
         {/* Background glow effects */}
-        <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[80%] rounded-full bg-brand-lime/5 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-brand-lime/3 blur-[100px]" />
+        
+        
 
         {/* Logo/Header */}
         <div className="flex items-center gap-2 relative z-10">
-          <span className="font-poppins text-lg font-black tracking-wider text-white">
+          <span className="font-sans text-lg font-black tracking-wider text-white">
             TURFZO <span className="text-brand-lime font-medium text-xs tracking-widest ml-1 border border-brand-lime/30 px-1.5 py-0.5 rounded-[4px] bg-brand-lime/5">PARTNER</span>
           </span>
         </div>
@@ -59,7 +61,7 @@ export default function OwnerRegisterPage() {
               <Sparkles className="h-3.5 w-3.5 fill-current" />
               Self-Serve Registration
             </span>
-            <h1 className="font-poppins text-3xl lg:text-4xl font-extrabold text-white leading-tight tracking-wide">
+            <h1 className="font-sans text-3xl lg:text-4xl font-extrabold text-white leading-tight tracking-wide">
               Grow your venue business with India's #1 booking platform
             </h1>
             <p className="font-sans text-sm text-text-muted/80 leading-relaxed">
@@ -90,7 +92,7 @@ export default function OwnerRegisterPage() {
                   <prop.icon className="h-5 w-5" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-poppins text-sm font-semibold text-white tracking-wide">{prop.title}</h4>
+                  <h4 className="font-sans text-sm font-semibold text-white tracking-wide">{prop.title}</h4>
                   <p className="font-sans text-xs text-text-muted/70 leading-relaxed">{prop.desc}</p>
                 </div>
               </div>
@@ -108,31 +110,39 @@ export default function OwnerRegisterPage() {
       {/* Right panel: Sign Up Form */}
       <div className="flex-1 flex flex-col justify-center px-6 py-12 md:px-16 lg:px-24 bg-bg relative">
         {/* Glow overlay for mobile */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[50%] rounded-full bg-brand-lime/2 blur-[80px] md:hidden -z-10" />
+        
 
         <div className="w-full max-w-sm mx-auto space-y-6">
           <div className="space-y-2">
-            <h2 className="font-poppins text-2xl font-bold text-white tracking-wide">Get Started as Partner</h2>
+            <h2 className="font-sans text-2xl font-bold text-white tracking-wide">
+              {isLogin ? "Welcome Back, Partner" : "Get Started as Partner"}
+            </h2>
             <p className="font-sans text-xs text-text-muted">
-              Create your partner account to set up your turf business.
+              {isLogin 
+                ? "Sign in to resume your turf business setup." 
+                : "Create your partner account to set up your turf business."}
             </p>
           </div>
 
           <div className="bg-surface border border-border-default rounded-[16px] p-6 shadow-xl shadow-brand-lime/1">
-            <SignUpForm role="owner" onSuccess={() => router.push("/owners/onboarding")} />
+            {isLogin ? (
+              <SignInForm onSuccess={() => router.push("/owners/onboarding")} />
+            ) : (
+              <SignUpForm role="owner" onSuccess={() => router.push("/owners/onboarding")} />
+            )}
           </div>
 
           <p className="text-center font-sans text-xs text-text-muted">
-            Already registered?{" "}
+            {isLogin ? "Don't have an account? " : "Already registered? "}
             <a
               href="#"
               className="text-brand-lime hover:underline font-semibold"
               onClick={(e) => {
                 e.preventDefault();
-                openAuthModal("signin");
+                setIsLogin(!isLogin);
               }}
             >
-              Sign In to Resume →
+              {isLogin ? "Sign Up →" : "Sign In to Resume →"}
             </a>
           </p>
         </div>

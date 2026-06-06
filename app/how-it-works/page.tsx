@@ -199,7 +199,7 @@ export default function HowItWorksPage() {
           <div className="bg-bg border border-border-subtle p-3 rounded-lg flex items-center justify-between shadow-inner">
             <div className="flex flex-col">
               <span className="text-[8px] text-text-muted uppercase">Monthly Revenue</span>
-              <span className="font-poppins font-extrabold text-text-main text-base mt-0.5">₹1,45,200</span>
+              <span className="font-sans font-extrabold text-text-main text-base mt-0.5">₹1,45,200</span>
             </div>
             <div className="bg-[#16211B] text-brand-lime border border-brand-lime/10 px-2 py-1 rounded text-[9px] font-bold">
               +14% Growth
@@ -233,8 +233,8 @@ export default function HowItWorksPage() {
 
       <main className="flex-grow pt-24 pb-20 relative">
         {/* Subtle background ambient lighting */}
-        <div className="absolute top-1/4 left-0 -translate-x-1/2 w-96 h-96 rounded-full bg-brand-lime/[0.015] blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-0 translate-x-1/2 w-96 h-96 rounded-full bg-brand-lime/[0.015] blur-[120px] pointer-events-none" />
+        
+        
 
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full relative z-10">
           
@@ -243,7 +243,7 @@ export default function HowItWorksPage() {
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-brand-lime/25 bg-brand-lime/5 text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
               <Sparkles className="w-3.5 h-3.5" /> Simplifying Sports Bookings
             </span>
-            <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight tracking-tight">
+            <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight tracking-tight">
               Discover How <span className="text-brand-lime">Turfzo Works</span>
             </h1>
             <p className="mt-4 text-text-muted text-sm sm:text-base font-sans max-w-xl mx-auto leading-relaxed">
@@ -254,7 +254,7 @@ export default function HowItWorksPage() {
             <div className="mt-8 flex justify-center bg-elevated border border-border-default p-1 rounded-lg max-w-xs mx-auto">
               <button 
                 onClick={() => setActiveTab("player")}
-                className={`flex-1 font-poppins font-semibold text-xs py-2.5 rounded-md transition-all cursor-pointer ${
+                className={`flex-1 font-sans font-semibold text-xs py-2.5 rounded-md transition-all cursor-pointer ${
                   activeTab === "player" ? "bg-surface text-brand-lime shadow-sm border border-border-subtle" : "text-text-muted hover:text-text-main"
                 }`}
               >
@@ -262,7 +262,7 @@ export default function HowItWorksPage() {
               </button>
               <button 
                 onClick={() => setActiveTab("owner")}
-                className={`flex-1 font-poppins font-semibold text-xs py-2.5 rounded-md transition-all cursor-pointer ${
+                className={`flex-1 font-sans font-semibold text-xs py-2.5 rounded-md transition-all cursor-pointer ${
                   activeTab === "owner" ? "bg-surface text-brand-lime shadow-sm border border-border-subtle" : "text-text-muted hover:text-text-main"
                 }`}
               >
@@ -297,14 +297,14 @@ export default function HowItWorksPage() {
                       {/* Typographic Guide Content (55% Width) */}
                       <div className="w-full lg:w-[50%] space-y-5 text-left">
                         <div className="flex items-center gap-3">
-                          <span className="font-poppins text-sm font-bold text-brand-lime tracking-wide">
+                          <span className="font-sans text-sm font-bold text-brand-lime tracking-wide">
                             {step.num}
                           </span>
                           <span className="text-[9px] font-sans font-semibold tracking-wider uppercase px-2 py-0.5 rounded bg-elevated text-text-muted border border-border-subtle">
                             {step.tag}
                           </span>
                         </div>
-                        <h2 className="font-poppins text-2xl sm:text-3xl font-extrabold text-text-main tracking-tight leading-tight">
+                        <h2 className="font-sans text-2xl sm:text-3xl font-extrabold text-text-main tracking-tight leading-tight">
                           {step.title}
                         </h2>
                         <p className="font-sans text-sm sm:text-base text-text-muted leading-relaxed">
@@ -325,7 +325,7 @@ export default function HowItWorksPage() {
 
           {/* FAQ Section: Minimal borderless list */}
           <div className="max-w-3xl mx-auto px-6 md:px-8 mt-20 border-t border-border-default pt-20">
-            <h2 className="font-poppins font-extrabold text-3xl text-text-main tracking-tight mb-10 text-center">
+            <h2 className="font-sans font-extrabold text-3xl text-text-main tracking-tight mb-10 text-center">
               Frequently Asked Questions
             </h2>
             <div className="divide-y divide-border-default">
@@ -334,7 +334,7 @@ export default function HowItWorksPage() {
                   key={idx}
                   className="py-5 group cursor-pointer"
                 >
-                  <summary className="font-poppins font-bold text-sm sm:text-base text-text-main cursor-pointer list-none flex items-center justify-between focus:outline-none select-none">
+                  <summary className="font-sans font-bold text-sm sm:text-base text-text-main cursor-pointer list-none flex items-center justify-between focus:outline-none select-none">
                     <span>{item.question}</span>
                     <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform duration-300" />
                   </summary>

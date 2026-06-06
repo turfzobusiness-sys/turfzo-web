@@ -63,26 +63,24 @@ export function AuthModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-overlay-heavy backdrop-blur-md p-3 sm:p-6"
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-overlay-heavy p-3 sm:p-6"
           onClick={closeAuthModal}
         >
           <motion.div
             ref={panelRef}
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 4 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
             className={cn(
-              "relative w-full max-w-[720px] overflow-hidden rounded-xl border border-border-default bg-bg shadow-card-shadow",
+              "relative w-full max-w-[720px] overflow-hidden rounded-md border border-border-default bg-bg shadow-lg",
               "grid grid-cols-1 lg:grid-cols-[260px_1fr]"
             )}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Left Panel — Brand */}
-            <div className="relative hidden lg:flex items-center justify-center overflow-hidden border-r border-border-default min-h-[440px]">
-              <div className="absolute inset-0 bg-gradient-to-br from-surface via-bg to-elevated" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(159,232,112,0.08),transparent_55%)]" />
+            <div className="relative hidden lg:flex items-center justify-center overflow-hidden border-r border-border-default min-h-[440px] bg-surface">
 
               <div className="relative z-10 flex flex-col items-center text-center px-6">
                 <motion.div
@@ -93,23 +91,22 @@ export function AuthModal() {
                   <Image
                     src="/turfzo_mascot.svg"
                     alt="Turfzo mascot"
-                    width={140}
-                    height={140}
+                    width={80}
+                    height={80}
                     priority
-                    className="h-32 w-32"
+                    className="h-20 w-20"
                   />
                 </motion.div>
 
                 <h1
                   id="auth-modal-title"
-                  className="mt-4 font-poppins font-extrabold text-3xl tracking-tighter leading-none"
+                  className="mt-4 font-sans font-bold text-2xl tracking-tight leading-none"
                 >
                   <span className="text-text-main">turf</span>
                   <span className="text-brand-lime">zo</span>
                 </h1>
-                <p className="mt-3 font-sans text-[10px] tracking-[0.25em] uppercase text-text-muted font-bold">
-                  Book <span className="text-brand-lime">•</span> Play{" "}
-                  <span className="text-brand-lime">•</span> Enjoy
+                <p className="mt-2 font-sans text-xs text-text-muted">
+                  Book sports venues instantly.
                 </p>
               </div>
             </div>
@@ -127,7 +124,7 @@ export function AuthModal() {
                     className="h-7 w-7"
                     priority
                   />
-                  <span className="font-poppins font-extrabold text-base text-text-main">
+                  <span className="font-sans font-bold text-base text-text-main">
                     turf<span className="text-brand-lime">zo</span>
                   </span>
                 </Link>
@@ -138,7 +135,7 @@ export function AuthModal() {
                 type="button"
                 onClick={closeAuthModal}
                 aria-label="Close"
-                className="absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-default bg-surface text-text-muted hover:border-border-strong hover:text-text-main transition-colors"
+                className="absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-md text-text-muted hover:bg-elevated hover:text-text-main transition-colors"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -146,7 +143,7 @@ export function AuthModal() {
               <div className="flex flex-col gap-3.5 px-5 py-5 sm:px-6 sm:py-6">
                 {/* Heading */}
                 <div>
-                  <h2 className="font-poppins text-xl sm:text-2xl font-extrabold text-text-main tracking-tight">
+                  <h2 className="font-sans text-xl sm:text-2xl font-semibold text-text-main tracking-tight">
                     {mode === "signin" 
                       ? (isOwnerPath ? "Welcome back, Partner" : "Welcome back") 
                       : (isOwnerPath ? "Become a Turfzo Partner" : "Create your account")}

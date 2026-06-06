@@ -36,8 +36,8 @@ export default function GlobalErrorBoundary({
           <button
             onClick={reset}
             style={{
-              backgroundColor: "#9FE870",
-              color: "#000",
+              backgroundColor: "#0f1f0f",
+              color: "#FFF",
               border: "none",
               padding: "12px 24px",
               borderRadius: 6,

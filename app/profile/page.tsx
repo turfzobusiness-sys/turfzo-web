@@ -134,10 +134,10 @@ export default function ProfilePage() {
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
           <div className="mb-10">
-            <span className="text-xs font-poppins font-extrabold tracking-widest text-brand-lime uppercase">
+            <span className="text-xs font-sans font-extrabold tracking-widest text-brand-lime uppercase">
               MY PROFILE
             </span>
-            <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main mt-2">
+            <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main mt-2">
               Welcome, <span className="text-brand-lime">{convexUser?.display_name ?? convexUser?.email?.split("@")[0]}</span>
             </h1>
             <p className="mt-2 text-text-muted text-sm font-sans">
@@ -149,7 +149,7 @@ export default function ProfilePage() {
             <div className="lg:col-span-1 flex flex-col gap-6">
               <div className="bg-surface border border-border-default rounded-md p-6 shadow-card-shadow">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="font-poppins font-bold text-lg text-text-main flex items-center gap-2">
+                  <h2 className="font-sans font-bold text-lg text-text-main flex items-center gap-2">
                     <User className="w-5 h-5 text-brand-lime" /> Account
                   </h2>
                   {!editMode ? (
@@ -251,7 +251,7 @@ export default function ProfilePage() {
                               key={sport}
                               type="button"
                               onClick={() => toggleSport(sport)}
-                              className={`text-xs font-semibold px-3 py-1.5 rounded-pill border transition-colors ${
+                              className={`text-xs font-semibold px-3 py-1.5 rounded-md border transition-colors ${
                                 isSelected
                                   ? "bg-brand-lime text-black border-brand-lime"
                                   : "bg-elevated text-text-muted border-border-subtle hover:text-text-main"
@@ -268,7 +268,7 @@ export default function ProfilePage() {
                           <span className="text-xs text-text-muted">No sports selected</span>
                         ) : (
                           convexUser?.favorite_sports?.map((s) => (
-                            <span key={s} className="text-xs font-semibold px-2.5 py-1 rounded-pill bg-brand-lime/10 text-brand-lime border border-brand-lime/20">
+                            <span key={s} className="text-xs font-semibold px-2.5 py-1 rounded-md bg-brand-lime/10 text-brand-lime border border-brand-lime/20">
                               {s}
                             </span>
                           ))
@@ -291,24 +291,24 @@ export default function ProfilePage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <div className="bg-surface border border-border-default rounded-md p-5 text-center">
                   <Ticket className="w-6 h-6 text-brand-lime mx-auto" />
-                  <span className="block font-poppins font-extrabold text-2xl text-text-main mt-2">{upcomingBookings.length}</span>
+                  <span className="block font-sans font-extrabold text-2xl text-text-main mt-2">{upcomingBookings.length}</span>
                   <span className="text-[10px] text-text-muted uppercase tracking-wider">Upcoming</span>
                 </div>
                 <div className="bg-surface border border-border-default rounded-md p-5 text-center">
                   <Check className="w-6 h-6 text-brand-lime mx-auto" />
-                  <span className="block font-poppins font-extrabold text-2xl text-text-main mt-2">{pastBookings.length}</span>
+                  <span className="block font-sans font-extrabold text-2xl text-text-main mt-2">{pastBookings.length}</span>
                   <span className="text-[10px] text-text-muted uppercase tracking-wider">Completed</span>
                 </div>
                 <div className="bg-surface border border-border-default rounded-md p-5 text-center">
                   <Trophy className="w-6 h-6 text-brand-lime mx-auto" />
-                  <span className="block font-poppins font-extrabold text-2xl text-text-main mt-2">{bookings.length}</span>
+                  <span className="block font-sans font-extrabold text-2xl text-text-main mt-2">{bookings.length}</span>
                   <span className="text-[10px] text-text-muted uppercase tracking-wider">Total</span>
                 </div>
               </div>
 
               <div className="bg-surface border border-border-default rounded-md p-6 shadow-card-shadow">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="font-poppins font-bold text-lg text-text-main flex items-center gap-2">
+                  <h2 className="font-sans font-bold text-lg text-text-main flex items-center gap-2">
                     <Ticket className="w-5 h-5 text-brand-lime" /> Recent Bookings
                   </h2>
                   <Link href="/explore" className="text-xs font-sans text-brand-lime hover:text-brand-lime-hover flex items-center gap-1">
@@ -323,9 +323,9 @@ export default function ProfilePage() {
                 ) : bookings.length === 0 ? (
                   <div className="text-center py-12 flex flex-col items-center gap-3">
                     <Ticket className="w-10 h-10 text-text-muted opacity-50" />
-                    <h3 className="font-poppins font-bold text-text-main">No bookings yet</h3>
+                    <h3 className="font-sans font-bold text-text-main">No bookings yet</h3>
                     <p className="text-xs text-text-muted font-sans">Your booked turfs will show up here.</p>
-                    <Link href="/explore" className="bg-brand-lime text-black font-poppins font-bold text-xs py-2.5 px-6 rounded-pill">
+                    <Link href="/explore" className="bg-brand-lime text-black font-sans font-bold text-xs py-2.5 px-6 rounded-md">
                       Explore Turfs
                     </Link>
                   </div>
@@ -339,7 +339,7 @@ export default function ProfilePage() {
                         className="bg-elevated border border-border-subtle rounded-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div className="flex flex-col gap-1">
-                          <span className="font-poppins font-bold text-sm text-text-main">
+                          <span className="font-sans font-bold text-sm text-text-main">
                             Booking {booking.booking_code}
                           </span>
                           <div className="flex items-center gap-3 text-[11px] text-text-muted font-sans">
@@ -355,7 +355,7 @@ export default function ProfilePage() {
                           </div>
                         </div>
                         <span
-                          className={`text-[10px] font-sans font-bold uppercase px-2.5 py-1 rounded-pill border w-fit ${
+                          className={`text-[10px] font-sans font-bold uppercase px-2.5 py-1 rounded-md border w-fit ${
                             booking.status === "confirmed" && new Date(booking.start_time) > new Date()
                               ? "bg-brand-lime/10 text-brand-lime border-brand-lime/20"
                               : booking.status === "cancelled"

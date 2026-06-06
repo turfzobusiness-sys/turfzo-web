@@ -16,7 +16,7 @@ export default function RefundPolicyPage() {
       <Header />
       <main className="flex-grow pt-24 pb-16">
         <article className="max-w-3xl mx-auto px-6 md:px-8">
-          <h1 className="font-poppins text-4xl font-extrabold mb-2">
+          <h1 className="font-sans text-4xl font-extrabold mb-2">
             Refund & Cancellation Policy
           </h1>
           <p className="text-text-muted text-sm mb-8">
@@ -126,7 +126,7 @@ export default function RefundPolicyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mb-8">
-      <h2 className="font-poppins text-2xl font-bold mb-3 text-text-main">{title}</h2>
+      <h2 className="font-sans text-2xl font-bold mb-3 text-text-main">{title}</h2>
       <div className="text-text-muted text-sm font-sans leading-relaxed space-y-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1">
         {children}
       </div>

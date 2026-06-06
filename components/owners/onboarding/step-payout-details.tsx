@@ -79,7 +79,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
-        <h2 className="font-poppins text-xl font-bold text-white tracking-wide">Payout Setup</h2>
+        <h2 className="font-sans text-xl font-bold text-white tracking-wide">Payout Setup</h2>
         <p className="font-sans text-sm text-text-muted/70">
           Enter the bank account details where you wish to receive bookings settlements.
         </p>
@@ -247,7 +247,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
           type="button"
           onClick={onBack}
           variant="ghost"
-          className="inline-flex items-center gap-2 py-2.5 px-4 font-poppins text-sm text-text-muted hover:text-text-main transition-all"
+          className="inline-flex items-center gap-2 py-2.5 px-4 font-sans text-sm text-text-muted hover:text-text-main transition-all"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -256,7 +256,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
         <Button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center gap-2 bg-[#0f1f0f] border border-brand-lime/30 text-white py-2.5 px-6 font-poppins font-bold text-sm tracking-wide rounded-[8px] hover:border-brand-lime/60 hover:bg-brand-lime/5 transition-all active:scale-[0.98] disabled:opacity-50"
+          className="inline-flex items-center gap-2 bg-brand-btn-bg border border-brand-lime/30 text-white py-2.5 px-6 font-sans font-bold text-sm tracking-wide rounded-[8px] hover:border-brand-lime/60 hover:bg-brand-btn-bg-hover transition-all active:scale-[0.98] disabled:opacity-50"
         >
           {loading ? (
             <>

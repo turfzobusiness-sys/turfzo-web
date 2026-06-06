@@ -19,7 +19,7 @@ export default function NotFound() {
               className="w-48 h-48 drop-shadow-xl"
             />
           </div>
-          <h1 className="font-poppins text-3xl font-extrabold text-text-main mb-3">
+          <h1 className="font-sans text-3xl font-extrabold text-text-main mb-3">
             Page not found
           </h1>
           <p className="text-text-muted text-sm font-sans mb-8 leading-relaxed">

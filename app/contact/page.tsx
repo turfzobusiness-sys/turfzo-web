@@ -87,10 +87,10 @@ export default function ContactPage() {
           
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
               <MessageSquare className="w-3.5 h-3.5" /> Support Center
             </span>
-            <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight tracking-tight">
+            <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight tracking-tight">
               Get In <span className="text-brand-lime">Touch With Us</span>
             </h1>
             <p className="mt-4 text-text-muted text-sm sm:text-base font-sans max-w-xl mx-auto leading-relaxed">
@@ -103,7 +103,7 @@ export default function ContactPage() {
             
             {/* Left Column: Contact Cards & Custom SVG Map (5 Cols) */}
             <div className="lg:col-span-5 flex flex-col gap-6 w-full">
-              <h2 className="font-poppins font-bold text-xl text-text-main pb-2 border-b border-border-subtle mb-2">
+              <h2 className="font-sans font-bold text-xl text-text-main pb-2 border-b border-border-subtle mb-2">
                 Office Information
               </h2>
 
@@ -178,7 +178,7 @@ export default function ContactPage() {
                   <path d="M 0 100 Q 200 40 400 100" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" />
                   
                   {/* Radar pulse at coordinates */}
-                  <circle cx="200" cy="100" r="30" fill="url(#mapRadar)" className="animate-pulse" />
+                  <circle cx="200" cy="100" r="30" fill="url(#mapRadar)" className="" />
                   <circle cx="200" cy="100" r="1.5" fill="var(--color-brand-lime)" />
                 </svg>
 
@@ -195,7 +195,7 @@ export default function ContactPage() {
 
             {/* Right Column: Contact Message Form (7 Cols) */}
             <div className="lg:col-span-7 bg-surface border border-border-default rounded-md p-6 sm:p-8 shadow-card-shadow w-full">
-              <h2 className="font-poppins font-bold text-xl text-text-main pb-2 border-b border-border-subtle mb-6">
+              <h2 className="font-sans font-bold text-xl text-text-main pb-2 border-b border-border-subtle mb-6">
                 Send a Message
               </h2>
 
@@ -280,7 +280,7 @@ export default function ContactPage() {
                     <button
                       type="submit"
                       disabled={!turnstileToken}
-                      className="bg-[#0f1f0f] border border-brand-lime/25 text-white hover:border-brand-lime/40 disabled:bg-elevated disabled:text-text-muted/50 disabled:border-border-default disabled:cursor-not-allowed font-poppins font-bold text-sm py-3.5 rounded-md transition-all duration-300 hover:scale-102 flex items-center justify-center gap-1.5"
+                      className="bg-brand-btn-bg border border-brand-lime/25 text-white hover:border-brand-lime/40 hover:bg-brand-btn-bg-hover disabled:bg-elevated disabled:text-text-muted/50 disabled:border-border-default disabled:cursor-not-allowed font-sans font-bold text-sm py-3.5 rounded-md transition-all duration-300  flex items-center justify-center gap-1.5"
                     >
                       Send Message
                       <Send className="w-4 h-4" />
@@ -301,13 +301,13 @@ export default function ContactPage() {
                     <div className="w-14 h-14 bg-error/10 rounded-full flex items-center justify-center border-2 border-error/30">
                       <span className="text-error text-2xl">!</span>
                     </div>
-                    <h3 className="font-poppins font-bold text-lg text-text-main">Could not send</h3>
+                    <h3 className="font-sans font-bold text-lg text-text-main">Could not send</h3>
                     <p className="text-xs text-text-muted max-w-xs font-sans leading-relaxed">
                       {errorMsg ?? "Something went wrong. Please try again or email us directly at support@turfzo.com."}
                     </p>
                     <button
                       onClick={() => setFormStep('form')}
-                      className="bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-semibold text-xs px-6 py-2.5 rounded-pill transition-all"
+                      className="bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-semibold text-xs px-6 py-2.5 rounded-md transition-all"
                     >
                       Try again
                     </button>
@@ -323,18 +323,18 @@ export default function ContactPage() {
                     exit={{ opacity: 0 }}
                     className="py-16 flex flex-col items-center justify-center gap-4 text-center"
                   >
-                    <div className="w-14 h-14 bg-brand-lime/10 rounded-full flex items-center justify-center border-2 border-brand-lime/30 shadow-glow-lime select-none">
+                    <div className="w-14 h-14 bg-brand-lime/10 rounded-full flex items-center justify-center border-2 border-brand-lime/30 shadow-md select-none">
                       <Check className="w-7 h-7 text-brand-lime stroke-[3]" />
                     </div>
                     
-                    <h3 className="font-poppins font-bold text-xl text-text-main">Message Sent!</h3>
+                    <h3 className="font-sans font-bold text-xl text-text-main">Message Sent!</h3>
                     <p className="text-xs text-text-muted max-w-xs font-sans leading-relaxed">
                       Thank you, <span className="text-brand-lime font-bold">{name}</span>. Your inquiry has been safely received. A support specialist will respond to <span className="font-semibold text-text-main">{email}</span> within 2 hours.
                     </p>
 
                     <button 
                       onClick={handleReset}
-                      className="bg-[#0f1f0f] border border-brand-lime/25 text-white hover:border-brand-lime/40 font-semibold text-xs px-6 py-2.5 rounded-pill transition-all mt-4 hover:scale-102"
+                      className="bg-brand-btn-bg border border-brand-lime/25 text-white hover:border-brand-lime/40 hover:bg-brand-btn-bg-hover font-semibold text-xs px-6 py-2.5 rounded-md transition-all mt-4 "
                     >
                       Send Another Message
                     </button>
@@ -351,7 +351,7 @@ export default function ContactPage() {
 
       {/* FAQ Section */}
       <div className="max-w-3xl mx-auto px-6 md:px-8 pb-16">
-        <h2 className="font-poppins font-bold text-2xl text-text-main mb-8 text-center">
+        <h2 className="font-sans font-bold text-2xl text-text-main mb-8 text-center">
           Frequently Asked Questions
         </h2>
         <div className="flex flex-col gap-4">
@@ -360,7 +360,7 @@ export default function ContactPage() {
               key={idx}
               className="bg-surface border border-border-default rounded-md p-5 group"
             >
-              <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
+              <summary className="font-sans font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                 {item.question}
                 <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />
               </summary>

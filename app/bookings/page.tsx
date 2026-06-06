@@ -168,23 +168,23 @@ export default function BookingsPage() {
         <div className="max-w-5xl mx-auto px-6 md:px-8 w-full">
           <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-              <span className="text-xs font-poppins font-extrabold tracking-widest text-brand-lime uppercase">MY BOOKINGS</span>
-              <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main mt-2">
+              <span className="text-xs font-sans font-extrabold tracking-widest text-brand-lime uppercase">MY BOOKINGS</span>
+              <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main mt-2">
                 Your <span className="text-brand-lime">Bookings</span>
               </h1>
               <p className="mt-2 text-text-muted text-sm font-sans">Manage upcoming slots and view past bookings.</p>
             </div>
-            <Link href="/explore" className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold text-sm py-3 px-6 rounded-pill inline-flex items-center gap-1.5 transition-all w-fit">
+            <Link href="/explore" className="bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all w-fit">
               Book a new slot <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </Link>
           </div>
 
-          <div className="flex gap-2 mb-6 bg-surface border border-border-subtle rounded-pill p-1 w-fit">
+          <div className="flex gap-2 mb-6 bg-surface border border-border-subtle rounded-md p-1 w-fit">
             {(["all", "upcoming", "past", "cancelled"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-pill text-xs font-poppins font-semibold capitalize transition-colors ${
+                className={`px-4 py-2 rounded-md text-xs font-sans font-semibold capitalize transition-colors ${
                   filter === f ? "bg-brand-lime text-black" : "text-text-muted hover:text-text-main"
                 }`}
               >
@@ -203,16 +203,16 @@ export default function BookingsPage() {
           {loading ? (
             <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center gap-4">
               <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
-              <h3 className="font-poppins font-bold text-lg text-text-main">Loading Bookings</h3>
+              <h3 className="font-sans font-bold text-lg text-text-main">Loading Bookings</h3>
             </div>
           ) : filteredBookings.length === 0 ? (
             <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center gap-3">
               <Ticket className="w-12 h-12 text-text-muted opacity-50" />
-              <h3 className="font-poppins font-bold text-lg text-text-main">No Bookings Found</h3>
+              <h3 className="font-sans font-bold text-lg text-text-main">No Bookings Found</h3>
               <p className="text-text-muted text-sm font-sans max-w-xs">
                 {filter === "all" ? "You haven't made any bookings yet." : `No ${filter} bookings.`}
               </p>
-              <Link href="/explore" className="bg-brand-lime text-black font-poppins font-bold text-xs py-2.5 px-6 rounded-pill mt-2">
+              <Link href="/explore" className="bg-brand-lime text-black font-sans font-bold text-xs py-2.5 px-6 rounded-md mt-2">
                 Explore Turfs
               </Link>
             </div>
@@ -239,10 +239,10 @@ export default function BookingsPage() {
                     <div className="flex-grow flex flex-col justify-between">
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-poppins font-bold text-base text-text-main">
+                          <h3 className="font-sans font-bold text-base text-text-main">
                             {turf?.name ?? "Turf"}
                           </h3>
-                          <span className={`text-[10px] font-sans font-bold uppercase px-2.5 py-0.5 rounded-pill border ${
+                          <span className={`text-[10px] font-sans font-bold uppercase px-2.5 py-0.5 rounded-md border ${
                             booking.status === "confirmed" && isUpcoming
                               ? "bg-brand-lime/10 text-brand-lime border-brand-lime/30"
                               : booking.status === "cancelled"
@@ -275,7 +275,7 @@ export default function BookingsPage() {
                           <>
                             <button
                               onClick={() => showQR(booking)}
-                              className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold text-xs py-2 px-4 rounded-md flex items-center gap-1.5 transition-colors"
+                              className="bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-xs py-2 px-4 rounded-md flex items-center gap-1.5 transition-colors"
                             >
                               <Ticket className="w-3.5 h-3.5" /> View QR
                             </button>
@@ -304,7 +304,7 @@ export default function BookingsPage() {
         >
           <div className="bg-surface border border-border-default rounded-md max-w-sm w-full p-6 text-center" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-poppins font-bold text-lg text-text-main">Booking QR Code</h3>
+              <h3 className="font-sans font-bold text-lg text-text-main">Booking QR Code</h3>
               <button onClick={() => setActiveQR(null)} className="p-1.5 hover:bg-elevated rounded-full">
                 <X className="w-5 h-5 text-text-muted" />
               </button>
@@ -317,7 +317,7 @@ export default function BookingsPage() {
             <a
               href={qrUrls[activeQR]}
               download={`turfzo-booking-${bookings.find((b) => b._id === activeQR)?.booking_code}.png`}
-              className="mt-4 w-full bg-brand-lime text-black font-poppins font-bold text-sm py-2.5 rounded-md flex items-center justify-center gap-1.5"
+              className="mt-4 w-full bg-brand-lime text-black font-sans font-bold text-sm py-2.5 rounded-md flex items-center justify-center gap-1.5"
             >
               <Download className="w-4 h-4" /> Download
             </a>

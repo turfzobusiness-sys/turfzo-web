@@ -58,7 +58,7 @@ export function StepIndicator({ currentStep, completedSteps }: StepIndicatorProp
               <div className="flex flex-col items-center gap-1.5 relative">
                 <div
                   className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-full border-2 font-poppins text-xs font-bold transition-all duration-300",
+                    "flex h-9 w-9 items-center justify-center rounded-full border-2 font-sans text-xs font-bold transition-all duration-300",
                     isCompleted
                       ? "bg-brand-lime/10 border-brand-lime text-brand-lime"
                       : isActive
@@ -117,7 +117,7 @@ export function StepIndicator({ currentStep, completedSteps }: StepIndicatorProp
             >
               <div
                 className={cn(
-                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 font-poppins font-bold text-sm transition-all duration-300",
+                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 font-sans font-bold text-sm transition-all duration-300",
                   isCompleted
                     ? "bg-brand-lime/15 border-brand-lime text-brand-lime shadow-md shadow-brand-lime/5"
                     : isActive
@@ -131,7 +131,7 @@ export function StepIndicator({ currentStep, completedSteps }: StepIndicatorProp
               <div className="flex flex-col">
                 <span
                   className={cn(
-                    "font-poppins text-sm font-semibold tracking-wide transition-colors duration-200",
+                    "font-sans text-sm font-semibold tracking-wide transition-colors duration-200",
                     isActive ? "text-brand-lime" : isCompleted ? "text-text-main" : "text-text-muted"
                   )}
                 >

@@ -70,7 +70,7 @@ export default function OwnerDashboardPage() {
     return (
       <div className="min-h-screen bg-bg flex flex-col items-center justify-center gap-3">
         <Loader2 className="h-8 w-8 animate-spin text-brand-lime" />
-        <span className="font-poppins text-sm text-text-muted">Loading partner dashboard...</span>
+        <span className="font-sans text-sm text-text-muted">Loading partner dashboard...</span>
       </div>
     );
   }
@@ -84,12 +84,12 @@ export default function OwnerDashboardPage() {
       case "active":
         return {
           icon: CheckCircle2,
-          iconClass: "text-[#9FE870]",
-          bgClass: "bg-[#9FE870]/10 border-[#9FE870]/20",
+          iconClass: "text-brand-lime",
+          bgClass: "bg-brand-lime/10 border-brand-lime/20",
           title: "Application Approved & Live",
           desc: "Congratulations! Your venue onboarding has been approved, and your turf listing is officially active on the Turfzo explorer search page.",
           badgeText: "Active & Live",
-          badgeClass: "bg-[#9FE870]/15 border-[#9FE870]/30 text-[#9FE870]",
+          badgeClass: "bg-brand-lime/15 border-brand-lime/30 text-brand-lime",
         };
       case "rejected":
         return {
@@ -127,14 +127,14 @@ export default function OwnerDashboardPage() {
   return (
     <main className="min-h-screen bg-bg relative py-12 px-6 md:py-20">
       {/* Glow backgrounds */}
-      <div className="absolute top-0 right-0 w-[45%] h-[40%] rounded-full bg-brand-lime/2 blur-[120px] -z-10" />
-      <div className="absolute bottom-0 left-0 w-[30%] h-[30%] rounded-full bg-brand-lime/1 blur-[100px] -z-10" />
+      
+      
 
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-default pb-5">
           <div className="space-y-1">
-            <h1 className="font-poppins text-2xl md:text-3xl font-extrabold text-white tracking-wide">
+            <h1 className="font-sans text-2xl md:text-3xl font-extrabold text-white tracking-wide">
               Partner Hub
             </h1>
             <p className="font-sans text-sm text-text-muted/80">
@@ -154,7 +154,7 @@ export default function OwnerDashboardPage() {
           </div>
           <div className="space-y-4 flex-1">
             <div className="space-y-1.5">
-              <h2 className="font-poppins text-lg font-bold text-white tracking-wide">{statusConfig.title}</h2>
+              <h2 className="font-sans text-lg font-bold text-white tracking-wide">{statusConfig.title}</h2>
               <p className="font-sans text-sm text-text-muted/80 leading-relaxed">
                 {statusConfig.desc}
               </p>
@@ -185,7 +185,7 @@ export default function OwnerDashboardPage() {
               <div className="pt-2 flex flex-wrap gap-3">
                 <Button
                   onClick={() => router.push(`/explore` /* OR full management dashboard once complete */)}
-                  className="bg-[#0f1f0f] border border-brand-lime/30 text-white font-poppins font-bold text-xs py-2 px-4 rounded-[8px] hover:border-brand-lime/60 hover:bg-brand-lime/5 transition-all inline-flex items-center gap-1.5"
+                  className="bg-brand-btn-bg border border-brand-lime/30 text-white font-sans font-bold text-xs py-2 px-4 rounded-[8px] hover:border-brand-lime/60 hover:bg-brand-btn-bg-hover transition-all inline-flex items-center gap-1.5"
                 >
                   View Live Listings
                   <ExternalLink className="h-3.5 w-3.5" />
@@ -205,7 +205,7 @@ export default function OwnerDashboardPage() {
           <div className="bg-surface border border-border-default rounded-[14px] p-5 space-y-4">
             <div className="flex items-center gap-2 border-b border-border-default pb-3">
               <Building className="h-5 w-5 text-brand-lime" />
-              <h3 className="font-poppins text-sm font-bold text-white tracking-wide">First Venue Setup</h3>
+              <h3 className="font-sans text-sm font-bold text-white tracking-wide">First Venue Setup</h3>
             </div>
             
             {primaryVenue ? (
@@ -246,7 +246,7 @@ export default function OwnerDashboardPage() {
           <div className="bg-surface border border-border-default rounded-[14px] p-5 space-y-4">
             <div className="flex items-center gap-2 border-b border-border-default pb-3">
               <CreditCard className="h-5 w-5 text-brand-lime" />
-              <h3 className="font-poppins text-sm font-bold text-white tracking-wide">Payout Settlement</h3>
+              <h3 className="font-sans text-sm font-bold text-white tracking-wide">Payout Settlement</h3>
             </div>
 
             {ownerData?.payout ? (
@@ -286,7 +286,7 @@ export default function OwnerDashboardPage() {
 
         {/* Need Help / Support Section */}
         <div className="bg-surface border border-border-default rounded-[14px] p-5 space-y-3">
-          <h3 className="font-poppins text-sm font-bold text-white tracking-wide">Need Assistance?</h3>
+          <h3 className="font-sans text-sm font-bold text-white tracking-wide">Need Assistance?</h3>
           <p className="font-sans text-xs text-text-muted/80 leading-relaxed">
             Have questions about document uploads, fee structures, or hardware integration (IoT lighting/gate controller setups)? Reach out to our partner success desk.
           </p>

@@ -122,10 +122,10 @@ export default function TurfBookingPriceIndia() {
             className="mb-12"
           >
             <div className="flex items-center gap-3 mb-4">
-              <span className="bg-brand-lime/10 text-brand-lime font-poppins font-bold text-[10px] px-2.5 py-1 rounded-pill">Research</span>
+              <span className="bg-brand-lime/10 text-brand-lime font-sans font-bold text-[10px] px-2.5 py-1 rounded-md">Research</span>
               <span className="text-[10px] text-text-muted font-sans">May 2026 · 6 min read</span>
             </div>
-            <h1 className="font-poppins text-3xl sm:text-4xl font-extrabold text-text-main leading-tight">
+            <h1 className="font-sans text-3xl sm:text-4xl font-extrabold text-text-main leading-tight">
               Turf Booking Price in India [2026 Data]
             </h1>
             <p className="mt-4 text-text-muted text-sm font-sans leading-relaxed">
@@ -139,7 +139,7 @@ export default function TurfBookingPriceIndia() {
 
           {/* Quick Answer */}
           <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
-            <h2 className="font-poppins font-bold text-base text-brand-lime mb-2">Quick Answer</h2>
+            <h2 className="font-sans font-bold text-base text-brand-lime mb-2">Quick Answer</h2>
             <p className="text-sm text-text-main font-sans leading-relaxed">
               Turf booking in India costs ₹400 to ₹2500 per hour depending on the city and sport. Football turfs average ₹800-1200/hr, cricket grounds ₹500-1500/hr, and badminton courts ₹300-800/hr. Mumbai and Bangalore are the most expensive cities, while Kolkata and Ahmedabad are the most affordable.
             </p>
@@ -147,18 +147,18 @@ export default function TurfBookingPriceIndia() {
 
           {/* City Pricing Table */}
           <div className="mb-12">
-            <h2 className="font-poppins font-bold text-xl text-text-main mb-6">
+            <h2 className="font-sans font-bold text-xl text-text-main mb-6">
               City-wise Turf Booking Prices (Football)
             </h2>
             <div className="bg-surface border border-border-subtle rounded-md overflow-hidden">
               <table className="w-full text-xs font-sans">
                 <thead>
                   <tr className="bg-elevated border-b border-border-subtle">
-                    <th className="text-left py-3 px-4 text-text-main font-poppins font-bold">City</th>
-                    <th className="text-left py-3 px-4 text-text-main font-poppins font-bold">Min Price</th>
-                    <th className="text-left py-3 px-4 text-text-main font-poppins font-bold">Max Price</th>
-                    <th className="text-left py-3 px-4 text-text-main font-poppins font-bold">Average</th>
-                    <th className="text-left py-3 px-4 text-text-main font-poppins font-bold">Turfs Available</th>
+                    <th className="text-left py-3 px-4 text-text-main font-sans font-bold">City</th>
+                    <th className="text-left py-3 px-4 text-text-main font-sans font-bold">Min Price</th>
+                    <th className="text-left py-3 px-4 text-text-main font-sans font-bold">Max Price</th>
+                    <th className="text-left py-3 px-4 text-text-main font-sans font-bold">Average</th>
+                    <th className="text-left py-3 px-4 text-text-main font-sans font-bold">Turfs Available</th>
                   </tr>
                 </thead>
                 <tbody className="text-text-muted">
@@ -178,7 +178,7 @@ export default function TurfBookingPriceIndia() {
 
           {/* Price by Sport */}
           <div className="mb-12">
-            <h2 className="font-poppins font-bold text-xl text-text-main mb-6">
+            <h2 className="font-sans font-bold text-xl text-text-main mb-6">
               Turf Booking Price by Sport
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -189,8 +189,8 @@ export default function TurfBookingPriceIndia() {
               ].map((item) => (
                 <div key={item.sport} className="bg-surface border border-border-subtle rounded-md p-5">
                   <span className="text-2xl">{item.icon}</span>
-                  <h3 className="font-poppins font-bold text-sm text-text-main mt-2">{item.sport}</h3>
-                  <p className="text-lg font-poppins font-extrabold text-brand-lime mt-1">{item.price}</p>
+                  <h3 className="font-sans font-bold text-sm text-text-main mt-2">{item.sport}</h3>
+                  <p className="text-lg font-sans font-extrabold text-brand-lime mt-1">{item.price}</p>
                   <p className="text-[10px] text-text-muted font-sans mt-1">{item.desc}</p>
                 </div>
               ))}
@@ -199,7 +199,7 @@ export default function TurfBookingPriceIndia() {
 
           {/* Factors affecting price */}
           <div className="mb-12">
-            <h2 className="font-poppins font-bold text-xl text-text-main mb-6">
+            <h2 className="font-sans font-bold text-xl text-text-main mb-6">
               What Factors Affect Turf Booking Price?
             </h2>
             <div className="space-y-3">
@@ -213,14 +213,14 @@ export default function TurfBookingPriceIndia() {
               ].map((item) => (
                 <div key={item.factor} className="bg-surface border border-border-subtle rounded-md p-4 flex gap-4">
                   <div className="w-16 shrink-0">
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-pill ${
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md ${
                       item.impact === "High" ? "bg-error/10 text-error" : "bg-warning/10 text-warning"
                     }`}>
                       {item.impact}
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-poppins font-bold text-sm text-text-main">{item.factor}</h3>
+                    <h3 className="font-sans font-bold text-sm text-text-main">{item.factor}</h3>
                     <p className="text-[10px] text-text-muted font-sans mt-1">{item.desc}</p>
                   </div>
                 </div>
@@ -230,20 +230,20 @@ export default function TurfBookingPriceIndia() {
 
           {/* CTA */}
           <div className="bg-brand-lime/10 border border-brand-lime/20 rounded-md p-6 mb-12 text-center">
-            <h3 className="font-poppins font-bold text-lg text-text-main mb-2">Compare Prices & Book</h3>
+            <h3 className="font-sans font-bold text-lg text-text-main mb-2">Compare Prices & Book</h3>
             <p className="text-xs text-text-muted font-sans mb-4">Browse real-time pricing for turfs in your city</p>
-            <Link href="/explore" className="inline-flex items-center gap-2 bg-brand-lime text-black font-poppins font-bold text-sm py-3 px-8 rounded-pill hover:bg-brand-lime-hover transition-all">
+            <Link href="/explore" className="inline-flex items-center gap-2 bg-brand-lime text-black font-sans font-bold text-sm py-3 px-8 rounded-md hover:bg-brand-lime-hover transition-all">
               Explore Turfs <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
           {/* FAQ */}
           <div className="mt-16 mb-12">
-            <h2 className="font-poppins font-bold text-2xl text-text-main mb-8">Frequently Asked Questions</h2>
+            <h2 className="font-sans font-bold text-2xl text-text-main mb-8">Frequently Asked Questions</h2>
             <div className="flex flex-col gap-4">
               {faqItems.map((item, idx) => (
                 <details key={idx} className="bg-surface border border-border-subtle rounded-md p-5 group">
-                  <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
+                  <summary className="font-sans font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}
                     <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />
                   </summary>

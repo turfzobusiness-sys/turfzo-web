@@ -83,8 +83,8 @@ export default async function CityPage({ params }: Props) {
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
           <div className="relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow p-8 sm:p-12 mb-12 min-h-[280px] flex flex-col justify-end">
             <div className="absolute inset-0 bg-cover bg-center z-0 opacity-40" style={{ backgroundImage: `url('/stadium_turf_bg.png')` }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-transparent z-0" />
-            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-brand-lime/5 rounded-full blur-[100px] pointer-events-none" />
+            
+            
 
             <div className="relative z-10 text-left">
               <nav className="flex items-center gap-1.5 text-xs text-text-muted font-sans mb-4">
@@ -94,20 +94,20 @@ export default async function CityPage({ params }: Props) {
                 <ChevronRight className="w-3 h-3" />
                 <span className="text-brand-lime">{data.name}</span>
               </nav>
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime mb-4">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime mb-4">
                 <MapPin className="w-3.5 h-3.5" /> {data.state}
               </span>
-              <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main leading-tight tracking-tight">
+              <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main leading-tight tracking-tight">
                 Book Turfs in <span className="text-brand-lime">{data.name}</span>
               </h1>
               <p className="mt-3 text-text-muted text-sm sm:text-base font-sans max-w-2xl leading-relaxed">
                 Book football turfs, cricket grounds, and sports venues across {data.name} starting at {data.avgPrice}. {data.venues} verified turfs in {data.highlights.slice(0, 3).join(", ")} and more. Real-time availability, secure payment, instant confirmation.
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-3">
-                <Link href={`/explore?city=${city}`} className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold text-sm py-3 px-6 rounded-pill inline-flex items-center gap-1.5 transition-all">
+                <Link href={`/explore?city=${city}`} className="bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
                   Browse {data.name} Turfs <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                 </Link>
-                <Link href="/tournaments" className="bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-poppins font-semibold text-sm py-3 px-6 rounded-pill inline-flex items-center gap-1.5 transition-all">
+                <Link href="/tournaments" className="bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-sans font-semibold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
                   <Trophy className="w-4 h-4 text-brand-lime" /> {data.name} Tournaments
                 </Link>
               </div>
@@ -116,7 +116,7 @@ export default async function CityPage({ params }: Props) {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 flex flex-col gap-6">
-              <h2 className="font-poppins font-bold text-2xl text-text-main text-left">Popular areas in {data.name}</h2>
+              <h2 className="font-sans font-bold text-2xl text-text-main text-left">Popular areas in {data.name}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {data.highlights.map((area) => (
                   <Link key={area} href={`/explore?city=${city}`}
@@ -126,7 +126,7 @@ export default async function CityPage({ params }: Props) {
                         <MapPin className="w-5 h-5" />
                       </div>
                       <div>
-                        <span className="font-poppins font-bold text-sm text-text-main block">{area}</span>
+                        <span className="font-sans font-bold text-sm text-text-main block">{area}</span>
                         <span className="text-[10px] text-text-muted">Football · Cricket · Multi-sport</span>
                       </div>
                     </div>
@@ -136,7 +136,7 @@ export default async function CityPage({ params }: Props) {
               </div>
 
               <div className="bg-surface border border-border-default rounded-md p-6 shadow-card-shadow mt-6 text-left">
-                <h2 className="font-poppins font-bold text-xl text-text-main mb-4">
+                <h2 className="font-sans font-bold text-xl text-text-main mb-4">
                   Why book turfs in {data.name} on Turfzo?
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -159,7 +159,7 @@ export default async function CityPage({ params }: Props) {
 
             <div className="lg:col-span-4 flex flex-col gap-6">
               <div className="bg-surface border border-border-default rounded-md p-6 text-left shadow-card-shadow">
-                <h3 className="font-poppins font-bold text-base text-text-main pb-3 border-b border-border-subtle mb-4">
+                <h3 className="font-sans font-bold text-base text-text-main pb-3 border-b border-border-subtle mb-4">
                   Quick facts
                 </h3>
                 <div className="flex flex-col gap-3 text-xs font-sans">
@@ -171,7 +171,7 @@ export default async function CityPage({ params }: Props) {
               </div>
 
               <div className="bg-surface border border-border-default rounded-md p-6 text-left shadow-card-shadow">
-                <h3 className="font-poppins font-bold text-base text-text-main pb-3 border-b border-border-subtle mb-4">
+                <h3 className="font-sans font-bold text-base text-text-main pb-3 border-b border-border-subtle mb-4">
                   Popular turfs in {data.name}
                 </h3>
                 <div className="flex flex-col gap-3">
@@ -187,7 +187,7 @@ export default async function CityPage({ params }: Props) {
                           <Star className="w-3 h-3 fill-brand-lime text-brand-lime" /> {t.rating}
                         </span>
                       </div>
-                      <span className="font-poppins font-extrabold text-brand-lime">₹{t.price}/hr</span>
+                      <span className="font-sans font-extrabold text-brand-lime">₹{t.price}/hr</span>
                     </div>
                   ))}
                 </div>
@@ -196,13 +196,13 @@ export default async function CityPage({ params }: Props) {
           </div>
 
           <div className="max-w-3xl mx-auto mt-16">
-            <h2 className="font-poppins font-bold text-2xl text-text-main mb-8 text-center">
+            <h2 className="font-sans font-bold text-2xl text-text-main mb-8 text-center">
               Frequently Asked Questions
             </h2>
             <div className="flex flex-col gap-4">
               {faqs.map((item, idx) => (
                 <details key={idx} className="bg-surface border border-border-default rounded-md p-5 group">
-                  <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
+                  <summary className="font-sans font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}
                     <ChevronRight className="w-4 h-4 text-text-muted group-open:rotate-90 transition-transform" />
                   </summary>

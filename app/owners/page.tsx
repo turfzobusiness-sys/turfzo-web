@@ -62,10 +62,7 @@ export default function OwnersPage() {
       <main className="flex-grow pt-24 pb-16">
         {/* HERO SECTION */}
         <section className="relative py-20 md:py-28 overflow-hidden">
-          {/* Subtle background glow effect */}
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-lime/5 rounded-full blur-[120px] pointer-events-none z-0" />
-          
-          <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10 text-center">
+          <div className="max-w-7xl mx-auto px-6 md:px-8 text-center relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -80,7 +77,7 @@ export default function OwnersPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="font-poppins text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] max-w-4xl mx-auto"
+              className="font-sans text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] max-w-4xl mx-auto text-text-main"
             >
               Run Your Sports Venue on <span className="text-brand-lime">Autopilot</span>
             </motion.h1>
@@ -103,14 +100,14 @@ export default function OwnersPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={() => router.push("/owners/register")}
-                  className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold px-8 py-4 rounded-[12px] transition-all shadow-glow-lime flex items-center justify-center gap-2 cursor-pointer active:scale-95 text-sm md:text-base animate-pulse shadow-brand-lime/10"
+                  className="bg-text-main hover:bg-text-main/90 text-bg font-sans font-medium px-6 py-3 rounded-md transition-all flex items-center justify-center gap-2 cursor-pointer text-sm md:text-base"
                 >
                   Get Started (Self-Serve)
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <a
                   href="#features"
-                  className="bg-surface border border-border-default hover:bg-elevated text-text-main font-poppins font-bold px-8 py-4 rounded-[12px] transition-all flex items-center justify-center text-sm md:text-base"
+                  className="bg-transparent border border-border-default hover:bg-elevated text-text-main font-sans font-medium px-6 py-3 rounded-md transition-all flex items-center justify-center text-sm md:text-base"
                 >
                   Explore Technology
                 </a>
@@ -129,8 +126,8 @@ export default function OwnersPage() {
         <section id="features" className="py-20 border-t border-border-subtle bg-surface/30">
           <div className="max-w-7xl mx-auto px-6 md:px-8">
             <div className="text-center mb-16 max-w-2xl mx-auto">
-              <span className="text-xs font-sans font-bold tracking-widest text-brand-lime uppercase">Next-Gen Manager Tech</span>
-              <h2 className="font-poppins text-3xl font-extrabold mt-3">Smart Automation, Not Just Bookings</h2>
+              <span className="text-xs font-sans font-medium tracking-wide text-text-muted uppercase">Next-Gen Manager Tech</span>
+              <h2 className="font-sans text-3xl font-bold mt-3 text-text-main tracking-tight">Smart Automation, Not Just Bookings</h2>
               <p className="text-text-muted text-sm font-sans mt-3">We replace clunky spreadsheets and midnight WhatsApp calls with complete venue IoT orchestration.</p>
             </div>
 
@@ -142,7 +139,7 @@ export default function OwnersPage() {
                   <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning border border-warning/20 mb-6">
                     <TbCalendarTime className="w-5 h-5" />
                   </div>
-                  <h3 className="font-poppins text-lg font-bold text-text-main mb-2">Automated Slot Booking</h3>
+                  <h3 className="font-sans text-lg font-semibold text-text-main mb-2">Automated Slot Booking</h3>
                   <p className="text-text-muted text-sm font-sans leading-relaxed mb-6">
                     Real-time scheduling grid updates instantly. Adjust pricing parameters dynamically for morning discounts or peak evening slots.
                   </p>
@@ -177,7 +174,7 @@ export default function OwnersPage() {
                   <div className="w-10 h-10 rounded-full bg-info/10 flex items-center justify-center text-info border border-info/20 mb-6">
                     <TbCpu className="w-5 h-5" />
                   </div>
-                  <h3 className="font-poppins text-lg font-bold text-text-main mb-2">IoT Light & Gate Automation</h3>
+                  <h3 className="font-sans text-lg font-semibold text-text-main mb-2">IoT Light & Gate Automation</h3>
                   <p className="text-text-muted text-sm font-sans leading-relaxed mb-6">
                     Forget staff overhead. Lights activate automatically when a booking begins and shut down at the end. Gates open via dynamic pin codes.
                   </p>
@@ -230,7 +227,7 @@ export default function OwnersPage() {
                   <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success border border-success/20 mb-6">
                     <TbWallet className="w-5 h-5" />
                   </div>
-                  <h3 className="font-poppins text-lg font-bold text-text-main mb-2">24h Settlement Payouts</h3>
+                  <h3 className="font-sans text-lg font-semibold text-text-main mb-2">24h Settlement Payouts</h3>
                   <p className="text-text-muted text-sm font-sans leading-relaxed mb-6">
                     Accept online, split payments, and direct deposits. Earnings clear instantly and transfer into your bank within 24 hours automatically.
                   </p>
@@ -270,8 +267,8 @@ export default function OwnersPage() {
         <section id="register" className="py-20 border-t border-border-subtle scroll-mt-12">
           <div className="max-w-7xl mx-auto px-6 md:px-8">
             <div className="text-center mb-12 max-w-2xl mx-auto">
-              <span className="text-xs font-sans font-bold tracking-widest text-brand-lime uppercase">Partner Registration</span>
-              <h2 className="font-poppins text-3xl font-extrabold mt-3">Register Your Sports Facility</h2>
+              <span className="text-xs font-sans font-medium tracking-wide text-text-muted uppercase">Partner Registration</span>
+              <h2 className="font-sans text-3xl font-bold mt-3 text-text-main tracking-tight">Register Your Sports Facility</h2>
               <p className="text-text-muted text-sm font-sans mt-3">
                 Complete the details below to submit your venue listing request. Our onboarding specialist will contact you to finalize.
               </p>
@@ -289,7 +286,7 @@ export default function OwnersPage() {
                 <TbShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-poppins font-bold text-base text-text-main mb-1">Secure & Certified</h4>
+                <h4 className="font-sans font-semibold text-base text-text-main mb-1">Secure & Certified</h4>
                 <p className="text-text-muted text-xs font-sans leading-relaxed">
                   All IoT hardware is CE/FCC certified, with custom server firewall protection to prevent lighting malfunctions or power overload.
                 </p>
@@ -301,7 +298,7 @@ export default function OwnersPage() {
                 <TbDeviceMobile className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-poppins font-bold text-base text-text-main mb-1">Partner App Controls</h4>
+                <h4 className="font-sans font-semibold text-base text-text-main mb-1">Partner App Controls</h4>
                 <p className="text-text-muted text-xs font-sans leading-relaxed">
                   Manage slots, override floodlights manually, block academy schedule hours, and review analytics directly from our iOS and Android partner app.
                 </p>
@@ -313,7 +310,7 @@ export default function OwnersPage() {
                 <TbMapPin className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-poppins font-bold text-base text-text-main mb-1">Local Visibility</h4>
+                <h4 className="font-sans font-semibold text-base text-text-main mb-1">Local Visibility</h4>
                 <p className="text-text-muted text-xs font-sans leading-relaxed">
                   Get discovered by thousands of players searching for turfs, pitches, and courts in your city. Boost occupancy during off-peak morning hours.
                 </p>
@@ -326,8 +323,8 @@ export default function OwnersPage() {
         <section className="py-20 border-t border-border-subtle bg-bg">
           <div className="max-w-4xl mx-auto px-6 md:px-8">
             <div className="text-center mb-14">
-              <span className="text-xs font-sans font-bold tracking-widest text-brand-lime uppercase">FAQS</span>
-              <h2 className="font-poppins text-3xl font-extrabold mt-3">Frequently Asked Questions</h2>
+              <span className="text-xs font-sans font-medium tracking-wide text-text-muted uppercase">FAQS</span>
+              <h2 className="font-sans text-3xl font-bold mt-3 text-text-main tracking-tight">Frequently Asked Questions</h2>
             </div>
 
             <div className="divide-y divide-border-subtle">
@@ -340,7 +337,7 @@ export default function OwnersPage() {
                       className="w-full flex justify-between items-center text-left focus:outline-none group py-2"
                       aria-expanded={isOpen}
                     >
-                      <span className="font-poppins font-semibold text-text-main group-hover:text-brand-lime transition-colors text-sm sm:text-base pr-4">
+                      <span className="font-sans font-semibold text-text-main group-hover:text-text-muted transition-colors text-sm sm:text-base pr-4">
                         {faq.q}
                       </span>
                       <TbChevronDown 

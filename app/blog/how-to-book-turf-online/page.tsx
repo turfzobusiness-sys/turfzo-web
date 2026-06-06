@@ -164,10 +164,10 @@ export default function HowToBookTurfOnline() {
             className="mb-12"
           >
             <div className="flex items-center gap-3 mb-4">
-              <span className="bg-brand-lime/10 text-brand-lime font-poppins font-bold text-[10px] px-2.5 py-1 rounded-pill">How-To</span>
+              <span className="bg-brand-lime/10 text-brand-lime font-sans font-bold text-[10px] px-2.5 py-1 rounded-md">How-To</span>
               <span className="text-[10px] text-text-muted font-sans">May 2026 · 4 min read</span>
             </div>
-            <h1 className="font-poppins text-3xl sm:text-4xl font-extrabold text-text-main leading-tight">
+            <h1 className="font-sans text-3xl sm:text-4xl font-extrabold text-text-main leading-tight">
               How to Book a Turf Online in 2 Minutes
             </h1>
             <p className="mt-4 text-text-muted text-sm font-sans leading-relaxed">
@@ -181,7 +181,7 @@ export default function HowToBookTurfOnline() {
 
           {/* Quick Answer */}
           <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
-            <h2 className="font-poppins font-bold text-base text-brand-lime mb-2">Quick Answer</h2>
+            <h2 className="font-sans font-bold text-base text-brand-lime mb-2">Quick Answer</h2>
             <p className="text-sm text-text-main font-sans leading-relaxed">
               To book a turf on Turfzo: (1) Visit turfzo.com/explore and select your city, (2) Browse available turfs and click &ldquo;View Slots&rdquo;, (3) Pick your date and time slot, (4) Pay online via UPI or card, (5) Receive your QR code ticket. The entire process takes about 2 minutes.
             </p>
@@ -189,7 +189,7 @@ export default function HowToBookTurfOnline() {
 
           {/* Step-by-Step */}
           <div className="mb-12">
-            <h2 className="font-poppins font-bold text-xl text-text-main mb-8">
+            <h2 className="font-sans font-bold text-xl text-text-main mb-8">
               Step-by-Step: How to Book a Turf on Turfzo
             </h2>
             <div className="space-y-6">
@@ -204,12 +204,12 @@ export default function HowToBookTurfOnline() {
                     className="bg-surface border border-border-subtle hover:border-brand-lime/10 rounded-md p-6 flex gap-5 transition-all duration-300"
                   >
                     <div className="w-12 h-12 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime border border-brand-lime/10 shrink-0">
-                      <span className="font-poppins font-bold text-sm">{idx + 1}</span>
+                      <span className="font-sans font-bold text-sm">{idx + 1}</span>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <Icon className="w-4 h-4 text-brand-lime" />
-                        <h3 className="font-poppins font-bold text-base text-text-main">
+                        <h3 className="font-sans font-bold text-base text-text-main">
                           {step.title}
                         </h3>
                       </div>
@@ -228,7 +228,7 @@ export default function HowToBookTurfOnline() {
 
           {/* Payment Methods */}
           <div className="mb-12">
-            <h2 className="font-poppins font-bold text-xl text-text-main mb-6">
+            <h2 className="font-sans font-bold text-xl text-text-main mb-6">
               Payment Methods Accepted on Turfzo
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -239,7 +239,7 @@ export default function HowToBookTurfOnline() {
                 { name: "Net Banking", apps: "All major banks" },
               ].map((method) => (
                 <div key={method.name} className="bg-surface border border-border-subtle rounded-md p-4 text-center">
-                  <h3 className="font-poppins font-bold text-sm text-text-main">{method.name}</h3>
+                  <h3 className="font-sans font-bold text-sm text-text-main">{method.name}</h3>
                   <p className="text-[10px] text-text-muted font-sans mt-1">{method.apps}</p>
                 </div>
               ))}
@@ -248,7 +248,7 @@ export default function HowToBookTurfOnline() {
 
           {/* Tips */}
           <div className="mb-12">
-            <h2 className="font-poppins font-bold text-xl text-text-main mb-6">
+            <h2 className="font-sans font-bold text-xl text-text-main mb-6">
               Tips for a Smooth Booking Experience
             </h2>
             <div className="space-y-3">
@@ -270,20 +270,20 @@ export default function HowToBookTurfOnline() {
 
           {/* CTA */}
           <div className="bg-brand-lime/10 border border-brand-lime/20 rounded-md p-6 mb-12 text-center">
-            <h3 className="font-poppins font-bold text-lg text-text-main mb-2">Ready to Book Your First Turf?</h3>
+            <h3 className="font-sans font-bold text-lg text-text-main mb-2">Ready to Book Your First Turf?</h3>
             <p className="text-xs text-text-muted font-sans mb-4">Browse 50+ verified turfs across India</p>
-            <Link href="/explore" className="inline-flex items-center gap-2 bg-brand-lime text-black font-poppins font-bold text-sm py-3 px-8 rounded-pill hover:bg-brand-lime-hover transition-all">
+            <Link href="/explore" className="inline-flex items-center gap-2 bg-brand-lime text-black font-sans font-bold text-sm py-3 px-8 rounded-md hover:bg-brand-lime-hover transition-all">
               Explore Turfs <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
           {/* FAQ */}
           <div className="mt-16 mb-12">
-            <h2 className="font-poppins font-bold text-2xl text-text-main mb-8">Frequently Asked Questions</h2>
+            <h2 className="font-sans font-bold text-2xl text-text-main mb-8">Frequently Asked Questions</h2>
             <div className="flex flex-col gap-4">
               {faqItems.map((item, idx) => (
                 <details key={idx} className="bg-surface border border-border-subtle rounded-md p-5 group">
-                  <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
+                  <summary className="font-sans font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}
                     <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />
                   </summary>

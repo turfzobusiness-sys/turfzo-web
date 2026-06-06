@@ -70,7 +70,7 @@ export default function HowItWorks() {
   return (
     <section id="how-it-works" className="py-24 sm:py-32 bg-bg border-t border-border-subtle relative overflow-hidden">
       {/* Background ambient light */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-lime/[0.015] blur-[150px] pointer-events-none" />
+      
 
       <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10">
         
@@ -79,7 +79,7 @@ export default function HowItWorks() {
           <span className="text-xs font-semibold tracking-[0.2em] uppercase text-brand-lime">
             Playbook Strategy
           </span>
-          <h2 className="font-poppins text-3xl sm:text-4xl font-extrabold tracking-tight text-text-main mt-4">
+          <h2 className="font-sans text-3xl sm:text-4xl font-extrabold tracking-tight text-text-main mt-4">
             Our Booking <span className="text-brand-lime">Playbook</span>
           </h2>
           <div className="h-1 w-12 bg-brand-lime mx-auto mt-4 rounded-full" />
@@ -164,7 +164,7 @@ export default function HowItWorks() {
                   >
                     {/* Node circle */}
                     <div className={cn(
-                      "w-10 h-10 -ml-5 -mt-5 rounded-full flex items-center justify-center border-2 font-poppins text-xs font-extrabold transition-all duration-300",
+                      "w-10 h-10 -ml-5 -mt-5 rounded-full flex items-center justify-center border-2 font-sans text-xs font-extrabold transition-all duration-300",
                       isActive 
                         ? "bg-[#16211B] border-brand-lime text-brand-lime shadow-[0_0_15px_rgba(159,232,112,0.35)] scale-110" 
                         : "bg-surface border-border-default text-text-muted hover:border-border-strong hover:text-text-main hover:scale-105"
@@ -235,7 +235,7 @@ export default function HowItWorks() {
                     {/* Text column */}
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center justify-between gap-4">
-                        <h3 className="font-poppins text-base sm:text-lg font-bold text-text-main tracking-tight group-hover:text-brand-lime transition-colors">
+                        <h3 className="font-sans text-base sm:text-lg font-bold text-text-main tracking-tight group-hover:text-brand-lime transition-colors">
                           {step.title}
                         </h3>
                         <span className="text-[9px] font-sans font-semibold tracking-wider uppercase px-2 py-0.5 rounded bg-elevated text-text-muted border border-border-subtle">

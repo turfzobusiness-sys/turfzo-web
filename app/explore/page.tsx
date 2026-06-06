@@ -360,13 +360,13 @@ export default function ExplorePage() {
                 className="absolute inset-0 bg-cover bg-center z-0 opacity-40"
                 style={{ backgroundImage: `url('/stadium_turf_bg.png')` }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-transparent z-0" />
+              
 
               <div className="relative z-10 text-left mb-6">
-                <span className="text-xs font-poppins font-extrabold tracking-widest text-brand-lime uppercase">
+                <span className="text-xs font-sans font-extrabold tracking-widest text-brand-lime uppercase">
                   EXPLORE TURFS
                 </span>
-                <h1 className="font-poppins text-4xl sm:text-5xl font-extrabold text-text-main mt-2 leading-none">
+                <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main mt-2 leading-none">
                   Find & Book <br />
                   The <span className="text-brand-lime">Best Turfs</span>
                 </h1>
@@ -375,7 +375,7 @@ export default function ExplorePage() {
                 </p>
               </div>
 
-              <div className="relative z-10 w-full bg-surface/90 backdrop-blur-md border border-border-default rounded-pill p-2 pl-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-center shadow-card-shadow mt-4">
+              <div className="relative z-10 w-full bg-surface/90 backdrop-blur-md border border-border-default rounded-md p-2 pl-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-center shadow-card-shadow mt-4">
                 <div className="flex items-center gap-3 border-r border-border-subtle pr-4 py-2">
                   <MapPin className="w-5 h-5 text-brand-lime shrink-0" />
                   <div className="flex flex-col text-left leading-none">
@@ -410,7 +410,7 @@ export default function ExplorePage() {
                   </div>
                 </div>
 
-                <button className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold text-sm py-3.5 px-6 rounded-pill transition-all duration-300 w-full">
+                <button className="bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-sm py-3.5 px-6 rounded-md transition-all duration-300 w-full">
                   Search
                 </button>
               </div>
@@ -421,7 +421,7 @@ export default function ExplorePage() {
                 <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                   <div className="flex items-center gap-2">
                     <SlidersHorizontal className="w-4 h-4 text-brand-lime" />
-                    <span className="font-poppins font-bold text-base text-text-main">Filters</span>
+                    <span className="font-sans font-bold text-base text-text-main">Filters</span>
                   </div>
                   <button
                     onClick={handleResetFilters}
@@ -433,7 +433,7 @@ export default function ExplorePage() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <span className="text-xs font-poppins font-bold uppercase text-text-main tracking-wider">Sport</span>
+                  <span className="text-xs font-sans font-bold uppercase text-text-main tracking-wider">Sport</span>
                   <div className="flex flex-col gap-2">
                     {sportOptions.length === 0 ? (
                       <span className="text-xs text-text-muted">No sports available</span>
@@ -463,7 +463,7 @@ export default function ExplorePage() {
                 </div>
 
                 <div className="flex flex-col gap-3 border-t border-border-subtle pt-5">
-                  <div className="flex justify-between items-center text-xs font-poppins font-bold uppercase text-text-main tracking-wider">
+                  <div className="flex justify-between items-center text-xs font-sans font-bold uppercase text-text-main tracking-wider">
                     <span>Max Price</span>
                     <span className="text-brand-lime font-sans font-bold text-sm">₹{priceRange}</span>
                   </div>
@@ -483,7 +483,7 @@ export default function ExplorePage() {
                 </div>
 
                 <div className="flex flex-col gap-3 border-t border-border-subtle pt-5">
-                  <span className="text-xs font-poppins font-bold uppercase text-text-main tracking-wider">Facilities</span>
+                  <span className="text-xs font-sans font-bold uppercase text-text-main tracking-wider">Facilities</span>
                   <div className="flex flex-col gap-2">
                     {["Flood Lights", "Parking", "Changing Room", "Cafeteria"].map((facility) => {
                       const isChecked = selectedFacilities.includes(facility);
@@ -511,7 +511,7 @@ export default function ExplorePage() {
 
               <div className="lg:col-span-9 flex flex-col gap-6">
                 <div className="flex items-center justify-between">
-                  <span className="font-poppins font-bold text-sm text-text-muted">
+                  <span className="font-sans font-bold text-sm text-text-muted">
                     <span className="text-brand-lime">{filteredTurfs.length}</span> Turfs found
                   </span>
                   <div className="flex items-center gap-4">
@@ -548,15 +548,15 @@ export default function ExplorePage() {
                   {loading ? (
                     <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
                       <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
-                      <h3 className="font-poppins font-bold text-lg text-text-main">Loading Turfs</h3>
+                      <h3 className="font-sans font-bold text-lg text-text-main">Loading Turfs</h3>
                       <p className="text-text-muted text-sm font-sans max-w-xs">Fetching the best venues near you...</p>
                     </div>
                   ) : filteredTurfs.length === 0 ? (
                     <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
                       <SlidersHorizontal className="w-12 h-12 text-text-muted opacity-50" />
-                      <h3 className="font-poppins font-bold text-lg text-text-main">No Venues Found</h3>
+                      <h3 className="font-sans font-bold text-lg text-text-main">No Venues Found</h3>
                       <p className="text-text-muted text-sm font-sans max-w-xs">Try adjusting your filters or resetting the form to discover matches.</p>
-                      <button onClick={handleResetFilters} className="bg-brand-lime text-black font-semibold px-6 py-2 rounded-pill mt-2">Reset Filters</button>
+                      <button onClick={handleResetFilters} className="bg-brand-lime text-black font-semibold px-6 py-2 rounded-md mt-2">Reset Filters</button>
                     </div>
                   ) : (
                     filteredTurfs.map((turf) => (
@@ -575,7 +575,7 @@ export default function ExplorePage() {
                             className="object-cover transition-transform duration-500 hover:scale-105"
                           />
                           {turf.premium && (
-                            <div className="absolute top-3 left-3 bg-overlay-heavy backdrop-blur-sm border border-brand-lime/30 text-brand-lime font-poppins font-bold text-[10px] px-2.5 py-1 rounded-pill flex items-center gap-1 select-none">
+                            <div className="absolute top-3 left-3 bg-overlay-heavy backdrop-blur-sm border border-brand-lime/30 text-brand-lime font-sans font-bold text-[10px] px-2.5 py-1 rounded-md flex items-center gap-1 select-none">
                               <Award className="w-3.5 h-3.5 fill-brand-lime text-brand-lime" />
                               Premium
                             </div>
@@ -591,7 +591,7 @@ export default function ExplorePage() {
                         <div className="flex-grow flex flex-col justify-between">
                           <div>
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <h3 className="font-poppins font-bold text-lg text-text-main hover:text-brand-lime transition-colors">
+                              <h3 className="font-sans font-bold text-lg text-text-main hover:text-brand-lime transition-colors">
                                 {turf.name}
                               </h3>
                               <span className="w-4 h-4 bg-brand-lime text-black rounded-full flex items-center justify-center text-[10px] font-bold select-none" title="Verified Venue">✓</span>
@@ -628,13 +628,13 @@ export default function ExplorePage() {
                           <div className="flex items-center justify-between border-t border-border-subtle pt-4 mt-4 md:mt-0">
                             <div>
                               <span className="text-[10px] text-text-muted block leading-none font-sans uppercase">Starting from</span>
-                              <span className="text-xl font-poppins font-extrabold text-brand-lime mt-1 block">
+                              <span className="text-xl font-sans font-extrabold text-brand-lime mt-1 block">
                                 {formatPrice(turf.price)} <span className="text-xs text-text-muted font-normal font-sans">/hr</span>
                               </span>
                             </div>
                             <button
                               onClick={() => handleOpenSlots(turf)}
-                              className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold text-sm py-3 px-6 rounded-md transition-all duration-300 hover:scale-102 flex items-center gap-1"
+                              className="bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-sm py-3 px-6 rounded-md transition-all duration-300  flex items-center gap-1"
                             >
                               View Slots
                               <ChevronRight className="w-4 h-4 stroke-[2.5]" />
@@ -672,10 +672,10 @@ export default function ExplorePage() {
                 </button>
 
                 <div className="text-left">
-                  <span className="text-[10px] font-sans font-bold uppercase text-brand-lime bg-brand-lime/10 px-2.5 py-1 rounded-pill w-fit inline-block">
+                  <span className="text-[10px] font-sans font-bold uppercase text-brand-lime bg-brand-lime/10 px-2.5 py-1 rounded-md w-fit inline-block">
                     SELECT SLOT
                   </span>
-                  <h2 className="font-poppins font-bold text-xl text-text-main mt-2">
+                  <h2 className="font-sans font-bold text-xl text-text-main mt-2">
                     {selectedTurf.name}
                   </h2>
                   <p className="text-xs text-text-muted flex items-center gap-0.5 mt-1 font-sans">
@@ -684,7 +684,7 @@ export default function ExplorePage() {
                 </div>
 
                 <div className="mt-6 flex flex-col gap-2.5">
-                  <span className="text-xs font-poppins font-bold uppercase text-text-main tracking-wider text-left">Select Date</span>
+                  <span className="text-xs font-sans font-bold uppercase text-text-main tracking-wider text-left">Select Date</span>
                   <div className="flex gap-2 overflow-x-auto scrollbar-none py-1">
                     {dateOptions.map((d) => (
                       <button
@@ -692,19 +692,19 @@ export default function ExplorePage() {
                         onClick={() => setSelectedDate(d.value)}
                         className={`flex flex-col items-center justify-center p-3 rounded-md border min-w-16 transition-all ${
                           selectedDate === d.value
-                            ? "bg-brand-lime text-black border-brand-lime font-bold shadow-glow-lime"
+                            ? "bg-brand-lime text-black border-brand-lime font-bold shadow-md"
                             : "bg-elevated text-text-muted border-border-subtle hover:text-text-main"
                         }`}
                       >
                         <span className="text-xs">{d.weekday}</span>
-                        <span className="text-sm font-poppins font-extrabold mt-1">{d.label}</span>
+                        <span className="text-sm font-sans font-extrabold mt-1">{d.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div className="mt-6 flex flex-col gap-2.5 text-left">
-                  <span className="text-xs font-poppins font-bold uppercase text-text-main tracking-wider">Select Pitch</span>
+                  <span className="text-xs font-sans font-bold uppercase text-text-main tracking-wider">Select Pitch</span>
                   <div className="grid grid-cols-2 gap-3">
                     {[`Pitch 1 (${selectedTurf.premium ? "Premium Turf" : "Standard Turf"})`, `Pitch 2 (${selectedTurf.premium ? "Premium Grass" : "Standard Grass"})`].map((pitch) => (
                       <button
@@ -724,7 +724,7 @@ export default function ExplorePage() {
 
                 <div className="mt-6 flex flex-col gap-4 text-left">
                   <div className="flex flex-col gap-2.5">
-                    <span className="text-xs font-poppins font-bold uppercase text-text-main tracking-wider flex items-center gap-1.5">
+                    <span className="text-xs font-sans font-bold uppercase text-text-main tracking-wider flex items-center gap-1.5">
                       <Clock className="w-4 h-4 text-brand-lime" /> Available Time Slots
                     </span>
                     {loadingSlots ? (
@@ -746,7 +746,7 @@ export default function ExplorePage() {
                                 !slot.available
                                   ? "bg-bg/40 text-text-muted/30 border-border-subtle line-through cursor-not-allowed"
                                   : isSelected
-                                    ? "bg-brand-lime text-black border-brand-lime shadow-glow-lime font-bold"
+                                    ? "bg-brand-lime text-black border-brand-lime shadow-md font-bold"
                                     : "bg-elevated text-text-muted border-border-subtle hover:text-text-main"
                               }`}
                             >
@@ -769,7 +769,7 @@ export default function ExplorePage() {
                   <button
                     disabled={!selectedTimeSlot}
                     onClick={handleProceedToCheckout}
-                    className="bg-brand-lime disabled:bg-elevated disabled:text-text-muted/40 text-black font-poppins font-bold text-sm py-3 px-8 rounded-md transition-all duration-300 hover:scale-102 flex items-center gap-1.5"
+                    className="bg-brand-lime disabled:bg-elevated disabled:text-text-muted/40 text-black font-sans font-bold text-sm py-3 px-8 rounded-md transition-all duration-300  flex items-center gap-1.5"
                   >
                     Proceed to Checkout
                     <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -808,10 +808,10 @@ export default function ExplorePage() {
                 </button>
 
                 <div className="text-center mt-3">
-                  <span className="text-[10px] font-sans font-bold uppercase text-brand-lime bg-brand-lime/10 px-2.5 py-1 rounded-pill w-fit inline-block">
+                  <span className="text-[10px] font-sans font-bold uppercase text-brand-lime bg-brand-lime/10 px-2.5 py-1 rounded-md w-fit inline-block">
                     CHECKOUT
                   </span>
-                  <h2 className="font-poppins font-bold text-xl text-text-main mt-3">
+                  <h2 className="font-sans font-bold text-xl text-text-main mt-3">
                     Confirm Your Booking
                   </h2>
                 </div>
@@ -819,7 +819,7 @@ export default function ExplorePage() {
                 <div className="mt-6 bg-elevated rounded-md p-4 border border-border-subtle text-left flex flex-col gap-3">
                   <div className="flex justify-between items-center pb-3 border-b border-border-subtle">
                     <div>
-                      <h4 className="font-poppins font-bold text-sm text-text-main">{selectedTurf.name}</h4>
+                      <h4 className="font-sans font-bold text-sm text-text-main">{selectedTurf.name}</h4>
                       <p className="text-[11px] text-text-muted flex items-center gap-0.5 mt-0.5 font-sans">
                         <MapPin className="w-3 h-3 text-brand-lime shrink-0" /> {selectedTurf.location.split(",")[0]}
                       </p>
@@ -857,7 +857,7 @@ export default function ExplorePage() {
                 </div>
 
                 <div className="mt-6 flex flex-col gap-3 text-left">
-                  <span className="text-xs font-poppins font-bold uppercase text-text-main tracking-wider">Select Payment Method</span>
+                  <span className="text-xs font-sans font-bold uppercase text-text-main tracking-wider">Select Payment Method</span>
                   <div className="flex flex-col gap-2">
                     <label className={`p-4 rounded-md border flex items-center justify-between cursor-pointer select-none transition-colors ${
                       selectedPayment === 'upi' ? 'bg-elevated border-brand-lime/50' : 'bg-surface border-border-subtle'
@@ -913,7 +913,7 @@ export default function ExplorePage() {
                     <span>GST (18%)</span>
                     <span>{formatPrice(pricing.gst)}</span>
                   </div>
-                  <div className="flex justify-between items-center text-sm font-poppins font-extrabold text-text-main">
+                  <div className="flex justify-between items-center text-sm font-sans font-extrabold text-text-main">
                     <span>Total Payable</span>
                     <span className="text-brand-lime">{formatPrice(pricing.total)}</span>
                   </div>
@@ -926,7 +926,7 @@ export default function ExplorePage() {
                   </p>
                   <button
                     onClick={handlePayNow}
-                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-bold text-sm py-3.5 rounded-md transition-all duration-300 hover:scale-102 flex items-center justify-center gap-1.5"
+                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-sm py-3.5 rounded-md transition-all duration-300  flex items-center justify-center gap-1.5"
                   >
                     Pay Now · {formatPrice(pricing.total)}
                   </button>
@@ -945,7 +945,7 @@ export default function ExplorePage() {
               className="fixed inset-0 z-50 bg-overlay-heavy backdrop-blur-md flex flex-col items-center justify-center gap-4"
             >
               <Loader2 className="w-10 h-10 text-brand-lime animate-spin stroke-[2.5]" />
-              <h3 className="font-poppins font-bold text-lg text-text-main mt-2">Processing Your Booking</h3>
+              <h3 className="font-sans font-bold text-lg text-text-main mt-2">Processing Your Booking</h3>
               <p className="text-xs text-text-muted font-sans text-center max-w-xs">Securing your slot and verifying payment. Please do not close or refresh this window.</p>
             </motion.div>
           )}
@@ -961,12 +961,12 @@ export default function ExplorePage() {
             >
               <div className="bg-surface border border-error/30 rounded-md max-w-md w-full p-6 text-center">
                 <AlertCircle className="w-10 h-10 text-error mx-auto" />
-                <h3 className="font-poppins font-bold text-lg text-text-main mt-4">Payment Failed</h3>
+                <h3 className="font-sans font-bold text-lg text-text-main mt-4">Payment Failed</h3>
                 <p className="text-xs text-text-muted mt-2 font-sans">{bookingError}</p>
                 <div className="mt-6 flex gap-3 justify-center">
                   <button
                     onClick={() => setFlowStep("checkout")}
-                    className="bg-brand-lime text-black font-poppins font-bold text-sm py-2.5 px-6 rounded-md"
+                    className="bg-brand-lime text-black font-sans font-bold text-sm py-2.5 px-6 rounded-md"
                   >
                     Try Again
                   </button>
@@ -989,11 +989,11 @@ export default function ExplorePage() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
             className="max-w-xl mx-auto px-6 md:px-8 w-full text-center flex flex-col items-center mt-12"
           >
-            <div className="relative w-20 h-20 bg-brand-lime/10 rounded-full flex items-center justify-center border-2 border-brand-lime/30 shadow-glow-lime-intense select-none">
+            <div className="relative w-20 h-20 bg-brand-lime/10 rounded-full flex items-center justify-center border-2 border-brand-lime/30 shadow-md-intense select-none">
               <Check className="w-10 h-10 text-brand-lime stroke-[3]" />
             </div>
 
-            <h1 className="font-poppins text-3xl font-extrabold text-text-main mt-6">
+            <h1 className="font-sans text-3xl font-extrabold text-text-main mt-6">
               Booking Confirmed!
             </h1>
             <p className="mt-2 text-sm text-text-muted font-sans max-w-xs">
@@ -1007,16 +1007,16 @@ export default function ExplorePage() {
               <div className="flex justify-between items-center pb-4 border-b border-dashed border-border-default">
                 <div className="flex flex-col">
                   <span className="text-[10px] text-text-muted uppercase tracking-wider font-sans">Booking Receipt ID</span>
-                  <span className="font-poppins font-bold text-base text-brand-lime tracking-wide">{confirmedBooking.booking_code}</span>
+                  <span className="font-sans font-bold text-base text-brand-lime tracking-wide">{confirmedBooking.booking_code}</span>
                 </div>
-                <div className="flex items-center gap-1 text-[10px] font-sans font-bold bg-brand-lime/10 text-brand-lime border border-brand-lime/10 rounded-pill px-3 py-1 uppercase">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-lime animate-pulse" /> paid
+                <div className="flex items-center gap-1 text-[10px] font-sans font-bold bg-brand-lime/10 text-brand-lime border border-brand-lime/10 rounded-md px-3 py-1 uppercase">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-lime " /> paid
                 </div>
               </div>
 
               <div className="flex flex-col gap-1 text-left">
                 <span className="text-[10px] text-text-muted uppercase tracking-wider font-sans">Venue</span>
-                <h3 className="font-poppins font-extrabold text-lg text-text-main">{selectedTurf.name}</h3>
+                <h3 className="font-sans font-extrabold text-lg text-text-main">{selectedTurf.name}</h3>
                 <p className="text-xs text-text-muted flex items-center gap-0.5 mt-0.5">
                   <MapPin className="w-3.5 h-3.5 text-brand-lime shrink-0" /> {selectedTurf.location}
                 </p>
@@ -1046,7 +1046,7 @@ export default function ExplorePage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={qrCodeUrl} alt="Booking QR Code" className="w-40 h-40 rounded-md bg-qr-bg p-2" />
                 ) : (
-                  <div className="w-40 h-40 bg-elevated animate-pulse rounded" />
+                  <div className="w-40 h-40 bg-elevated  rounded" />
                 )}
                 <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-text-muted select-none">
                   Scan Ticket Receipt At Entrance
@@ -1057,13 +1057,13 @@ export default function ExplorePage() {
             <div className="mt-8 flex flex-col sm:flex-row gap-4 w-full justify-center">
               <button
                 onClick={handleDownloadTicket}
-                className="bg-surface hover:bg-elevated border border-border-default text-text-main font-poppins font-semibold py-3.5 px-8 rounded-pill flex items-center justify-center gap-2 transition-all hover:scale-102"
+                className="bg-surface hover:bg-elevated border border-border-default text-text-main font-sans font-semibold py-3.5 px-8 rounded-md flex items-center justify-center gap-2 transition-all "
               >
                 <Download className="w-4 h-4" /> Download Ticket
               </button>
               <button
                 onClick={() => setFlowStep("listing")}
-                className="bg-brand-lime hover:bg-brand-lime-hover text-black font-poppins font-semibold py-3.5 px-8 rounded-pill flex items-center justify-center gap-1.5 transition-all hover:scale-102"
+                className="bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-semibold py-3.5 px-8 rounded-md flex items-center justify-center gap-1.5 transition-all "
               >
                 Explore More Turfs
                 <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -1082,7 +1082,7 @@ export default function ExplorePage() {
 
       {flowStep === "listing" && (
         <div className="max-w-3xl mx-auto px-6 md:px-8 pb-16">
-          <h2 className="font-poppins font-bold text-2xl text-text-main mb-8 text-center">
+          <h2 className="font-sans font-bold text-2xl text-text-main mb-8 text-center">
             Frequently Asked Questions About Turf Booking
           </h2>
           <div className="flex flex-col gap-4">
@@ -1091,7 +1091,7 @@ export default function ExplorePage() {
                 key={idx}
                 className="bg-surface border border-border-default rounded-md p-5 group"
               >
-                <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
+                <summary className="font-sans font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                   {item.question}
                   <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />
                 </summary>

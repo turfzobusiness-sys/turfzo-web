@@ -5,19 +5,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-lime/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-bg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-strong focus-visible:border-border-strong disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-[#0f1f0f] border border-brand-lime/25 text-white hover:border-brand-lime/40 transition-colors",
+          "bg-brand-btn-bg border border-brand-lime/30 text-white hover:border-brand-lime/60 hover:bg-brand-btn-bg-hover shadow-sm transition-all",
         destructive:
           "bg-error text-white hover:bg-error/90",
         outline:
-          "border border-border-default bg-surface text-text-main hover:border-border-strong hover:bg-elevated",
+          "border border-border-default bg-transparent text-text-main hover:border-border-strong hover:bg-surface transition-all",
         secondary:
-          "bg-elevated text-text-main hover:bg-elevated/80",
-        ghost: "text-text-muted hover:bg-surface hover:text-text-main",
+          "bg-surface border border-border-default text-text-main hover:bg-elevated hover:border-border-strong transition-all",
+        ghost: "text-text-muted hover:text-text-main",
         link: "text-brand-lime underline-offset-4 hover:underline",
       },
       size: {

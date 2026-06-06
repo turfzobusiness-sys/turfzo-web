@@ -52,7 +52,7 @@ export function OnboardingWizard() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[350px] gap-3">
         <Loader2 className="h-8 w-8 animate-spin text-brand-lime" />
-        <span className="font-poppins text-sm text-text-muted">Loading your partner application...</span>
+        <span className="font-sans text-sm text-text-muted">Loading your partner application...</span>
       </div>
     );
   }
@@ -154,7 +154,7 @@ export function OnboardingWizard() {
           <CheckCircle2 className="h-10 w-10 text-brand-lime" />
         </div>
         <div className="space-y-2">
-          <h2 className="font-poppins text-2xl font-bold text-white tracking-wide">Application Submitted!</h2>
+          <h2 className="font-sans text-2xl font-bold text-white tracking-wide">Application Submitted!</h2>
           <p className="font-sans text-sm text-text-muted leading-relaxed">
             Thank you for registering with Turfzo! Your venue details and business credentials have been successfully logged. Our onboarding success team is verifying your registration.
           </p>
@@ -173,7 +173,7 @@ export function OnboardingWizard() {
         <div className="pt-2">
           <button
             onClick={() => window.location.href = "/owners/dashboard"}
-            className="inline-flex items-center justify-center rounded-md bg-brand-lime border border-brand-lime text-[#0c1b0c] hover:bg-[#b0f782] px-6 py-2.5 font-poppins font-bold text-sm tracking-wide transition-all shadow-md shadow-brand-lime/10 cursor-pointer"
+            className="inline-flex items-center justify-center rounded-md bg-brand-btn-bg border border-brand-lime/30 text-white hover:bg-brand-btn-bg-hover hover:border-brand-lime/60 shadow-sm px-6 py-2.5 font-sans font-bold text-sm tracking-wide transition-all shadow-md shadow-brand-lime/10 cursor-pointer"
           >
             Go to Partner Dashboard
           </button>

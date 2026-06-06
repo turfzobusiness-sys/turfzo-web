@@ -48,11 +48,11 @@ export default function ForgotPasswordPage() {
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2 mb-6">
               <Image src="/turfzo_mascot.svg" alt="Turfzo" width={40} height={40} />
-              <span className="font-poppins font-bold text-xl text-text-main">
+              <span className="font-sans font-bold text-xl text-text-main">
                 turf<span className="text-brand-lime">zo</span>
               </span>
             </Link>
-            <h1 className="font-poppins text-2xl font-extrabold text-text-main">
+            <h1 className="font-sans text-2xl font-extrabold text-text-main">
               Reset Your Password
             </h1>
             <p className="text-text-muted text-sm font-sans mt-1">
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
-                className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated disabled:text-text-muted/40 text-black font-poppins font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated disabled:text-text-muted/40 text-black font-sans font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Reset Link"}
               </button>

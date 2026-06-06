@@ -73,7 +73,7 @@ export default function Footer() {
                 height={28}
                 className="w-7 h-7"
               />
-              <span className="font-poppins font-bold text-xl text-text-main tracking-tight">
+              <span className="font-sans font-semibold text-xl text-text-main tracking-tight">
                 turf<span className="text-brand-lime">zo</span>
               </span>
             </a>
@@ -83,20 +83,20 @@ export default function Footer() {
             
             {/* Newsletter Subscription input */}
             <div className="flex flex-col gap-2.5">
-              <span className="text-xs font-poppins font-bold text-text-main tracking-wider uppercase">
+              <span className="text-sm font-sans font-medium text-text-main">
                 Stay updated
               </span>
               <div className="relative flex items-center">
                 <input 
                   type="email" 
                   placeholder="Enter your email" 
-                  className="w-full max-w-sm bg-surface border border-border-subtle focus:border-brand-lime/30 rounded-pill py-3 pl-5 pr-12 text-sm text-text-main placeholder-text-muted/50 focus:outline-none transition-colors duration-300"
+                  className="w-full max-w-sm bg-bg border border-border-default focus:border-border-strong focus:ring-1 focus:ring-border-strong rounded-md py-2.5 pl-3 pr-10 text-sm text-text-main placeholder-text-muted focus:outline-none transition-colors"
                 />
                 <button 
-                  className="absolute right-1.5 p-2 bg-[#0f1f0f] border border-brand-lime/25 text-white hover:border-brand-lime/40 rounded-full transition-colors duration-300 focus:outline-none active:scale-95"
+                  className="absolute right-1 p-1.5 text-text-muted hover:text-text-main transition-colors focus:outline-none"
                   aria-label="Subscribe"
                 >
-                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                  <ArrowRight className="w-4 h-4 stroke-[1.5]" />
                 </button>
               </div>
             </div>
@@ -106,13 +106,13 @@ export default function Footer() {
           <div className="lg:col-span-5 grid grid-cols-3 gap-6 sm:gap-8">
             {/* Col 1 */}
             <div className="flex flex-col gap-4">
-              <span className="text-xs font-poppins font-bold text-text-main tracking-wider uppercase">
+              <span className="text-sm font-sans font-medium text-text-main">
                 Company
               </span>
               <ul className="flex flex-col gap-2.5">
                 {companyLinks.map((link) => (
                   <li key={link.name}>
-                    <a href={link.href} className="text-sm font-sans text-text-muted hover:text-brand-lime transition-colors">
+                    <a href={link.href} className="text-sm font-sans text-text-muted hover:text-text-main transition-colors">
                       {link.name}
                     </a>
                   </li>
@@ -122,13 +122,13 @@ export default function Footer() {
 
             {/* Col 2 */}
             <div className="flex flex-col gap-4">
-              <span className="text-xs font-poppins font-bold text-text-main tracking-wider uppercase">
+              <span className="text-sm font-sans font-medium text-text-main">
                 Explore
               </span>
               <ul className="flex flex-col gap-2.5">
                 {exploreLinks.map((link) => (
                   <li key={link.name}>
-                    <a href={link.href} className="text-sm font-sans text-text-muted hover:text-brand-lime transition-colors">
+                    <a href={link.href} className="text-sm font-sans text-text-muted hover:text-text-main transition-colors">
                       {link.name}
                     </a>
                   </li>
@@ -138,13 +138,13 @@ export default function Footer() {
 
             {/* Col 3 */}
             <div className="flex flex-col gap-4">
-              <span className="text-xs font-poppins font-bold text-text-main tracking-wider uppercase">
+              <span className="text-sm font-sans font-medium text-text-main">
                 Support
               </span>
               <ul className="flex flex-col gap-2.5">
                 {supportLinks.map((link) => (
                   <li key={link.name}>
-                    <a href={link.href} className="text-sm font-sans text-text-muted hover:text-brand-lime transition-colors">
+                    <a href={link.href} className="text-sm font-sans text-text-muted hover:text-text-main transition-colors">
                       {link.name}
                     </a>
                   </li>
@@ -155,25 +155,25 @@ export default function Footer() {
 
           {/* Contact Details Column (Lg: 3 columns) */}
           <div className="lg:col-span-3 flex flex-col gap-5">
-            <span className="text-xs font-poppins font-bold text-text-main tracking-wider uppercase">
+            <span className="text-sm font-sans font-medium text-text-main">
               Get in Touch
             </span>
             <ul className="flex flex-col gap-3.5">
               <li className="flex items-start gap-3 text-sm text-text-muted">
-                <MapPin className="w-5 h-5 text-brand-lime shrink-0 stroke-[1.8]" />
+                <MapPin className="w-4 h-4 text-text-muted shrink-0 stroke-[1.5] mt-0.5" />
                 <span className="font-sans leading-relaxed">
                   100 Feet Rd, HSR Layout, Bengaluru, Karnataka 560102
                 </span>
               </li>
               <li className="flex items-center gap-3 text-sm text-text-muted">
-                <Phone className="w-4 h-4 text-brand-lime shrink-0 stroke-[1.8]" />
+                <Phone className="w-4 h-4 text-text-muted shrink-0 stroke-[1.5]" />
                 <span className="font-sans">
                   +91 (80) 4567-8900
                 </span>
               </li>
               <li className="flex items-center gap-3 text-sm text-text-muted">
-                <Mail className="w-4 h-4 text-brand-lime shrink-0 stroke-[1.8]" />
-                <span className="font-sans hover:text-brand-lime transition-colors cursor-pointer">
+                <Mail className="w-4 h-4 text-text-muted shrink-0 stroke-[1.5]" />
+                <span className="font-sans hover:text-text-main transition-colors cursor-pointer">
                   support@turfzo.com
                 </span>
               </li>
@@ -187,7 +187,7 @@ export default function Footer() {
                   <a
                     key={social.label}
                     href={social.href}
-                    className="w-9 h-9 rounded-full bg-surface border border-border-default hover:border-border-strong flex items-center justify-center text-text-muted hover:text-text-main transition-all duration-300"
+                    className="p-1 flex items-center justify-center text-text-muted hover:text-text-main transition-all duration-300"
                     aria-label={social.label}
                   >
                     <IconComp className="w-4 h-4" />
@@ -205,8 +205,8 @@ export default function Footer() {
             © {currentYear} Turfzo Technologies Pvt Ltd. All rights reserved.
           </span>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-brand-lime transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-brand-lime transition-colors">Sitemap</a>
+            <a href="#" className="hover:text-text-main transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-text-main transition-colors">Sitemap</a>
           </div>
         </div>
 

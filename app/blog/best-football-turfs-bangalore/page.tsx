@@ -192,14 +192,14 @@ export default function BestFootballTurfsBangalore() {
             className="mb-12"
           >
             <div className="flex items-center gap-3 mb-4">
-              <span className="bg-brand-lime/10 text-brand-lime font-poppins font-bold text-[10px] px-2.5 py-1 rounded-pill">
+              <span className="bg-brand-lime/10 text-brand-lime font-sans font-bold text-[10px] px-2.5 py-1 rounded-md">
                 City Guide
               </span>
               <span className="text-[10px] text-text-muted font-sans">
                 May 2026 · 8 min read
               </span>
             </div>
-            <h1 className="font-poppins text-3xl sm:text-4xl font-extrabold text-text-main leading-tight">
+            <h1 className="font-sans text-3xl sm:text-4xl font-extrabold text-text-main leading-tight">
               Best Football Turfs in Bangalore [2026 Guide]
             </h1>
             <p className="mt-4 text-text-muted text-sm font-sans leading-relaxed">
@@ -223,7 +223,7 @@ export default function BestFootballTurfsBangalore() {
 
           {/* Direct Answer Block (for AI citation) */}
           <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
-            <h2 className="font-poppins font-bold text-base text-brand-lime mb-2">
+            <h2 className="font-sans font-bold text-base text-brand-lime mb-2">
               Quick Answer
             </h2>
             <p className="text-sm text-text-main font-sans leading-relaxed">
@@ -233,14 +233,14 @@ export default function BestFootballTurfsBangalore() {
 
           {/* Article Content */}
           <article className="prose prose-invert max-w-none">
-            <h2 className="font-poppins font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
               Why is Bangalore the Best City for Football Turfs?
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-6">
               Bangalore has the highest concentration of football turfs in India, with over 50 verified venues across the city. The city&apos;s tech-savvy population, pleasant weather, and strong football culture have driven demand for quality playing surfaces. Most turfs offer floodlights for evening games, making it easy to play after work or on weekends.
             </p>
 
-            <h2 className="font-poppins font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
               Top Football Turfs in Bangalore by Area
             </h2>
 
@@ -252,11 +252,11 @@ export default function BestFootballTurfsBangalore() {
                   className="bg-surface border border-border-subtle rounded-md p-4 hover:border-brand-lime/10 transition-all"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-poppins font-bold text-sm text-text-main">
+                    <h3 className="font-sans font-bold text-sm text-text-main">
                       {turf.name}
                     </h3>
                     {turf.premium && (
-                      <span className="text-[9px] bg-brand-lime/10 text-brand-lime font-bold px-2 py-0.5 rounded-pill">
+                      <span className="text-[9px] bg-brand-lime/10 text-brand-lime font-bold px-2 py-0.5 rounded-md">
                         Premium
                       </span>
                     )}
@@ -289,7 +289,7 @@ export default function BestFootballTurfsBangalore() {
               ))}
             </div>
 
-            <h2 className="font-poppins font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
               How Much Does Football Turf Cost in Bangalore?
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-4">
@@ -299,13 +299,13 @@ export default function BestFootballTurfsBangalore() {
               <table className="w-full text-xs font-sans">
                 <thead>
                   <tr className="border-b border-border-subtle">
-                    <th className="text-left py-2 text-text-main font-poppins font-bold">
+                    <th className="text-left py-2 text-text-main font-sans font-bold">
                       Area
                     </th>
-                    <th className="text-left py-2 text-text-main font-poppins font-bold">
+                    <th className="text-left py-2 text-text-main font-sans font-bold">
                       Price Range
                     </th>
-                    <th className="text-left py-2 text-text-main font-poppins font-bold">
+                    <th className="text-left py-2 text-text-main font-sans font-bold">
                       Best For
                     </th>
                   </tr>
@@ -340,7 +340,7 @@ export default function BestFootballTurfsBangalore() {
               </table>
             </div>
 
-            <h2 className="font-poppins font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
               What Amenities Should You Look For?
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-4">
@@ -365,14 +365,14 @@ export default function BestFootballTurfsBangalore() {
               ))}
             </ul>
 
-            <h2 className="font-poppins font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
               Best Time to Book a Football Turf in Bangalore
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-6">
               Early morning slots (6-8 AM) and late evening slots (8-10 PM) are the cheapest and most available. Peak hours (5-8 PM) are the most expensive and book up fast, especially on weekends. If you want to save money, book during off-peak hours on weekdays. Turfzo shows real-time availability so you can find open slots instantly.
             </p>
 
-            <h2 className="font-poppins font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
               How to Book a Football Turf in Bangalore
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-6">
@@ -381,7 +381,7 @@ export default function BestFootballTurfsBangalore() {
 
             {/* CTA */}
             <div className="bg-brand-lime/10 border border-brand-lime/20 rounded-md p-6 my-8 text-center">
-              <h3 className="font-poppins font-bold text-lg text-text-main mb-2">
+              <h3 className="font-sans font-bold text-lg text-text-main mb-2">
                 Ready to Book?
               </h3>
               <p className="text-xs text-text-muted font-sans mb-4">
@@ -389,7 +389,7 @@ export default function BestFootballTurfsBangalore() {
               </p>
               <Link
                 href="/explore"
-                className="inline-flex items-center gap-2 bg-brand-lime text-black font-poppins font-bold text-sm py-3 px-8 rounded-pill hover:bg-brand-lime-hover transition-all"
+                className="inline-flex items-center gap-2 bg-brand-lime text-black font-sans font-bold text-sm py-3 px-8 rounded-md hover:bg-brand-lime-hover transition-all"
               >
                 Explore Turfs <ArrowRight className="w-4 h-4" />
               </Link>
@@ -398,7 +398,7 @@ export default function BestFootballTurfsBangalore() {
 
           {/* FAQ Section */}
           <div className="mt-16 mb-12">
-            <h2 className="font-poppins font-bold text-2xl text-text-main mb-8">
+            <h2 className="font-sans font-bold text-2xl text-text-main mb-8">
               Frequently Asked Questions
             </h2>
             <div className="flex flex-col gap-4">
@@ -407,7 +407,7 @@ export default function BestFootballTurfsBangalore() {
                   key={idx}
                   className="bg-surface border border-border-subtle rounded-md p-5 group"
                 >
-                  <summary className="font-poppins font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
+                  <summary className="font-sans font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}
                     <ChevronDown className="w-4 h-4 text-text-muted group-open:rotate-180 transition-transform" />
                   </summary>

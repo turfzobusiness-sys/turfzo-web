@@ -104,7 +104,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-bg text-text-main p-6">
         <Shield className="w-16 h-16 text-text-muted mb-4" />
-        <h1 className="font-poppins text-2xl font-extrabold mb-2">Access denied</h1>
+        <h1 className="font-sans text-2xl font-extrabold mb-2">Access denied</h1>
         <p className="text-text-muted text-sm mb-6">
           You need admin role to view this page.
         </p>
@@ -136,7 +136,7 @@ export default function AdminPage() {
               <Shield className="w-6 h-6 text-brand-lime" />
             </div>
             <div>
-              <h1 className="font-poppins text-3xl font-extrabold">Admin Dashboard</h1>
+              <h1 className="font-sans text-3xl font-extrabold">Admin Dashboard</h1>
               <p className="text-text-muted text-sm">
                 Signed in as {convexUser?.email}
               </p>
@@ -232,7 +232,7 @@ function MessagesList({ messages }: { messages: ContactMessage[] }) {
         >
           <div className="flex items-start justify-between gap-4 mb-2">
             <div>
-              <h3 className="font-poppins font-semibold text-sm text-text-main">
+              <h3 className="font-sans font-semibold text-sm text-text-main">
                 {msg.subject || "General Inquiry"}
               </h3>
               <p className="text-xs text-text-muted mt-1">
@@ -241,7 +241,7 @@ function MessagesList({ messages }: { messages: ContactMessage[] }) {
             </div>
             <div className="flex items-center gap-2 text-xs">
               <span
-                className={`px-2 py-1 rounded-pill font-semibold ${
+                className={`px-2 py-1 rounded-md font-semibold ${
                   msg.status === "new"
                     ? "bg-brand-lime/10 text-brand-lime"
                     : "bg-white/5 text-text-muted"

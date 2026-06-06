@@ -58,7 +58,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
 
       {/* Email */}
       <div className="relative">
-        <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted/75 transition-colors" />
+        <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted transition-colors" />
         <input
           id="auth-signin-email"
           type="email"
@@ -67,13 +67,13 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
           placeholder="Email address"
           required
           autoComplete="email"
-          className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-10 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/50 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/15 transition-all duration-200"
+          className="w-full rounded-md border border-border-default bg-bg py-2.5 pl-10 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted focus:border-border-strong focus:outline-none focus:ring-1 focus:ring-border-strong transition-all duration-200"
         />
       </div>
 
       {/* Password */}
       <div className="relative">
-        <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted/75 transition-colors" />
+        <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted transition-colors" />
         <input
           id="auth-signin-password"
           type={showPassword ? "text" : "password"}
@@ -82,13 +82,13 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
           placeholder="Password"
           required
           autoComplete="current-password"
-          className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-10 pr-10 font-sans text-sm text-text-main placeholder:text-text-muted/50 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/15 transition-all duration-200"
+          className="w-full rounded-md border border-border-default bg-bg py-2.5 pl-10 pr-10 font-sans text-sm text-text-main placeholder:text-text-muted focus:border-border-strong focus:outline-none focus:ring-1 focus:ring-border-strong transition-all duration-200"
         />
         <button
           type="button"
           onClick={() => setShowPassword((v) => !v)}
           aria-label={showPassword ? "Hide password" : "Show password"}
-          className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-[6px] text-text-muted hover:bg-surface hover:text-text-main transition-colors"
+          className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-text-muted hover:bg-elevated hover:text-text-main transition-colors"
         >
           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
@@ -101,7 +101,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
             type="checkbox"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
-            className="h-3.5 w-3.5 rounded border-border-strong bg-elevated accent-brand-lime"
+            className="h-3.5 w-3.5 rounded border-border-default bg-bg accent-brand-lime"
           />
           <span>Remember me</span>
         </label>
@@ -111,7 +111,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
             closeAuthModal();
             window.location.href = "/forgot-password";
           }}
-          className="font-sans text-xs font-medium text-brand-lime hover:text-brand-lime-hover transition-colors"
+          className="font-sans text-xs font-medium text-text-muted hover:text-text-main transition-colors"
         >
           Forgot password?
         </button>
@@ -121,11 +121,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
       <button
         type="submit"
         disabled={loading}
-        className={cn(
-          "w-full inline-flex items-center justify-center gap-2 rounded-md bg-[#0f1f0f] border border-brand-lime/25 px-4 py-2.5 font-poppins font-bold text-sm text-white transition-all duration-300",
-          "hover:border-brand-lime/40 active:scale-[0.99]",
-          "disabled:cursor-not-allowed disabled:bg-elevated disabled:text-text-muted/50"
-        )}
+        className="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-bg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-strong focus-visible:border-border-strong disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-text-main text-bg hover:bg-text-main/90"
       >
         {loading ? (
           <>
@@ -143,7 +139,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
           <div className="w-full border-t border-border-default" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-bg px-2 font-sans text-[10px] uppercase tracking-wider text-text-muted">
+          <span className="bg-bg px-2 font-sans text-[10px] text-text-muted">
             or
           </span>
         </div>

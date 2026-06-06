@@ -6,41 +6,33 @@ import { ArrowUpRight } from "lucide-react";
 export default function CTABanner() {
   return (
     <section id="tournaments" className="relative py-20 px-6 md:px-8 bg-bg overflow-hidden">
-      {/* Outer container to hold the background image and card */}
-      <div className="max-w-7xl mx-auto relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow min-h-[420px] flex items-center">
-        
-        {/* Background Image with Dark Overlays */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center z-0" 
-          style={{ backgroundImage: `url('/stadium_turf_bg.png')` }}
-        />
-        <div className="absolute inset-0 bg-overlay z-0" />
-        <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-transparent z-0" />
+      {/* Outer container to hold the content */}
+      <div className="max-w-7xl mx-auto relative rounded-xl overflow-hidden border border-border-default bg-surface min-h-[380px] flex items-center justify-center">
         
         {/* Content Centered Container */}
-        <div className="relative z-10 w-full max-w-3xl mx-auto text-center flex flex-col items-center justify-center p-8 sm:p-12 md:p-16">
-          <span className="text-xs sm:text-sm font-sans font-bold tracking-widest text-brand-lime uppercase mb-4">
-            READY TO PLAY?
+        <div className="relative z-10 w-full max-w-3xl mx-auto text-center flex flex-col items-center justify-center p-8 sm:p-12">
+          <span className="text-xs sm:text-sm font-sans font-medium tracking-wide uppercase mb-4 text-brand-lime">
+            Ready to play?
           </span>
-          <h2 className="font-poppins text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main leading-tight tracking-tight">
-            Your next game is <span className="text-brand-lime">one tap away</span>
+          <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
+            Your next game is one tap away
           </h2>
           <p className="mt-4 text-sm sm:text-base text-text-muted max-w-md font-sans leading-relaxed">
             Pick a turf, pick a time. We&apos;ll handle the rest.
           </p>
 
           {/* CTAs */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-              <a 
-                href="#explore"
-                className="bg-[#0f1f0f] border border-brand-lime/25 text-white font-poppins font-semibold px-8 py-3.5 rounded-[12px] hover:border-brand-lime/40 transition-all duration-300 flex items-center justify-center gap-1.5"
-              >
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
+            <a 
+              href="#explore"
+              className="bg-brand-btn-bg border border-brand-lime/30 text-white hover:bg-brand-btn-bg-hover hover:border-brand-lime/60 font-sans font-medium px-6 py-3 rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 shadow-sm"
+            >
               Book Now
-              <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
+              <ArrowUpRight className="w-4 h-4 stroke-[1.5]" />
             </a>
             <a 
               href="#explore"
-              className="bg-surface border border-border-default text-text-main hover:bg-elevated font-poppins font-semibold px-8 py-3.5 rounded-[12px] transition-all duration-300 flex items-center justify-center"
+              className="bg-bg border border-border-default text-text-main hover:bg-elevated hover:border-border-strong font-sans font-medium px-6 py-3 rounded-md transition-all duration-200 flex items-center justify-center"
             >
               Explore Turfs
             </a>

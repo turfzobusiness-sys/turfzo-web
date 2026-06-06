@@ -69,7 +69,7 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
-        <h2 className="font-poppins text-xl font-bold text-white tracking-wide">Review & Submit</h2>
+        <h2 className="font-sans text-xl font-bold text-white tracking-wide">Review & Submit</h2>
         <p className="font-sans text-sm text-text-muted/70">
           Double check your details before submitting your application for admin review.
         </p>
@@ -86,7 +86,7 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
         {/* Section 1: Business Profile */}
         <div className="rounded-[12px] border border-border-default bg-surface/40 p-4 space-y-3">
           <div className="flex items-center justify-between border-b border-border-default pb-2">
-            <h3 className="font-poppins text-sm font-bold text-white tracking-wide">1. Business Profile</h3>
+            <h3 className="font-sans text-sm font-bold text-white tracking-wide">1. Business Profile</h3>
             <button
               type="button"
               onClick={() => onEditStep(1)}
@@ -125,7 +125,7 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
         {/* Section 2: Venue Details */}
         <div className="rounded-[12px] border border-border-default bg-surface/40 p-4 space-y-3">
           <div className="flex items-center justify-between border-b border-border-default pb-2">
-            <h3 className="font-poppins text-sm font-bold text-white tracking-wide">2. First Venue Setup</h3>
+            <h3 className="font-sans text-sm font-bold text-white tracking-wide">2. First Venue Setup</h3>
             <button
               type="button"
               onClick={() => onEditStep(2)}
@@ -179,7 +179,7 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
         {/* Section 3: Payout Details */}
         <div className="rounded-[12px] border border-border-default bg-surface/40 p-4 space-y-3">
           <div className="flex items-center justify-between border-b border-border-default pb-2">
-            <h3 className="font-poppins text-sm font-bold text-white tracking-wide">3. Payout Settings</h3>
+            <h3 className="font-sans text-sm font-bold text-white tracking-wide">3. Payout Settings</h3>
             <button
               type="button"
               onClick={() => onEditStep(3)}
@@ -238,7 +238,7 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
           type="button"
           onClick={onBack}
           variant="ghost"
-          className="inline-flex items-center gap-2 py-2.5 px-4 font-poppins text-sm text-text-muted hover:text-text-main transition-all"
+          className="inline-flex items-center gap-2 py-2.5 px-4 font-sans text-sm text-text-muted hover:text-text-main transition-all"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -247,16 +247,16 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
         <Button
           type="submit"
           disabled={loading || !agreement}
-          className="inline-flex items-center gap-2 bg-brand-lime border border-brand-lime text-[#0c1b0c] hover:bg-[#b0f782] py-3 px-8 font-poppins font-bold text-sm tracking-wide rounded-[8px] transition-all duration-300 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-brand-lime/10 hover:shadow-brand-lime/20"
+          className="inline-flex items-center gap-2 bg-brand-btn-bg border border-brand-lime/30 text-white hover:bg-brand-btn-bg-hover hover:border-brand-lime/60 shadow-sm py-3 px-8 font-sans font-bold text-sm tracking-wide rounded-[8px] transition-all duration-300 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-brand-lime/10 hover:shadow-brand-lime/20"
         >
           {loading ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin text-[#0c1b0c]" />
+              <Loader2 className="h-4 w-4 animate-spin text-white" />
               Submitting Application...
             </>
           ) : (
             <>
-              <Sparkles className="h-4 w-4 fill-current text-[#0c1b0c]" />
+              <Sparkles className="h-4 w-4 fill-current text-brand-lime" />
               Submit Application
             </>
           )}
