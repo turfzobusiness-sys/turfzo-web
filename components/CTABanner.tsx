@@ -14,7 +14,7 @@ export default function CTABanner() {
           <span className="text-xs sm:text-sm font-sans font-medium tracking-wide uppercase mb-4 text-brand-lime">
             Ready to play?
           </span>
-          <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
+          <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main leading-tight tracking-tight">
             Your next game is one tap away
           </h2>
           <p className="mt-4 text-sm sm:text-base text-text-muted max-w-md font-sans leading-relaxed">
