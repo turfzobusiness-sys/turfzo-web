@@ -90,7 +90,7 @@ export default function PrivacyPage() {
 
           <Section title="8. Data Retention and Deletion Rights">
             <p>
-              We retain your account details as long as your account remains active. Transactional history and invoice logs are retained for a period of 7 years in compliance with Indian tax laws.
+              We retain your account details as long as your account remains active. Transactional history and invoice logs are retained for a period of 7 years in compliance with Indian tax laws. For details on how billing data, reversals, and cancellations are settled, please see our <Link href="/refund-policy" className="text-brand-lime underline font-semibold">Refund & Cancellation Policy</Link>.
             </p>
             <p>
               You have the right to request complete erasure of your account. You can trigger deletion directly from your <Link href="/profile" className="text-brand-lime underline">profile page</Link> or by sending an email to <a href="mailto:privacy@turfzo.com" className="text-brand-lime hover:underline">privacy@turfzo.com</a>. Upon verification, we will permanently purge all non-statutory data within 30 days.

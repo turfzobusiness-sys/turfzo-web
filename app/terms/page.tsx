@@ -80,7 +80,7 @@ export default function TermsPage() {
               <li><strong>Force Majeure & Inclement Weather:</strong> Partners are responsible for declaring playability due to rain or power outages. If a Partner cancels a slot due to unplayability or technical issues, the User will receive a full refund.</li>
             </ul>
             <p>
-              Approved refunds are initiated automatically and processed within 5 to 7 business days to the original payment source.
+              Approved refunds are initiated automatically and processed within 5 to 7 business days to the original payment source. For detailed conditions and payment processor rules, refer to our full <Link href="/refund-policy" className="text-brand-lime underline font-semibold">Refund & Cancellation Policy</Link>.
             </p>
           </Section>
 

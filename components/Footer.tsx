@@ -37,7 +37,7 @@ export default function Footer() {
     { name: "About Us", href: "#" },
     { name: "Careers", href: "#" },
     { name: "Press & Media", href: "#" },
-    { name: "Privacy Policy", href: "#" },
+    { name: "Privacy Policy", href: "/privacy" },
   ];
 
   const exploreLinks = [
@@ -205,8 +205,8 @@ export default function Footer() {
             © {currentYear} Turfzo Technologies Pvt Ltd. All rights reserved.
           </span>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-text-main transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-text-main transition-colors">Sitemap</a>
+            <a href="/terms" className="hover:text-text-main transition-colors">Terms of Service</a>
+            <a href="/sitemap.xml" className="hover:text-text-main transition-colors">Sitemap</a>
           </div>
         </div>
 
