@@ -248,7 +248,7 @@ export default function OwnersPage() {
                     <div className="relative">
                       <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-success border-2 border-bg" />
                       <div className="font-semibold text-text-main">Escrow Cleared</div>
-                      <div className="text-[10px] text-text-muted">Razorpay split settled · 5:05 PM</div>
+                      <div className="text-[10px] text-text-muted">Cashfree split settled · 5:05 PM</div>
                     </div>
                     <div className="relative">
                       <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-info border-2 border-bg" />

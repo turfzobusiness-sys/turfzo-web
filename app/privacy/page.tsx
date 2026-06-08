@@ -46,7 +46,7 @@ export default function PrivacyPage() {
               <li><strong>Account Registration Data:</strong> Full name, email address, mobile phone number, and avatar image (obtained via Google OAuth login if selected).</li>
               <li><strong>Booking History:</strong> Venue selections, play dates, slot timings, sport category preferences, tournament entry registrations, and transaction amounts.</li>
               <li><strong>Device Telemetry:</strong> IP address, device type, operating system, browser configuration, page navigation paths, and time spent on pages.</li>
-              <li><strong>Payment Processing:</strong> All payment details are collected directly by our RBI-compliant payment aggregator, Razorpay. Turfzo <strong>never</strong> views or stores your raw card numbers, CVVs, net banking credentials, or UPI PINs.</li>
+              <li><strong>Payment Processing:</strong> All payment details are collected directly by our RBI-compliant payment aggregator, Cashfree. Turfzo <strong>never</strong> views or stores your raw card numbers, CVVs, net banking credentials, or UPI PINs.</li>
             </ul>
           </Section>
 
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
             <p>We do not sell, rent, or lease your personal data. We share information only with trusted third parties for service delivery:</p>
             <ul>
               <li><strong>Partner Venues:</strong> When you book a slot, we share your name and mobile number with the respective Partner (turf owner) to verify your entry at the ground.</li>
-              <li><strong>Payment aggregators:</strong> Razorpay (to process checkout payments securely).</li>
+              <li><strong>Payment aggregators:</strong> Cashfree (to process checkout payments securely).</li>
               <li><strong>Notification Services:</strong> Email and SMS gateways to dispatch automated confirmation logs.</li>
               <li><strong>Legal Obligations:</strong> We may disclose data if required by law enforcement or competent judicial bodies under a valid government warrant.</li>
             </ul>

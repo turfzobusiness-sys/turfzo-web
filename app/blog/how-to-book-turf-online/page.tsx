@@ -36,7 +36,7 @@ const faqItems = [
   {
     question: "What payment methods are accepted?",
     answer:
-      "Turfzo accepts UPI (GPay, PhonePe, Paytm), credit cards, debit cards, and net banking. All payments are processed through Razorpay for secure transactions.",
+      "Turfzo accepts UPI (GPay, PhonePe, Paytm), credit cards, debit cards, and net banking. All payments are processed through Cashfree for secure transactions.",
   },
   {
     question: "Can I cancel my booking?",

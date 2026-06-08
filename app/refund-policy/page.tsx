@@ -97,7 +97,7 @@ export default function RefundPolicyPage() {
 
           <Section title="5. Refund Processing Timelines">
             <p>
-              Once initiated, refunds are processed securely via our payment gateway aggregator, Razorpay, back to the original source method. The timeline depends on your payment provider:
+              Once initiated, refunds are processed securely via our payment gateway aggregator, Cashfree, back to the original source method. The timeline depends on your payment provider:
             </p>
             <ul>
               <li><strong>UPI (GPay, PhonePe, Paytm, etc.):</strong> 1 to 2 business days.</li>

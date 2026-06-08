@@ -63,7 +63,7 @@ export default function TermsPage() {
             </p>
             <ul>
               <li>Prices are inclusive of applicable Goods and Services Tax (GST) as designated by the Partner.</li>
-              <li>Online payments are processed securely through our RBI-authorized third-party payment gateway, Razorpay.</li>
+              <li>Online payments are processed securely through our RBI-authorized third-party payment gateway, Cashfree.</li>
               <li>You agree to pay all charges incurred by your account, including any booking convenience fees or processing fees charged by Turfzo, which will be clearly shown at the checkout screen.</li>
               <li>A booking is officially confirmed only after Turfzo receives successful payment authorization from the payment gateway and issues a booking confirmation code.</li>
             </ul>
