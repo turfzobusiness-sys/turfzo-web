@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { MapPin, Info, ArrowLeft, ArrowRight, Loader2, IndianRupee, Layers, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface VenueDraftData {
+export interface VenueDraftData {
   name?: string;
   description?: string;
   address?: string;

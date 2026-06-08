@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Sparkles, CheckCircle2 } from "lucide-react";
 import { StepIndicator } from "./step-indicator";
-import { StepBusinessProfile } from "./step-business-profile";
-import { StepVenueSetup } from "./step-venue-setup";
-import { StepPayoutDetails } from "./step-payout-details";
+import { StepBusinessProfile, type BusinessProfileData } from "./step-business-profile";
+import { StepVenueSetup, type VenueDraftData } from "./step-venue-setup";
+import { StepPayoutDetails, type PayoutData } from "./step-payout-details";
 import { StepReviewSubmit } from "./step-review-submit";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
@@ -66,7 +66,7 @@ export function OnboardingWizard() {
   }
 
   // Handle Step 1 Save
-  const handleSaveStep1 = async (businessData: Record<string, unknown>) => {
+  const handleSaveStep1 = async (businessData: Required<Omit<BusinessProfileData, "zip_code" | "gst_number" | "pan_number">> & BusinessProfileData) => {
     setActionLoading(true);
     try {
       await convexClient.mutation("auth:completeOnboardingStep", {
@@ -87,7 +87,7 @@ export function OnboardingWizard() {
   };
 
   // Handle Step 2 Save
-  const handleSaveStep2 = async (venueData: Record<string, unknown>) => {
+  const handleSaveStep2 = async (venueData: Required<Pick<VenueDraftData, "name" | "address" | "city" | "price_per_hour">> & VenueDraftData) => {
     setActionLoading(true);
     try {
       await convexClient.mutation("auth:completeOnboardingStep", {
@@ -108,7 +108,7 @@ export function OnboardingWizard() {
   };
 
   // Handle Step 3 Save
-  const handleSaveStep3 = async (payoutData: Record<string, unknown>) => {
+  const handleSaveStep3 = async (payoutData: Required<Omit<PayoutData, "bank_branch" | "upi_id">> & PayoutData) => {
     setActionLoading(true);
     try {
       await convexClient.mutation("auth:completeOnboardingStep", {

@@ -295,3 +295,31 @@ export function ArticleSchema({
     />
   );
 }
+
+export interface SiteNavigationItem {
+  name: string;
+  url: string;
+}
+
+export interface SiteNavigationSchemaProps {
+  items: SiteNavigationItem[];
+}
+
+export function SiteNavigationSchema({ items }: SiteNavigationSchemaProps) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": items.map((item) => ({
+      "@type": "SiteNavigationElement",
+      "@id": `${item.url}#nav`,
+      "name": item.name,
+      "url": item.url,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}

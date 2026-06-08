@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Building2, Phone, MapPin, Globe, FileText, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface BusinessProfileData {
+export interface BusinessProfileData {
   business_name?: string;
   phone_number?: string;
   address?: string;

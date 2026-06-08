@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ShieldAlert, ArrowLeft, ArrowRight, Loader2, CreditCard, Landmark, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface PayoutData {
+export interface PayoutData {
   bank_account_holder_name?: string;
   bank_account_number?: string;
   bank_ifsc_code?: string;

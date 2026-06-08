@@ -5,7 +5,7 @@ import "@/lib/env-init";
 import { AuthProvider } from "@/lib/auth-context";
 import { AuthModalProvider } from "@/lib/auth-modal-context";
 import { ThemeProvider } from "@/lib/theme-context";
-import { OrganizationSchema, WebSiteSchema } from "@/lib/schema";
+import { OrganizationSchema, WebSiteSchema, SiteNavigationSchema } from "@/lib/schema";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { AuthModal } from "@/components/ui/auth-modal";
 
@@ -124,6 +124,18 @@ export default function RootLayout({
             target: `${SITE_URL}/explore?q={search_term_string}`,
             "query-input": "required name=search_term_string",
           }}
+        />
+        <SiteNavigationSchema
+          items={[
+            { name: "Book Turfs", url: `${SITE_URL}/explore` },
+            { name: "How It Works", url: `${SITE_URL}/how-it-works` },
+            { name: "Tournaments", url: `${SITE_URL}/tournaments` },
+            { name: "List Your Turf", url: `${SITE_URL}/owners` },
+            { name: "Contact Support", url: `${SITE_URL}/contact` },
+            { name: "Terms of Service", url: `${SITE_URL}/terms` },
+            { name: "Privacy Policy", url: `${SITE_URL}/privacy` },
+            { name: "Refund Policy", url: `${SITE_URL}/refund-policy` },
+          ]}
         />
       </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-bg text-text-main selection:bg-brand-lime/30 selection:text-text-main">
