@@ -36,7 +36,7 @@ export default function Footer() {
   const companyLinks = [
     { name: "About Us", href: "#" },
     { name: "Careers", href: "#" },
-    { name: "Press & Media", href: "#" },
+    { name: "Terms of Use", href: "/terms" },
     { name: "Privacy Policy", href: "/privacy" },
   ];
 
