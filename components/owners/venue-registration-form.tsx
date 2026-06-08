@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   TbUser, 
@@ -659,12 +660,12 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
               >
                 Submit Another Venue
               </Button>
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center justify-center bg-brand-btn-bg border border-brand-lime/25 text-white hover:border-brand-lime/40 hover:bg-brand-btn-bg-hover font-sans font-semibold px-6 py-3 rounded-md transition-colors text-sm"
               >
                 Go to Homepage
-              </a>
+              </Link>
             </div>
           </motion.div>
         )}

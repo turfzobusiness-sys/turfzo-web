@@ -1,4 +1,4 @@
-import { mutation, query, action } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const syncFirebaseUser = mutation({
@@ -14,7 +14,7 @@ export const syncFirebaseUser = mutation({
       throw new Error("Not authenticated");
     }
 
-    const token = identity.token as any;
+    const token = identity.token as { email?: string; email_verified?: boolean; picture?: string };
     const firebaseUid = identity.subject;
     const email = token?.email || "";
     const emailVerified = token?.email_verified || false;
@@ -221,7 +221,7 @@ export const updateOwnerProfile = mutation({
       throw new Error("Owner profile not found");
     }
 
-    const updateData: any = { ...args };
+    const updateData: Record<string, unknown> = { ...args };
     if (args.onboarding_completed) {
       updateData.onboarding_completed_at = Date.now();
     }
