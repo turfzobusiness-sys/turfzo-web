@@ -69,7 +69,7 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
-        <h2 className="font-sans text-xl font-bold text-white tracking-wide">Review & Submit</h2>
+        <h2 className="font-sans text-xl font-bold text-text-main tracking-wide">Review & Submit</h2>
         <p className="font-sans text-sm text-text-muted/70">
           Double check your details before submitting your application for admin review.
         </p>
@@ -86,7 +86,7 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
         {/* Section 1: Business Profile */}
         <div className="rounded-[12px] border border-border-default bg-surface/40 p-4 space-y-3">
           <div className="flex items-center justify-between border-b border-border-default pb-2">
-            <h3 className="font-sans text-sm font-bold text-white tracking-wide">1. Business Profile</h3>
+            <h3 className="font-sans text-sm font-bold text-text-main tracking-wide">1. Business Profile</h3>
             <button
               type="button"
               onClick={() => onEditStep(1)}
@@ -125,7 +125,7 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
         {/* Section 2: Venue Details */}
         <div className="rounded-[12px] border border-border-default bg-surface/40 p-4 space-y-3">
           <div className="flex items-center justify-between border-b border-border-default pb-2">
-            <h3 className="font-sans text-sm font-bold text-white tracking-wide">2. First Venue Setup</h3>
+            <h3 className="font-sans text-sm font-bold text-text-main tracking-wide">2. First Venue Setup</h3>
             <button
               type="button"
               onClick={() => onEditStep(2)}
@@ -179,7 +179,7 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
         {/* Section 3: Payout Details */}
         <div className="rounded-[12px] border border-border-default bg-surface/40 p-4 space-y-3">
           <div className="flex items-center justify-between border-b border-border-default pb-2">
-            <h3 className="font-sans text-sm font-bold text-white tracking-wide">3. Payout Settings</h3>
+            <h3 className="font-sans text-sm font-bold text-text-main tracking-wide">3. Payout Settings</h3>
             <button
               type="button"
               onClick={() => onEditStep(3)}

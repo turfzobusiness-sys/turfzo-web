@@ -51,7 +51,7 @@ export default function OwnerDashboardPage() {
 
           setOwnerData(profileState);
 
-          const ownerVenues = await convexClient.query<any[]>("auth:getOwnerVenues");
+          const ownerVenues = await convexClient.query<Turf[]>("auth:getOwnerVenues");
           setVenues(ownerVenues);
         } catch (err) {
           console.error("Failed to load owner dashboard details:", err);
@@ -134,11 +134,11 @@ export default function OwnerDashboardPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-default pb-5">
           <div className="space-y-1">
-            <h1 className="font-sans text-2xl md:text-3xl font-extrabold text-white tracking-wide">
+            <h1 className="font-sans text-2xl md:text-3xl font-extrabold text-text-main tracking-wide">
               Partner Hub
             </h1>
             <p className="font-sans text-sm text-text-muted/80">
-              Welcome back, <span className="text-white font-semibold">{ownerData?.profile?.business_name || "Partner"}</span>
+              Welcome back, <span className="text-text-main font-semibold">{ownerData?.profile?.business_name || "Partner"}</span>
             </p>
           </div>
           <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold uppercase tracking-wider ${statusConfig.badgeClass}`}>
@@ -154,7 +154,7 @@ export default function OwnerDashboardPage() {
           </div>
           <div className="space-y-4 flex-1">
             <div className="space-y-1.5">
-              <h2 className="font-sans text-lg font-bold text-white tracking-wide">{statusConfig.title}</h2>
+              <h2 className="font-sans text-lg font-bold text-text-main tracking-wide">{statusConfig.title}</h2>
               <p className="font-sans text-sm text-text-muted/80 leading-relaxed">
                 {statusConfig.desc}
               </p>
@@ -172,7 +172,7 @@ export default function OwnerDashboardPage() {
                     <div className="h-1 w-full rounded-full bg-border-default overflow-hidden">
                       <div className={`h-full ${step.done ? "bg-brand-lime" : step.active ? "bg-amber-400 animate-pulse" : "bg-transparent"}`} style={{ width: step.active ? "100%" : "0%" }} />
                     </div>
-                    <span className={`text-[10px] font-sans font-semibold uppercase tracking-wider ${step.active ? "text-white" : "text-text-muted/50"}`}>
+                    <span className={`text-[10px] font-sans font-semibold uppercase tracking-wider ${step.active ? "text-text-main" : "text-text-muted/50"}`}>
                       {step.label}
                     </span>
                   </div>
@@ -205,7 +205,7 @@ export default function OwnerDashboardPage() {
           <div className="bg-surface border border-border-default rounded-[14px] p-5 space-y-4">
             <div className="flex items-center gap-2 border-b border-border-default pb-3">
               <Building className="h-5 w-5 text-brand-lime" />
-              <h3 className="font-sans text-sm font-bold text-white tracking-wide">First Venue Setup</h3>
+              <h3 className="font-sans text-sm font-bold text-text-main tracking-wide">First Venue Setup</h3>
             </div>
             
             {primaryVenue ? (
@@ -246,7 +246,7 @@ export default function OwnerDashboardPage() {
           <div className="bg-surface border border-border-default rounded-[14px] p-5 space-y-4">
             <div className="flex items-center gap-2 border-b border-border-default pb-3">
               <CreditCard className="h-5 w-5 text-brand-lime" />
-              <h3 className="font-sans text-sm font-bold text-white tracking-wide">Payout Settlement</h3>
+              <h3 className="font-sans text-sm font-bold text-text-main tracking-wide">Payout Settlement</h3>
             </div>
 
             {ownerData?.payout ? (
@@ -286,7 +286,7 @@ export default function OwnerDashboardPage() {
 
         {/* Need Help / Support Section */}
         <div className="bg-surface border border-border-default rounded-[14px] p-5 space-y-3">
-          <h3 className="font-sans text-sm font-bold text-white tracking-wide">Need Assistance?</h3>
+          <h3 className="font-sans text-sm font-bold text-text-main tracking-wide">Need Assistance?</h3>
           <p className="font-sans text-xs text-text-muted/80 leading-relaxed">
             Have questions about document uploads, fee structures, or hardware integration (IoT lighting/gate controller setups)? Reach out to our partner success desk.
           </p>

@@ -77,7 +77,7 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
-        <h2 className="font-sans text-xl font-bold text-white tracking-wide">Business Profile</h2>
+        <h2 className="font-sans text-xl font-bold text-text-main tracking-wide">Business Profile</h2>
         <p className="font-sans text-sm text-text-muted/70">
           Provide your basic business details. GST and PAN registration details are optional.
         </p>

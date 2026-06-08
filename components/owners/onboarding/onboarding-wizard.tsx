@@ -66,7 +66,7 @@ export function OnboardingWizard() {
   }
 
   // Handle Step 1 Save
-  const handleSaveStep1 = async (businessData: any) => {
+  const handleSaveStep1 = async (businessData: Record<string, unknown>) => {
     setActionLoading(true);
     try {
       await convexClient.mutation("auth:completeOnboardingStep", {
@@ -87,7 +87,7 @@ export function OnboardingWizard() {
   };
 
   // Handle Step 2 Save
-  const handleSaveStep2 = async (venueData: any) => {
+  const handleSaveStep2 = async (venueData: Record<string, unknown>) => {
     setActionLoading(true);
     try {
       await convexClient.mutation("auth:completeOnboardingStep", {
@@ -108,7 +108,7 @@ export function OnboardingWizard() {
   };
 
   // Handle Step 3 Save
-  const handleSaveStep3 = async (payoutData: any) => {
+  const handleSaveStep3 = async (payoutData: Record<string, unknown>) => {
     setActionLoading(true);
     try {
       await convexClient.mutation("auth:completeOnboardingStep", {
@@ -154,13 +154,13 @@ export function OnboardingWizard() {
           <CheckCircle2 className="h-10 w-10 text-brand-lime" />
         </div>
         <div className="space-y-2">
-          <h2 className="font-sans text-2xl font-bold text-white tracking-wide">Application Submitted!</h2>
+          <h2 className="font-sans text-2xl font-bold text-text-main tracking-wide">Application Submitted!</h2>
           <p className="font-sans text-sm text-text-muted leading-relaxed">
             Thank you for registering with Turfzo! Your venue details and business credentials have been successfully logged. Our onboarding success team is verifying your registration.
           </p>
         </div>
         <div className="bg-[#0f1f0f]/30 border border-brand-lime/10 p-4 rounded-[12px] font-sans text-xs text-text-muted/80 text-left space-y-2">
-          <p className="font-semibold text-white flex items-center gap-1">
+          <p className="font-semibold text-text-main flex items-center gap-1">
             <Sparkles className="h-3.5 w-3.5 text-brand-lime fill-current" />
             What happens next?
           </p>

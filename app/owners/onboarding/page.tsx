@@ -96,14 +96,14 @@ export default function OnboardingPage() {
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-brand-lime/10 border border-brand-lime/20 text-brand-lime text-[10px] font-semibold uppercase tracking-wider">
               Account Upgrade
             </span>
-            <h2 className="font-sans text-xl font-bold text-white tracking-wide">Become a Turfzo Partner</h2>
+            <h2 className="font-sans text-xl font-bold text-text-main tracking-wide">Become a Turfzo Partner</h2>
             <p className="font-sans text-sm text-text-muted leading-relaxed">
               Your account is currently registered as a **Player**. Would you like to upgrade your profile to a **Turf Owner** to list your venues and manage bookings?
             </p>
           </div>
 
           <div className="bg-[#0f1f0f]/20 border border-brand-lime/10 p-4 rounded-[12px] font-sans text-xs text-text-muted/80 space-y-2.5">
-            <p className="font-semibold text-white flex items-center gap-1">
+            <p className="font-semibold text-text-main flex items-center gap-1">
               <Sparkles className="h-3.5 w-3.5 text-brand-lime fill-current" />
               Upgrading will allow you to:
             </p>
@@ -154,7 +154,7 @@ export default function OnboardingPage() {
 
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="space-y-2 border-b border-border-default pb-5">
-          <h1 className="font-sans text-2xl md:text-3xl font-extrabold text-white tracking-wide">
+          <h1 className="font-sans text-2xl md:text-3xl font-extrabold text-text-main tracking-wide">
             Partner Onboarding Flow
           </h1>
           <p className="font-sans text-sm text-text-muted/80">

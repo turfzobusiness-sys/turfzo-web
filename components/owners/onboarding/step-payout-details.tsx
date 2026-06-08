@@ -79,7 +79,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
-        <h2 className="font-sans text-xl font-bold text-white tracking-wide">Payout Setup</h2>
+        <h2 className="font-sans text-xl font-bold text-text-main tracking-wide">Payout Setup</h2>
         <p className="font-sans text-sm text-text-muted/70">
           Enter the bank account details where you wish to receive bookings settlements.
         </p>

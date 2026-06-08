@@ -49,7 +49,7 @@ export default function OwnerRegisterPage() {
 
         {/* Logo/Header */}
         <div className="flex items-center gap-2 relative z-10">
-          <span className="font-sans text-lg font-black tracking-wider text-white">
+          <span className="font-sans text-lg font-black tracking-wider text-text-main">
             TURFZO <span className="text-brand-lime font-medium text-xs tracking-widest ml-1 border border-brand-lime/30 px-1.5 py-0.5 rounded-[4px] bg-brand-lime/5">PARTNER</span>
           </span>
         </div>
@@ -61,8 +61,8 @@ export default function OwnerRegisterPage() {
               <Sparkles className="h-3.5 w-3.5 fill-current" />
               Self-Serve Registration
             </span>
-            <h1 className="font-sans text-3xl lg:text-4xl font-extrabold text-white leading-tight tracking-wide">
-              Grow your venue business with India's #1 booking platform
+            <h1 className="font-sans text-3xl lg:text-4xl font-extrabold text-text-main leading-tight tracking-wide">
+              Grow your venue business with India&apos;s #1 booking platform
             </h1>
             <p className="font-sans text-sm text-text-muted/80 leading-relaxed">
               Join hundreds of arena owners who use Turfzo to automate bookings, schedule slots, and accept instant digital payouts.
@@ -92,7 +92,7 @@ export default function OwnerRegisterPage() {
                   <prop.icon className="h-5 w-5" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-sans text-sm font-semibold text-white tracking-wide">{prop.title}</h4>
+                  <h4 className="font-sans text-sm font-semibold text-text-main tracking-wide">{prop.title}</h4>
                   <p className="font-sans text-xs text-text-muted/70 leading-relaxed">{prop.desc}</p>
                 </div>
               </div>
@@ -114,7 +114,7 @@ export default function OwnerRegisterPage() {
 
         <div className="w-full max-w-sm mx-auto space-y-6">
           <div className="space-y-2">
-            <h2 className="font-sans text-2xl font-bold text-white tracking-wide">
+            <h2 className="font-sans text-2xl font-bold text-text-main tracking-wide">
               {isLogin ? "Welcome Back, Partner" : "Get Started as Partner"}
             </h2>
             <p className="font-sans text-xs text-text-muted">
