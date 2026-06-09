@@ -3,26 +3,24 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  TbUser, 
-  TbPhone, 
-  TbMail, 
-  TbMapPin, 
-  TbBuilding, 
-  TbClock, 
-  TbCheck, 
-  TbArrowRight, 
-  TbArrowLeft, 
+import {
+  TbUser,
+  TbPhone,
+  TbMail,
+  TbMapPin,
+  TbBuilding,
+  TbClock,
+  TbCheck,
+  TbArrowRight,
+  TbArrowLeft,
   TbCircleCheck,
-  TbAlertCircle
+  TbAlertCircle,
 } from "react-icons/tb";
 import { HiSparkles } from "react-icons/hi2";
-import { Button } from "@/components/ui/button";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
 
-// Sports options
 const SPORTS_OPTIONS = [
   { id: "football", label: "Football" },
   { id: "cricket", label: "Cricket Nets" },
@@ -32,7 +30,6 @@ const SPORTS_OPTIONS = [
   { id: "basketball", label: "Basketball" },
 ];
 
-// Amenities options
 const AMENITIES_OPTIONS = [
   { id: "floodlights", label: "Floodlights" },
   { id: "changing_rooms", label: "Changing Rooms" },
@@ -47,38 +44,37 @@ const AMENITIES_OPTIONS = [
 
 export function VenueRegistrationForm() {
   const { firebaseUser } = useAuth();
-  
-  // Step navigation: 1, 2, 3, or 'success'
+
   const [step, setStep] = useState<1 | 2 | 3 | "success">(1);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
-  // Form Fields
-  // Step 1: Owner Profile
   const [ownerName, setOwnerName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
 
-  // Step 2: Venue Specifications
   const [venueName, setVenueName] = useState("");
   const [address, setAddress] = useState("");
   const [groundCount, setGroundCount] = useState("1");
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
 
-  // Step 3: Operational Details
   const [operatingHours, setOperatingHours] = useState("");
   const [basePrice, setBasePrice] = useState("");
   const [additionalNotes, setAdditionalNotes] = useState("");
 
-  // Validation state per step
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const inputBase =
+    "w-full bg-gray-50/80 dark:bg-[#1a1a1a] border rounded-xl py-3 pl-11 pr-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80]/20 transition-all";
+  const inputError = "border-red-400 dark:border-red-500";
+  const inputNormal = "border-gray-200 dark:border-[#3a3a3a]";
 
   const validateStep = (currentStep: number): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (currentStep === 1) {
       if (!ownerName.trim()) newErrors.ownerName = "Full name is required";
       if (!phone.trim()) {
@@ -93,7 +89,7 @@ export function VenueRegistrationForm() {
       }
       if (!city.trim()) newErrors.city = "City is required";
     }
-    
+
     if (currentStep === 2) {
       if (!venueName.trim()) newErrors.venueName = "Venue name is required";
       if (!address.trim()) newErrors.address = "Full address is required";
@@ -126,11 +122,11 @@ export function VenueRegistrationForm() {
   };
 
   const toggleSport = (sportId: string) => {
-    setSelectedSports(prev => 
-      prev.includes(sportId) ? prev.filter(s => s !== sportId) : [...prev, sportId]
+    setSelectedSports((prev) =>
+      prev.includes(sportId) ? prev.filter((s) => s !== sportId) : [...prev, sportId]
     );
     if (errors.sports) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const copy = { ...prev };
         delete copy.sports;
         return copy;
@@ -139,15 +135,15 @@ export function VenueRegistrationForm() {
   };
 
   const toggleAmenity = (amenityId: string) => {
-    setSelectedAmenities(prev => 
-      prev.includes(amenityId) ? prev.filter(a => a !== amenityId) : [...prev, amenityId]
+    setSelectedAmenities((prev) =>
+      prev.includes(amenityId) ? prev.filter((a) => a !== amenityId) : [...prev, amenityId]
     );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateStep(3)) return;
-    
+
     if (!turnstileToken) {
       setErrorMsg("Please complete the bot check before submitting.");
       return;
@@ -156,16 +152,20 @@ export function VenueRegistrationForm() {
     setLoading(true);
     setErrorMsg(null);
 
-    // Format Markdown message content
-    const sportsString = selectedSports.map(s => {
-      const match = SPORTS_OPTIONS.find(o => o.id === s);
-      return match ? match.label : s;
-    }).join(", ");
+    const sportsString = selectedSports
+      .map((s) => {
+        const match = SPORTS_OPTIONS.find((o) => o.id === s);
+        return match ? match.label : s;
+      })
+      .join(", ");
 
-    const amenitiesString = selectedAmenities.map(a => {
-      const match = AMENITIES_OPTIONS.find(o => o.id === a);
-      return match ? match.label : a;
-    }).join(", ") || "None";
+    const amenitiesString =
+      selectedAmenities
+        .map((a) => {
+          const match = AMENITIES_OPTIONS.find((o) => o.id === a);
+          return match ? match.label : a;
+        })
+        .join(", ") || "None";
 
     const formattedMessage = `### PARTNER ONBOARDING REGISTRATION
 
@@ -191,7 +191,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
 
     try {
       const token = firebaseUser ? await firebaseUser.getIdToken() : undefined;
-      
+
       await convexClient.mutation(
         "contact:submitContact",
         {
@@ -199,11 +199,11 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
           email: email,
           subject: `Partner Onboarding: ${venueName}`,
           message: formattedMessage,
-          turnstileToken
+          turnstileToken,
         },
         token
       );
-      
+
       setStep("success");
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Submission failed. Please try again.");
@@ -213,21 +213,18 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-surface border border-border-default rounded-md p-6 sm:p-8 md:p-10 shadow-card-shadow relative overflow-hidden">
-      {/* Decorative top green glow line */}
-      
-      
+    <div className="w-full max-w-2xl mx-auto bg-white dark:bg-[#282828] border border-gray-200/80 dark:border-[#3a3a3a] rounded-2xl p-6 sm:p-8 md:p-10 relative overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] dark:shadow-none">
       {step !== "success" && (
         <div className="mb-8">
-          <div className="flex justify-between items-center text-xs font-sans font-bold tracking-widest text-text-muted mb-4 uppercase">
+          <div className="flex justify-between items-center text-[11px] font-semibold tracking-widest text-gray-500 dark:text-gray-400 mb-3 uppercase">
             <span>Step {step} of 3</span>
-            <span className="text-brand-lime">
+            <span className="text-[#4ADE80]">
               {step === 1 ? "Profile" : step === 2 ? "Venue" : "Pricing & Review"}
             </span>
           </div>
-          <div className="w-full h-1 bg-border-subtle rounded-full overflow-hidden flex">
-            <motion.div 
-              className="h-full bg-brand-lime"
+          <div className="w-full h-1.5 bg-gray-100 dark:bg-[#2a2a2a] rounded-full overflow-hidden flex">
+            <motion.div
+              className="h-full bg-[#4ADE80] rounded-full"
               animate={{ width: `${(step / 3) * 100}%` }}
               transition={{ ease: "easeOut", duration: 0.3 }}
             />
@@ -236,7 +233,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
       )}
 
       {errorMsg && (
-        <div className="mb-6 p-4 rounded bg-error/5 border border-error/20 text-error text-sm font-sans flex items-start gap-2">
+        <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm flex items-start gap-2">
           <TbAlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <div>{errorMsg}</div>
         </div>
@@ -250,106 +247,107 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className="space-y-6"
+            className="space-y-5"
           >
             <div>
-              <h3 className="font-sans text-lg font-bold text-text-main mb-1">Owner Profile</h3>
-              <p className="text-xs text-text-muted">Introduce yourself and your business email so we can verify your credentials.</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Owner Profile</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Introduce yourself and your business email so we can verify your credentials.
+              </p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                   Full Name
                 </label>
                 <div className="relative">
-                  <TbUser className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <TbUser className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
                     value={ownerName}
                     onChange={(e) => {
                       setOwnerName(e.target.value);
-                      if (errors.ownerName) setErrors(prev => ({ ...prev, ownerName: "" }));
+                      if (errors.ownerName) setErrors((prev) => ({ ...prev, ownerName: "" }));
                     }}
                     placeholder="John Doe"
-                    className={`w-full bg-bg border ${errors.ownerName ? "border-error" : "border-border-default"} focus:border-brand-lime rounded-md py-3 pl-11 pr-4 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-colors`}
+                    className={`${inputBase} ${errors.ownerName ? inputError : inputNormal}`}
                   />
                 </div>
-                {errors.ownerName && <p className="text-xs text-error mt-1.5">{errors.ownerName}</p>}
+                {errors.ownerName && <p className="text-xs text-red-500 mt-1">{errors.ownerName}</p>}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                     Phone Number
                   </label>
                   <div className="relative">
-                    <TbPhone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                    <TbPhone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="tel"
                       value={phone}
                       onChange={(e) => {
                         setPhone(e.target.value);
-                        if (errors.phone) setErrors(prev => ({ ...prev, phone: "" }));
+                        if (errors.phone) setErrors((prev) => ({ ...prev, phone: "" }));
                       }}
                       placeholder="+91 98765 43210"
-                      className={`w-full bg-bg border ${errors.phone ? "border-error" : "border-border-default"} focus:border-brand-lime rounded-md py-3 pl-11 pr-4 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-colors`}
+                      className={`${inputBase} ${errors.phone ? inputError : inputNormal}`}
                     />
                   </div>
-                  {errors.phone && <p className="text-xs text-error mt-1.5">{errors.phone}</p>}
+                  {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                     Email Address
                   </label>
                   <div className="relative">
-                    <TbMail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                    <TbMail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => {
                         setEmail(e.target.value);
-                        if (errors.email) setErrors(prev => ({ ...prev, email: "" }));
+                        if (errors.email) setErrors((prev) => ({ ...prev, email: "" }));
                       }}
                       placeholder="john@example.com"
-                      className={`w-full bg-bg border ${errors.email ? "border-error" : "border-border-default"} focus:border-brand-lime rounded-md py-3 pl-11 pr-4 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-colors`}
+                      className={`${inputBase} ${errors.email ? inputError : inputNormal}`}
                     />
                   </div>
-                  {errors.email && <p className="text-xs text-error mt-1.5">{errors.email}</p>}
+                  {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                   City
                 </label>
                 <div className="relative">
-                  <TbMapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <TbMapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
                     value={city}
                     onChange={(e) => {
                       setCity(e.target.value);
-                      if (errors.city) setErrors(prev => ({ ...prev, city: "" }));
+                      if (errors.city) setErrors((prev) => ({ ...prev, city: "" }));
                     }}
                     placeholder="Bengaluru"
-                    className={`w-full bg-bg border ${errors.city ? "border-error" : "border-border-default"} focus:border-brand-lime rounded-md py-3 pl-11 pr-4 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-colors`}
+                    className={`${inputBase} ${errors.city ? inputError : inputNormal}`}
                   />
                 </div>
-                {errors.city && <p className="text-xs text-error mt-1.5">{errors.city}</p>}
+                {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
               </div>
             </div>
 
             <div className="pt-4 flex justify-end">
-              <Button
+              <button
                 type="button"
                 onClick={handleNext}
-                className="font-sans font-semibold px-6 py-3 h-auto"
+                className="bg-[#4ADE80] hover:bg-[#16A34A] text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm flex items-center gap-1.5"
               >
-                Next Step
-                <TbArrowRight className="w-4 h-4 ml-1.5" />
-              </Button>
+                Next Step <TbArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </motion.div>
         )}
@@ -361,63 +359,65 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className="space-y-6"
+            className="space-y-5"
           >
             <div>
-              <h3 className="font-sans text-lg font-bold text-text-main mb-1">Venue Specifications</h3>
-              <p className="text-xs text-text-muted">Tell us about your sports complex, courts, and supported amenities.</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Venue Specifications</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Tell us about your sports complex, courts, and supported amenities.
+              </p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                   Venue Name
                 </label>
                 <div className="relative">
-                  <TbBuilding className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <TbBuilding className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
                     value={venueName}
                     onChange={(e) => {
                       setVenueName(e.target.value);
-                      if (errors.venueName) setErrors(prev => ({ ...prev, venueName: "" }));
+                      if (errors.venueName) setErrors((prev) => ({ ...prev, venueName: "" }));
                     }}
                     placeholder="Turfzo Arena HSR"
-                    className={`w-full bg-bg border ${errors.venueName ? "border-error" : "border-border-default"} focus:border-brand-lime rounded-md py-3 pl-11 pr-4 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-colors`}
+                    className={`${inputBase} ${errors.venueName ? inputError : inputNormal}`}
                   />
                 </div>
-                {errors.venueName && <p className="text-xs text-error mt-1.5">{errors.venueName}</p>}
+                {errors.venueName && <p className="text-xs text-red-500 mt-1">{errors.venueName}</p>}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                     Full Address
                   </label>
                   <div className="relative">
-                    <TbMapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                    <TbMapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text"
                       value={address}
                       onChange={(e) => {
                         setAddress(e.target.value);
-                        if (errors.address) setErrors(prev => ({ ...prev, address: "" }));
+                        if (errors.address) setErrors((prev) => ({ ...prev, address: "" }));
                       }}
                       placeholder="100 Feet Rd, HSR Layout"
-                      className={`w-full bg-bg border ${errors.address ? "border-error" : "border-border-default"} focus:border-brand-lime rounded-md py-3 pl-11 pr-4 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-colors`}
+                      className={`${inputBase} ${errors.address ? inputError : inputNormal}`}
                     />
                   </div>
-                  {errors.address && <p className="text-xs text-error mt-1.5">{errors.address}</p>}
+                  {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                     Grounds/Courts
                   </label>
                   <select
                     value={groundCount}
                     onChange={(e) => setGroundCount(e.target.value)}
-                    className="w-full bg-bg border border-border-default focus:border-brand-lime rounded-md py-3 px-4 text-sm text-text-main focus:outline-none h-[46px]"
+                    className="w-full bg-gray-50/80 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#3a3a3a] rounded-xl py-3 px-4 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80]/20 h-[46px] transition-all"
                   >
                     <option value="1">1 Ground</option>
                     <option value="2">2 Grounds</option>
@@ -429,7 +429,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
               </div>
 
               <div>
-                <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-3">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2.5">
                   Supported Sports
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -440,23 +440,23 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                         key={sport.id}
                         type="button"
                         onClick={() => toggleSport(sport.id)}
-                        className={`py-3 px-4 rounded border text-left text-sm font-sans flex items-center justify-between transition-all duration-200 ${
+                        className={`py-3 px-4 rounded-xl border text-left text-sm flex items-center justify-between transition-all duration-200 ${
                           active
-                            ? "bg-brand-lime/10 border-brand-lime text-brand-lime font-bold"
-                            : "bg-bg border-border-default text-text-muted hover:border-border-strong hover:text-text-main"
+                            ? "bg-[#4ADE80]/10 border-[#4ADE80] text-[#4ADE80] font-bold"
+                            : "bg-gray-50/80 dark:bg-[#1a1a1a] border-gray-200 dark:border-[#3a3a3a] text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500 hover:text-gray-900 dark:hover:text-white"
                         }`}
                       >
                         <span>{sport.label}</span>
-                        {active && <TbCheck className="w-4 h-4 text-brand-lime stroke-[2.5]" />}
+                        {active && <TbCheck className="w-4 h-4 text-[#4ADE80] stroke-[2.5]" />}
                       </button>
                     );
                   })}
                 </div>
-                {errors.sports && <p className="text-xs text-error mt-1.5">{errors.sports}</p>}
+                {errors.sports && <p className="text-xs text-red-500 mt-1.5">{errors.sports}</p>}
               </div>
 
               <div>
-                <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-3">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2.5">
                   Available Amenities
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -467,14 +467,14 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                         key={amenity.id}
                         type="button"
                         onClick={() => toggleAmenity(amenity.id)}
-                        className={`py-3 px-4 rounded border text-left text-sm font-sans flex items-center justify-between transition-all duration-200 ${
+                        className={`py-3 px-4 rounded-xl border text-left text-sm flex items-center justify-between transition-all duration-200 ${
                           active
-                            ? "bg-brand-lime/5 border-brand-lime/50 text-text-main font-semibold"
-                            : "bg-bg border-border-default text-text-muted hover:border-border-strong"
+                            ? "bg-[#4ADE80]/10 border-[#4ADE80]/50 text-gray-900 dark:text-white font-semibold"
+                            : "bg-gray-50/80 dark:bg-[#1a1a1a] border-gray-200 dark:border-[#3a3a3a] text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500"
                         }`}
                       >
                         <span className="truncate">{amenity.label}</span>
-                        {active && <TbCheck className="w-3.5 h-3.5 text-brand-lime stroke-[2]" />}
+                        {active && <TbCheck className="w-3.5 h-3.5 text-[#4ADE80] stroke-[2]" />}
                       </button>
                     );
                   })}
@@ -483,23 +483,20 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
             </div>
 
             <div className="pt-4 flex justify-between">
-              <Button
+              <button
                 type="button"
-                variant="outline"
                 onClick={handleBack}
-                className="font-sans font-semibold px-6 py-3 h-auto"
+                className="bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#3a3a3a] text-gray-600 dark:text-gray-400 font-semibold px-6 py-3 rounded-xl transition-colors text-sm flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-[#282828] hover:text-gray-900 dark:hover:text-white"
               >
-                <TbArrowLeft className="w-4 h-4 mr-1.5" />
-                Back
-              </Button>
-              <Button
+                <TbArrowLeft className="w-4 h-4" /> Back
+              </button>
+              <button
                 type="button"
                 onClick={handleNext}
-                className="font-sans font-semibold px-6 py-3 h-auto"
+                className="bg-[#4ADE80] hover:bg-[#16A34A] text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm flex items-center gap-1.5"
               >
-                Next Step
-                <TbArrowRight className="w-4 h-4 ml-1.5" />
-              </Button>
+                Next Step <TbArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </motion.div>
         )}
@@ -511,58 +508,62 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className="space-y-6"
+            className="space-y-5"
           >
             <div>
-              <h3 className="font-sans text-lg font-bold text-text-main mb-1">Operations & Pricing</h3>
-              <p className="text-xs text-text-muted">Enter scheduling timings, base rates, and complete the check to submit.</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Operations & Pricing</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Enter scheduling timings, base rates, and complete the check to submit.
+              </p>
             </div>
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                     Operating Hours
                   </label>
                   <div className="relative">
-                    <TbClock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                    <TbClock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text"
                       value={operatingHours}
                       onChange={(e) => {
                         setOperatingHours(e.target.value);
-                        if (errors.operatingHours) setErrors(prev => ({ ...prev, operatingHours: "" }));
+                        if (errors.operatingHours) setErrors((prev) => ({ ...prev, operatingHours: "" }));
                       }}
                       placeholder="6 AM - 11 PM"
-                      className={`w-full bg-bg border ${errors.operatingHours ? "border-error" : "border-border-default"} focus:border-brand-lime rounded-md py-3 pl-11 pr-4 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-colors`}
+                      className={`${inputBase} ${errors.operatingHours ? inputError : inputNormal}`}
                     />
                   </div>
-                  {errors.operatingHours && <p className="text-xs text-error mt-1.5">{errors.operatingHours}</p>}
+                  {errors.operatingHours && <p className="text-xs text-red-500 mt-1">{errors.operatingHours}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                     Base Price per Hour (₹)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-text-muted font-bold">₹</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-bold">₹</span>
                     <input
                       type="text"
                       value={basePrice}
                       onChange={(e) => {
                         setBasePrice(e.target.value);
-                        if (errors.basePrice) setErrors(prev => ({ ...prev, basePrice: "" }));
+                        if (errors.basePrice) setErrors((prev) => ({ ...prev, basePrice: "" }));
                       }}
                       placeholder="1200"
-                      className={`w-full bg-bg border ${errors.basePrice ? "border-error" : "border-border-default"} focus:border-brand-lime rounded-md py-3 pl-9 pr-4 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-colors`}
+                      className={`w-full bg-gray-50/80 dark:bg-[#1a1a1a] border rounded-xl py-3 pl-9 pr-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80]/20 transition-all ${
+                        errors.basePrice ? inputError : inputNormal
+                      }`}
                     />
                   </div>
-                  {errors.basePrice && <p className="text-xs text-error mt-1.5">{errors.basePrice}</p>}
+                  {errors.basePrice && <p className="text-xs text-red-500 mt-1">{errors.basePrice}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                   Additional Notes (Optional)
                 </label>
                 <textarea
@@ -570,45 +571,42 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                   onChange={(e) => setAdditionalNotes(e.target.value)}
                   placeholder="Tell us about special pricing, tournament setups, or dynamic peak slot preferences..."
                   rows={3}
-                  className="w-full bg-bg border border-border-default focus:border-brand-lime rounded-md py-3 px-4 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-colors resize-none"
+                  className="w-full bg-gray-50/80 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#3a3a3a] rounded-xl py-3 px-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80]/20 transition-all resize-none"
                 />
               </div>
 
-              {/* Turnstile verification widget */}
               <div className="pt-2">
-                <label className="block text-xs font-sans font-bold text-text-muted uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
                   Verification
                 </label>
-                <TurnstileWidget 
+                <TurnstileWidget
                   onVerify={(token) => {
                     setTurnstileToken(token);
                     setErrorMsg(null);
-                  }} 
+                  }}
                   className="w-full"
                 />
               </div>
             </div>
 
             <div className="pt-4 flex justify-between items-center gap-4">
-              <Button
+              <button
                 type="button"
-                variant="outline"
                 onClick={handleBack}
                 disabled={loading}
-                className="font-sans font-semibold px-6 py-3 h-auto"
+                className="bg-gray-100 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] text-gray-700 dark:text-gray-300 font-semibold px-6 py-3 rounded-xl transition-colors text-sm flex items-center gap-1.5 hover:bg-gray-200 dark:hover:bg-[#282828] disabled:opacity-50"
               >
-                <TbArrowLeft className="w-4 h-4 mr-1.5" />
-                Back
-              </Button>
-              <Button
+                <TbArrowLeft className="w-4 h-4" /> Back
+              </button>
+              <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="font-sans font-semibold px-8 py-3.5 h-auto text-base"
+                className="bg-[#4ADE80] hover:bg-[#16A34A] text-white font-semibold px-8 py-3.5 rounded-xl transition-colors text-sm flex items-center gap-1.5 disabled:opacity-50"
               >
                 {loading ? "Submitting..." : "Submit Registration"}
-                {!loading && <HiSparkles className="w-4 h-4 ml-1.5" />}
-              </Button>
+                {!loading && <HiSparkles className="w-4 h-4" />}
+              </button>
             </div>
           </motion.div>
         )}
@@ -621,25 +619,24 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
             transition={{ type: "spring", stiffness: 100, damping: 15 }}
             className="text-center py-10 space-y-6"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-lime/10 border-2 border-brand-lime/30 text-brand-lime mb-2">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#4ADE80]/10 border-2 border-[#4ADE80]/30 text-[#4ADE80] mb-2">
               <TbCircleCheck className="w-8 h-8 stroke-[2]" />
             </div>
 
             <div>
-              <h2 className="font-sans text-2xl font-extrabold text-text-main mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Registration Received!
               </h2>
-              <p className="text-sm text-text-muted max-w-md mx-auto leading-relaxed">
-                Thank you for listing your venue with Turfzo! Our partner success team will review your application and contact you within <span className="text-brand-lime font-bold">24 hours</span> to set up your dashboard credentials and verification.
+              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto leading-relaxed">
+                Thank you for listing your venue with Turfzo! Our partner success team will review your application and contact you within{" "}
+                <span className="text-[#4ADE80] font-bold">24 hours</span> to set up your dashboard credentials and verification.
               </p>
             </div>
 
-            <div className="pt-4 flex justify-center gap-4">
-              <Button
+            <div className="pt-4 flex justify-center gap-3">
+              <button
                 type="button"
-                variant="outline"
                 onClick={() => {
-                  // Reset form fields
                   setOwnerName("");
                   setPhone("");
                   setEmail("");
@@ -656,13 +653,13 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                   setErrorMsg(null);
                   setStep(1);
                 }}
-                className="font-sans font-semibold px-6 py-3 h-auto"
+                className="bg-gray-100 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] text-gray-700 dark:text-gray-300 font-semibold px-6 py-3 rounded-xl transition-colors text-sm hover:bg-gray-200 dark:hover:bg-[#282828]"
               >
                 Submit Another Venue
-              </Button>
+              </button>
               <Link
                 href="/"
-                className="inline-flex items-center justify-center bg-brand-btn-bg border border-brand-lime/25 text-white hover:border-brand-lime/40 hover:bg-brand-btn-bg-hover font-sans font-semibold px-6 py-3 rounded-md transition-colors text-sm"
+                className="inline-flex items-center justify-center bg-[#4ADE80] hover:bg-[#16A34A] text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
               >
                 Go to Homepage
               </Link>
