@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +18,11 @@ import {
   Loader2,
   Download,
   AlertCircle,
+  Users,
+  Star,
+  Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
@@ -66,6 +71,60 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
 }
 
+function CalendarPicker({ onSelect, onClose }: { onSelect: (date: Date) => void; onClose: () => void }) {
+  const today = new Date();
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const monthLabel = new Date(year, month).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+
+  const days: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) days.push(null);
+  for (let i = 1; i <= daysInMonth; i++) days.push(i);
+
+  return (
+    <div className="absolute top-full left-0 mt-2 bg-white dark:bg-[#282828] border border-gray-200 dark:border-[#3a3a3a] rounded-xl shadow-lg p-4 z-50" style={{ width: "320px" }}>
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={() => { if (month === 0) { setMonth(11); setYear(year - 1); } else setMonth(month - 1); }} className="p-1 hover:bg-gray-100 dark:hover:bg-[#3a3a3a] rounded-full transition-colors">
+          <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+        </button>
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">{monthLabel}</span>
+        <button onClick={() => { if (month === 11) { setMonth(0); setYear(year + 1); } else setMonth(month + 1); }} className="p-1 hover:bg-gray-100 dark:hover:bg-[#3a3a3a] rounded-full transition-colors">
+          <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+        </button>
+      </div>
+      <div className="grid grid-cols-7 gap-0 mb-2">
+        {WEEKDAYS.map((d) => (
+          <div key={d} className="text-center text-[11px] font-medium text-gray-400 dark:text-gray-500 py-1">{d}</div>
+        ))}
+      </div>
+      <div className="grid grid-cols-7 gap-0">
+        {days.map((day, i) => {
+          if (day === null) return <div key={`empty-${i}`} />;
+          const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+          const isSelected = selectedDate?.getDate() === day && selectedDate?.getMonth() === month && selectedDate?.getFullYear() === year;
+          return (
+            <button
+              key={day}
+              onClick={() => { const d = new Date(year, month, day); setSelectedDate(d); onSelect(d); onClose(); }}
+              className={`w-full aspect-square flex items-center justify-center text-sm rounded-full transition-colors
+                ${isSelected ? "bg-black dark:bg-white text-white dark:text-black font-semibold" : ""}
+                ${!isSelected && isToday ? "border border-black dark:border-white text-black dark:text-white font-semibold" : ""}
+                ${!isSelected && !isToday ? "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#3a3a3a]" : ""}`}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function TournamentsPage() {
   const router = useRouter();
   const { status, firebaseUser, convexUser } = useAuth();
@@ -75,6 +134,8 @@ export default function TournamentsPage() {
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [regStep, setRegStep] = useState<RegStep>("closed");
   const [regError, setRegError] = useState<string | null>(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   const [teamName, setTeamName] = useState("");
   const [captainName, setCaptainName] = useState("");
@@ -84,6 +145,21 @@ export default function TournamentsPage() {
   const [registrationCode, setRegistrationCode] = useState("");
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [downloadQrUrl, setDownloadQrUrl] = useState("");
+
+  const [searchSport, setSearchSport] = useState("");
+  const [searchCity, setSearchCity] = useState("");
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (calendarRef.current && !calendarRef.current.contains(e.target as Node)) {
+        setShowCalendar(false);
+      }
+    }
+    if (showCalendar) {
+      setTimeout(() => document.addEventListener("mousedown", handleClickOutside), 0);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showCalendar]);
 
   useEffect(() => {
     async function fetchTournaments() {
@@ -99,6 +175,12 @@ export default function TournamentsPage() {
     }
     fetchTournaments();
   }, []);
+
+  const filteredTournaments = tournaments.filter((t) => {
+    const matchSport = !searchSport || t.sport.toLowerCase().includes(searchSport.toLowerCase());
+    const matchCity = !searchCity || t.city.toLowerCase().includes(searchCity.toLowerCase());
+    return matchSport && matchCity;
+  });
 
   const handleOpenRegistration = (t: Tournament) => {
     if (status !== "authenticated") {
@@ -199,7 +281,7 @@ export default function TournamentsPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg text-text-main">
+    <div className="airbnb-explore-theme flex flex-col min-h-screen bg-[#f7f7f7] dark:bg-[#1a1a1a]">
       <head>
         <title>Sports Tournaments | Find & Join Local Tournaments | Turfzo</title>
         <meta name="description" content="Discover and join football, cricket, and badminton tournaments in your city. Register your team, compete, and win prizes on Turfzo." />
@@ -210,174 +292,287 @@ export default function TournamentsPage() {
       </head>
       <Header />
 
-      <main className="flex-grow pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
-          <div className="relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow p-8 sm:p-12 mb-12 min-h-[240px] flex flex-col justify-end">
-            <div className="absolute inset-0 bg-cover bg-center z-0 opacity-40" style={{ backgroundImage: `url('/stadium_turf_bg.png')` }} />
-            
-            
-
-            <div className="relative z-10 text-left">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime mb-4">
-                <Trophy className="w-3.5 h-3.5" /> Compete With The Best
-              </span>
-              <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main leading-tight tracking-tight">
-                Active Leagues & <span className="text-brand-lime">Tournaments</span>
-              </h1>
-              <p className="mt-3 text-text-muted text-sm sm:text-base font-sans max-w-xl leading-relaxed">
-                Register your team, climb the regional leaderboards, and compete for grand cash prizes. Experience professional sports leagues hosted on the finest turfs.
-              </p>
-            </div>
+      <main className="flex-grow pt-24 pb-16 px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full">
+        {/* Hero */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="relative rounded-2xl overflow-hidden mb-10 min-h-[280px] sm:min-h-[340px] flex flex-col items-start justify-end p-8 sm:p-12"
+        >
+          <div className="absolute inset-0 bg-cover bg-center z-0 opacity-50" style={{ backgroundImage: `url('/stadium_light_bg.png')` }} />
+          <div className="absolute inset-0 z-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.05) 100%)" }} />
+          <div className="relative z-10">
+            <h1 className="font-[family-name:var(--font-anton)] text-4xl sm:text-5xl lg:text-6xl text-white uppercase leading-[1.1] tracking-wide mb-2">
+              Leagues &<br />Tournaments
+            </h1>
+            <p className="text-white/80 text-sm sm:text-base font-[family-name:var(--font-inter)] max-w-xl">
+              Register your team, climb the regional leaderboards, and compete for grand cash prizes on the finest turfs.
+            </p>
           </div>
+        </motion.section>
 
-          {loadError && (
-            <div className="bg-error/10 border border-error/20 rounded-md p-4 flex items-center gap-3 mb-8">
-              <AlertCircle className="w-5 h-5 text-error shrink-0" />
-              <p className="text-sm text-error font-sans">{loadError}</p>
+        {/* Search bar */}
+        <div className="flex justify-center mb-12">
+          <div className="flex items-center gap-0 border border-[#ddd] dark:border-[#3a3a3a] rounded-full py-2 px-2 shadow-sm w-full max-w-2xl">
+            <div className="flex-1 min-w-0 px-5 border-r border-[#ddd] dark:border-[#3a3a3a]">
+              <label className="block text-[11px] font-bold text-gray-900 dark:text-white uppercase tracking-wider">City</label>
+              <input
+                type="text"
+                placeholder="Where are you playing?"
+                value={searchCity}
+                onChange={(e) => setSearchCity(e.target.value)}
+                className="w-full bg-transparent text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none py-1"
+              />
             </div>
-          )}
+            <div className="flex-1 min-w-0 px-5 border-r border-[#ddd] dark:border-[#3a3a3a]">
+              <label className="block text-[11px] font-bold text-gray-900 dark:text-white uppercase tracking-wider">Sport</label>
+              <input
+                type="text"
+                placeholder="Football, Cricket..."
+                value={searchSport}
+                onChange={(e) => setSearchSport(e.target.value)}
+                className="w-full bg-transparent text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 focus:outline-none py-1"
+              />
+            </div>
+            <div className="relative flex-1 min-w-0 px-5" ref={calendarRef}>
+              <button
+                onClick={() => setShowCalendar(!showCalendar)}
+                className="w-full text-left bg-transparent"
+              >
+                <label className="block text-[11px] font-bold text-gray-900 dark:text-white uppercase tracking-wider cursor-pointer">Date</label>
+                <span className="text-sm text-gray-400 py-1 block">When?</span>
+              </button>
+              {showCalendar && <CalendarPicker onSelect={() => {}} onClose={() => setShowCalendar(false)} />}
+            </div>
+            <button
+              onClick={() => {}}
+              className="flex items-center justify-center bg-[#4ADE80] hover:bg-[#16A34A] text-white rounded-full w-12 h-12 transition-colors flex-shrink-0"
+              aria-label="Search tournaments"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-8 flex flex-col gap-6">
-              <h2 className="font-sans font-bold text-xl text-text-main text-left pb-2 border-b border-border-subtle flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-brand-lime" /> Open Registrations
+        {/* Stats strip */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="flex flex-wrap gap-6 sm:gap-10 mb-12"
+        >
+          {[
+            { icon: <Trophy className="w-5 h-5 text-[#4ADE80]" />, label: "Tournaments", value: tournaments.length || "—" },
+            { icon: <Users className="w-5 h-5 text-[#4ADE80]" />, label: "Teams Registered", value: tournaments.reduce((s, t) => s + t.registered_teams, 0) || "—" },
+            { icon: <MapPin className="w-5 h-5 text-[#4ADE80]" />, label: "Venues", value: new Set(tournaments.map((t) => t.venue)).size || "—" },
+          ].map((s, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="bg-white dark:bg-[#282828] border border-[#ddd] dark:border-[#3a3a3a] rounded-xl p-2.5">{s.icon}</div>
+              <div>
+                <span className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{s.label}</span>
+                <span className="text-lg font-semibold text-gray-900 dark:text-white">{s.value}</span>
+              </div>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Main grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left: tournaments */}
+          <div className="lg:col-span-8 flex flex-col gap-6">
+            {loadError && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
+                <p className="text-sm text-red-700 dark:text-red-300">{loadError}</p>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <h2 className="text-[17px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-[#4ADE80]" /> Open Registrations
               </h2>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{filteredTournaments.length} tournaments</span>
+            </div>
 
-              {loading ? (
-                <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center justify-center gap-4">
-                  <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
-                  <h3 className="font-sans font-bold text-lg text-text-main">Loading Tournaments</h3>
-                </div>
-              ) : tournaments.length === 0 ? (
-                <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center justify-center gap-3">
-                  <Trophy className="w-12 h-12 text-text-muted opacity-50" />
-                  <h3 className="font-sans font-bold text-lg text-text-main">No Open Registrations</h3>
-                  <p className="text-text-muted text-sm font-sans max-w-xs">Check back soon for upcoming tournaments in your city.</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-6">
-                  {tournaments.map((t) => (
-                    <motion.div
-                      key={t._id}
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="bg-surface border border-border-default hover:border-brand-lime/10 rounded-md p-6 flex flex-col md:flex-row gap-6 transition-all duration-300 hover:shadow-card-shadow text-left"
-                    >
-                      <div className="relative w-full md:w-56 h-40 bg-elevated rounded-sm overflow-hidden flex-shrink-0">
-                        <Image src={t.image_url || "/stadium_turf_bg.png"} alt={t.title} fill className="object-cover" />
-                        <div className="absolute top-3 left-3 bg-overlay-heavy border border-border-default text-text-main font-sans font-bold text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider select-none">
-                          {t.sport}
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-24 gap-4">
+                <Loader2 className="w-8 h-8 text-[#4ADE80] animate-spin" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">Loading tournaments...</p>
+              </div>
+            ) : filteredTournaments.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-24 gap-3">
+                <Trophy className="w-12 h-12 text-gray-300 dark:text-gray-600" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">No tournaments found</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Check back soon for upcoming tournaments.</p>
+              </div>
+            ) : (
+              filteredTournaments.map((t) => {
+                const spotsLeft = t.max_teams - t.registered_teams;
+                const isFull = spotsLeft <= 0;
+                return (
+                  <motion.div
+                    key={t._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="bg-white dark:bg-[#282828] border border-[#ddd] dark:border-[#3a3a3a] rounded-2xl overflow-hidden hover:shadow-lg dark:hover:shadow-2xl transition-shadow duration-300"
+                  >
+                    <div className="flex flex-col sm:flex-row">
+                      {/* Image */}
+                      <div className="relative w-full sm:w-64 h-48 sm:h-auto bg-gray-100 dark:bg-[#1a1a1a] flex-shrink-0">
+                        <Image
+                          src={t.image_url || "/stadium_turf_bg.png"}
+                          alt={t.title}
+                          fill
+                          className="object-cover"
+                        />
+                        <div className="absolute top-3 left-3 flex gap-2">
+                          <span className="bg-white dark:bg-[#282828] text-gray-900 dark:text-white text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                            {t.sport}
+                          </span>
+                          <span className="bg-[#4ADE80] text-white text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                            {t.format}
+                          </span>
                         </div>
+                        {!isFull && spotsLeft <= 3 && (
+                          <div className="absolute bottom-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            {spotsLeft} spots left
+                          </div>
+                        )}
                       </div>
 
-                      <div className="flex-grow flex flex-col justify-between">
+                      {/* Content */}
+                      <div className="flex-1 p-5 flex flex-col justify-between">
                         <div>
-                          <div className="flex justify-between items-start gap-4 flex-wrap">
-                            <h3 className="font-sans font-bold text-lg text-text-main hover:text-brand-lime transition-colors">
+                          <div className="flex items-start justify-between gap-3">
+                            <h3 className="text-[17px] font-semibold text-gray-900 dark:text-white leading-snug">
                               {t.title}
                             </h3>
-                            <span className="text-[10px] font-sans font-bold bg-brand-lime/10 text-brand-lime border border-brand-lime/25 px-2.5 py-1 rounded-md uppercase tracking-wider">
-                              {t.format}
-                            </span>
                           </div>
-
-                          <p className="text-xs text-text-muted mt-2 flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5 text-brand-lime shrink-0" /> {t.venue}
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-[#4ADE80] flex-shrink-0" />
+                            {t.venue}, {t.city}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-[#4ADE80] flex-shrink-0" />
+                            Starts {formatDate(t.start_date)}
                           </p>
 
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4 border-t border-border-subtle pt-4 text-xs font-sans text-text-muted">
-                            <div className="flex flex-col gap-0.5">
-                              <span className="text-[9px] uppercase tracking-wider">Schedule</span>
-                              <span className="font-semibold text-text-main">Starts {formatDate(t.start_date)}</span>
+                          <div className="flex flex-wrap gap-3 mt-4">
+                            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-[#1a1a1a] rounded-lg px-3 py-1.5">
+                              <Trophy className="w-3.5 h-3.5 text-[#4ADE80]" />
+                              <span className="text-xs font-semibold text-gray-900 dark:text-white">{t.prize_pool}</span>
                             </div>
-                            <div className="flex flex-col gap-0.5">
-                              <span className="text-[9px] uppercase tracking-wider">Prize Pool</span>
-                              <span className="font-bold text-brand-lime">{t.prize_pool}</span>
-                            </div>
-                            <div className="flex flex-col gap-0.5">
-                              <span className="text-[9px] uppercase tracking-wider">Slots Registered</span>
-                              <span className="font-semibold text-text-main">{t.registered_teams} / {t.max_teams} Teams</span>
+                            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-[#1a1a1a] rounded-lg px-3 py-1.5">
+                              <Users className="w-3.5 h-3.5 text-[#4ADE80]" />
+                              <span className="text-xs text-gray-600 dark:text-gray-300">{t.registered_teams}/{t.max_teams} teams</span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between border-t border-border-subtle pt-4 mt-6">
+                        <div className="flex items-center justify-between mt-5 pt-4 border-t border-[#eee] dark:border-[#3a3a3a]">
                           <div>
-                            <span className="text-[9px] uppercase text-text-muted block leading-none font-sans">Registration Fee</span>
-                            <span className="text-lg font-sans font-extrabold text-brand-lime mt-1 block">
-                              ₹{t.entry_fee.toLocaleString("en-IN")} <span className="text-xs text-text-muted font-normal font-sans">/Team</span>
+                            <span className="block text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Entry Fee</span>
+                            <span className="text-xl font-bold text-[#4ADE80]">
+                              ₹{t.entry_fee.toLocaleString("en-IN")}
+                              <span className="text-xs text-gray-400 dark:text-gray-500 font-normal ml-1">/team</span>
                             </span>
                           </div>
-
                           <button
                             onClick={() => handleOpenRegistration(t)}
-                            disabled={t.registered_teams >= t.max_teams}
-                            className="bg-brand-lime disabled:bg-elevated disabled:text-text-muted/30 hover:bg-brand-lime-hover text-black font-sans font-bold text-xs py-3 px-6 rounded-md transition-all duration-300  flex items-center gap-1"
+                            disabled={isFull}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                              isFull
+                                ? "bg-gray-100 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-600 cursor-not-allowed"
+                                : "bg-[#4ADE80] hover:bg-[#16A34A] text-white"
+                            }`}
                           >
-                            {t.registered_teams >= t.max_teams ? "Slots Full" : "Register Team"}
-                            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                            {isFull ? "Full" : "Register"}
+                            {!isFull && <ArrowRight className="w-4 h-4" />}
                           </button>
                         </div>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Right: sidebar */}
+          <div className="lg:col-span-4 flex flex-col gap-6 sticky top-24">
+            {/* League Standings */}
+            <div className="bg-white dark:bg-[#282828] border border-[#ddd] dark:border-[#3a3a3a] rounded-2xl p-5">
+              <h3 className="text-[15px] font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
+                <Award className="w-5 h-5 text-[#4ADE80]" /> League Standings
+              </h3>
+              <div className="overflow-x-auto scrollbar-none">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-gray-500 dark:text-gray-400 border-b border-[#eee] dark:border-[#3a3a3a] font-semibold text-[10px] uppercase tracking-wider text-left">
+                      <th className="pb-2.5 pr-2">#</th>
+                      <th className="pb-2.5">Team</th>
+                      <th className="pb-2.5 text-center">P</th>
+                      <th className="pb-2.5 text-center">GD</th>
+                      <th className="pb-2.5 text-right">Pts</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leagueStandings.map((row) => (
+                      <tr key={row.rank} className="border-b border-[#f0f0f0] dark:border-[#2a2a2a] last:border-b-0 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors">
+                        <td className="py-3 font-bold text-gray-400 dark:text-gray-500 pr-2">{row.rank}</td>
+                        <td className="py-3 font-semibold text-gray-900 dark:text-white">{row.team}</td>
+                        <td className="py-3 text-center text-gray-500 dark:text-gray-400">{row.played}</td>
+                        <td className="py-3 text-center font-semibold text-[#4ADE80]">{row.goalDiff}</td>
+                        <td className="py-3 text-right font-extrabold text-[#4ADE80] pr-1">{row.points}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <div className="lg:col-span-4 flex flex-col gap-8 sticky top-24">
-              <div className="bg-surface border border-border-default rounded-md p-6 text-left shadow-card-shadow">
-                <h3 className="font-sans font-bold text-base text-text-main flex items-center gap-2 pb-3.5 border-b border-border-subtle mb-4">
-                  <Award className="w-5 h-5 text-brand-lime" /> League Standings
-                </h3>
-                <div className="overflow-x-auto scrollbar-none">
-                  <table className="w-full text-xs font-sans">
-                    <thead>
-                      <tr className="text-text-muted border-b border-border-subtle font-semibold text-[10px] uppercase tracking-wider text-left">
-                        <th className="py-2.5">Rank</th>
-                        <th className="py-2.5">Team</th>
-                        <th className="py-2.5 text-center">P</th>
-                        <th className="py-2.5 text-center">GD</th>
-                        <th className="py-2.5 text-right">Pts</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {leagueStandings.map((row) => (
-                        <tr key={row.rank} className="border-b border-border-subtle hover:bg-elevated/30 transition-colors">
-                          <td className="py-3 font-bold text-text-muted pl-1">{row.rank}</td>
-                          <td className="py-3 font-semibold text-text-main">{row.team}</td>
-                          <td className="py-3 text-center text-text-muted">{row.played}</td>
-                          <td className="py-3 text-center font-semibold text-brand-lime/80">{row.goalDiff}</td>
-                          <td className="py-3 text-right font-extrabold text-brand-lime pr-1">{row.points}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="bg-surface border border-border-default rounded-md p-6 text-left shadow-card-shadow">
-                <h3 className="font-sans font-bold text-base text-text-main flex items-center gap-2 pb-3.5 border-b border-border-subtle mb-4">
-                  <Trophy className="w-4 h-4 text-brand-lime" /> Golden Boot Leaderboard
-                </h3>
-                <div className="flex flex-col gap-3.5">
-                  {topScorers.map((scorer, i) => (
-                    <div key={i} className="flex items-center justify-between border-b border-border-subtle pb-2.5 last:border-b-0 last:pb-0">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-elevated border border-border-default flex items-center justify-center font-sans font-bold text-[11px] text-text-main">
-                          {scorer.name.split(" ").map((n) => n[0]).join("")}
-                        </div>
-                        <div className="flex flex-col leading-none">
-                          <span className="text-xs font-bold text-text-main">{scorer.name}</span>
-                          <span className="text-[10px] text-text-muted mt-1">{scorer.team}</span>
-                        </div>
+            {/* Golden Boot */}
+            <div className="bg-white dark:bg-[#282828] border border-[#ddd] dark:border-[#3a3a3a] rounded-2xl p-5">
+              <h3 className="text-[15px] font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
+                <Star className="w-5 h-5 text-[#4ADE80]" /> Golden Boot
+              </h3>
+              <div className="flex flex-col gap-3">
+                {topScorers.map((scorer, i) => (
+                  <div key={i} className="flex items-center justify-between pb-3 border-b border-[#f0f0f0] dark:border-[#2a2a2a] last:border-b-0 last:pb-0">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] flex items-center justify-center text-xs font-bold text-gray-700 dark:text-gray-300">
+                        {scorer.name.split(" ").map((n) => n[0]).join("")}
                       </div>
-                      <div className="flex items-center gap-1 bg-brand-lime/10 text-brand-lime font-sans font-extrabold text-xs px-2.5 py-1 rounded-md">
-                        {scorer.goals} Goals
+                      <div>
+                        <span className="block text-sm font-semibold text-gray-900 dark:text-white">{scorer.name}</span>
+                        <span className="block text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{scorer.team}</span>
                       </div>
                     </div>
-                  ))}
+                    <span className="bg-[#4ADE80]/10 text-[#4ADE80] text-xs font-bold px-2.5 py-1 rounded-full">
+                      {scorer.goals} goals
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick info */}
+            <div className="bg-white dark:bg-[#282828] border border-[#ddd] dark:border-[#3a3a3a] rounded-2xl p-5">
+              <h3 className="text-[15px] font-bold text-gray-900 dark:text-white mb-3">How it works</h3>
+              <div className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-start gap-2.5">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#4ADE80]/10 text-[#4ADE80] text-xs font-bold flex items-center justify-center">1</span>
+                  <span>Browse open tournaments and pick your league</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#4ADE80]/10 text-[#4ADE80] text-xs font-bold flex items-center justify-center">2</span>
+                  <span>Register your team and pay the entry fee</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#4ADE80]/10 text-[#4ADE80] text-xs font-bold flex items-center justify-center">3</span>
+                  <span>Receive your QR pass and check in at venue</span>
                 </div>
               </div>
             </div>
@@ -385,80 +580,119 @@ export default function TournamentsPage() {
         </div>
       </main>
 
+      {/* Registration Modal */}
       <AnimatePresence>
         {regStep !== "closed" && selectedTournament && (
-          <div className="fixed inset-0 z-50 bg-overlay-heavy backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm"
+              onClick={() => setRegStep("closed")}
+            />
+
             {regStep === "form" && (
               <motion.div
-                initial={{ scale: 0.95, y: 15, opacity: 0 }}
+                initial={{ scale: 0.95, y: 20, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.95, y: 15, opacity: 0 }}
-                className="bg-surface border border-border-default rounded-md max-w-md w-full p-6 relative shadow-card-shadow text-left"
+                exit={{ scale: 0.95, y: 20, opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="relative bg-white dark:bg-[#282828] border border-[#ddd] dark:border-[#3a3a3a] rounded-2xl max-w-md w-full p-6 shadow-xl"
               >
-                <button onClick={() => setRegStep("closed")} className="absolute top-4 right-4 p-1.5 bg-elevated hover:bg-elevated rounded-full text-text-muted hover:text-text-main transition-colors">
-                  <X className="w-5 h-5" />
+                <button onClick={() => setRegStep("closed")} className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 dark:hover:bg-[#3a3a3a] rounded-full transition-colors">
+                  <X className="w-5 h-5 text-gray-500" />
                 </button>
 
                 <div className="text-center mb-6">
-                  <Trophy className="w-8 h-8 text-brand-lime mx-auto" />
-                  <h3 className="font-sans font-bold text-lg text-text-main mt-3">Team Registration</h3>
-                  <p className="text-xs text-text-muted font-sans mt-0.5">{selectedTournament.title}</p>
+                  <div className="w-12 h-12 bg-[#4ADE80]/10 rounded-full flex items-center justify-center mx-auto">
+                    <Trophy className="w-6 h-6 text-[#4ADE80]" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-3">Team Registration</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{selectedTournament.title}</p>
                 </div>
 
                 {regError && (
-                  <div className="mb-4 p-3 bg-error/10 border border-error/20 rounded text-error text-xs font-sans flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" /> {regError}
+                  <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" /> {regError}
                   </div>
                 )}
 
-                <form onSubmit={handleSubmitRegistration} className="flex flex-col gap-4 text-xs font-sans">
+                <form onSubmit={handleSubmitRegistration} className="flex flex-col gap-4 text-sm">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Team Name</label>
-                    <input type="text" required placeholder="Enter team name" value={teamName} onChange={(e) => setTeamName(e.target.value)}
-                      className="bg-elevated border border-border-subtle rounded px-4 py-2.5 text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
+                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Team Name</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter team name"
+                      value={teamName}
+                      onChange={(e) => setTeamName(e.target.value)}
+                      className="bg-gray-50 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] transition-colors"
+                    />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Captain Name</label>
-                    <div className="relative flex items-center">
-                      <User className="absolute left-3 w-4 h-4 text-text-muted" />
-                      <input type="text" required placeholder="Enter captain name" value={captainName} onChange={(e) => setCaptainName(e.target.value)}
-                        className="bg-elevated border border-border-subtle rounded pl-10 pr-4 py-2.5 w-full text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
+                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Captain Name</label>
+                    <div className="relative">
+                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="Enter captain name"
+                        value={captainName}
+                        onChange={(e) => setCaptainName(e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] rounded-xl pl-10 pr-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] transition-colors"
+                      />
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Captain Mobile Number</label>
-                    <div className="relative flex items-center">
-                      <Phone className="absolute left-3 w-4 h-4 text-text-muted" />
-                      <input type="tel" required placeholder="Enter phone number" value={captainPhone} onChange={(e) => setCaptainPhone(e.target.value)}
-                        className="bg-elevated border border-border-subtle rounded pl-10 pr-4 py-2.5 w-full text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
+                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Phone Number</label>
+                    <div className="relative">
+                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        type="tel"
+                        required
+                        placeholder="Enter phone number"
+                        value={captainPhone}
+                        onChange={(e) => setCaptainPhone(e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] rounded-xl pl-10 pr-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] transition-colors"
+                      />
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Captain Email</label>
-                    <div className="relative flex items-center">
-                      <Mail className="absolute left-3 w-4 h-4 text-text-muted" />
-                      <input type="email" required placeholder="Enter email address" value={captainEmail} onChange={(e) => setCaptainEmail(e.target.value)}
-                        className="bg-elevated border border-border-subtle rounded pl-10 pr-4 py-2.5 w-full text-text-main placeholder-text-muted/40 focus:outline-none focus:border-brand-lime/30" />
+                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        type="email"
+                        required
+                        placeholder="Enter email address"
+                        value={captainEmail}
+                        onChange={(e) => setCaptainEmail(e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] rounded-xl pl-10 pr-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] transition-colors"
+                      />
                     </div>
                   </div>
 
-                  <div className="bg-elevated p-3.5 rounded border border-border-subtle flex justify-between items-center mt-2">
-                    <span className="font-semibold text-text-muted">Total Registration Fee</span>
-                    <span className="font-sans font-extrabold text-sm text-brand-lime">₹{selectedTournament.entry_fee.toLocaleString("en-IN")}</span>
+                  <div className="bg-gray-50 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] rounded-xl p-4 flex justify-between items-center">
+                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Total Fee</span>
+                    <span className="text-lg font-bold text-[#4ADE80]">₹{selectedTournament.entry_fee.toLocaleString("en-IN")}</span>
                   </div>
 
-                  <button type="submit" className="w-full bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-sm py-3 rounded-md transition-all mt-2 flex items-center justify-center gap-1.5">
-                    Pay & Register Team
+                  <button
+                    type="submit"
+                    className="w-full bg-[#4ADE80] hover:bg-[#16A34A] text-white font-semibold text-sm py-3.5 rounded-xl transition-colors mt-1"
+                  >
+                    Pay &amp; Register Team
                   </button>
                 </form>
               </motion.div>
             )}
 
             {regStep === "processing" && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center gap-3 text-center">
-                <Loader2 className="w-10 h-10 text-brand-lime animate-spin stroke-[2.5]" />
-                <h3 className="font-sans font-bold text-lg text-text-main mt-2">Processing Registration</h3>
-                <p className="text-xs text-text-muted max-w-xs font-sans">Booking slot in the league brackets...</p>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative flex flex-col items-center justify-center gap-4 text-center bg-white dark:bg-[#282828] border border-[#ddd] dark:border-[#3a3a3a] rounded-2xl max-w-sm w-full p-10 shadow-xl">
+                <Loader2 className="w-10 h-10 text-[#4ADE80] animate-spin" />
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Processing Registration</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Booking your slot in the brackets...</p>
               </motion.div>
             )}
 
@@ -467,79 +701,75 @@ export default function TournamentsPage() {
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-surface border border-border-default rounded-md max-w-md w-full p-6 relative shadow-card-shadow text-center flex flex-col items-center"
+                className="relative bg-white dark:bg-[#282828] border border-[#ddd] dark:border-[#3a3a3a] rounded-2xl max-w-md w-full p-6 shadow-xl text-center"
               >
-                <div className="w-16 h-16 bg-brand-lime/10 rounded-full flex items-center justify-center border-2 border-brand-lime/30 shadow-md select-none mb-4">
-                  <Check className="w-8 h-8 text-brand-lime stroke-[3]" />
+                <div className="w-16 h-16 bg-[#4ADE80]/10 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#4ADE80]/30">
+                  <Check className="w-8 h-8 text-[#4ADE80]" strokeWidth={3} />
                 </div>
-                <h3 className="font-sans font-bold text-xl text-text-main">Team Registered!</h3>
-                <p className="text-xs text-text-muted font-sans mt-1">Your team has been successfully placed in the brackets.</p>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Team Registered!</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your team has been successfully placed.</p>
 
-                <div className="relative w-full bg-elevated border border-border-subtle rounded p-5 mt-6 text-left flex flex-col gap-4 overflow-hidden">
-                  <div className="absolute top-1/2 -left-3 w-6 h-6 bg-surface rounded-full border-r border-border-default" />
-                  <div className="absolute top-1/2 -right-3 w-6 h-6 bg-surface rounded-full border-l border-border-default" />
-
-                  <div className="flex justify-between items-center pb-3.5 border-b border-dashed border-border-default font-sans">
-                    <div className="flex flex-col">
-                      <span className="text-[9px] text-text-muted uppercase">Tournament Pass ID</span>
-                      <span className="font-sans font-bold text-brand-lime text-sm tracking-wide">{registrationCode}</span>
+                <div className="bg-gray-50 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] rounded-xl p-5 mt-6 text-left">
+                  <div className="flex justify-between items-center pb-3 border-b border-dashed border-[#ddd] dark:border-[#3a3a3a] mb-4">
+                    <div>
+                      <span className="block text-[10px] text-gray-500 dark:text-gray-400 uppercase">Pass ID</span>
+                      <span className="font-bold text-[#4ADE80] text-sm tracking-wide">{registrationCode}</span>
                     </div>
-                    <span className="bg-brand-lime/10 text-brand-lime font-bold text-[9px] border border-brand-lime/10 px-2 py-0.5 rounded uppercase">paid</span>
+                    <span className="bg-[#4ADE80]/10 text-[#4ADE80] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">paid</span>
                   </div>
 
-                  <div className="flex flex-col gap-0.5 text-left">
-                    <span className="text-[9px] text-text-muted uppercase font-sans">Tournament</span>
-                    <span className="font-sans font-extrabold text-sm text-text-main">{selectedTournament.title}</span>
+                  <div className="mb-4">
+                    <span className="block text-[10px] text-gray-500 dark:text-gray-400 uppercase">Tournament</span>
+                    <span className="font-bold text-gray-900 dark:text-white text-sm">{selectedTournament.title}</span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 border-t border-border-subtle pt-3.5 text-xs font-sans">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-[9px] text-text-muted uppercase">Team Name</span>
-                      <span className="font-semibold text-text-main">{teamName}</span>
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                      <span className="block text-[10px] text-gray-500 dark:text-gray-400 uppercase">Team</span>
+                      <span className="font-semibold text-gray-900 dark:text-white text-sm">{teamName}</span>
                     </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-[9px] text-text-muted uppercase">Captain</span>
-                      <span className="font-semibold text-text-main">{captainName}</span>
+                    <div>
+                      <span className="block text-[10px] text-gray-500 dark:text-gray-400 uppercase">Captain</span>
+                      <span className="font-semibold text-gray-900 dark:text-white text-sm">{captainName}</span>
                     </div>
-                    <div className="flex flex-col gap-0.5 col-span-2">
-                      <span className="text-[9px] text-text-muted uppercase">Venue</span>
-                      <span className="font-semibold text-text-main">{selectedTournament.venue}</span>
+                    <div className="col-span-2">
+                      <span className="block text-[10px] text-gray-500 dark:text-gray-400 uppercase">Venue</span>
+                      <span className="font-semibold text-gray-900 dark:text-white text-sm">{selectedTournament.venue}</span>
                     </div>
                   </div>
 
-                  <div className="border-t border-dashed border-border-default pt-4 flex flex-col items-center justify-center gap-2">
+                  <div className="border-t border-dashed border-[#ddd] dark:border-[#3a3a3a] pt-4 flex flex-col items-center gap-2">
                     {qrCodeUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={qrCodeUrl} alt="Tournament Pass QR" className="w-32 h-32 rounded bg-qr-bg p-2" />
+                      <img src={qrCodeUrl} alt="Tournament Pass QR" className="w-32 h-32 rounded-xl bg-white p-2" />
                     ) : (
-                      <div className="w-32 h-32 bg-bg animate-pulse rounded" />
+                      <div className="w-32 h-32 bg-gray-100 dark:bg-[#282828] animate-pulse rounded-xl" />
                     )}
-                    <span className="text-[8px] font-sans font-bold uppercase tracking-wider text-text-muted">SCAN AT VENUE GATE TO CHECK IN</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Scan at venue gate</span>
                   </div>
                 </div>
 
-                <div className="mt-6 flex flex-col gap-3.5 w-full">
-                  <button onClick={handleDownloadTicket}
-                    className="w-full bg-elevated hover:bg-elevated border border-border-default text-text-main font-semibold py-3 rounded-md flex items-center justify-center gap-2">
-                    <Download className="w-4 h-4" /> Download Ticket Pass
+                <div className="flex flex-col gap-3 mt-6">
+                  <button onClick={handleDownloadTicket} className="w-full bg-gray-50 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] text-gray-900 dark:text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#282828] transition-colors">
+                    <Download className="w-4 h-4" /> Download Pass
                   </button>
-                  <button onClick={() => setRegStep("closed")} className="w-full bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold py-3 rounded-md transition-all">
-                    Close
+                  <button onClick={() => setRegStep("closed")} className="w-full bg-[#4ADE80] hover:bg-[#16A34A] text-white font-semibold py-3 rounded-xl transition-colors">
+                    Done
                   </button>
                 </div>
               </motion.div>
             )}
 
             {regStep === "error" && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-surface border border-error/30 rounded-md max-w-md w-full p-6 text-center">
-                <AlertCircle className="w-10 h-10 text-error mx-auto" />
-                <h3 className="font-sans font-bold text-lg text-text-main mt-4">Registration Failed</h3>
-                <p className="text-xs text-text-muted mt-2 font-sans">{regError}</p>
-                <div className="mt-6 flex gap-3 justify-center">
-                  <button onClick={() => setRegStep("form")} className="bg-brand-lime text-black font-sans font-bold text-sm py-2.5 px-6 rounded-md">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative bg-white dark:bg-[#282828] border border-red-200 dark:border-red-800 rounded-2xl max-w-md w-full p-6 shadow-xl text-center">
+                <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-4">Registration Failed</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{regError}</p>
+                <div className="flex gap-3 mt-6 justify-center">
+                  <button onClick={() => setRegStep("form")} className="bg-[#4ADE80] hover:bg-[#16A34A] text-white font-semibold text-sm py-2.5 px-6 rounded-xl transition-colors">
                     Try Again
                   </button>
-                  <button onClick={() => setRegStep("closed")} className="bg-elevated border border-border-default text-text-main font-sans text-sm py-2.5 px-6 rounded-md">
+                  <button onClick={() => setRegStep("closed")} className="bg-gray-100 dark:bg-[#1a1a1a] border border-[#ddd] dark:border-[#3a3a3a] text-gray-700 dark:text-gray-300 text-sm py-2.5 px-6 rounded-xl">
                     Close
                   </button>
                 </div>
