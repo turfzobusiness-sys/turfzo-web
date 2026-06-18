@@ -21,6 +21,7 @@ export default defineSchema({
     last_login_at: v.optional(v.string()),
     favorite_sports: v.optional(v.array(v.string())),
     notifications_enabled: v.boolean(),
+    approved_at: v.optional(v.number()),
     created_at: v.string(),
     updated_at: v.string(),
   })
