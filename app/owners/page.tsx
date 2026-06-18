@@ -52,17 +52,17 @@ export default function OwnersPage() {
     <div className="airbnb-explore-theme flex flex-col min-h-screen bg-[#fafafa] dark:bg-[#1a1a1a]">
       <Header />
 
-      <main className="flex-grow pt-24 pb-16 px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full">
-        {/* HERO — split layout */}
+      <main className="flex-grow pt-24 pb-16">
+        {/* HERO — full bleed */}
         <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="relative rounded-3xl overflow-hidden mb-16 bg-gradient-to-br from-[#0f1f0f] via-[#162016] to-[#0d1a0d]"
+          className="relative -mt-24 overflow-hidden bg-gradient-to-br from-[#dcfce7] via-[#f0fdf4] to-[#bbf7d0] dark:from-[#0f1f0f] dark:via-[#162016] dark:to-[#0d1a0d]"
         >
           {/* Background image — subtle */}
           <div
-            className="absolute inset-0 z-0 opacity-20 bg-cover bg-center"
+            className="absolute inset-0 z-0 opacity-25 dark:opacity-20 bg-cover bg-center brightness-[0.80] dark:brightness-100"
             style={{ backgroundImage: "url('/stadium_cinematic_bg.png')" }}
           />
 
@@ -70,14 +70,14 @@ export default function OwnersPage() {
           <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#4ADE80]/8 rounded-full blur-3xl z-0" />
           <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#4ADE80]/5 rounded-full blur-3xl z-0" />
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-16 py-16 sm:py-20 lg:py-24 px-8 sm:px-14">
+          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-16 py-16 sm:py-20 lg:py-24 px-6 sm:px-10 lg:px-20 max-w-[1760px] mx-auto w-full">
             {/* Left — copy */}
             <div className="flex-1 max-w-xl">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15, duration: 0.5 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#4ADE80]/10 border border-[#4ADE80]/20 text-[#4ADE80] text-[11px] font-semibold tracking-wider uppercase mb-6"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-lime/10 border border-brand-lime/20 text-brand-lime text-[11px] font-semibold tracking-wider uppercase mb-6"
               >
                 <HiSparkles className="w-3.5 h-3.5" />
                 Turfzo for Partners
@@ -87,18 +87,18 @@ export default function OwnersPage() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25, duration: 0.5 }}
-                className="font-[family-name:var(--font-anton)] text-4xl sm:text-5xl lg:text-[3.5rem] text-white uppercase leading-[1.08] tracking-wide mb-5"
+                className="font-[family-name:var(--font-anton)] text-4xl sm:text-5xl lg:text-[3.5rem] text-text-main dark:text-white uppercase leading-[1.08] tracking-wide mb-5"
               >
                 Run Your Venue
                 <br />
-                on <span className="text-[#4ADE80]">Autopilot</span>
+                on <span className="text-brand-lime">Autopilot</span>
               </motion.h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35, duration: 0.5 }}
-                className="text-white/60 text-sm sm:text-[15px] leading-relaxed mb-8 max-w-md"
+                className="text-text-muted dark:text-white/60 text-sm sm:text-[15px] leading-relaxed mb-8 max-w-md"
               >
                 Connect your venue to India&apos;s premium sports automation suite.
                 Maximize court occupancy, trigger floodlights automatically, and
@@ -113,13 +113,13 @@ export default function OwnersPage() {
               >
                 <button
                   onClick={() => router.push("/owners/register")}
-                  className="flex items-center gap-2 bg-[#4ADE80] hover:bg-[#16A34A] text-white font-semibold px-7 py-3.5 rounded-xl transition-colors text-sm"
+                  className="flex items-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-bg font-semibold px-7 py-3.5 rounded-xl transition-colors text-sm cursor-pointer border-none outline-none"
                 >
                   Get Started <ArrowRight className="w-4 h-4" />
                 </button>
                 <a
                   href="#features"
-                  className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/80 font-medium px-7 py-3.5 rounded-xl transition-colors text-sm border border-white/10"
+                  className="flex items-center gap-2 bg-surface hover:bg-elevated/50 text-text-main dark:bg-white/5 dark:hover:bg-white/10 dark:text-white/80 font-medium px-7 py-3.5 rounded-xl transition-colors text-sm border border-border-strong dark:border-white/10"
                 >
                   Explore Technology
                 </a>
@@ -130,7 +130,7 @@ export default function OwnersPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
                 href="/owners/dashboard"
-                className="inline-block mt-6 text-xs text-white/30 hover:text-[#4ADE80] transition-colors"
+                className="inline-block mt-6 text-xs text-text-muted/65 hover:text-brand-lime dark:text-white/30 dark:hover:text-brand-lime transition-colors"
               >
                 Already registered? Check your application status →
               </motion.a>
@@ -159,20 +159,20 @@ export default function OwnersPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.8, duration: 0.5 }}
-                  className="absolute -left-16 top-20 bg-black/40 backdrop-blur-md rounded-xl px-4 py-3"
+                  className="absolute -left-16 top-20 bg-surface/90 border border-border-default shadow-sm dark:border-none dark:bg-black/40 backdrop-blur-md rounded-xl px-4 py-3"
                 >
-                  <div className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Today&apos;s Earnings</div>
-                  <div className="text-lg font-bold text-[#4ADE80] mt-0.5">₹12,400</div>
+                  <div className="text-[10px] text-text-muted/80 dark:text-white/50 uppercase tracking-wider font-medium">Today&apos;s Earnings</div>
+                  <div className="text-lg font-bold text-brand-lime mt-0.5">₹12,400</div>
                 </motion.div>
 
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 1, duration: 0.5 }}
-                  className="absolute -right-12 bottom-28 bg-black/40 backdrop-blur-md rounded-xl px-4 py-3"
+                  className="absolute -right-12 bottom-28 bg-surface/90 border border-border-default shadow-sm dark:border-none dark:bg-black/40 backdrop-blur-md rounded-xl px-4 py-3"
                 >
-                  <div className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Active Bookings</div>
-                  <div className="text-lg font-bold text-white mt-0.5">8 <span className="text-xs text-white/40 font-normal">live now</span></div>
+                  <div className="text-[10px] text-text-muted/80 dark:text-white/50 uppercase tracking-wider font-medium">Active Bookings</div>
+                  <div className="text-lg font-bold text-text-main dark:text-white mt-0.5">8 <span className="text-xs text-text-muted/60 dark:text-white/40 font-normal">live now</span></div>
                 </motion.div>
               </div>
             </motion.div>
@@ -180,7 +180,8 @@ export default function OwnersPage() {
         </motion.section>
 
         {/* FEATURES */}
-        <section id="features" className="mb-20">
+        <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
+        <section id="features" className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14">
           <div className="text-center mb-12 max-w-2xl mx-auto">
             <span className="text-[11px] font-semibold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
               Next-Gen Manager Tech
@@ -201,7 +202,7 @@ export default function OwnersPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="bg-white dark:bg-[#282828] border border-gray-200/80 dark:border-[#3a3a3a] rounded-2xl p-7 flex flex-col shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none"
+              className="bg-white dark:bg-[#282828] rounded-2xl p-7 flex flex-col"
             >
               <div className="w-11 h-11 rounded-2xl bg-[#4ADE80]/10 flex items-center justify-center mb-5">
                 <TbCalendarTime className="w-5 h-5 text-[#4ADE80]" />
@@ -244,7 +245,7 @@ export default function OwnersPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-white dark:bg-[#282828] border border-gray-200/80 dark:border-[#3a3a3a] rounded-2xl p-7 flex flex-col shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none"
+              className="bg-white dark:bg-[#282828] rounded-2xl p-7 flex flex-col"
             >
               <div className="w-11 h-11 rounded-2xl bg-[#4ADE80]/10 flex items-center justify-center mb-5">
                 <TbCpu className="w-5 h-5 text-[#4ADE80]" />
@@ -307,7 +308,7 @@ export default function OwnersPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white dark:bg-[#282828] border border-gray-200/80 dark:border-[#3a3a3a] rounded-2xl p-7 flex flex-col shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none"
+              className="bg-white dark:bg-[#282828] rounded-2xl p-7 flex flex-col"
             >
               <div className="w-11 h-11 rounded-2xl bg-[#4ADE80]/10 flex items-center justify-center mb-5">
                 <TbWallet className="w-5 h-5 text-[#4ADE80]" />
@@ -361,7 +362,8 @@ export default function OwnersPage() {
         </section>
 
         {/* REGISTRATION FORM */}
-        <section id="register" className="mb-20 scroll-mt-12">
+        <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
+        <section id="register" className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14 scroll-mt-12">
           <div className="text-center mb-10 max-w-2xl mx-auto">
             <span className="text-[11px] font-semibold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
               Partner Registration
@@ -378,7 +380,8 @@ export default function OwnersPage() {
         </section>
 
         {/* TRUST BADGES */}
-        <section className="mb-20">
+        <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
+        <section className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
@@ -403,7 +406,7 @@ export default function OwnersPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-white dark:bg-[#282828] border border-gray-200/80 dark:border-[#3a3a3a] rounded-2xl p-6 flex items-start gap-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none"
+                className="bg-white dark:bg-[#282828] rounded-2xl p-6 flex items-start gap-4"
               >
                 <div className="w-11 h-11 rounded-2xl bg-[#4ADE80]/10 flex items-center justify-center flex-shrink-0">
                   {badge.icon}
@@ -422,7 +425,9 @@ export default function OwnersPage() {
         </section>
 
         {/* FAQ */}
-        <section className="max-w-3xl mx-auto">
+        <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
+        <section className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14">
+          <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <span className="text-[11px] font-semibold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
               FAQs
@@ -432,7 +437,7 @@ export default function OwnersPage() {
             </h2>
           </div>
 
-          <div className="bg-white dark:bg-[#282828] border border-gray-200/80 dark:border-[#3a3a3a] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none">
+          <div className="bg-white dark:bg-[#282828] rounded-2xl overflow-hidden">
             {OWNER_FAQS.map((faq, index) => {
               const isOpen = activeFaq === index;
               return (
@@ -474,6 +479,7 @@ export default function OwnersPage() {
                 </div>
               );
             })}
+          </div>
           </div>
         </section>
       </main>
