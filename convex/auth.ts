@@ -14,10 +14,12 @@ export const syncFirebaseUser = mutation({
       throw new Error("Not authenticated");
     }
 
-    const token = identity.token as { email?: string; email_verified?: boolean; picture?: string };
+    const token = identity.token as any;
     const firebaseUid = identity.subject;
-    const email = token?.email || "";
-    const emailVerified = token?.email_verified || false;
+    const email = identity.email || token?.email || "";
+    const emailVerified = identity.emailVerified || token?.email_verified || false;
+    const name = identity.name || token?.name || "";
+    const picture = identity.pictureUrl || token?.picture || "";
 
     const existingUser = await ctx.db
       .query("users")
@@ -30,7 +32,9 @@ export const syncFirebaseUser = mutation({
       const targetRole = args.role || existingUser.role;
       await ctx.db.patch(existingUser._id, {
         role: targetRole,
-        display_name: args.displayName || existingUser.display_name,
+        display_name: args.displayName || existingUser.display_name || name,
+        full_name: existingUser.full_name || name,
+        avatar_url: existingUser.avatar_url || picture,
         phone_number: args.phoneNumber || existingUser.phone_number,
         city: args.city || existingUser.city,
         is_email_verified: emailVerified,
@@ -66,10 +70,10 @@ export const syncFirebaseUser = mutation({
     const targetRole = args.role ?? "player";
     const newUser = await ctx.db.insert("users", {
       email,
-      full_name: args.displayName || "",
-      display_name: args.displayName || "",
+      full_name: args.displayName || name || "",
+      display_name: args.displayName || name || "",
       phone_number: args.phoneNumber || "",
-      avatar_url: token?.picture || "",
+      avatar_url: picture || "",
       role: targetRole,
       city: args.city || "",
       state: "",
