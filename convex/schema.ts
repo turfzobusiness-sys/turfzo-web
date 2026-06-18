@@ -245,4 +245,14 @@ export default defineSchema({
     created_at: v.number(),
   })
     .index("by_status", ["status"]),
+
+  auditLogs: defineTable({
+    action: v.string(),
+    target_user_id: v.id("users"),
+    admin_user_id: v.id("users"),
+    timestamp: v.number(),
+  })
+    .index("by_admin_id", ["admin_user_id"])
+    .index("by_target_id", ["target_user_id"])
+    .index("by_timestamp", ["timestamp"]),
 });
