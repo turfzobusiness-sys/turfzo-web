@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AdminGuard } from "@/components/admin/admin-guard";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Turfzo",
@@ -6,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <AdminGuard>
+      {children}
+    </AdminGuard>
+  );
 }
