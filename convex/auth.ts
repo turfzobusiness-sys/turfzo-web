@@ -1,9 +1,21 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+// =============================================================================
+// VALIDATION HELPERS
+// =============================================================================
+function validateGST(gst: string): boolean {
+  const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+  return gstRegex.test(gst);
+}
+
+function validatePAN(pan: string): boolean {
+  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+  return panRegex.test(pan);
+}
+
 export const syncFirebaseUser = mutation({
   args: {
-    role: v.optional(v.union(v.literal("player"), v.literal("owner"), v.literal("admin"))),
     displayName: v.optional(v.string()),
     phoneNumber: v.optional(v.string()),
     city: v.optional(v.string()),
@@ -29,9 +41,9 @@ export const syncFirebaseUser = mutation({
     const now = new Date().toISOString();
 
     if (existingUser) {
-      const targetRole = args.role || existingUser.role;
+      // SECURITY: Role cannot be changed via this mutation
+      // Role changes must go through admin:updateUserRole mutation
       await ctx.db.patch(existingUser._id, {
-        role: targetRole,
         display_name: args.displayName || existingUser.display_name || name,
         full_name: existingUser.full_name || name,
         avatar_url: existingUser.avatar_url || picture,
@@ -41,7 +53,7 @@ export const syncFirebaseUser = mutation({
         updated_at: now,
       });
 
-      if (targetRole === "owner") {
+      if (existingUser.role === "owner") {
         const existingProfile = await ctx.db
           .query("ownerProfiles")
           .withIndex("by_user_id", (q) => q.eq("user_id", existingUser._id))
@@ -67,41 +79,26 @@ export const syncFirebaseUser = mutation({
       return { success: true, user: updatedUser, session_token: "" };
     }
 
-    const targetRole = args.role ?? "player";
+    // SECURITY: New users always start as "player" role
+    // Owner/admin roles must be assigned via admin:updateUserRole
     const newUser = await ctx.db.insert("users", {
       email,
       full_name: args.displayName || name || "",
       display_name: args.displayName || name || "",
       phone_number: args.phoneNumber || "",
       avatar_url: picture || "",
-      role: targetRole,
+      role: "player",
       city: args.city || "",
       state: "",
       is_email_verified: emailVerified,
       is_phone_verified: false,
-      is_approved: targetRole === "player",
+      is_approved: true,
       firebase_uid: firebaseUid,
       favorite_sports: [],
       notifications_enabled: true,
       created_at: now,
       updated_at: now,
     });
-
-    if (targetRole === "owner") {
-      await ctx.db.insert("ownerProfiles", {
-        user_id: newUser,
-        business_name: "",
-        phone_number: args.phoneNumber || "",
-        gst_number: "",
-        pan_number: "",
-        address: "",
-        city: args.city || "",
-        state: "",
-        zip_code: "",
-        onboarding_step: 1,
-        onboarding_completed: false,
-      });
-    }
 
     const userDoc = await ctx.db.get(newUser);
     return { success: true, user: userDoc, session_token: "" };
@@ -223,6 +220,14 @@ export const updateOwnerProfile = mutation({
 
     if (!profile) {
       throw new Error("Owner profile not found");
+    }
+
+    // SECURITY: Validate GST/PAN format if provided
+    if (args.gst_number && !validateGST(args.gst_number)) {
+      throw new Error("Invalid GST number format. Must be 15 characters: 2 digit state code + 10 char PAN + entity number + Z + check digit");
+    }
+    if (args.pan_number && !validatePAN(args.pan_number)) {
+      throw new Error("Invalid PAN number format. Must be 10 characters: AAAAA1234F");
     }
 
     const updateData: Record<string, unknown> = { ...args };
@@ -483,6 +488,21 @@ export const completeOnboardingStep = mutation({
 
     if (!profile) {
       throw new Error("Owner profile not found");
+    }
+
+    // SECURITY: Validate GST/PAN format in step 1
+    if (args.step === 1 && args.businessProfile) {
+      if (args.businessProfile.gst_number && !validateGST(args.businessProfile.gst_number)) {
+        throw new Error("Invalid GST number format");
+      }
+      if (args.businessProfile.pan_number && !validatePAN(args.businessProfile.pan_number)) {
+        throw new Error("Invalid PAN number format");
+      }
+    }
+
+    // SECURITY: Enforce sequential onboarding steps
+    if (args.step !== profile.onboarding_step + 1 && args.step !== 1) {
+      throw new Error(`Cannot skip steps. Current step: ${profile.onboarding_step}, requested: ${args.step}`);
     }
 
     if (args.step === 1 && args.businessProfile) {
