@@ -498,3 +498,38 @@ export const checkAdminExists = query({
     };
   },
 });
+
+// =============================================================================
+// RESET SETUP - Use this to clear all admins and start fresh
+// Call this from Convex dashboard: admin:resetSetup
+// =============================================================================
+
+export const resetSetup = mutation({
+  args: {
+    confirm: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (args.confirm !== "RESET_ALL_ADMINS") {
+      throw new Error("Invalid confirmation. Pass confirm: 'RESET_ALL_ADMINS'");
+    }
+
+    // Find all admins
+    const admins = await ctx.db
+      .query("users")
+      .withIndex("by_role", (q) => q.eq("role", "admin"))
+      .collect();
+
+    // Reset each admin to player
+    for (const admin of admins) {
+      await ctx.db.patch(admin._id, {
+        role: "player",
+        updated_at: new Date().toISOString(),
+      });
+    }
+
+    return {
+      success: true,
+      message: `Reset ${admins.length} admin(s) to player role. You can now use /setup again.`,
+    };
+  },
+});
