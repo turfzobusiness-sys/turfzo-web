@@ -9,6 +9,8 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as bookings from "../bookings.js";
+import type * as turfs from "../turfs.js";
 import type * as venues from "../venues.js";
 
 import type {
@@ -19,6 +21,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  bookings: typeof bookings;
+  turfs: typeof turfs;
   venues: typeof venues;
 }>;
 
