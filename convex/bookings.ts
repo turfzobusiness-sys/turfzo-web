@@ -15,7 +15,7 @@ async function requireUserId(ctx: any) {
   if (!identity) throw new Error("Not authenticated");
   const user = await ctx.db
     .query("users")
-    .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
+    .withIndex("by_firebase_uid", (q: any) => q.eq("firebase_uid", identity.subject))
     .unique();
   if (!user) throw new Error("User not found");
   return user._id;
@@ -28,7 +28,7 @@ export const getMyBookings = query({
     if (!userId) return [];
     return await ctx.db
       .query("bookings")
-      .withIndex("by_user_id", (q) => q.eq("user_id", userId))
+      .withIndex("by_user_id", (q: any) => q.eq("user_id", userId))
       .order("desc")
       .collect();
   },
@@ -39,7 +39,7 @@ export const getByCode = query({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("bookings")
-      .filter((q) => q.eq(q.field("booking_code"), args.booking_code))
+      .filter((q: any) => q.eq(q.field("booking_code"), args.booking_code))
       .first();
   },
 });
@@ -57,7 +57,7 @@ export const createPending = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);
-    const turf = await ctx.db.get(args.turf_id as any);
+    const turf = (await ctx.db.get(args.turf_id as any)) as any;
     if (!turf || !turf.is_available) {
       throw new Error("Turf is no longer available");
     }
@@ -66,8 +66,8 @@ export const createPending = mutation({
     // Using simple filter since by_turf_start index might not exist in the new schema
     const existing = await ctx.db
       .query("bookings")
-      .withIndex("by_turf_id", (q) => q.eq("turf_id", args.turf_id))
-      .filter(q => q.eq(q.field("start_time"), slotStart.toISOString()))
+      .withIndex("by_turf_id", (q: any) => q.eq("turf_id", args.turf_id))
+      .filter((q: any) => q.eq(q.field("start_time"), slotStart.toISOString()))
       .first();
       
     if (existing && existing.status !== "cancelled") {
