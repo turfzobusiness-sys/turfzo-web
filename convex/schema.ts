@@ -28,6 +28,51 @@ export default defineSchema({
     .index("by_email", ["email"])
     .index("by_role", ["role"]),
 
+  turfs: defineTable({
+    user_id: v.optional(v.string()),
+    name: v.string(),
+    description: v.optional(v.string()),
+    address: v.optional(v.string()),
+    city: v.string(),
+    state: v.optional(v.string()),
+    zip_code: v.optional(v.string()),
+    price_per_hour: v.number(),
+    image_url: v.optional(v.string()),
+    image_gallery: v.optional(v.array(v.string())),
+    is_available: v.boolean(),
+    sport_type: v.optional(v.string()),
+    amenities: v.optional(v.array(v.string())),
+    rating: v.optional(v.number()),
+    review_count: v.optional(v.number()),
+    tier: v.optional(v.string()),
+    format: v.optional(v.string()),
+    location_name: v.optional(v.string()),
+    latitude: v.optional(v.number()),
+    longitude: v.optional(v.number()),
+    operating_hours: v.optional(
+      v.object({
+        open: v.string(),
+        close: v.string(),
+      })
+    ),
+    max_players: v.optional(v.number()),
+    has_floodlights: v.optional(v.boolean()),
+    has_free_parking: v.optional(v.boolean()),
+    has_changing_room: v.optional(v.boolean()),
+    has_drinking_water: v.optional(v.boolean()),
+    has_first_aid: v.optional(v.boolean()),
+    is_indoor: v.optional(v.boolean()),
+    created_at: v.optional(v.string()),
+    updated_at: v.optional(v.string()),
+  })
+    .index("by_city", ["city"])
+    .index("by_sport", ["sport_type"])
+    .index("by_available", ["is_available"])
+    .searchIndex("search_turfs", {
+      searchField: "name",
+      filterFields: ["city", "sport_type", "is_available"],
+    }),
+
   venues: defineTable({
     owner_id: v.id("users"),
     name: v.string(),

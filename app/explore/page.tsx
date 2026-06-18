@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -18,9 +17,21 @@ import {
   X,
   Loader2,
   Download,
-  ArrowRight,
+  ArrowLeft,
   AlertCircle,
   Search,
+  Sparkles,
+  Info,
+  Calendar,
+  Wifi,
+  Zap,
+  Droplet,
+  Coffee,
+  Home,
+  Sun,
+  Sunrise,
+  Moon,
+  ParkingCircle,
 } from "lucide-react";
 import { GiSoccerBall, GiCricketBat, GiShuttlecock, GiTennisRacket, GiAmericanFootballBall } from "react-icons/gi";
 import { Header } from "@/components/ui/header-2";
@@ -42,12 +53,17 @@ const exploreFaqItems = [
 ];
 
 const SPORT_CATEGORIES = [
+  { id: "all", label: "All Sports", icon: TrophyIcon },
   { id: "Football", label: "Football", icon: GiSoccerBall },
   { id: "Cricket", label: "Cricket", icon: GiCricketBat },
   { id: "Badminton", label: "Badminton", icon: GiShuttlecock },
   { id: "Tennis", label: "Tennis", icon: GiTennisRacket },
   { id: "Multipurpose", label: "Multipurpose", icon: GiAmericanFootballBall },
 ];
+
+function TrophyIcon(props: React.ComponentProps<typeof Award>) {
+  return <Award {...props} />;
+}
 
 interface TurfDisplay {
   id: string;
@@ -62,6 +78,12 @@ interface TurfDisplay {
   facilities: string[];
   image: string;
   city?: string;
+  hasFloodlights?: boolean;
+  hasFreeParking?: boolean;
+  hasChangingRoom?: boolean;
+  hasDrinkingWater?: boolean;
+  hasFirstAid?: boolean;
+  isIndoor?: boolean;
 }
 
 function mapTurf(t: ConvexTurf): TurfDisplay {
@@ -79,10 +101,16 @@ function mapTurf(t: ConvexTurf): TurfDisplay {
     facilities: t.amenities ?? [],
     image: t.image_url || "/stadium_turf_bg.png",
     city: t.city,
+    hasFloodlights: t.has_floodlights,
+    hasFreeParking: t.has_free_parking,
+    hasChangingRoom: t.has_changing_room,
+    hasDrinkingWater: t.has_drinking_water,
+    hasFirstAid: t.has_first_aid,
+    isIndoor: t.is_indoor,
   };
 }
 
-type FlowStep = "listing" | "slots" | "checkout" | "processing" | "confirmed" | "error";
+type FlowStep = "listing" | "checkout" | "processing" | "confirmed" | "error";
 
 interface SlotInfo {
   time: string;
@@ -117,12 +145,10 @@ function formatDisplayDate(dateStr: string) {
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="ae-faq-item">
-      <button className="ae-faq-trigger" onClick={() => setOpen((v) => !v)}>
+    <div className="bg-surface border border-border-default rounded-xl overflow-hidden mb-3">
+      <button className="w-full flex items-center justify-between p-4 font-semibold text-text-main text-left cursor-pointer hover:bg-elevated transition-colors" onClick={() => setOpen((v) => !v)}>
         <span>{question}</span>
-        <div className={`ae-faq-icon ${open ? "ae-faq-item-open" : ""}`}>
-          <ChevronDown className="w-4 h-4" style={{ color: "var(--ae-ink)" }} />
-        </div>
+        <ChevronDown className={`w-4 h-4 text-text-muted transition-transform duration-200 ${open ? "rotate-180 text-brand-lime" : ""}`} />
       </button>
       <AnimatePresence initial={false}>
         {open && (
@@ -130,10 +156,10 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.2 }}
             style={{ overflow: "hidden" }}
           >
-            <div className="ae-faq-content">{answer}</div>
+            <div className="p-4 pt-0 text-text-muted text-sm border-t border-border-default bg-elevated/20 leading-relaxed">{answer}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -154,11 +180,11 @@ function CustomSelect({ value, onChange, options }: { value: string; onChange: (
   }, []);
 
   return (
-    <div ref={ref} className="ae-select-wrapper" style={{ position: "relative" }}>
-      <button className="ae-select" onClick={() => setOpen((v) => !v)}>
+    <div ref={ref} className="relative inline-flex items-center">
+      <button className="bg-surface border border-border-default text-xs font-bold text-text-main px-3 py-1.5 rounded-xl cursor-pointer hover:border-border-strong transition-all flex items-center gap-1 focus:outline-none" onClick={() => setOpen((v) => !v)}>
         {value}
+        <ChevronDown className="w-3.5 h-3.5 text-text-muted shrink-0" />
       </button>
-      <ChevronDown className="ae-select-arrow w-3.5 h-3.5" style={{ color: "var(--ae-muted)" }} />
       <AnimatePresence>
         {open && (
           <motion.div
@@ -166,40 +192,14 @@ function CustomSelect({ value, onChange, options }: { value: string; onChange: (
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            style={{
-              position: "absolute",
-              top: "calc(100% + 6px)",
-              right: 0,
-              minWidth: "180px",
-              borderRadius: "var(--ae-radius-md)",
-              border: "1px solid var(--ae-hairline)",
-              background: "var(--ae-canvas)",
-              boxShadow: "var(--ae-shadow-hover)",
-              zIndex: 20,
-              padding: "6px",
-              overflow: "hidden",
-            }}
+            className="absolute top-full right-0 mt-1.5 min-w-[160px] bg-surface border border-border-default rounded-xl shadow-lg z-50 p-1.5 overflow-hidden"
           >
             {options.map((opt) => (
               <button
                 key={opt}
                 onClick={() => { onChange(opt); setOpen(false); }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  padding: "10px 14px",
-                  borderRadius: "var(--ae-radius-sm)",
-                  border: "none",
-                  background: opt === value ? "var(--ae-surface-soft)" : "transparent",
-                  color: "var(--ae-ink)",
-                  fontSize: "14px",
-                  fontWeight: opt === value ? 600 : 400,
-                  textAlign: "left",
-                  cursor: "pointer",
-                  transition: "background-color 0.12s",
-                }}
-                onMouseEnter={(e) => { if (opt !== value) e.currentTarget.style.background = "var(--ae-surface-soft)"; }}
-                onMouseLeave={(e) => { if (opt !== value) e.currentTarget.style.background = "transparent"; }}
+                className={`w-full block text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors focus:outline-none
+                  ${opt === value ? "bg-brand-lime/10 text-brand-lime font-semibold" : "text-text-main hover:bg-elevated"}`}
               >
                 {opt}
               </button>
@@ -212,11 +212,11 @@ function CustomSelect({ value, onChange, options }: { value: string; onChange: (
 }
 
 /* ── Calendar Picker — Airbnb-style month grid ── */
-function CalendarPicker({ selected, onSelect }: { selected: string; onSelect: (v: string) => void }) {
+function CalendarPicker({ selected, onSelect, onClose }: { selected: string; onSelect: (v: string) => void; onClose?: () => void }) {
   const todayRef = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
   const [viewMonth, setViewMonth] = useState(() => {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), 1);
+    const d = new Date(selected);
+    return new Date(d.getFullYear(), d.getMonth(), 1);
   });
 
   const monthLabel = viewMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" });
@@ -243,48 +243,36 @@ function CalendarPicker({ selected, onSelect }: { selected: string; onSelect: (v
   const canGoPrev = viewMonth.getFullYear() > todayRef.getFullYear() || (viewMonth.getFullYear() === todayRef.getFullYear() && viewMonth.getMonth() > todayRef.getMonth());
 
   return (
-    <div style={{ width: "100%" }}>
+    <div className="w-[280px]">
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+      <div className="flex items-center justify-between mb-4">
         <button
           disabled={!canGoPrev}
           onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))}
-          style={{
-            width: "32px", height: "32px", borderRadius: "50%", border: "none",
-            background: canGoPrev ? "var(--ae-surface-soft)" : "transparent",
-            cursor: canGoPrev ? "pointer" : "default",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            opacity: canGoPrev ? 1 : 0.3,
-            transition: "all 0.15s",
-          }}
+          className="w-8 h-8 rounded-full border-none bg-elevated hover:bg-border-default disabled:opacity-30 disabled:cursor-default flex items-center justify-center cursor-pointer transition-all duration-200"
         >
-          <ChevronLeft className="w-4 h-4" style={{ color: "var(--ae-ink)" }} />
+          <ChevronLeft className="w-4 h-4 text-text-main" />
         </button>
-        <span style={{ fontSize: "16px", fontWeight: 700, color: "var(--ae-ink)", letterSpacing: "-0.01em" }}>{monthLabel}</span>
+        <span className="text-sm font-bold text-text-main">{monthLabel}</span>
         <button
           onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))}
-          style={{
-            width: "32px", height: "32px", borderRadius: "50%", border: "none",
-            background: "var(--ae-surface-soft)", cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "all 0.15s",
-          }}
+          className="w-8 h-8 rounded-full border-none bg-elevated hover:bg-border-default flex items-center justify-center cursor-pointer transition-all duration-200"
         >
-          <ChevronDown className="w-4 h-4" style={{ color: "var(--ae-ink)", transform: "rotate(-90deg)" }} />
+          <ChevronLeft className="w-4 h-4 text-text-main rotate-180" />
         </button>
       </div>
 
       {/* Weekday headers */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: "4px" }}>
+      <div className="grid grid-cols-7 mb-1">
         {weekdays.map((wd) => (
-          <div key={wd} style={{ textAlign: "center", fontSize: "12px", fontWeight: 600, color: "var(--ae-muted)", padding: "6px 0", letterSpacing: "0.02em" }}>
+          <div key={wd} className="text-center text-[10px] font-bold text-text-muted py-1">
             {wd}
           </div>
         ))}
       </div>
 
       {/* Day grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "0" }}>
+      <div className="grid grid-cols-7 gap-0.5">
         {days.map((day) => {
           const isSelected = day.key === selected;
           const isCurrentMonth = day.key.startsWith(`${viewMonth.getFullYear()}-${String(viewMonth.getMonth() + 1).padStart(2, "0")}`);
@@ -292,28 +280,15 @@ function CalendarPicker({ selected, onSelect }: { selected: string; onSelect: (v
             <button
               key={day.key}
               disabled={day.disabled || !isCurrentMonth}
-              onClick={() => { if (!day.disabled && isCurrentMonth) onSelect(day.key); }}
-              style={{
-                width: "40px", height: "40px", borderRadius: "50%",
-                border: "none", padding: 0, margin: "auto",
-                background: isSelected ? "var(--ae-ink)" : "transparent",
-                color: isSelected ? "var(--ae-canvas)" : day.disabled || !isCurrentMonth ? "var(--ae-muted-soft)" : "var(--ae-ink)",
-                fontSize: "14px", fontWeight: isSelected || day.isToday ? 700 : 400,
-                cursor: day.disabled || !isCurrentMonth ? "default" : "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                position: "relative",
-                transition: "all 0.15s ease",
-                outline: day.isToday && !isSelected ? "2px solid var(--ae-primary)" : "none",
-                outlineOffset: "-2px",
-              }}
-              onMouseEnter={(e) => {
-                if (!day.disabled && isCurrentMonth && !isSelected) {
-                  e.currentTarget.style.background = "var(--ae-surface-soft)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isSelected) e.currentTarget.style.background = "transparent";
-              }}
+              onClick={() => { if (!day.disabled && isCurrentMonth) { onSelect(day.key); if (onClose) onClose(); } }}
+              className={`w-8 h-8 rounded-full border-none p-0 mx-auto text-xs flex items-center justify-center transition-all duration-150
+                ${
+                  isSelected
+                    ? "bg-text-main text-bg font-bold"
+                    : day.disabled || !isCurrentMonth
+                      ? "text-text-muted/40 cursor-default"
+                      : "text-text-main hover:bg-elevated cursor-pointer"
+                } ${day.isToday && !isSelected ? "ring-1 ring-brand-lime" : ""}`}
             >
               {day.label}
             </button>
@@ -329,6 +304,7 @@ export default function ExplorePage() {
   const { status, firebaseUser } = useAuth();
 
   const [flowStep, setFlowStep] = useState<FlowStep>("listing");
+  const [viewMode, setViewMode] = useState<"list" | "details">("list");
   const [selectedTurf, setSelectedTurf] = useState<TurfDisplay | null>(null);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [allTurfs, setAllTurfs] = useState<TurfDisplay[]>([]);
@@ -339,20 +315,70 @@ export default function ExplorePage() {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [downloadQrUrl, setDownloadQrUrl] = useState<string>("");
 
-  const [searchLocation, setSearchLocation] = useState("Bengaluru, Karnataka");
+  const [searchLocation, setSearchLocation] = useState("");
   const [searchDate, setSearchDate] = useState(() => toDateKey(new Date()));
   const [whenCalendarOpen, setWhenCalendarOpen] = useState(false);
-  const [selectedSports, setSelectedSports] = useState<string[]>(["Football"]);
-  const [priceRange, setPriceRange] = useState(3000);
+  const [sportDropdownOpen, setSportDropdownOpen] = useState(false);
+  const [selectedSport, setSelectedSport] = useState("all");
+  const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
+  const [filterFormat, setFilterFormat] = useState("all");
+  const [filterMinPrice, setFilterMinPrice] = useState(500);
+  const [filterMaxPrice, setFilterMaxPrice] = useState(3000);
+  const [filterAmenities, setFilterAmenities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("Popular");
+
+  const [hoveredSlider, setHoveredSlider] = useState<"min" | "max" | null>(null);
+  const [activeSlider, setActiveSlider] = useState<"min" | "max" | null>(null);
+  const [minInputVal, setMinInputVal] = useState("500");
+  const [maxInputVal, setMaxInputVal] = useState("3000");
 
   const [selectedDate, setSelectedDate] = useState<string>(toDateKey(new Date()));
   const [availableSlots, setAvailableSlots] = useState<SlotInfo[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
   const [selectedPitch, setSelectedPitch] = useState("Pitch 1 (Premium Turf)");
-  const [selectedPayment, setSelectedPayment] = useState<"upi" | "card" | "netbanking">("upi");
+  const [selectedPayment, setSelectedPayment] = useState<"upi" | "card" | "netbanking" | "pay_at_venue">("upi");
   const [attendees, setAttendees] = useState(10);
+  const [showCalendarBooking, setShowCalendarBooking] = useState(false);
+
+  const groupedSlots = useMemo(() => {
+    const groups: { title: string; icon: any; slots: SlotInfo[] }[] = [
+      { title: "Morning", icon: Sunrise, slots: [] },
+      { title: "Evening", icon: Sun, slots: [] },
+      { title: "Night", icon: Moon, slots: [] },
+    ];
+    availableSlots.forEach((slot) => {
+      const startHourStr = slot.time.split(" ")[0].split(":")[0];
+      const hour = parseInt(startHourStr, 10);
+      if (hour < 12) groups[0].slots.push(slot);
+      else if (hour < 18) groups[1].slots.push(slot);
+      else groups[2].slots.push(slot);
+    });
+    return groups.filter((g) => g.slots.length > 0);
+  }, [availableSlots]);
+
+  const format12Hour = (timeStr: string) => {
+    const start = timeStr.split(" - ")[0];
+    const [h, m] = start.split(":");
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${m} ${ampm}`;
+  };
+
+  const format12HourRange = (timeStr: string) => {
+    if (!timeStr) return "";
+    const parts = timeStr.split(" - ");
+    if (parts.length !== 2) return timeStr;
+    const formatTime = (t: string) => {
+      const [h, m] = t.split(":");
+      const hour = parseInt(h, 10);
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${m} ${ampm}`;
+    };
+    return `${formatTime(parts[0])} - ${formatTime(parts[1])}`;
+  };
 
   useEffect(() => {
     async function fetchTurfs() {
@@ -370,7 +396,7 @@ export default function ExplorePage() {
   }, []);
 
   useEffect(() => {
-    if (flowStep === "slots" && selectedTurf) {
+    if (viewMode === "details" && selectedTurf) {
       const fetchSlots = async () => {
         setLoadingSlots(true);
         try {
@@ -378,7 +404,6 @@ export default function ExplorePage() {
             "turfs:getAvailableSlots",
             { turf_id: selectedTurf.id, date: selectedDate }
           );
-          // Fallback: if no slots returned, generate mock slots for testing
           if (!slots || slots.length === 0) {
             const mockSlots: SlotInfo[] = [
               { time: "06:00 - 07:00", available: true },
@@ -410,14 +435,52 @@ export default function ExplorePage() {
       };
       fetchSlots();
     }
-  }, [flowStep, selectedTurf, selectedDate]);
+  }, [viewMode, selectedTurf, selectedDate]);
+
+  useEffect(() => {
+    const handleOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("[data-when-calendar]")) {
+        setWhenCalendarOpen(false);
+      }
+      if (!target.closest("[data-sport-dropdown]")) {
+        setSportDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, []);
 
   const filteredTurfs = useMemo(() => {
     let result = allTurfs;
-    if (selectedSports.length > 0) {
-      result = result.filter((t) => selectedSports.includes(t.sport));
+    if (selectedSport !== "all") {
+      result = result.filter((t) => t.sport.toLowerCase() === selectedSport.toLowerCase());
     }
-    result = result.filter((t) => t.price <= priceRange);
+    if (searchLocation) {
+      result = result.filter((t) => t.location.toLowerCase().includes(searchLocation.toLowerCase()) || (t.city && t.city.toLowerCase().includes(searchLocation.toLowerCase())));
+    }
+    if (filterFormat !== "all") {
+      result = result.filter((t) => t.size.toLowerCase() === filterFormat.toLowerCase());
+    }
+    result = result.filter((t) => t.price >= filterMinPrice && t.price <= filterMaxPrice);
+    if (filterAmenities.length > 0) {
+      result = result.filter((t) => {
+        return filterAmenities.every((amenityId) => {
+          if (amenityId === "instant") return t.premium || t.facilities.some(f => f.toLowerCase().includes("instant") || f.toLowerCase().includes("confirm"));
+          if (amenityId === "wifi") return t.facilities.some(f => f.toLowerCase().includes("wifi") || f.toLowerCase().includes("internet"));
+          if (amenityId === "parking") return t.hasFreeParking || t.facilities.some(f => f.toLowerCase().includes("parking"));
+          if (amenityId === "floodlight") return t.hasFloodlights || t.facilities.some(f => f.toLowerCase().includes("flood") || f.toLowerCase().includes("light"));
+          if (amenityId === "water") return t.hasDrinkingWater || t.facilities.some(f => f.toLowerCase().includes("water"));
+          if (amenityId === "changing") return t.hasChangingRoom || t.facilities.some(f => f.toLowerCase().includes("changing") || f.toLowerCase().includes("restroom") || f.toLowerCase().includes("shower") || f.toLowerCase().includes("washroom"));
+          if (amenityId === "rental") return t.facilities.some(f => f.toLowerCase().includes("rental") || f.toLowerCase().includes("equipment") || f.toLowerCase().includes("bat") || f.toLowerCase().includes("ball"));
+          if (amenityId === "first-aid") return t.hasFirstAid || t.facilities.some(f => f.toLowerCase().includes("first aid") || f.toLowerCase().includes("medical") || f.toLowerCase().includes("safety"));
+          if (amenityId === "cafeteria") return t.facilities.some(f => f.toLowerCase().includes("cafe") || f.toLowerCase().includes("food") || f.toLowerCase().includes("refreshment") || f.toLowerCase().includes("canteen"));
+          if (amenityId === "indoor") return t.isIndoor || t.facilities.some(f => f.toLowerCase().includes("indoor"));
+          if (amenityId === "outdoor") return !t.isIndoor || t.facilities.some(f => f.toLowerCase().includes("outdoor"));
+          return false;
+        });
+      });
+    }
     if (sortBy === "Popular") {
       result = [...result].sort((a, b) => b.rating - a.rating);
     } else if (sortBy === "Price: Low to High") {
@@ -426,40 +489,19 @@ export default function ExplorePage() {
       result = [...result].sort((a, b) => b.price - a.price);
     }
     return result;
-  }, [allTurfs, selectedSports, priceRange, sortBy]);
+  }, [allTurfs, selectedSport, searchLocation, filterFormat, filterMinPrice, filterMaxPrice, filterAmenities, sortBy]);
 
-  const toggleWishlist = (id: string) => {
+  const toggleWishlist = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setWishlist((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  };
-
-  useEffect(() => {
-    if (flowStep !== "listing" || !whenCalendarOpen) return;
-    const handler = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest("[data-when-calendar]")) {
-        setWhenCalendarOpen(false);
-      }
-    };
-    // Use setTimeout to avoid closing on the same click that opened it
-    const id = setTimeout(() => {
-      document.addEventListener("mousedown", handler);
-    }, 0);
-    return () => {
-      clearTimeout(id);
-      document.removeEventListener("mousedown", handler);
-    };
-  }, [whenCalendarOpen, flowStep]);
-
-  const handleResetFilters = () => {
-    setSelectedSports(["Football"]);
-    setPriceRange(3000);
-    setSortBy("Popular");
   };
 
   const handleOpenSlots = (turf: TurfDisplay) => {
     setSelectedTurf(turf);
     setSelectedPitch(turf.premium ? "Pitch 1 (Premium Turf)" : "Pitch 1 (Standard Turf)");
-    setFlowStep("slots");
+    setSelectedDate(searchDate);
+    setViewMode("details");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleProceedToCheckout = () => {
@@ -499,31 +541,39 @@ export default function ExplorePage() {
     const clientRequestId = `turf_${firebaseUser.uid}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     try {
-      const order = await convexClient.action<{
-        id: string;
-        payment_session_id?: string;
-        amount: number;
-        mock?: boolean;
-        idempotent_replay?: boolean;
-      }>("payments:createCashfreeOrder", {
-        amount: totalPaise, currency: "INR", receipt, client_request_id: clientRequestId, type: "turf_booking",
-      });
+      let paymentId = "mock";
+      let orderId = "pay_at_venue_" + Date.now();
+      
+      if (selectedPayment !== "pay_at_venue") {
+        const order = await convexClient.action<{
+          id: string;
+          payment_session_id?: string;
+          amount: number;
+          mock?: boolean;
+          idempotent_replay?: boolean;
+        }>("payments:createCashfreeOrder", {
+          amount: totalPaise, currency: "INR", receipt, client_request_id: clientRequestId, type: "turf_booking",
+        });
 
-      if (!order.payment_session_id) throw new Error("Failed to initialize payment session");
-      await openCashfreeCheckout({ paymentSessionId: order.payment_session_id });
+        if (!order.payment_session_id) throw new Error("Failed to initialize payment session");
+        await openCashfreeCheckout({ paymentSessionId: order.payment_session_id });
 
-      const verifyResult = await convexClient.action<{ verified: boolean; payment_id?: string; mock?: boolean }>(
-        "payments:verifyCashfreePayment", { order_id: order.id }
-      );
-      if (!verifyResult.verified) throw new Error("Payment verification failed.");
+        const verifyResult = await convexClient.action<{ verified: boolean; payment_id?: string; mock?: boolean }>(
+          "payments:verifyCashfreePayment", { order_id: order.id }
+        );
+        if (!verifyResult.verified) throw new Error("Payment verification failed.");
+        
+        paymentId = verifyResult.payment_id || "mock";
+        orderId = order.id;
+      }
 
       const pendingBooking = await convexClient.mutation<Booking>("bookings:createPending", {
         turf_id: selectedTurf.id, start_time: parsed.start.toISOString(), end_time: parsed.end.toISOString(),
-        total_price: total, service_fee: convenience + gst, attendees, pg_order_id: order.id,
+        total_price: total, service_fee: convenience + gst, attendees, pg_order_id: orderId,
       });
 
       const confirmed = await convexClient.mutation<Booking>("bookings:confirmPaid", {
-        booking_id: pendingBooking._id, pg_payment_id: verifyResult.payment_id || "mock", pg_signature: "verified",
+        booking_id: pendingBooking._id, pg_payment_id: paymentId, pg_signature: selectedPayment === "pay_at_venue" ? "pay_at_venue" : "verified",
       });
 
       setConfirmedBooking(confirmed);
@@ -549,528 +599,1350 @@ export default function ExplorePage() {
 
   const pricing = getPricingDetails();
 
-  const accentColor = "#4ADE80";
-
   return (
-    <div className="airbnb-explore-theme flex flex-col min-h-screen" style={{ fontFamily: "Inter, -apple-system, system-ui, sans-serif" }}>
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <FAQPageSchema items={exploreFaqItems} />
 
-      <div className="sticky top-0 z-50 w-full" style={{ backgroundColor: "var(--ae-canvas)", borderBottom: "1px solid var(--ae-hairline)", transition: "background-color 0.25s, border-color 0.25s" }}>
-        <Header />
-      </div>
+      <Header />
 
-      <main className="flex-grow">
-        {/* ═══ LISTING VIEW ═══ */}
-        {flowStep === "listing" && (
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10 lg:px-20 w-full">
-            {/* Hero + Search */}
-            <div className="pt-8 pb-6">
-              <h1 className="mb-6" style={{ fontSize: "32px", fontWeight: 800, lineHeight: 1.2, color: "var(--ae-ink)", letterSpacing: "-0.02em" }}>
-                Find &amp; book the best turfs near you
-              </h1>
+      <main className="flex-grow pt-24 pb-16">
+        {/* ========================================================
+            VIEW 1: TURFS LISTING BROWSER
+            ======================================================== */}
+        {viewMode === "list" && flowStep === "listing" && (
+          <div>
+            {/* Full Bleed Hero Section */}
+            <motion.section
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="relative -mt-24 overflow-visible min-h-[380px] sm:min-h-[440px] flex flex-col items-start justify-end mb-6"
+            >
+              <div className="absolute inset-0 bg-cover bg-center z-0 opacity-95 dark:opacity-50 brightness-[0.70] dark:brightness-100" style={{ backgroundImage: `url('/stadium_light_bg.png')` }} />
+              <div className="absolute inset-0 z-0 bg-gradient-to-t from-bg via-bg/40 to-transparent dark:from-black/80 dark:via-black/40 dark:to-transparent" />
+              <div className="relative z-10 px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full pb-10 sm:pb-14">
+                <h1 className="font-[family-name:var(--font-anton)] text-4xl sm:text-5xl lg:text-6xl text-text-main dark:text-white uppercase leading-[1.1] tracking-wide mb-2">
+                  Find &amp; Book<br />The Best Turfs Near You
+                </h1>
+                <p className="text-text-muted dark:text-white/70 text-sm sm:text-base max-w-xl mb-6">
+                  Check real-time slots, secure bookings in under 60 seconds, and play on 100% verified fields.
+                </p>
 
-              <div className="ae-search-bar" style={{ maxWidth: "860px" }}>
-                <div className="ae-search-segment" style={{ flex: 1.3, minWidth: 0 }}>
-                  <span className="ae-search-segment-label">Where</span>
-                  <input
-                    type="text"
-                    value={searchLocation}
-                    onChange={(e) => setSearchLocation(e.target.value)}
-                    placeholder="Search destinations"
-                    className="ae-search-segment-value"
-                  />
-                </div>
-                <div
-                  data-when-calendar
-                  className="ae-search-segment"
-                  style={{ flex: 0.9, minWidth: 0, position: "relative" }}
-                  onClick={() => setWhenCalendarOpen((v) => !v)}
-                >
-                  <span className="ae-search-segment-label">When</span>
-                  <span className="ae-search-segment-value" style={{ color: "var(--ae-ink)", cursor: "pointer" }}>
-                    {formatDisplayDate(searchDate)}
-                  </span>
+                {/* Airbnb-style Search Pill */}
+                <div className="w-full max-w-3xl bg-surface border border-border-default rounded-full shadow-lg h-[66px] flex items-center focus-within:border-border-strong focus-within:shadow-xl transition-all duration-200 relative z-20">
+                  {/* Segment 1: Where */}
+                  <div className="flex flex-col justify-center px-8 h-full rounded-l-full cursor-pointer hover:bg-elevated/50 transition-colors flex-[1.3] min-w-0">
+                    <span className="text-[10px] font-bold tracking-wider text-text-muted uppercase">Where</span>
+                    <input
+                      type="text"
+                      value={searchLocation}
+                      onChange={(e) => setSearchLocation(e.target.value)}
+                      placeholder="Search destinations/cities"
+                      className="text-xs text-text-main placeholder-text-muted bg-transparent border-none outline-none w-full mt-0.5 font-semibold"
+                    />
+                  </div>
 
-                  {/* Calendar Popover */}
-                  <AnimatePresence>
-                    {whenCalendarOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                        transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          position: "absolute",
-                          top: "calc(100% + 12px)",
-                          left: "50%",
-                          transform: "translateX(-50%)",
-                          zIndex: 40,
-                          background: "var(--ae-canvas)",
-                          borderRadius: "var(--ae-radius-lg)",
-                          boxShadow: "var(--ae-shadow-hover)",
-                          padding: "20px",
-                          minWidth: "320px",
-                          border: "1px solid var(--ae-hairline)",
-                        }}
-                      >
-                        <CalendarPicker
-                          selected={searchDate}
-                          onSelect={(v) => {
-                            setSearchDate(v);
-                            setWhenCalendarOpen(false);
-                          }}
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-                <div className="ae-search-segment" style={{ flex: 0.8, minWidth: 0 }}>
-                  <span className="ae-search-segment-label">Sport</span>
-                  <span className="ae-search-segment-value" style={{ color: "var(--ae-ink)" }}>
-                    {selectedSports.length > 0 ? selectedSports.join(", ") : "Any sport"}
-                  </span>
-                </div>
-                <button className="ae-search-orb" aria-label="Search">
-                  <Search className="w-5 h-5" style={{ color: "#ffffff" }} strokeWidth={2.5} />
-                </button>
-              </div>
-            </div>
-
-            {/* Category Strip */}
-            <div className="ae-hairline-bottom" style={{ paddingBottom: "0" }}>
-              <div className="ae-category-strip" style={{ paddingTop: "4px", paddingBottom: "0" }}>
-                {SPORT_CATEGORIES.map((cat) => {
-                  const Icon = cat.icon;
-                  const isActive = selectedSports.includes(cat.id);
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => {
-                        setSelectedSports(isActive
-                          ? selectedSports.filter((s) => s !== cat.id)
-                          : [...selectedSports, cat.id]
-                        );
-                      }}
-                      className={`ae-category-item ${isActive ? "ae-category-item-active" : ""}`}
-                    >
-                      <div className="ae-category-icon">
-                        <Icon size={26} />
-                      </div>
-                      <span className="ae-category-label">{cat.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Results Bar */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 0 16px" }}>
-              <span style={{ fontSize: "15px", fontWeight: 500, color: "var(--ae-muted)" }}>
-                {filteredTurfs.length > 0
-                  ? `${filteredTurfs.length} turf${filteredTurfs.length !== 1 ? "s" : ""} available`
-                  : "No turfs found"}
-              </span>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ fontSize: "14px", color: "var(--ae-muted)" }}>Sort:</span>
-                  <CustomSelect value={sortBy} onChange={setSortBy} options={["Popular", "Price: Low to High", "Price: High to Low"]} />
-                </div>
-              </div>
-            </div>
-
-            {/* Loading */}
-            {loading && (
-              <div className="ae-state-card" style={{ padding: "80px 32px" }}>
-                <Loader2 className="w-8 h-8 animate-spin" style={{ color: accentColor }} />
-                <span style={{ fontSize: "16px", fontWeight: 600, color: "var(--ae-ink)" }}>Loading turfs...</span>
-                <span style={{ fontSize: "14px", color: "var(--ae-muted)" }}>Finding the best venues near you</span>
-              </div>
-            )}
-
-            {/* Error */}
-            {loadError && (
-              <div style={{ padding: "18px 22px", borderRadius: "var(--ae-radius-md)", border: "1px solid var(--ae-error)", backgroundColor: "var(--ae-surface-soft)", display: "flex", alignItems: "center", gap: "12px" }}>
-                <AlertCircle className="w-5 h-5 shrink-0" style={{ color: "var(--ae-error)" }} />
-                <p style={{ fontSize: "14px", color: "var(--ae-error)" }}>{loadError}</p>
-              </div>
-            )}
-
-            {/* Empty */}
-            {!loading && filteredTurfs.length === 0 && (
-              <div className="ae-state-card">
-                <SlidersHorizontal className="w-12 h-12" style={{ color: "var(--ae-muted-soft)" }} />
-                <span style={{ fontSize: "18px", fontWeight: 600, color: "var(--ae-ink)" }}>No venues found</span>
-                <span style={{ fontSize: "14px", textAlign: "center", maxWidth: "340px", color: "var(--ae-muted)", lineHeight: 1.5 }}>
-                  Try adjusting your filters or resetting to discover more turfs.
-                </span>
-                <button onClick={handleResetFilters} className="ae-btn-primary" style={{ padding: "12px 28px", borderRadius: "var(--ae-radius-sm)", fontSize: "14px", marginTop: "8px" }}>
-                  Reset filters
-                </button>
-              </div>
-            )}
-
-            {/* Cards Grid */}
-            {!loading && filteredTurfs.length > 0 && (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "24px", paddingBottom: "48px" }}>
-                {filteredTurfs.map((turf) => (
-                  <motion.div
-                    key={turf.id}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="ae-property-card"
-                    onClick={() => handleOpenSlots(turf)}
+                  {/* Segment 2: When */}
+                  <div
+                    data-when-calendar
+                    className="flex flex-col justify-center px-8 h-full cursor-pointer hover:bg-elevated/50 border-l border-border-default transition-colors relative flex-[0.9] min-w-0"
+                    onClick={() => {
+                      setWhenCalendarOpen((v) => !v);
+                      setSportDropdownOpen(false);
+                    }}
                   >
-                    <div className="ae-property-card-photo">
-                      <Image src={turf.image} alt={turf.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" style={{ objectFit: "cover" }} />
-                      {turf.rating >= 4.5 && <div className="ae-guest-favorite-badge">Guest favourite</div>}
-                      {turf.premium && (
-                        <div style={{ position: "absolute", top: "12px", right: "52px", backgroundColor: "var(--ae-ink)", borderRadius: "var(--ae-radius-pill)", padding: "4px 10px", fontSize: "11px", fontWeight: 700, color: "var(--ae-canvas)", display: "flex", alignItems: "center", gap: "4px", zIndex: 2, letterSpacing: "0.02em" }}>
-                          <Award className="w-3 h-3" /> Premium
-                        </div>
-                      )}
-                      <button
-                        onClick={(e) => { e.stopPropagation(); toggleWishlist(turf.id); }}
-                        className="ae-heart-btn"
-                        aria-label={wishlist.includes(turf.id) ? "Remove from wishlist" : "Add to wishlist"}
-                      >
-                        <Heart className="w-[18px] h-[18px]" style={{ fill: wishlist.includes(turf.id) ? accentColor : "rgba(255,255,255,0.9)", color: wishlist.includes(turf.id) ? accentColor : "rgba(255,255,255,0.9)", transition: "all 0.2s" }} strokeWidth={2} />
-                      </button>
-                      <div className="ae-carousel-dots">
-                        <div className="ae-carousel-dot ae-carousel-dot-active" />
-                        <div className="ae-carousel-dot" />
-                        <div className="ae-carousel-dot" />
-                      </div>
-                    </div>
+                    <span className="text-[10px] font-bold tracking-wider text-text-muted uppercase">When</span>
+                    <span className="text-xs text-text-main font-semibold mt-0.5 truncate">
+                      {formatDisplayDate(searchDate)}
+                    </span>
 
-                    <div style={{ padding: "0 2px" }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
-                        <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--ae-ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
-                          {turf.name}
-                        </span>
-                        <div style={{ display: "flex", alignItems: "center", gap: "3px", flexShrink: 0 }}>
-                          <Star className="w-[13px] h-[13px]" style={{ fill: "var(--ae-ink)", color: "var(--ae-ink)" }} />
-                          <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--ae-ink)" }}>
-                            {turf.rating > 0 ? turf.rating.toFixed(2) : "New"}
-                          </span>
+                    {/* Calendar Popover */}
+                    <AnimatePresence>
+                      {whenCalendarOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                          transition={{ duration: 0.2 }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-2xl shadow-xl p-5 min-w-[320px]"
+                        >
+                          <CalendarPicker
+                            selected={searchDate}
+                            onSelect={(v) => {
+                              setSearchDate(v);
+                              setWhenCalendarOpen(false);
+                            }}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Segment 3: Sport */}
+                  <div
+                    data-sport-dropdown
+                    className="flex flex-col justify-center px-8 h-full cursor-pointer hover:bg-elevated/50 border-l border-border-default transition-colors relative flex-[0.8] min-w-0"
+                    onClick={() => {
+                      setSportDropdownOpen((v) => !v);
+                      setWhenCalendarOpen(false);
+                    }}
+                  >
+                    <span className="text-[10px] font-bold tracking-wider text-text-muted uppercase">Sport</span>
+                    <span className="text-xs text-text-main font-semibold mt-0.5 truncate">
+                      {selectedSport === "all" ? "All Sports" : selectedSport}
+                    </span>
+
+                    {/* Sport Dropdown Popover */}
+                    <AnimatePresence>
+                      {sportDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                          transition={{ duration: 0.2 }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-2xl shadow-xl p-2 min-w-[200px]"
+                        >
+                          <div className="flex flex-col gap-1">
+                            {SPORT_CATEGORIES.map((s) => {
+                              const Icon = s.icon;
+                              const isActive = selectedSport === s.id;
+                              return (
+                                <button
+                                  key={s.id}
+                                  onClick={() => {
+                                    setSelectedSport(s.id);
+                                    setSportDropdownOpen(false);
+                                  }}
+                                  className={`flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-xl transition-colors text-left cursor-pointer
+                                    ${isActive ? "bg-brand-lime/10 text-brand-lime" : "text-text-main hover:bg-elevated"}`}
+                                >
+                                  <Icon className="w-4 h-4 shrink-0" />
+                                  <span>{s.label}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Search Orb */}
+                  <button className="w-12 h-12 rounded-full bg-brand-lime hover:bg-brand-lime-hover hover:scale-105 active:scale-95 transition-all flex items-center justify-center mr-2 ml-auto shrink-0 cursor-pointer">
+                    <Search className="w-5 h-5 text-bg" strokeWidth={2.5} />
+                  </button>
+                </div>
+              </div>
+            </motion.section>
+
+            <div className="max-w-[1280px] mx-auto px-6 md:px-10 w-full">
+              {/* Category Strip Row */}
+              <div className="border-b border-border-default mt-2 mb-6">
+                <div className="flex gap-10 overflow-x-auto scrollbar-none pb-0 justify-start sm:justify-center items-center">
+                  {SPORT_CATEGORIES.map((s) => {
+                    const Icon = s.icon;
+                    const isActive = selectedSport === s.id;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => setSelectedSport(s.id)}
+                        className={`flex flex-col items-center gap-2 pb-3.5 cursor-pointer border-b-2 transition-all duration-200 relative -mb-[2px]
+                          ${
+                            isActive
+                              ? "border-text-main text-text-main opacity-100 font-semibold"
+                              : "border-transparent text-text-muted opacity-55 hover:opacity-100 hover:text-text-main"
+                          }`}
+                      >
+                        <Icon className="w-7 h-7 shrink-0" />
+                        <span className="text-[11px] font-medium tracking-wide">{s.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Sub-Filters and Count Row */}
+              <div className="flex items-center justify-between gap-4 mb-8">
+                <div className="text-sm text-text-muted font-medium">
+                  {filteredTurfs.length} turf{filteredTurfs.length !== 1 ? "s" : ""} available
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {/* Sort filter */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-text-muted whitespace-nowrap">Sort by:</span>
+                    <CustomSelect value={sortBy} onChange={setSortBy} options={["Popular", "Price: Low to High", "Price: High to Low"]} />
+                  </div>
+
+                  {/* Filters Button */}
+                  <button
+                    onClick={() => setIsFiltersModalOpen(true)}
+                    className="flex items-center gap-2 bg-surface border border-border-default hover:border-border-strong text-text-main text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer h-[38px] shrink-0"
+                  >
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-brand-lime" /> Filters
+                  </button>
+                </div>
+              </div>
+
+              {/* Error warning state */}
+              {loadError && (
+                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/25 rounded-2xl flex items-center gap-3 text-red-400 text-sm">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <p>{loadError}</p>
+                </div>
+              )}
+
+              {/* Empty warning state */}
+              {!loading && filteredTurfs.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-24 gap-4 bg-surface border border-border-default rounded-2xl text-center p-8">
+                  <SlidersHorizontal className="w-12 h-12 text-text-muted" strokeWidth={1.2} />
+                  <div>
+                    <h3 className="font-bold text-lg text-text-main">No venues found</h3>
+                    <p className="text-sm text-text-muted mt-1 max-w-sm">
+                      We couldn&apos;t find any sports venues matching your exact filters. Adjust your queries and slide max price.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSelectedSport("all");
+                      setSearchLocation("");
+                      setFilterFormat("all");
+                      setFilterMinPrice(500);
+                      setFilterMaxPrice(3000);
+                      setMinInputVal("500");
+                      setMaxInputVal("3000");
+                      setFilterAmenities([]);
+                      setSortBy("Popular");
+                    }}
+                    className="mt-2 bg-text-main hover:bg-text-main/90 text-bg text-xs font-semibold px-5 py-2.5 rounded-xl transition-all cursor-pointer"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              )}
+
+              {/* Turfs Cards Grid */}
+              {!loading && filteredTurfs.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredTurfs.map((turf) => (
+                    <motion.div
+                      key={turf.id}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      onClick={() => handleOpenSlots(turf)}
+                      className="bg-surface border border-border-default rounded-2xl overflow-hidden hover:shadow-lg hover:border-border-strong transition-all duration-300 cursor-pointer group flex flex-col h-full relative"
+                    >
+                      {/* Heart Save button */}
+                      <button
+                        onClick={(e) => toggleWishlist(turf.id, e)}
+                        className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-bg/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all"
+                        aria-label="Wishlist"
+                      >
+                        <Heart
+                          className={`w-4 h-4 ${wishlist.includes(turf.id) ? "fill-brand-lime text-brand-lime" : "text-white"}`}
+                        />
+                      </button>
+
+                      {/* Image banner */}
+                      <div className="relative w-full h-48 bg-elevated overflow-hidden shrink-0">
+                        <Image
+                          src={turf.image}
+                          alt={turf.name}
+                          fill
+                          sizes="(max-width: 640px) 100vw, 33vw"
+                          className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+                        />
+                        <div className="absolute top-4 left-4 flex gap-2">
+                          {turf.rating >= 4.7 && (
+                            <span className="bg-bg/85 dark:bg-surface/85 backdrop-blur-sm text-text-main text-[10px] font-bold px-2.5 py-1 rounded-md border border-border-default">
+                              Guest Favorite
+                            </span>
+                          )}
+                          {turf.premium && (
+                            <span className="bg-brand-lime text-bg text-[10px] font-extrabold px-2.5 py-1 rounded-md">
+                              Premium
+                            </span>
+                          )}
                         </div>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "3px", fontSize: "14px", color: "var(--ae-muted)" }}>
-                        <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--ae-muted)" }} />
-                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{turf.location}</span>
+
+                      {/* Card Content body */}
+                      <div className="p-5 flex flex-col justify-between flex-grow">
+                        <div>
+                          <div className="flex items-center gap-1.5 text-xs text-text-muted mb-2">
+                            <MapPin className="w-3.5 h-3.5 text-brand-lime shrink-0" />
+                            <span className="truncate">{turf.location}</span>
+                          </div>
+
+                          <h3 className="text-lg font-bold text-text-main leading-tight mb-2 group-hover:text-brand-lime transition-colors duration-200">
+                            {turf.name}
+                          </h3>
+
+                          <p className="text-xs text-text-muted">
+                            {turf.sport} · {turf.size} format matches
+                          </p>
+                        </div>
+
+                        <div className="border-t border-border-default mt-5 pt-4 flex items-center justify-between">
+                          <div>
+                            <span className="block text-[9px] text-text-muted uppercase tracking-wider font-semibold">Hourly Rate</span>
+                            <span className="text-lg font-extrabold text-brand-lime">
+                              {formatPrice(turf.price)}
+                              <span className="text-xs text-text-muted font-normal ml-0.5">/hr</span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3.5 h-3.5 fill-text-main text-text-main" />
+                            <span className="text-xs font-bold text-text-main">
+                              {turf.rating > 0 ? turf.rating.toFixed(2) : "New"}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div style={{ marginTop: "4px", fontSize: "14px", color: "var(--ae-muted)" }}>
-                        {turf.sport} · {turf.size}
-                      </div>
-                      <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginTop: "6px" }}>
-                        <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--ae-ink)" }}>{formatPrice(turf.price)}</span>
-                        <span style={{ fontSize: "14px", color: "var(--ae-muted)" }}>/hr</span>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* ═══ SLOT PICKER MODAL ═══ */}
-        <AnimatePresence>
-          {flowStep === "slots" && selectedTurf && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="ae-scrim" onClick={() => setFlowStep("listing")}>
-              <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }} className="ae-modal" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => setFlowStep("listing")} className="ae-modal-close">
-                  <X className="w-4 h-4" style={{ color: "var(--ae-ink)" }} />
+        {/* ========================================================
+            VIEW 2: PREMIUM AIRBNB-STYLE DETAILS VIEW
+            ======================================================== */}
+        {viewMode === "details" && selectedTurf && flowStep === "listing" && (
+          <div className="max-w-[1280px] mx-auto px-6 md:px-10 w-full">
+            {/* Top Navigation breadcrumbs */}
+            <div className="flex items-center justify-between pb-6">
+              <button
+                onClick={() => setViewMode("list")}
+                className="flex items-center gap-2 text-sm font-semibold text-text-main hover:text-brand-lime transition-colors group cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to all venues
+              </button>
+              <div className="flex items-center gap-4 text-sm font-semibold">
+                <button className="flex items-center gap-1.5 text-text-main hover:text-brand-lime transition-colors">
+                  <Heart className={`w-4 h-4 ${wishlist.includes(selectedTurf.id) ? "fill-brand-lime text-brand-lime" : ""}`} onClick={(e) => toggleWishlist(selectedTurf.id, e)} />
+                  {wishlist.includes(selectedTurf.id) ? "Saved" : "Save"}
                 </button>
+              </div>
+            </div>
 
-                <div style={{ marginBottom: "28px" }}>
-                  <h2 style={{ fontSize: "22px", fontWeight: 700, lineHeight: 1.2, color: "var(--ae-ink)", letterSpacing: "-0.01em" }}>{selectedTurf.name}</h2>
-                  <p style={{ fontSize: "14px", marginTop: "6px", display: "flex", alignItems: "center", gap: "4px", color: "var(--ae-muted)" }}>
-                    <MapPin className="w-3.5 h-3.5" /> {selectedTurf.location}
+            {/* Title Header */}
+            <div className="pb-6">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-text-main tracking-tight leading-tight">
+                {selectedTurf.name}
+              </h1>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text-muted mt-2">
+                <span className="flex items-center gap-1">
+                  <Star className="w-3.5 h-3.5 fill-text-main text-text-main" /> {selectedTurf.rating > 0 ? selectedTurf.rating.toFixed(2) : "4.8"}
+                </span>
+                <span>·</span>
+                <span className="underline cursor-pointer hover:text-text-main">{selectedTurf.reviews > 0 ? `${selectedTurf.reviews} reviews` : "15 reviews"}</span>
+                <span>·</span>
+                <span className="flex items-center gap-1 font-semibold text-text-main">
+                  <MapPin className="w-3.5 h-3.5 text-brand-lime" /> {selectedTurf.location}
+                </span>
+              </div>
+            </div>
+
+            {/* Photos Grid Gallery */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-2xl overflow-hidden bg-elevated relative h-[300px] md:h-[420px]">
+              {/* Left Large main photo */}
+              <div className="md:col-span-2 relative h-full w-full overflow-hidden group">
+                <Image
+                  src={selectedTurf.image}
+                  alt={selectedTurf.name}
+                  fill
+                  className="object-cover group-hover:brightness-95 transition-all duration-300"
+                />
+              </div>
+              {/* Right stacked photos */}
+              <div className="hidden md:flex flex-col gap-3 h-full">
+                <div className="relative flex-1 w-full overflow-hidden group">
+                  <Image
+                    src="/feature_verified.jpg"
+                    alt="Verified pitch conditions"
+                    fill
+                    className="object-cover group-hover:brightness-95 transition-all duration-300"
+                  />
+                </div>
+                <div className="relative flex-1 w-full overflow-hidden group">
+                  <Image
+                    src="/stadium_cinematic_bg.png"
+                    alt="Cinematic stadium lights"
+                    fill
+                    className="object-cover group-hover:brightness-95 transition-all duration-300"
+                  />
+                </div>
+              </div>
+
+              {/* Show all photos button */}
+              <button className="absolute bottom-6 right-6 bg-surface border border-border-strong text-text-main hover:bg-elevated transition-colors text-xs font-semibold py-2 px-4 rounded-xl flex items-center gap-1.5 shadow-md">
+                <Info className="w-3.5 h-3.5" /> Show all photos
+              </button>
+            </div>
+
+            {/* Split Content columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12 mt-8 items-start">
+              {/* LEFT COLUMN: Overview features, ratings, FAQs */}
+              <div className="space-y-6">
+                <div className="pb-6 border-b border-border-default">
+                  <h2 className="text-xl sm:text-2xl font-bold text-text-main">
+                    {selectedTurf.sport} court managed by Turfzo
+                  </h2>
+                  <p className="text-text-muted mt-1 text-sm">
+                    {selectedTurf.size} dimensions layout · Play up to 14 players · Floodlight lighting system
                   </p>
                 </div>
 
-                {/* Date Calendar */}
-                <div style={{ marginBottom: "28px" }}>
-                  <span className="ae-section-title" style={{ display: "block", marginBottom: "16px" }}>Select date</span>
-                  <div style={{ padding: "16px", borderRadius: "var(--ae-radius-md)", border: "1px solid var(--ae-hairline)", backgroundColor: "var(--ae-canvas)" }}>
-                    <CalendarPicker selected={selectedDate} onSelect={setSelectedDate} />
+                {/* Host card */}
+                <div className="pb-6 border-b border-border-default flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime font-bold text-lg border border-brand-lime/30 shrink-0">
+                      TZ
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-text-main">Verified Sports Arena</h3>
+                      <p className="text-xs text-text-muted">Superhost · Booking confirmed instantly</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Pitch */}
-                <div style={{ marginBottom: "28px" }}>
-                  <span className="ae-section-title" style={{ display: "block", marginBottom: "14px" }}>Select pitch</span>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                    {[`Pitch 1 (${selectedTurf.premium ? "Premium Turf" : "Standard Turf"})`, `Pitch 2 (${selectedTurf.premium ? "Premium Grass" : "Standard Grass"})`].map((pitch) => (
-                      <button key={pitch} onClick={() => setSelectedPitch(pitch)} className={`ae-pitch-btn ${selectedPitch === pitch ? "ae-pitch-btn-active" : ""}`}>
-                        {pitch}
-                      </button>
+                {/* Bullet checklist highlights */}
+                <div className="pb-6 border-b border-border-default space-y-5">
+                  <div className="flex items-start gap-4">
+                    <ShieldCheck className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-text-main text-sm">100% Inspected Field</h4>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        Our venue specialists personally verify pitch grip, lighting level, and net quality.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <Check className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-text-main text-sm">Instant Confirmation</h4>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        Direct connection to the venue&apos;s manager dashboard guarantees no double bookings.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <Info className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-text-main text-sm">Flexible Cancellations</h4>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        Cancel up to 24 hours in advance to receive automatic full refund options.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description text */}
+                <div className="pb-6 border-b border-border-default">
+                  <h3 className="text-lg font-bold text-text-main mb-3">About this venue</h3>
+                  <p className="text-text-muted text-sm leading-relaxed">
+                    This premium court features professional artificial grass turf designed to reduce joint strain and maximize ball control. Ideal for corporate matches, friendly matches, or intensive team training sessions. Changing room facilities and showers are available, and free parking spots are provided.
+                  </p>
+                </div>
+
+                {/* Amenities checklist icons */}
+                <div className="pb-6 border-b border-border-default">
+                  <h3 className="text-lg font-bold text-text-main mb-4">What this turf offers</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6">
+                    {[
+                      { label: "High-intensity floodlights", icon: <Award className="w-4 h-4 text-text-muted" /> },
+                      { label: "Free parking spots on premises", icon: <SlidersHorizontal className="w-4 h-4 text-text-muted" /> },
+                      { label: "Purified drinking water stations", icon: <Info className="w-4 h-4 text-text-muted" /> },
+                      { label: "Changing rooms & restroom blocks", icon: <Check className="w-4 h-4 text-text-muted" /> },
+                      { label: "Wi-Fi access for spectators", icon: <Star className="w-4 h-4 text-text-muted" /> },
+                      { label: "Equipped first-aid box on site", icon: <ShieldCheck className="w-4 h-4 text-text-muted" /> },
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-3 text-sm text-text-main">
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Time Slots */}
-                <div style={{ marginBottom: "28px" }}>
-                  <span className="ae-section-title" style={{ display: "block", marginBottom: "14px" }}>Available time slots</span>
+                {/* Turf review rating progress bars */}
+                <div className="pb-6 border-b border-border-default">
+                  <h3 className="text-lg font-bold text-text-main flex items-center gap-1.5 mb-6">
+                    <Star className="w-5 h-5 fill-text-main text-text-main" /> {selectedTurf.rating > 0 ? selectedTurf.rating.toFixed(2) : "4.8"} · Venue Ratings
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4">
+                    {[
+                      { label: "Turf Grass Bounce", score: "4.8" },
+                      { label: "Lighting Uniformity", score: "4.9" },
+                      { label: "Facility Cleanliness", score: "4.7" },
+                      { label: "Staff Hospitality", score: "4.9" },
+                    ].map((rating, idx) => (
+                      <div key={idx} className="flex items-center justify-between gap-4">
+                        <span className="text-sm text-text-main">{rating.label}</span>
+                        <div className="flex items-center gap-3 shrink-0 w-36 sm:w-44">
+                          <div className="h-1.5 flex-grow bg-border-default rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-text-main rounded-full"
+                              style={{ width: `${(parseFloat(rating.score) / 5) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-xs font-bold text-text-main text-right w-5">
+                            {rating.score}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Frequently Asked Questions */}
+                <div>
+                  <h3 className="text-lg font-bold text-text-main mb-6 text-center">Frequently asked questions</h3>
+                  <div className="flex flex-col gap-2">
+                    {exploreFaqItems.map((item, idx) => (
+                      <FaqItem key={idx} question={item.question} answer={item.answer} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN: Sticky booking selectors (Airbnb-style) */}
+              <div className="sticky top-28 bg-surface border border-border-default rounded-2xl p-6 shadow-md space-y-4">
+                <div className="flex items-baseline justify-between">
+                  <div>
+                    <span className="text-2xl font-extrabold text-text-main">
+                      {formatPrice(selectedTurf.price)}
+                    </span>
+                    <span className="text-sm text-text-muted font-medium ml-1">/ hour</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-text-muted">
+                    <Star className="w-3 h-3 fill-text-main text-text-main" /> {selectedTurf.rating > 0 ? selectedTurf.rating.toFixed(2) : "4.8"}
+                  </div>
+                </div>
+
+                {/* Select Date popup box selector */}
+                <div className="border border-border-strong rounded-xl overflow-visible text-xs bg-bg relative">
+                  {/* Top split */}
+                  <div className="grid grid-cols-2 border-b border-border-strong overflow-visible">
+                    <div className="p-3 border-r border-border-strong cursor-pointer hover:bg-elevated/25" onClick={() => setShowCalendarBooking(!showCalendarBooking)}>
+                      <label className="block text-[8px] uppercase font-bold text-text-muted">Select Date</label>
+                      <span className="font-semibold text-text-main mt-0.5 block truncate flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-brand-lime" /> {formatDisplayDate(selectedDate)}
+                      </span>
+                    </div>
+                    <div className="p-3">
+                      <label className="block text-[8px] uppercase font-bold text-text-muted">Format size</label>
+                      <span className="font-semibold text-text-main mt-0.5 block truncate">
+                        {selectedTurf.size}
+                      </span>
+                    </div>
+
+                    {/* Inline Calendar Popover */}
+                    <AnimatePresence>
+                      {showCalendarBooking && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          className="absolute top-12 left-2 z-50 bg-surface border border-border-default rounded-2xl shadow-xl p-5"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <CalendarPicker
+                            selected={selectedDate}
+                            onSelect={(v) => {
+                              setSelectedDate(v);
+                              setShowCalendarBooking(false);
+                            }}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Bottom selection Pitch */}
+                  <div className="p-3">
+                    <label className="block text-[8px] uppercase font-bold text-text-muted mb-1.5">Select Pitch</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[`Pitch 1 (${selectedTurf.premium ? "Premium" : "Standard"})`, `Pitch 2 (${selectedTurf.premium ? "Grass" : "Standard"})`].map((pitch) => (
+                        <button
+                          key={pitch}
+                          onClick={() => setSelectedPitch(pitch)}
+                          className={`py-1.5 border rounded-lg text-[10px] font-bold text-center cursor-pointer transition-all
+                            ${selectedPitch === pitch ? "border-text-main bg-elevated text-text-main" : "border-border-default text-text-muted hover:border-border-strong hover:text-text-main"}`}
+                        >
+                          {pitch.split(" ")[0]} {pitch.split(" ")[1]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Available time slots section */}
+                <div className="space-y-3">
+                  <label className="block text-[9px] uppercase font-bold text-text-muted">Available time slots</label>
                   {loadingSlots ? (
-                    <div style={{ display: "flex", justifyContent: "center", padding: "32px" }}>
-                      <Loader2 className="w-6 h-6 animate-spin" style={{ color: accentColor }} />
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="w-5 h-5 animate-spin text-brand-lime" />
                     </div>
                   ) : availableSlots.length === 0 ? (
-                    <p style={{ fontSize: "14px", padding: "20px", textAlign: "center", color: "var(--ae-muted)", borderRadius: "var(--ae-radius-md)", backgroundColor: "var(--ae-surface-soft)" }}>
-                      No slots available for this date. Try another day.
+                    <p className="text-center text-xs text-text-muted py-2 bg-elevated/40 rounded-xl">
+                      No slots available. Try another date.
                     </p>
                   ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: "8px" }}>
-                      {availableSlots.map((slot) => {
-                        const isSelected = selectedTimeSlot === slot.time;
-                        const cls = `ae-time-slot ${isSelected ? "ae-time-slot-active" : ""} ${!slot.available ? "ae-time-slot-disabled" : ""}`;
+                    <div className="max-h-[280px] overflow-y-auto pr-1 space-y-4">
+                      {groupedSlots.map((group) => {
+                        const Icon = group.icon;
                         return (
-                          <button key={slot.time} disabled={!slot.available} onClick={() => setSelectedTimeSlot(slot.time)} className={cls}>
-                            {slot.time}
-                          </button>
+                          <div key={group.title}>
+                            <div className="flex items-center gap-1.5 mb-2 text-text-main">
+                              <Icon className="w-3.5 h-3.5 text-brand-lime" />
+                              <span className="text-[10px] font-bold uppercase tracking-wider">{group.title}</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-1.5">
+                              {group.slots.map((slot) => {
+                                const isSelected = selectedTimeSlot === slot.time;
+                                return (
+                                  <button
+                                    key={slot.time}
+                                    disabled={!slot.available}
+                                    onClick={() => setSelectedTimeSlot(slot.time)}
+                                    className={`py-1.5 text-[10px] font-medium border rounded-md transition-all text-center sm:text-xs
+                                      ${
+                                        isSelected
+                                          ? "border-text-main bg-text-main text-bg font-bold"
+                                          : !slot.available
+                                            ? "opacity-30 cursor-not-allowed border-border-subtle line-through"
+                                            : "border-border-default text-text-main hover:border-border-strong cursor-pointer"
+                                      }`}
+                                  >
+                                    {format12HourRange(slot.time)}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
                         );
                       })}
                     </div>
                   )}
                 </div>
 
-                {/* Footer */}
-                <div className="ae-divider" style={{ paddingTop: "20px", marginTop: "4px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div>
-                      <span style={{ fontSize: "12px", color: "var(--ae-muted)", fontWeight: 500 }}>Selected slot</span>
-                      <span style={{ fontSize: "15px", fontWeight: 600, display: "block", marginTop: "3px", color: "var(--ae-ink)" }}>
-                        {selectedTimeSlot ? `${formatDisplayDate(selectedDate)} · ${selectedTimeSlot}` : "None selected"}
-                      </span>
-                    </div>
-                    <button disabled={!selectedTimeSlot} onClick={handleProceedToCheckout} className="ae-btn-primary" style={{ padding: "14px 28px", borderRadius: "var(--ae-radius-sm)", fontSize: "15px" }}>
-                      Continue <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ═══ CHECKOUT MODAL ═══ */}
-        <AnimatePresence>
-          {flowStep === "checkout" && selectedTurf && selectedTimeSlot && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="ae-scrim" onClick={() => setFlowStep("slots")}>
-              <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }} className="ae-modal" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => setFlowStep("slots")} className="ae-modal-close">
-                  <X className="w-4 h-4" style={{ color: "var(--ae-ink)" }} />
+                {/* CTA Action button */}
+                <button
+                  disabled={!selectedTimeSlot}
+                  onClick={handleProceedToCheckout}
+                  className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-border-default disabled:text-text-muted text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm disabled:cursor-not-allowed active:scale-[0.99]"
+                >
+                  Book Turf
                 </button>
 
-                <h2 style={{ fontSize: "22px", fontWeight: 700, lineHeight: 1.2, color: "var(--ae-ink)", letterSpacing: "-0.01em", marginBottom: "24px" }}>Request to book</h2>
-
-                {/* Summary Card */}
-                <div style={{ padding: "20px", borderRadius: "var(--ae-radius-md)", border: "1px solid var(--ae-hairline)", marginBottom: "24px" }}>
-                  <div style={{ paddingBottom: "16px", borderBottom: "1px solid var(--ae-hairline-soft)", marginBottom: "16px" }}>
-                    <h3 style={{ fontSize: "16px", fontWeight: 600, color: "var(--ae-ink)" }}>{selectedTurf.name}</h3>
-                    <p style={{ fontSize: "14px", marginTop: "4px", display: "flex", alignItems: "center", gap: "4px", color: "var(--ae-muted)" }}>
-                      <MapPin className="w-3.5 h-3.5" /> {selectedTurf.location.split(",")[0]}
-                    </p>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", fontSize: "14px" }}>
-                    <div>
-                      <span style={{ fontSize: "12px", fontWeight: 600, display: "block", color: "var(--ae-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Date</span>
-                      <span style={{ fontWeight: 500, marginTop: "4px", display: "block", color: "var(--ae-ink)" }}>{formatDisplayDate(selectedDate)}</span>
+                {/* Fee calculation breakdown */}
+                {selectedTimeSlot && (
+                  <div className="border-t border-border-default pt-4 space-y-2.5 text-sm text-text-muted">
+                    <div className="flex justify-between">
+                      <span className="underline">Base fare</span>
+                      <span className="text-text-main">{formatPrice(pricing.subtotal)}</span>
                     </div>
-                    <div>
-                      <span style={{ fontSize: "12px", fontWeight: 600, display: "block", color: "var(--ae-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Time</span>
-                      <span style={{ fontWeight: 500, marginTop: "4px", display: "block", color: "var(--ae-ink)" }}>{selectedTimeSlot}</span>
+                    <div className="flex justify-between">
+                      <span className="underline">Convenience fee (1.8%)</span>
+                      <span className="text-text-main">{formatPrice(pricing.convenience)}</span>
                     </div>
-                    <div>
-                      <span style={{ fontSize: "12px", fontWeight: 600, display: "block", color: "var(--ae-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Pitch</span>
-                      <span style={{ fontWeight: 500, marginTop: "4px", display: "block", color: "var(--ae-ink)" }}>{selectedPitch}</span>
+                    <div className="flex justify-between">
+                      <span className="underline">GST (18%)</span>
+                      <span className="text-text-main">{formatPrice(pricing.gst)}</span>
                     </div>
-                    <div>
-                      <label style={{ fontSize: "12px", fontWeight: 600, display: "block", color: "var(--ae-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Players</label>
-                      <input type="number" min={2} max={selectedTurf.premium ? 22 : 14} value={attendees} onChange={(e) => setAttendees(Math.max(2, Math.min(22, Number(e.target.value))))} style={{ marginTop: "4px", padding: "8px 12px", borderRadius: "var(--ae-radius-sm)", border: "1.5px solid var(--ae-hairline)", fontSize: "14px", color: "var(--ae-ink)", background: "var(--ae-surface-soft)", width: "80px", outline: "none", transition: "border-color 0.15s" }} />
+                    <div className="flex justify-between font-bold text-text-main border-t border-border-default pt-2.5 text-base">
+                      <span>Total</span>
+                      <span>{formatPrice(pricing.total)}</span>
                     </div>
                   </div>
-                </div>
-
-                {/* Payment Methods */}
-                <div style={{ marginBottom: "24px" }}>
-                  <span className="ae-section-title" style={{ display: "block", marginBottom: "14px" }}>Payment method</span>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {([
-                      { key: "upi" as const, label: "UPI (GPay, PhonePe, Paytm)", sub: "Instant booking confirmation" },
-                      { key: "card" as const, label: "Credit / Debit Card", sub: "Visa, Mastercard, RuPay, Amex" },
-                      { key: "netbanking" as const, label: "Net Banking", sub: "All major Indian banks" },
-                    ]).map((method) => (
-                      <div key={method.key} className={`ae-payment-option ${selectedPayment === method.key ? "ae-payment-option-active" : ""}`} onClick={() => setSelectedPayment(method.key)}>
-                        <div className={`ae-payment-radio ${selectedPayment === method.key ? "ae-payment-radio-active" : ""}`}>
-                          <div className="ae-payment-radio-inner" />
-                        </div>
-                        <div>
-                          <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--ae-ink)", display: "block" }}>{method.label}</span>
-                          <span style={{ fontSize: "12px", color: "var(--ae-muted)", marginTop: "2px", display: "block" }}>{method.sub}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Price Breakdown */}
-                <div style={{ borderTop: "1px solid var(--ae-hairline)", paddingTop: "20px", display: "flex", flexDirection: "column", gap: "12px", fontSize: "14px", marginBottom: "24px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ae-muted)" }}>
-                    <span>Base fare (1 hour)</span><span>{formatPrice(pricing.subtotal)}</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ae-muted)" }}>
-                    <span>Convenience fee (1.8%)</span><span>{formatPrice(pricing.convenience)}</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ae-muted)", paddingBottom: "12px", borderBottom: "1px solid var(--ae-hairline-soft)" }}>
-                    <span>GST (18%)</span><span>{formatPrice(pricing.gst)}</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, color: "var(--ae-ink)", fontSize: "16px" }}>
-                    <span>Total</span><span>{formatPrice(pricing.total)}</span>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                  <p style={{ fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", color: "var(--ae-muted)" }}>
-                    <ShieldCheck className="w-4 h-4" style={{ color: accentColor }} /> Payments secured by Cashfree
-                  </p>
-                  <button onClick={handlePayNow} className="ae-btn-primary" style={{ width: "100%", padding: "16px", borderRadius: "var(--ae-radius-sm)", fontSize: "16px" }}>
-                    Pay now · {formatPrice(pricing.total)}
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ═══ PROCESSING ═══ */}
-        <AnimatePresence>
-          {flowStep === "processing" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="ae-scrim">
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
-                <Loader2 className="w-10 h-10 animate-spin" style={{ color: accentColor }} />
-                <div style={{ textAlign: "center" }}>
-                  <h3 style={{ fontSize: "20px", fontWeight: 600, color: "var(--ae-ink)" }}>Processing your booking</h3>
-                  <p style={{ fontSize: "14px", color: "var(--ae-muted)", marginTop: "8px", maxWidth: "320px" }}>
-                    Securing your slot and verifying payment. Please do not close this window.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ═══ ERROR ═══ */}
-        <AnimatePresence>
-          {flowStep === "error" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="ae-scrim">
-              <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="ae-modal" style={{ maxWidth: "420px", textAlign: "center" }}>
-                <AlertCircle className="w-12 h-12 mx-auto" style={{ color: "var(--ae-error)" }} />
-                <h3 style={{ fontSize: "20px", fontWeight: 700, color: "var(--ae-ink)", marginTop: "16px" }}>Payment failed</h3>
-                <p style={{ fontSize: "14px", color: "var(--ae-muted)", marginTop: "8px", lineHeight: 1.5 }}>{bookingError}</p>
-                <div style={{ marginTop: "28px", display: "flex", gap: "12px", justifyContent: "center" }}>
-                  <button onClick={() => setFlowStep("checkout")} className="ae-btn-primary" style={{ padding: "12px 28px", borderRadius: "var(--ae-radius-sm)", fontSize: "14px" }}>
-                    Try again
-                  </button>
-                  <button onClick={() => setFlowStep("listing")} className="ae-btn-secondary" style={{ padding: "12px 28px", borderRadius: "var(--ae-radius-sm)", fontSize: "14px" }}>
-                    Browse turfs
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ═══ CONFIRMED ═══ */}
-        {flowStep === "confirmed" && confirmedBooking && selectedTurf && selectedTimeSlot && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="max-w-xl mx-auto px-6 md:px-8 w-full text-center flex flex-col items-center mt-12 mb-16">
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.15, type: "spring", stiffness: 200, damping: 15 }} style={{ width: "72px", height: "72px", borderRadius: "50%", backgroundColor: "var(--ae-surface-soft)", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid var(--ae-hairline)" }}>
-              <Check className="w-9 h-9" style={{ color: "#16a34a", strokeWidth: 2.5 }} />
-            </motion.div>
-
-            <h1 style={{ fontSize: "28px", fontWeight: 800, color: "var(--ae-ink)", marginTop: "24px", letterSpacing: "-0.02em" }}>Booking confirmed!</h1>
-            <p style={{ fontSize: "15px", color: "var(--ae-muted)", marginTop: "8px", maxWidth: "380px", lineHeight: 1.5 }}>
-              Your turf is reserved. Show the QR code at the entrance.
-            </p>
-
-            <div className="ae-confirmed-card" style={{ width: "100%", marginTop: "32px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "16px", borderBottom: "1.5px dashed var(--ae-hairline)" }}>
-                <div>
-                  <span style={{ fontSize: "11px", color: "var(--ae-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Booking code</span>
-                  <span style={{ fontSize: "18px", fontWeight: 700, color: accentColor, display: "block", marginTop: "4px" }}>{confirmedBooking.booking_code}</span>
-                </div>
-                <span style={{ fontSize: "11px", fontWeight: 700, color: "#16a34a", backgroundColor: "var(--ae-surface-soft)", padding: "5px 12px", borderRadius: "var(--ae-radius-pill)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Paid</span>
-              </div>
-
-              <div style={{ marginTop: "16px" }}>
-                <span style={{ fontSize: "11px", color: "var(--ae-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Venue</span>
-                <h3 style={{ fontSize: "16px", fontWeight: 600, color: "var(--ae-ink)", marginTop: "4px" }}>{selectedTurf.name}</h3>
-                <p style={{ fontSize: "13px", color: "var(--ae-muted)", display: "flex", alignItems: "center", gap: "4px", marginTop: "4px" }}>
-                  <MapPin className="w-3 h-3" /> {selectedTurf.location}
-                </p>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--ae-hairline-soft)", fontSize: "13px" }}>
-                <div>
-                  <span style={{ fontSize: "11px", color: "var(--ae-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>Date</span>
-                  <span style={{ fontWeight: 500, color: "var(--ae-ink)", display: "block", marginTop: "3px" }}>{formatDisplayDate(selectedDate)}</span>
-                </div>
-                <div>
-                  <span style={{ fontSize: "11px", color: "var(--ae-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>Time</span>
-                  <span style={{ fontWeight: 500, color: "var(--ae-ink)", display: "block", marginTop: "3px" }}>{selectedTimeSlot}</span>
-                </div>
-                <div>
-                  <span style={{ fontSize: "11px", color: "var(--ae-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>Pitch</span>
-                  <span style={{ fontWeight: 500, color: "var(--ae-ink)", display: "block", marginTop: "3px" }}>{selectedPitch}</span>
-                </div>
-                <div>
-                  <span style={{ fontSize: "11px", color: "var(--ae-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>Amount</span>
-                  <span style={{ fontWeight: 700, color: accentColor, display: "block", marginTop: "3px" }}>{formatPrice(confirmedBooking.total_price)}</span>
-                </div>
-              </div>
-
-              <div style={{ marginTop: "24px", paddingTop: "24px", borderTop: "1.5px dashed var(--ae-hairline)", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
-                {qrCodeUrl ? (
-                  <img src={qrCodeUrl} alt="Booking QR Code" style={{ width: "160px", height: "160px", borderRadius: "var(--ae-radius-md)", padding: "8px", backgroundColor: "#ffffff" }} />
-                ) : (
-                  <div style={{ width: "160px", height: "160px", backgroundColor: "var(--ae-surface-soft)", borderRadius: "var(--ae-radius-md)" }} />
                 )}
-                <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ae-muted)" }}>Scan at entrance</span>
               </div>
             </div>
-
-            <div style={{ marginTop: "28px", display: "flex", gap: "12px", width: "100%", justifyContent: "center", flexWrap: "wrap" }}>
-              <button onClick={handleDownloadTicket} className="ae-btn-secondary" style={{ padding: "14px 28px", borderRadius: "var(--ae-radius-sm)", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
-                <Download className="w-4 h-4" /> Download ticket
-              </button>
-              <button onClick={() => setFlowStep("listing")} className="ae-btn-primary" style={{ padding: "14px 28px", borderRadius: "var(--ae-radius-sm)", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px" }}>
-                Explore more <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            <Link href="/profile" style={{ marginTop: "20px", fontSize: "14px", color: "var(--ae-muted)", textDecoration: "underline", transition: "color 0.15s" }}>
-              View all my bookings
-            </Link>
-          </motion.div>
+          </div>
         )}
       </main>
 
-      {/* ═══ FAQ ═══ */}
-      {flowStep === "listing" && (
-        <div className="max-w-3xl mx-auto px-6 md:px-8 pb-20">
-          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--ae-ink)", marginBottom: "32px", textAlign: "center", letterSpacing: "-0.01em" }}>
-            Frequently asked questions
-          </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {exploreFaqItems.map((item, idx) => (
-              <FaqItem key={idx} question={item.question} answer={item.answer} />
-            ))}
+      {/* ========================================================
+          BOOKING SUMMARY CHECKOUT MODALS
+          ======================================================== */}
+      <AnimatePresence>
+        {flowStep === "checkout" && selectedTurf && selectedTimeSlot && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Scrim backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"
+              onClick={() => setFlowStep("listing")}
+            />
+
+            {/* Checkout Form Modal Card */}
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="relative bg-surface border border-border-default rounded-2xl max-w-md w-full p-6 shadow-2xl z-10 flex flex-col gap-4 text-left"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-border-default">
+                <h3 className="text-lg font-bold text-text-main">Request to Book</h3>
+                <button
+                  onClick={() => setFlowStep("listing")}
+                  className="p-1 hover:bg-elevated rounded-full border border-border-default transition-colors text-text-muted hover:text-text-main"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Summary details card */}
+              <div className="bg-elevated border border-border-default rounded-xl p-4 text-xs font-semibold space-y-3">
+                <div className="flex justify-between border-b border-border-strong pb-2">
+                  <div>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">Venue Turf</span>
+                    <span className="font-bold text-text-main text-sm">{selectedTurf.name}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">Booking Date</span>
+                    <span className="font-semibold text-text-main text-xs">{formatDisplayDate(selectedDate)}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">Time Slot</span>
+                    <span className="font-semibold text-text-main text-xs">{format12HourRange(selectedTimeSlot)}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">Select Pitch</span>
+                    <span className="font-semibold text-text-main text-xs">{selectedPitch}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold mb-1">Attendees count</span>
+                    <div className="relative w-[100px]">
+                      <input
+                        type="number"
+                        min={2}
+                        max={selectedTurf.premium ? 22 : 14}
+                        value={attendees}
+                        onChange={(e) => setAttendees(Math.max(2, Math.min(22, Number(e.target.value))))}
+                        className="w-full bg-surface border border-border-strong rounded-lg pl-3 pr-2 py-1.5 text-text-main text-xs font-semibold focus:outline-none focus:border-brand-lime focus:ring-1 focus:ring-brand-lime/50 transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment selection list */}
+              <div>
+                <label className="block text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Select Payment Method</label>
+                <div className="flex flex-col gap-2">
+                  {[
+                    { key: "upi" as const, label: "UPI Payments (GPay, PhonePe, Paytm)", sub: "Instant slot confirmation pass" },
+                    { key: "card" as const, label: "Credit & Debit Cards (Visa, MasterCard)", sub: "Major international banks supported" },
+                    { key: "netbanking" as const, label: "NetBanking Bank Access", sub: "Redirect to official netbanking portal" },
+                    { key: "pay_at_venue" as const, label: "Pay at Venue", sub: "Pay directly at the turf before your game" },
+                  ].map((method) => {
+                    const isSelected = selectedPayment === method.key;
+                    return (
+                      <div
+                        key={method.key}
+                        onClick={() => setSelectedPayment(method.key)}
+                        className={`flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition-all duration-200
+                          ${isSelected ? "border-brand-lime bg-brand-lime/10" : "border-border-default hover:bg-elevated"}`}
+                      >
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 mt-0.5
+                          ${isSelected ? "border-brand-lime" : "border-border-strong"}`}>
+                          {isSelected && <div className="w-2 h-2 rounded-full bg-brand-lime" />}
+                        </div>
+                        <div>
+                          <span className="block text-xs font-bold text-text-main leading-none">{method.label}</span>
+                          <span className="block text-[10px] text-text-muted mt-1 leading-tight">{method.sub}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Pricing breakdown summary */}
+              <div className="bg-elevated border border-border-default rounded-xl p-4 flex flex-col gap-2 text-xs text-text-muted">
+                <div className="flex justify-between">
+                  <span>Base slot price</span>
+                  <span className="text-text-main">{formatPrice(pricing.subtotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Convenience surcharge</span>
+                  <span className="text-text-main">{formatPrice(pricing.convenience)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>GST Taxes (18%)</span>
+                  <span className="text-text-main">{formatPrice(pricing.gst)}</span>
+                </div>
+                <div className="flex justify-between border-t border-border-strong pt-2.5 font-bold text-text-main text-sm">
+                  <span>Grand Total</span>
+                  <span className="text-brand-lime">{formatPrice(pricing.total)}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2.5 mt-1">
+                <button
+                  onClick={handlePayNow}
+                  className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99]"
+                >
+                  {selectedPayment === "pay_at_venue" ? `Book & Pay at Venue · ${formatPrice(pricing.total)}` : `Pay Now · ${formatPrice(pricing.total)}`}
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================
+          PROCESSING CHECKOUT LOADER
+          ======================================================== */}
+      <AnimatePresence>
+        {flowStep === "processing" && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <Loader2 className="w-10 h-10 animate-spin text-brand-lime" />
+              <div>
+                <h3 className="text-lg font-bold text-text-main">Securing Your Slot</h3>
+                <p className="text-xs text-text-muted mt-1 max-w-[280px]">
+                  Confirming your payment signature and locking slot times. Please do not refresh.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================
+          CHECKOUT ERROR MODAL
+          ======================================================== */}
+      <AnimatePresence>
+        {flowStep === "error" && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              className="bg-surface border border-border-default rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center flex flex-col items-center gap-4"
+            >
+              <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 border border-red-500/25">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-text-main">Payment Failed</h3>
+              <p className="text-xs text-text-muted leading-relaxed">{bookingError || "Something went wrong during checkout. Please try again."}</p>
+              <div className="flex gap-3 mt-4 w-full justify-center text-xs font-semibold">
+                <button
+                  onClick={() => setFlowStep("checkout")}
+                  className="bg-brand-lime hover:bg-brand-lime-hover text-bg font-bold px-6 py-3 rounded-xl transition-all cursor-pointer"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={() => { setFlowStep("listing"); setViewMode("list"); }}
+                  className="bg-elevated border border-border-default text-text-main px-6 py-3 rounded-xl transition-colors cursor-pointer"
+                >
+                  Browse Turfs
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================
+          BOOKING CONFIRMED PASS VIEW (Airbnb Style)
+          ======================================================== */}
+      <AnimatePresence>
+        {flowStep === "confirmed" && confirmedBooking && selectedTurf && selectedTimeSlot && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-sm overflow-y-auto">
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              className="bg-surface border border-border-default rounded-2xl max-w-md w-full p-6 shadow-2xl z-10 text-center my-8"
+            >
+              <div className="w-16 h-16 bg-brand-lime/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-lime/20">
+                <Check className="w-8 h-8 text-brand-lime" strokeWidth={3} />
+              </div>
+              <h3 className="text-xl font-extrabold text-text-main">Booking Confirmed!</h3>
+              <p className="text-xs text-text-muted mt-1">Your pitch reservation has been successfully booked.</p>
+
+              {/* Ticket receipt box */}
+              <div className="relative mt-6 rounded-2xl overflow-hidden shadow-xl border border-border-default bg-surface">
+                {/* Top Section */}
+                <div className="bg-gradient-to-br from-brand-lime to-green-600 p-5 text-bg">
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-0.5">Venue</span>
+                      <span className="font-extrabold text-lg">{selectedTurf.name}</span>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-1.5">Status</span>
+                      <span className="font-black text-xs uppercase px-2 py-0.5 bg-bg text-brand-lime rounded-md shadow-sm">
+                        {selectedPayment === "pay_at_venue" ? "Pay at Venue" : "Paid"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-0.5">Date</span>
+                      <span className="font-semibold text-sm">{formatDisplayDate(selectedDate)}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-0.5">Time</span>
+                      <span className="font-semibold text-sm">{format12HourRange(selectedTimeSlot)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Perforated separator */}
+                <div className="relative h-6 flex items-center justify-between z-10 px-[-16px]">
+                  <div className="w-6 h-6 rounded-full bg-black/60 dark:bg-black/85 absolute -left-3 shadow-inner" style={{ backdropFilter: "blur(4px)" }}></div>
+                  <div className="w-full border-t-[3px] border-dashed border-border-strong mx-5 opacity-50"></div>
+                  <div className="w-6 h-6 rounded-full bg-black/60 dark:bg-black/85 absolute -right-3 shadow-inner" style={{ backdropFilter: "blur(4px)" }}></div>
+                </div>
+
+                {/* Bottom Section */}
+                <div className="bg-surface p-5 pt-2 text-left">
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-2 mb-5">
+                    <div>
+                      <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">Booking ID</span>
+                      <span className="font-bold text-text-main text-sm">{confirmedBooking.booking_code}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">Pitch No</span>
+                      <span className="font-bold text-text-main text-sm">{selectedPitch}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">Amount</span>
+                      <span className="font-bold text-brand-lime text-sm">{formatPrice(confirmedBooking.total_price)}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">Attendees</span>
+                      <span className="font-bold text-text-main text-sm">{attendees} Players</span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-border-default pt-5 flex flex-col items-center gap-3">
+                    {qrCodeUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={qrCodeUrl} alt="Booking QR Pass" className="w-24 h-24 rounded-xl bg-white p-1.5 shadow-md" />
+                    ) : (
+                      <div className="w-24 h-24 bg-elevated animate-pulse rounded-xl" />
+                    )}
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-text-muted">
+                      Scan at entrance gate
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 mt-6">
+                <button
+                  onClick={handleDownloadTicket}
+                  className="w-full bg-elevated border border-border-default hover:bg-bg text-text-main font-semibold py-3 rounded-xl flex items-center justify-center gap-2 text-sm transition-colors cursor-pointer"
+                >
+                  <Download className="w-4 h-4" /> Download Ticket Pass
+                </button>
+                <button
+                  onClick={() => { setFlowStep("listing"); setViewMode("list"); }}
+                  className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold py-3 rounded-xl text-sm transition-all cursor-pointer"
+                >
+                  Done
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================
+          AIRBNB FILTERS MODAL
+          ======================================================== */}
+      <AnimatePresence>
+        {isFiltersModalOpen && (() => {
+          const isMinOnTop = activeSlider === "min" || (activeSlider !== "max" && hoveredSlider === "min");
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              {/* Scrim backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"
+                onClick={() => setIsFiltersModalOpen(false)}
+              />
+
+              {/* Modal Card */}
+              <motion.div
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="relative bg-surface border border-border-default rounded-2xl max-w-xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl z-10"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border-default shrink-0">
+                  <button
+                    onClick={() => setIsFiltersModalOpen(false)}
+                    className="p-1 hover:bg-elevated rounded-full border border-border-default transition-colors text-text-muted hover:text-text-main cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <h3 className="text-base font-bold text-text-main">Filters</h3>
+                  <div className="w-6 h-6" /> {/* Spacer */}
+                </div>
+
+                {/* Scrollable content body */}
+                <div className="p-6 overflow-y-auto space-y-8 flex-grow">
+                  {/* Section 1: Recommended for you */}
+                  <div className="pb-8 border-b border-border-default mb-8">
+                    <h4 className="text-base font-bold text-text-main mb-4">Recommended for you</h4>
+                    <div className="grid grid-cols-4 gap-3">
+                      {[
+                        { id: "instant", label: "Instant Book", icon: Zap, color: "text-amber-500 bg-amber-500/10 border-amber-500/20" },
+                        { id: "wifi", label: "Spectator Wifi", icon: Wifi, color: "text-blue-500 bg-blue-500/10 border-blue-500/20" },
+                        { id: "parking", label: "Free parking", icon: ParkingCircle, color: "text-green-500 bg-green-500/10 border-green-500/20" },
+                        { id: "floodlight", label: "Floodlights", icon: Sparkles, color: "text-brand-lime bg-brand-lime/10 border-brand-lime/20" },
+                      ].map((card) => {
+                        const isChecked = filterAmenities.includes(card.id);
+                        const Icon = card.icon;
+                        return (
+                          <button
+                            key={card.id}
+                            onClick={() => {
+                              setFilterAmenities((prev) =>
+                                isChecked ? prev.filter((x) => x !== card.id) : [...prev, card.id]
+                              );
+                            }}
+                            className={`flex flex-col items-center justify-center p-4 border rounded-2xl cursor-pointer transition-all duration-200 aspect-square select-none
+                              ${
+                                isChecked
+                                  ? "border-text-main bg-elevated/40 ring-1 ring-text-main"
+                                  : "border-border-default hover:border-border-strong hover:bg-elevated/10"
+                              }`}
+                          >
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2.5 border ${card.color}`}>
+                              <Icon className="w-5 h-5 shrink-0" />
+                            </div>
+                            <span className="text-[11px] font-bold text-text-main text-center leading-tight">
+                              {card.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Section 2: Type of place */}
+                  <div className="pb-8 border-b border-border-default mb-8">
+                    <h4 className="text-base font-bold text-text-main mb-3">Type of turf</h4>
+                    <div className="flex border border-border-default rounded-full p-1 bg-bg/50 select-none w-full justify-between gap-1">
+                      {[
+                        { id: "all", label: "Any format" },
+                        { id: "5v5", label: "5v5 Pitch" },
+                        { id: "7v7", label: "7v7 Pitch" },
+                        { id: "11v11", label: "11v11 Pitch" },
+                      ].map((fmt) => {
+                        const isActive = filterFormat === fmt.id;
+                        return (
+                          <button
+                            key={fmt.id}
+                            onClick={() => setFilterFormat(fmt.id)}
+                            className={`flex-1 py-3 text-xs font-extrabold text-center rounded-full transition-all cursor-pointer focus:outline-none
+                              ${
+                                isActive
+                                  ? "bg-surface border border-text-main text-text-main shadow-sm"
+                                  : "text-text-muted hover:bg-elevated/40 hover:text-text-main"
+                              }`}
+                          >
+                            {fmt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Section 3: Price range */}
+                  <div className="pb-8 border-b border-border-default mb-8">
+                    <h4 className="text-base font-bold text-text-main mb-1">Price range</h4>
+                    <p className="text-xs text-text-muted mb-6 font-medium">Hourly rate for turf pitch bookings, including all taxes</p>
+
+                    {/* Airbnb-style Decorative Price Density Histogram */}
+                    <div className="flex items-end justify-between gap-[2px] h-12 px-4 relative select-none">
+                      {[
+                        15, 20, 30, 25, 40, 55, 70, 85, 95, 80, 65, 50, 45, 60, 75,
+                        80, 60, 40, 30, 25, 35, 45, 55, 60, 50, 35, 20, 15, 10, 8,
+                      ].map((height, i) => {
+                        // Calculate if this bar is within the current min/max price range
+                        const barPercentage = (i / 30) * 100;
+                        const minPercentage = ((filterMinPrice - 500) / 2500) * 100;
+                        const maxPercentage = ((filterMaxPrice - 500) / 2500) * 100;
+                        const isHighlighted = barPercentage >= minPercentage && barPercentage <= maxPercentage;
+                        return (
+                          <div
+                            key={i}
+                            className="flex-1 rounded-t-sm transition-all duration-300"
+                            style={{
+                              height: `${height}%`,
+                              backgroundColor: isHighlighted ? "var(--brand-lime, #4ADE80)" : "var(--border-strong, #3f3f46)",
+                              opacity: isHighlighted ? 1 : 0.25,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+
+                    {/* Custom Dual Range Slider */}
+                    <div className="relative w-full h-8 flex items-center mb-4 select-none">
+                      <div className="relative w-full mx-4 h-full flex items-center">
+                        {/* Track line background */}
+                        <div className="absolute left-0 right-0 h-1 bg-border-default rounded-full" />
+                        {/* Highlighted track line between thumbs */}
+                        <div
+                          className="absolute h-1 bg-brand-lime rounded-full"
+                          style={{
+                            left: `${((filterMinPrice - 500) / 2500) * 100}%`,
+                            right: `${100 - ((filterMaxPrice - 500) / 2500) * 100}%`,
+                          }}
+                        />
+                        
+                        {/* Minimum Range Slider Input */}
+                        <input
+                          type="range"
+                          min={500}
+                          max={3000}
+                          step={100}
+                          value={filterMinPrice}
+                          onMouseEnter={() => setHoveredSlider("min")}
+                          onMouseLeave={() => setHoveredSlider(null)}
+                          onMouseDown={() => setActiveSlider("min")}
+                          onMouseUp={() => setActiveSlider(null)}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (val <= filterMaxPrice) {
+                              setFilterMinPrice(val);
+                              setMinInputVal(val.toString());
+                            }
+                          }}
+                          className={`absolute left-0 right-0 w-full h-1 pointer-events-none appearance-none bg-transparent outline-none focus:outline-none
+                            ${isMinOnTop ? "z-40" : "z-30"}
+                            [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-border-strong [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer
+                            [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-surface [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-border-strong [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer`}
+                        />
+
+                        {/* Maximum Range Slider Input */}
+                        <input
+                          type="range"
+                          min={500}
+                          max={3000}
+                          step={100}
+                          value={filterMaxPrice}
+                          onMouseEnter={() => setHoveredSlider("max")}
+                          onMouseLeave={() => setHoveredSlider(null)}
+                          onMouseDown={() => setActiveSlider("max")}
+                          onMouseUp={() => setActiveSlider(null)}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (val >= filterMinPrice) {
+                              setFilterMaxPrice(val);
+                              setMaxInputVal(val.toString());
+                            }
+                          }}
+                          className={`absolute left-0 right-0 w-full h-1 pointer-events-none appearance-none bg-transparent outline-none focus:outline-none
+                            ${isMinOnTop ? "z-30" : "z-40"}
+                            [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-border-strong [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer
+                            [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-surface [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-border-strong [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer`}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Dual price inputs */}
+                    <div className="grid grid-cols-2 gap-4 items-center">
+                      {/* Min Price Box */}
+                      <div className="border border-border-default focus-within:border-text-main focus-within:ring-1 focus-within:ring-text-main rounded-full px-6 py-2.5 bg-bg flex flex-col justify-center">
+                        <label className="text-[9px] font-bold uppercase tracking-wider text-text-muted">Minimum</label>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <span className="text-sm font-bold text-text-muted">₹</span>
+                          <input
+                            type="text"
+                            value={minInputVal}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (/^\d*$/.test(val)) {
+                                setMinInputVal(val);
+                              }
+                            }}
+                            onBlur={() => {
+                              let num = Number(minInputVal);
+                              if (isNaN(num) || num < 500) num = 500;
+                              if (num > filterMaxPrice) num = filterMaxPrice;
+                              setFilterMinPrice(num);
+                              setMinInputVal(num.toString());
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                let num = Number(minInputVal);
+                                if (isNaN(num) || num < 500) num = 500;
+                                if (num > filterMaxPrice) num = filterMaxPrice;
+                                setFilterMinPrice(num);
+                                setMinInputVal(num.toString());
+                                e.currentTarget.blur();
+                              }
+                            }}
+                            className="w-full text-sm font-bold text-text-main bg-transparent border-none outline-none focus:ring-0 p-0"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Max Price Box */}
+                      <div className="border border-border-default focus-within:border-text-main focus-within:ring-1 focus-within:ring-text-main rounded-full px-6 py-2.5 bg-bg flex flex-col justify-center">
+                        <label className="text-[9px] font-bold uppercase tracking-wider text-text-muted">Maximum</label>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <span className="text-sm font-bold text-text-muted">₹</span>
+                          <input
+                            type="text"
+                            value={maxInputVal}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (/^\d*$/.test(val)) {
+                                setMaxInputVal(val);
+                              }
+                            }}
+                            onBlur={() => {
+                              let num = Number(maxInputVal);
+                              if (isNaN(num) || num > 3000) num = 3000;
+                              if (num < filterMinPrice) num = filterMinPrice;
+                              setFilterMaxPrice(num);
+                              setMaxInputVal(num.toString());
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                let num = Number(maxInputVal);
+                                if (isNaN(num) || num > 3000) num = 3000;
+                                if (num < filterMinPrice) num = filterMinPrice;
+                                setFilterMaxPrice(num);
+                                setMaxInputVal(num.toString());
+                                e.currentTarget.blur();
+                              }
+                            }}
+                            className="w-full text-sm font-bold text-text-main bg-transparent border-none outline-none focus:ring-0 p-0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 4: Amenities (Pills) */}
+                  <div className="pb-8 border-b border-border-default mb-8">
+                    <h4 className="text-base font-bold text-text-main mb-3">Amenities</h4>
+                    <div className="flex flex-wrap gap-2.5">
+                      {[
+                        { id: "water", label: "Drinking water", icon: Droplet },
+                        { id: "changing", label: "Changing rooms", icon: Info },
+                        { id: "rental", label: "Equipment rental", icon: Award },
+                        { id: "first-aid", label: "First Aid kit", icon: ShieldCheck },
+                        { id: "cafeteria", label: "Snacks / Cafe", icon: Coffee },
+                      ].map((amenity) => {
+                        const isChecked = filterAmenities.includes(amenity.id);
+                        const Icon = amenity.icon;
+                        return (
+                          <button
+                            key={amenity.id}
+                            onClick={() => {
+                              setFilterAmenities((prev) =>
+                                isChecked ? prev.filter((x) => x !== amenity.id) : [...prev, amenity.id]
+                              );
+                            }}
+                            className={`flex items-center gap-2 border px-4 py-2.5 rounded-full text-xs font-bold cursor-pointer transition-all duration-200 select-none
+                              ${
+                                isChecked
+                                  ? "border-text-main ring-1 ring-text-main text-text-main bg-surface/30"
+                                  : "border-border-default text-text-main hover:border-border-strong bg-surface/50"
+                              }`}
+                          >
+                            <Icon className={`w-3.5 h-3.5 shrink-0 ${isChecked ? "text-text-main" : "text-text-muted"}`} />
+                            <span>{amenity.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Section 5: Booking Options (Pills) */}
+                  <div>
+                    <h4 className="text-base font-bold text-text-main mb-3">Booking options</h4>
+                    <div className="flex flex-wrap gap-2.5">
+                      {[
+                        { id: "instant", label: "Instant Book", icon: Zap },
+                        { id: "changing", label: "Free cancellation", icon: Calendar },
+                        { id: "indoor", label: "Indoor Court", icon: Home },
+                        { id: "outdoor", label: "Outdoor Field", icon: Sun },
+                      ].map((option) => {
+                        const isChecked = filterAmenities.includes(option.id);
+                        const Icon = option.icon;
+                        return (
+                          <button
+                            key={option.id}
+                            onClick={() => {
+                              setFilterAmenities((prev) =>
+                                isChecked ? prev.filter((x) => x !== option.id) : [...prev, option.id]
+                              );
+                            }}
+                            className={`flex items-center gap-2 border px-4 py-2.5 rounded-full text-xs font-bold cursor-pointer transition-all duration-200 select-none
+                              ${
+                                isChecked
+                                  ? "border-text-main ring-1 ring-text-main text-text-main bg-surface/30"
+                                  : "border-border-default text-text-main hover:border-border-strong bg-surface/50"
+                              }`}
+                          >
+                            <Icon className={`w-3.5 h-3.5 shrink-0 ${isChecked ? "text-text-main" : "text-text-muted"}`} />
+                            <span>{option.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sticky Footer */}
+                <div className="px-6 py-4 border-t border-border-default flex items-center justify-between shrink-0 bg-surface">
+                  <button
+                    onClick={() => {
+                      setFilterFormat("all");
+                      setFilterMinPrice(500);
+                      setFilterMaxPrice(3000);
+                      setMinInputVal("500");
+                      setMaxInputVal("3000");
+                      setFilterAmenities([]);
+                    }}
+                    className="text-xs font-bold text-text-main hover:text-text-main hover:underline cursor-pointer bg-transparent border-none outline-none underline decoration-solid"
+                  >
+                    Clear all
+                  </button>
+                  <button
+                    onClick={() => setIsFiltersModalOpen(false)}
+                    className="bg-text-main hover:bg-text-main/90 text-bg font-extrabold text-xs py-3 px-6 rounded-full transition-all cursor-pointer"
+                  >
+                    Show {filteredTurfs.length} turf{filteredTurfs.length !== 1 ? "s" : ""}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          );
+        })()}
+      </AnimatePresence>
 
       <Footer />
     </div>
