@@ -37,7 +37,7 @@ interface PendingOwner {
     pan_number?: string;
     onboarding_completed: boolean;
   } | null;
-  venues: Array<{
+  turfs: Array<{
     id: string;
     name: string;
     status: string;
@@ -362,18 +362,18 @@ function PendingOwnersList({
                   </div>
                 </div>
 
-                {owner.venues.length > 0 && (
+                {owner.turfs.length > 0 && (
                   <div className="mt-4 pt-4 border-t border-border-subtle">
-                    <span className="text-text-muted text-xs">Venues</span>
+                    <span className="text-text-muted text-xs">Turfs</span>
                     <div className="mt-2 space-y-2">
-                      {owner.venues.map((venue) => (
+                      {owner.turfs.map((turf) => (
                         <div
-                          key={venue.id}
+                          key={turf.id}
                           className="flex items-center justify-between bg-elevated rounded-md px-3 py-2"
                         >
-                          <span className="text-sm text-text-main">{venue.name}</span>
+                          <span className="text-sm text-text-main">{turf.name}</span>
                           <span className="text-xs text-text-muted">
-                            ₹{venue.price_per_hour}/hr · {venue.status}
+                            ₹{turf.price_per_hour}/hr · {turf.status}
                           </span>
                         </div>
                       ))}

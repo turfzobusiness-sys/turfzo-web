@@ -51,8 +51,8 @@ export default function OwnerDashboardPage() {
 
           setOwnerData(profileState);
 
-          const ownerVenues = await convexClient.query<Turf[]>("auth:getOwnerVenues");
-          setVenues(ownerVenues);
+          const ownerTurfs = await convexClient.query<Turf[]>("auth:getOwnerTurfs");
+          setVenues(ownerTurfs);
         } catch (err) {
           console.error("Failed to load owner dashboard details:", err);
         } finally {
