@@ -62,7 +62,7 @@ export default defineSchema({
     has_first_aid: v.optional(v.boolean()),
     is_indoor: v.optional(v.boolean()),
     ground_count: v.optional(v.number()),
-    status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected"), v.literal("active"), v.literal("inactive")),
+    status: v.optional(v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected"), v.literal("active"), v.literal("inactive"))),
     approved_at: v.optional(v.number()),
     approved_by: v.optional(v.string()),
     created_at: v.optional(v.string()),
