@@ -1,9 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// =============================================================================
-// VALIDATION HELPERS
-// =============================================================================
 function validateGST(gst: string): boolean {
   const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
   return gstRegex.test(gst);
@@ -41,8 +38,6 @@ export const syncFirebaseUser = mutation({
     const now = new Date().toISOString();
 
     if (existingUser) {
-      // SECURITY: Role cannot be changed via this mutation
-      // Role changes must go through admin:updateUserRole mutation
       await ctx.db.patch(existingUser._id, {
         display_name: args.displayName || existingUser.display_name || name,
         full_name: existingUser.full_name || name,
@@ -79,8 +74,6 @@ export const syncFirebaseUser = mutation({
       return { success: true, user: updatedUser, session_token: "" };
     }
 
-    // SECURITY: New users always start as "player" role
-    // Owner/admin roles must be assigned via admin:updateUserRole
     const newUser = await ctx.db.insert("users", {
       email,
       full_name: args.displayName || name || "",
@@ -94,7 +87,6 @@ export const syncFirebaseUser = mutation({
       is_phone_verified: false,
       is_approved: true,
       firebase_uid: firebaseUid,
-      favorite_sports: [],
       notifications_enabled: true,
       created_at: now,
       updated_at: now,
@@ -222,12 +214,11 @@ export const updateOwnerProfile = mutation({
       throw new Error("Owner profile not found");
     }
 
-    // SECURITY: Validate GST/PAN format if provided
     if (args.gst_number && !validateGST(args.gst_number)) {
-      throw new Error("Invalid GST number format. Must be 15 characters: 2 digit state code + 10 char PAN + entity number + Z + check digit");
+      throw new Error("Invalid GST number format");
     }
     if (args.pan_number && !validatePAN(args.pan_number)) {
-      throw new Error("Invalid PAN number format. Must be 10 characters: AAAAA1234F");
+      throw new Error("Invalid PAN number format");
     }
 
     const updateData: Record<string, unknown> = { ...args };
@@ -240,7 +231,7 @@ export const updateOwnerProfile = mutation({
   },
 });
 
-export const createVenue = mutation({
+export const createTurf = mutation({
   args: {
     name: v.string(),
     description: v.optional(v.string()),
@@ -251,15 +242,7 @@ export const createVenue = mutation({
     price_per_hour: v.number(),
     sport_type: v.optional(v.string()),
     amenities: v.optional(v.array(v.string())),
-    operating_hours: v.optional(v.object({
-      monday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      tuesday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      wednesday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      thursday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      friday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      saturday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      sunday: v.optional(v.object({ open: v.string(), close: v.string() })),
-    })),
+    operating_hours: v.optional(v.any()),
     max_players: v.optional(v.number()),
     has_floodlights: v.optional(v.boolean()),
     has_free_parking: v.optional(v.boolean()),
@@ -281,11 +264,13 @@ export const createVenue = mutation({
       .unique();
 
     if (!user || user.role !== "owner") {
-      throw new Error("Only owners can create venues");
+      throw new Error("Only owners can create turfs");
     }
 
-    const venue = await ctx.db.insert("venues", {
-      owner_id: user._id,
+    const now = new Date().toISOString();
+
+    const turf = await ctx.db.insert("turfs", {
+      user_id: user._id,
       name: args.name,
       description: args.description || "",
       address: args.address,
@@ -315,15 +300,17 @@ export const createVenue = mutation({
       is_indoor: args.is_indoor || false,
       ground_count: args.ground_count || 1,
       status: "pending",
+      created_at: now,
+      updated_at: now,
     });
 
-    await ctx.db.patch(user._id, { updated_at: new Date().toISOString() });
+    await ctx.db.patch(user._id, { updated_at: now });
 
-    return venue;
+    return turf;
   },
 });
 
-export const getOwnerVenues = query({
+export const getOwnerTurfs = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
@@ -340,8 +327,8 @@ export const getOwnerVenues = query({
     }
 
     return await ctx.db
-      .query("venues")
-      .withIndex("by_owner_id", (q) => q.eq("owner_id", user._id))
+      .query("turfs")
+      .withIndex("by_user_id", (q) => q.eq("user_id", user._id))
       .collect();
   },
 });
@@ -439,15 +426,7 @@ export const completeOnboardingStep = mutation({
       price_per_hour: v.number(),
       sport_type: v.optional(v.string()),
       amenities: v.optional(v.array(v.string())),
-      operating_hours: v.optional(v.object({
-        monday: v.optional(v.object({ open: v.string(), close: v.string() })),
-        tuesday: v.optional(v.object({ open: v.string(), close: v.string() })),
-        wednesday: v.optional(v.object({ open: v.string(), close: v.string() })),
-        thursday: v.optional(v.object({ open: v.string(), close: v.string() })),
-        friday: v.optional(v.object({ open: v.string(), close: v.string() })),
-        saturday: v.optional(v.object({ open: v.string(), close: v.string() })),
-        sunday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      })),
+      operating_hours: v.optional(v.any()),
       max_players: v.optional(v.number()),
       has_floodlights: v.optional(v.boolean()),
       has_free_parking: v.optional(v.boolean()),
@@ -490,7 +469,6 @@ export const completeOnboardingStep = mutation({
       throw new Error("Owner profile not found");
     }
 
-    // SECURITY: Validate GST/PAN format in step 1
     if (args.step === 1 && args.businessProfile) {
       if (args.businessProfile.gst_number && !validateGST(args.businessProfile.gst_number)) {
         throw new Error("Invalid GST number format");
@@ -500,7 +478,6 @@ export const completeOnboardingStep = mutation({
       }
     }
 
-    // SECURITY: Enforce sequential onboarding steps
     if (args.step !== profile.onboarding_step + 1 && args.step !== 1) {
       throw new Error(`Cannot skip steps. Current step: ${profile.onboarding_step}, requested: ${args.step}`);
     }
@@ -580,9 +557,10 @@ export const submitOnboarding = mutation({
     }
 
     const draft = profile.venue_draft;
+    const now = new Date().toISOString();
 
-    const venueId = await ctx.db.insert("venues", {
-      owner_id: user._id,
+    const turfId = await ctx.db.insert("turfs", {
+      user_id: user._id,
       name: draft.name || "My Venue",
       description: draft.description || "",
       address: draft.address || "",
@@ -612,6 +590,8 @@ export const submitOnboarding = mutation({
       is_indoor: draft.is_indoor || false,
       ground_count: draft.ground_count || 1,
       status: "pending",
+      created_at: now,
+      updated_at: now,
     });
 
     await ctx.db.patch(profile._id, {
@@ -628,9 +608,10 @@ export const submitOnboarding = mutation({
       body: `Your venue "${draft.name || "My Venue"}" onboarding application has been submitted and is pending admin approval.`,
       type: "onboarding_submitted",
       is_read: false,
+      created_at: now,
     });
 
-    return { success: true, venueId };
+    return { success: true, turfId };
   },
 });
 

@@ -1,10 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import type { Doc, Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
 
-// =============================================================================
-// SECURITY: Admin-only helper with server-side role verification
-// =============================================================================
 async function requireAdmin(ctx: any) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
@@ -23,31 +20,21 @@ async function requireAdmin(ctx: any) {
   return user;
 }
 
-// =============================================================================
-// GST/PAN VALIDATION
-// =============================================================================
 function validateGST(gst: string): boolean {
-  // GST format: 15 characters, alphanumeric
-  // Format: 2 digit state code + 10 char PAN + 1 digit entity number + Z default + check digit
   const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
   return gstRegex.test(gst);
 }
 
 function validatePAN(pan: string): boolean {
-  // PAN format: 10 characters
-  // Format: AAAAA1234F (5 letters + 4 digits + 1 letter)
   const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
   return panRegex.test(pan);
 }
 
-// =============================================================================
-// AUDIT LOG HELPER
-// =============================================================================
 async function logAuditEvent(
   ctx: any,
   action: string,
-  targetUserId: Id<"users">,
-  adminUserId: Id<"users">
+  targetUserId: string,
+  adminUserId: string
 ) {
   await ctx.db.insert("auditLogs", {
     action,
@@ -56,10 +43,6 @@ async function logAuditEvent(
     timestamp: Date.now(),
   });
 }
-
-// =============================================================================
-// QUERIES
-// =============================================================================
 
 export const listPendingOwners = query({
   handler: async (ctx) => {
@@ -79,9 +62,9 @@ export const listPendingOwners = query({
           .withIndex("by_user_id", (q: any) => q.eq("user_id", owner._id))
           .unique();
 
-        const venues = await ctx.db
-          .query("venues")
-          .withIndex("by_owner_id", (q: any) => q.eq("owner_id", owner._id))
+        const turfs = await ctx.db
+          .query("turfs")
+          .withIndex("by_user_id", (q: any) => q.eq("user_id", owner._id))
           .collect();
 
         return {
@@ -100,11 +83,11 @@ export const listPendingOwners = query({
                 onboarding_completed: profile.onboarding_completed,
               }
             : null,
-          venues: venues.map((v: any) => ({
-            id: v._id,
-            name: v.name,
-            status: v.status,
-            price_per_hour: v.price_per_hour,
+          turfs: turfs.map((t: any) => ({
+            id: t._id,
+            name: t.name,
+            status: t.status,
+            price_per_hour: t.price_per_hour,
           })),
         };
       })
@@ -154,7 +137,6 @@ export const listAllUsers = query({
 export const listContactMessages = query({
   handler: async (ctx) => {
     await requireAdmin(ctx);
-
     return await ctx.db.query("contactSubmissions").collect();
   },
 });
@@ -165,21 +147,10 @@ export const getAuditLogs = query({
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
-
     const limit = Math.min(args.limit ?? 100, 500);
-
-    const logs = await ctx.db
-      .query("auditLogs")
-      .order("desc")
-      .take(limit);
-
-    return logs;
+    return await ctx.db.query("auditLogs").order("desc").take(limit);
   },
 });
-
-// =============================================================================
-// MUTATIONS
-// =============================================================================
 
 export const approveOwner = mutation({
   args: {
@@ -188,17 +159,12 @@ export const approveOwner = mutation({
   },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx);
-    const targetUserId = args.userId as Id<"users">;
+    const targetUserId = args.userId;
 
-    const targetUser = await ctx.db.get(targetUserId);
-    if (!targetUser) {
-      throw new Error("User not found");
-    }
-    if (targetUser.role !== "owner") {
-      throw new Error("User is not an owner");
-    }
+    const targetUser = await ctx.db.get(targetUserId as Id<"users">);
+    if (!targetUser) throw new Error("User not found");
+    if (targetUser.role !== "owner") throw new Error("User is not an owner");
 
-    // Validate GST/PAN if present in owner profile
     const profile = await ctx.db
       .query("ownerProfiles")
       .withIndex("by_user_id", (q: any) => q.eq("user_id", targetUserId))
@@ -213,22 +179,22 @@ export const approveOwner = mutation({
       }
     }
 
-    // Approve user
-    await ctx.db.patch(targetUserId, {
+    const now = new Date().toISOString();
+
+    await ctx.db.patch(targetUserId as Id<"users">, {
       is_approved: true,
       approved_at: Date.now(),
-      updated_at: new Date().toISOString(),
+      updated_at: now,
     });
 
-    // Approve all pending venues for this owner
-    const venues = await ctx.db
-      .query("venues")
-      .withIndex("by_owner_id", (q: any) => q.eq("owner_id", targetUserId))
+    const turfs = await ctx.db
+      .query("turfs")
+      .withIndex("by_user_id", (q: any) => q.eq("user_id", targetUserId))
       .collect();
 
-    for (const venue of venues) {
-      if (venue.status === "pending") {
-        await ctx.db.patch(venue._id, {
+    for (const turf of turfs) {
+      if (turf.status === "pending") {
+        await ctx.db.patch(turf._id, {
           status: "approved",
           approved_at: Date.now(),
           approved_by: admin._id,
@@ -236,16 +202,15 @@ export const approveOwner = mutation({
       }
     }
 
-    // Create notification
     await ctx.db.insert("notifications", {
       user_id: targetUserId,
       title: "Account Approved",
-      body: "Your owner account has been approved. You can now manage your venues.",
+      body: "Your owner account has been approved. You can now manage your turfs.",
       type: "owner_approved",
       is_read: false,
+      created_at: now,
     });
 
-    // Audit log
     await logAuditEvent(ctx, "approve_owner", targetUserId, admin._id);
 
     return { success: true };
@@ -259,39 +224,32 @@ export const rejectOwner = mutation({
   },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx);
-    const targetUserId = args.userId as Id<"users">;
+    const targetUserId = args.userId;
 
-    const targetUser = await ctx.db.get(targetUserId);
-    if (!targetUser) {
-      throw new Error("User not found");
-    }
-    if (targetUser.role !== "owner") {
-      throw new Error("User is not an owner");
-    }
+    const targetUser = await ctx.db.get(targetUserId as Id<"users">);
+    if (!targetUser) throw new Error("User not found");
+    if (targetUser.role !== "owner") throw new Error("User is not an owner");
 
-    // Reject user
-    await ctx.db.patch(targetUserId, {
+    const now = new Date().toISOString();
+
+    await ctx.db.patch(targetUserId as Id<"users">, {
       is_approved: false,
-      updated_at: new Date().toISOString(),
+      updated_at: now,
     });
 
-    // Reject all pending venues
-    const venues = await ctx.db
-      .query("venues")
-      .withIndex("by_owner_id", (q: any) => q.eq("owner_id", targetUserId))
+    const turfs = await ctx.db
+      .query("turfs")
+      .withIndex("by_user_id", (q: any) => q.eq("user_id", targetUserId))
       .collect();
 
-    for (const venue of venues) {
-      if (venue.status === "pending") {
-        await ctx.db.patch(venue._id, {
+    for (const turf of turfs) {
+      if (turf.status === "pending") {
+        await ctx.db.patch(turf._id, {
           status: "rejected",
-          approved_at: Date.now(),
-          approved_by: admin._id,
         });
       }
     }
 
-    // Create notification with rejection reason
     await ctx.db.insert("notifications", {
       user_id: targetUserId,
       title: "Account Rejected",
@@ -299,86 +257,79 @@ export const rejectOwner = mutation({
       type: "owner_rejected",
       data: { reason: args.reason },
       is_read: false,
+      created_at: now,
     });
 
-    // Audit log
     await logAuditEvent(ctx, "reject_owner", targetUserId, admin._id);
 
     return { success: true };
   },
 });
 
-export const approveVenue = mutation({
+export const approveTurf = mutation({
   args: {
-    venueId: v.string(),
+    turfId: v.string(),
   },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx);
-    const venueId = args.venueId as Id<"venues">;
+    const turfId = args.turfId as Id<"turfs">;
 
-    const venue = await ctx.db.get(venueId);
-    if (!venue) {
-      throw new Error("Venue not found");
-    }
+    const turf = await ctx.db.get(turfId);
+    if (!turf) throw new Error("Turf not found");
 
-    // Verify the owner is approved
-    const owner = await ctx.db.get(venue.owner_id);
+    const owner = await ctx.db.get(turf.user_id as Id<"users">);
     if (!owner || !owner.is_approved) {
-      throw new Error("Owner must be approved before venue can be activated");
+      throw new Error("Owner must be approved before turf can be activated");
     }
 
-    await ctx.db.patch(venueId, {
+    await ctx.db.patch(turfId, {
       status: "active",
       approved_at: Date.now(),
       approved_by: admin._id,
     });
 
-    // Notify owner
     await ctx.db.insert("notifications", {
-      user_id: venue.owner_id,
-      title: "Venue Approved",
-      body: `Your venue "${venue.name}" has been approved and is now live.`,
-      type: "venue_approved",
+      user_id: turf.user_id,
+      title: "Turf Approved",
+      body: `Your turf "${turf.name}" has been approved and is now live.`,
+      type: "turf_approved",
       is_read: false,
+      created_at: new Date().toISOString(),
     });
 
-    await logAuditEvent(ctx, "approve_venue", venue.owner_id, admin._id);
+    await logAuditEvent(ctx, "approve_turf", turf.user_id, admin._id);
 
     return { success: true };
   },
 });
 
-export const rejectVenue = mutation({
+export const rejectTurf = mutation({
   args: {
-    venueId: v.string(),
+    turfId: v.string(),
     reason: v.string(),
   },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx);
-    const venueId = args.venueId as Id<"venues">;
+    const turfId = args.turfId as Id<"turfs">;
 
-    const venue = await ctx.db.get(venueId);
-    if (!venue) {
-      throw new Error("Venue not found");
-    }
+    const turf = await ctx.db.get(turfId);
+    if (!turf) throw new Error("Turf not found");
 
-    await ctx.db.patch(venueId, {
+    await ctx.db.patch(turfId, {
       status: "rejected",
-      approved_at: Date.now(),
-      approved_by: admin._id,
     });
 
-    // Notify owner
     await ctx.db.insert("notifications", {
-      user_id: venue.owner_id,
-      title: "Venue Rejected",
-      body: `Your venue "${venue.name}" has been rejected. Reason: ${args.reason}`,
-      type: "venue_rejected",
+      user_id: turf.user_id,
+      title: "Turf Rejected",
+      body: `Your turf "${turf.name}" has been rejected. Reason: ${args.reason}`,
+      type: "turf_rejected",
       data: { reason: args.reason },
       is_read: false,
+      created_at: new Date().toISOString(),
     });
 
-    await logAuditEvent(ctx, "reject_venue", venue.owner_id, admin._id);
+    await logAuditEvent(ctx, "reject_turf", turf.user_id, admin._id);
 
     return { success: true };
   },
@@ -394,11 +345,8 @@ export const updateUserRole = mutation({
     const targetUserId = args.userId as Id<"users">;
 
     const targetUser = await ctx.db.get(targetUserId);
-    if (!targetUser) {
-      throw new Error("User not found");
-    }
+    if (!targetUser) throw new Error("User not found");
 
-    // Prevent self-demotion
     if (targetUserId === admin._id && args.newRole !== "admin") {
       throw new Error("Cannot change your own admin role");
     }
@@ -414,12 +362,6 @@ export const updateUserRole = mutation({
   },
 });
 
-// =============================================================================
-// ONE-TIME ADMIN SETUP
-// This mutation can only be used ONCE - when no admin exists in the system.
-// After the first admin is created, this mutation will permanently fail.
-// =============================================================================
-
 export const setupFirstAdmin = mutation({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -427,7 +369,6 @@ export const setupFirstAdmin = mutation({
       throw new Error("Not authenticated");
     }
 
-    // Check if ANY admin already exists
     const existingAdmins = await ctx.db
       .query("users")
       .withIndex("by_role", (q) => q.eq("role", "admin"))
@@ -435,12 +376,10 @@ export const setupFirstAdmin = mutation({
 
     if (existingAdmins.length > 0) {
       throw new Error(
-        "Admin already exists. This setup can only be used once. " +
-        "Please contact the existing admin for access."
+        "Admin already exists. This setup can only be used once."
       );
     }
 
-    // Get the current user
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
@@ -450,23 +389,23 @@ export const setupFirstAdmin = mutation({
       throw new Error("User not found. Please sign up first.");
     }
 
-    // Promote to admin
+    const now = new Date().toISOString();
+
     await ctx.db.patch(user._id, {
       role: "admin",
       is_approved: true,
-      updated_at: new Date().toISOString(),
+      updated_at: now,
     });
 
-    // Create notification
     await ctx.db.insert("notifications", {
       user_id: user._id,
       title: "Admin Account Created",
       body: "You are now the first admin of Turfzo. You can access the admin dashboard at /admin.",
       type: "admin_setup",
       is_read: false,
+      created_at: now,
     });
 
-    // Audit log
     await ctx.db.insert("auditLogs", {
       action: "setup_first_admin",
       target_user_id: user._id,
@@ -480,10 +419,6 @@ export const setupFirstAdmin = mutation({
     };
   },
 });
-
-// =============================================================================
-// CHECK IF ADMIN EXISTS (for setup page)
-// =============================================================================
 
 export const checkAdminExists = query({
   handler: async (ctx) => {
@@ -499,11 +434,6 @@ export const checkAdminExists = query({
   },
 });
 
-// =============================================================================
-// RESET SETUP - Use this to clear all admins and start fresh
-// Call this from Convex dashboard: admin:resetSetup
-// =============================================================================
-
 export const resetSetup = mutation({
   args: {
     confirm: v.string(),
@@ -513,13 +443,11 @@ export const resetSetup = mutation({
       throw new Error("Invalid confirmation. Pass confirm: 'RESET_ALL_ADMINS'");
     }
 
-    // Find all admins
     const admins = await ctx.db
       .query("users")
       .withIndex("by_role", (q) => q.eq("role", "admin"))
       .collect();
 
-    // Reset each admin to player
     for (const admin of admins) {
       await ctx.db.patch(admin._id, {
         role: "player",
@@ -529,7 +457,7 @@ export const resetSetup = mutation({
 
     return {
       success: true,
-      message: `Reset ${admins.length} admin(s) to player role. You can now use /setup again.`,
+      message: `Reset ${admins.length} admin(s) to player role.`,
     };
   },
 });
