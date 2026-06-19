@@ -9,9 +9,9 @@ export const getAvailable = query({
   handler: async (ctx, args) => {
     const all = await ctx.db
       .query("turfs")
-      .withIndex("by_available", (q) => q.eq("is_available", true))
+      .withIndex("by_is_available", (q) => q.eq("is_available", true))
       .collect();
-    let result = all;
+    let result = all.filter((t) => t.status === "active" || t.status === "approved");
     if (args.city) {
       const lower = args.city.toLowerCase();
       result = result.filter((t) => t.city.toLowerCase() === lower);
@@ -36,7 +36,7 @@ export const getByCity = query({
     return await ctx.db
       .query("turfs")
       .withIndex("by_city", (q) => q.eq("city", args.city))
-      .filter((q) => q.eq(q.field("is_available"), true))
+      .filter((q) => q.and(q.eq(q.field("is_available"), true), q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), "approved"))))
       .collect();
   },
 });

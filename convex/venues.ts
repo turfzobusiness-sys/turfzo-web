@@ -1,9 +1,9 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-export const updateVenue = mutation({
+export const updateTurf = mutation({
   args: {
-    venueId: v.id("venues"),
+    turfId: v.id("turfs"),
     name: v.optional(v.string()),
     description: v.optional(v.string()),
     address: v.optional(v.string()),
@@ -13,15 +13,7 @@ export const updateVenue = mutation({
     price_per_hour: v.optional(v.number()),
     sport_type: v.optional(v.string()),
     amenities: v.optional(v.array(v.string())),
-    operating_hours: v.optional(v.object({
-      monday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      tuesday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      wednesday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      thursday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      friday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      saturday: v.optional(v.object({ open: v.string(), close: v.string() })),
-      sunday: v.optional(v.object({ open: v.string(), close: v.string() })),
-    })),
+    operating_hours: v.optional(v.any()),
     max_players: v.optional(v.number()),
     has_floodlights: v.optional(v.boolean()),
     has_free_parking: v.optional(v.boolean()),
@@ -44,22 +36,25 @@ export const updateVenue = mutation({
       .unique();
 
     if (!user || user.role !== "owner") {
-      throw new Error("Only owners can update venues");
+      throw new Error("Only owners can update turfs");
     }
 
-    const venue = await ctx.db.get(args.venueId);
-    if (!venue || venue.owner_id !== user._id) {
-      throw new Error("Venue not found or not authorized");
+    const turf = await ctx.db.get(args.turfId);
+    if (!turf || turf.user_id !== user._id) {
+      throw new Error("Turf not found or not authorized");
     }
 
-    const { venueId, ...updateData } = args;
-    await ctx.db.patch(venueId, updateData);
-    return await ctx.db.get(venueId);
+    const { turfId, ...updateData } = args;
+    await ctx.db.patch(turfId, {
+      ...updateData,
+      updated_at: new Date().toISOString(),
+    });
+    return await ctx.db.get(turfId);
   },
 });
 
-export const deleteVenue = mutation({
-  args: { venueId: v.id("venues") },
+export const deleteTurf = mutation({
+  args: { turfId: v.id("turfs") },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
@@ -72,42 +67,47 @@ export const deleteVenue = mutation({
       .unique();
 
     if (!user || user.role !== "owner") {
-      throw new Error("Only owners can delete venues");
+      throw new Error("Only owners can delete turfs");
     }
 
-    const venue = await ctx.db.get(args.venueId);
-    if (!venue || venue.owner_id !== user._id) {
-      throw new Error("Venue not found or not authorized");
+    const turf = await ctx.db.get(args.turfId);
+    if (!turf || turf.user_id !== user._id) {
+      throw new Error("Turf not found or not authorized");
     }
 
-    await ctx.db.delete(args.venueId);
+    await ctx.db.delete(args.turfId);
     return { success: true };
   },
 });
 
-export const getVenue = query({
-  args: { venueId: v.id("venues") },
+export const getTurf = query({
+  args: { turfId: v.id("turfs") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.venueId);
+    return await ctx.db.get(args.turfId);
   },
 });
 
-export const getVenuesByCity = query({
+export const getTurfsByCity = query({
   args: { city: v.string() },
   handler: async (ctx, args) => {
     return await ctx.db
-      .query("venues")
+      .query("turfs")
       .withIndex("by_city", (q) => q.eq("city", args.city))
-      .filter((q) => q.eq(q.field("status"), "active"))
+      .filter((q) => q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), "approved")))
       .collect();
   },
 });
 
-export const getActiveVenues = query({
+export const getActiveTurfs = query({
   handler: async (ctx) => {
-    return await ctx.db
-      .query("venues")
+    const active = await ctx.db
+      .query("turfs")
       .withIndex("by_status", (q) => q.eq("status", "active"))
       .collect();
+    const approved = await ctx.db
+      .query("turfs")
+      .withIndex("by_status", (q) => q.eq("status", "approved"))
+      .collect();
+    return [...active, ...approved];
   },
 });
