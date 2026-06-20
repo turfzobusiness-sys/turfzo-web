@@ -68,7 +68,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           success: boolean;
           user: AppUser;
           session_token: string;
-        }>("auth:syncFirebaseUser", {}, token);
+        }>("auth:syncFirebaseUser", {
+          displayName: firebaseUser.displayName || undefined,
+          photoURL: firebaseUser.photoURL || undefined,
+          phoneNumber: firebaseUser.phoneNumber || undefined,
+        }, token);
         convexClient.authToken = token;
         if (response.success && response.user) {
           return response.user;

@@ -64,7 +64,7 @@ export function Header() {
   const [open, setOpen] = React.useState(false);
   const scrolled = useScroll(10);
   const pathname = usePathname();
-  const { status, convexUser, signOut } = useAuth();
+  const { status, firebaseUser, convexUser, signOut } = useAuth();
   const { openAuthModal } = useAuthModal();
   const isAuthed = status === "authenticated";
 
@@ -178,9 +178,13 @@ export function Header() {
               >
                 <UserIcon className="size-5" />
                 <span>
-                  {convexUser?.display_name ??
-                    convexUser?.email?.split("@")[0] ??
-                    "Profile"}
+                  {((convexUser?.display_name && convexUser.display_name.trim() !== "")
+                    ? convexUser.display_name
+                    : (convexUser?.full_name && convexUser.full_name.trim() !== "")
+                      ? convexUser.full_name
+                      : firebaseUser?.displayName
+                        ? firebaseUser.displayName
+                        : (convexUser?.email ?? firebaseUser?.email)?.split("@")[0]) ?? "Profile"}
                 </span>
               </Link>
               <Button
@@ -285,9 +289,13 @@ export function Header() {
                   )}
                 >
                   <UserIcon className="size-5" />
-                  {convexUser?.display_name ??
-                    convexUser?.email?.split("@")[0] ??
-                    "Profile"}
+                  {((convexUser?.display_name && convexUser.display_name.trim() !== "")
+                    ? convexUser.display_name
+                    : (convexUser?.full_name && convexUser.full_name.trim() !== "")
+                      ? convexUser.full_name
+                      : firebaseUser?.displayName
+                        ? firebaseUser.displayName
+                        : (convexUser?.email ?? firebaseUser?.email)?.split("@")[0]) ?? "Profile"}
                 </Link>
                 <Button
                   variant="ghost"

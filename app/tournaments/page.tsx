@@ -212,7 +212,15 @@ export default function TournamentsPage() {
     }
     setSelectedTournament(t);
     if (convexUser) {
-      setCaptainName(convexUser.full_name ?? convexUser.display_name ?? "");
+      setCaptainName(
+        (convexUser.full_name && convexUser.full_name.trim() !== "")
+          ? convexUser.full_name
+          : (convexUser.display_name && convexUser.display_name.trim() !== "")
+            ? convexUser.display_name
+            : firebaseUser?.displayName
+              ? firebaseUser.displayName
+              : (convexUser.email ?? firebaseUser?.email)?.split("@")[0] ?? ""
+      );
       setCaptainEmail(convexUser.email ?? firebaseUser?.email ?? "");
       setCaptainPhone(convexUser.phone_number ?? "");
     }

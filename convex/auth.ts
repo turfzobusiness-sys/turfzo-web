@@ -16,6 +16,7 @@ export const syncFirebaseUser = mutation({
     displayName: v.optional(v.string()),
     phoneNumber: v.optional(v.string()),
     city: v.optional(v.string()),
+    photoURL: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -39,11 +40,11 @@ export const syncFirebaseUser = mutation({
 
     if (existingUser) {
       await ctx.db.patch(existingUser._id, {
-        display_name: args.displayName || existingUser.display_name || name,
-        full_name: existingUser.full_name || name,
-        avatar_url: existingUser.avatar_url || picture,
-        phone_number: args.phoneNumber || existingUser.phone_number,
-        city: args.city || existingUser.city,
+        display_name: existingUser.display_name || args.displayName || name || email.split("@")[0],
+        full_name: existingUser.full_name || args.displayName || name || "",
+        avatar_url: existingUser.avatar_url || args.photoURL || picture || "",
+        phone_number: existingUser.phone_number || args.phoneNumber,
+        city: existingUser.city || args.city,
         is_email_verified: emailVerified,
         updated_at: now,
       });
@@ -57,11 +58,11 @@ export const syncFirebaseUser = mutation({
           await ctx.db.insert("ownerProfiles", {
             user_id: existingUser._id,
             business_name: "",
-            phone_number: args.phoneNumber || existingUser.phone_number || "",
+            phone_number: existingUser.phone_number || args.phoneNumber || "",
             gst_number: "",
             pan_number: "",
             address: "",
-            city: args.city || existingUser.city || "",
+            city: existingUser.city || args.city || "",
             state: "",
             zip_code: "",
             onboarding_step: 1,
@@ -77,9 +78,9 @@ export const syncFirebaseUser = mutation({
     const newUser = await ctx.db.insert("users", {
       email,
       full_name: args.displayName || name || "",
-      display_name: args.displayName || name || "",
+      display_name: args.displayName || name || email.split("@")[0],
       phone_number: args.phoneNumber || "",
-      avatar_url: picture || "",
+      avatar_url: args.photoURL || picture || "",
       role: "player",
       city: args.city || "",
       state: "",
@@ -642,5 +643,25 @@ export const getOnboardingState = query({
       .unique();
 
     return { user, profile, payout };
+  },
+});
+
+export const generateUploadUrl = mutation({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const resolveStorageUrl = query({
+  args: { storageId: v.string() },
+  handler: async (ctx, args) => {
+    if (!args.storageId || args.storageId.startsWith("http")) {
+      return args.storageId || null;
+    }
+    return await ctx.storage.getUrl(args.storageId as any);
   },
 });
