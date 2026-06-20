@@ -19,6 +19,7 @@ import {
   Trophy,
   Ticket,
   ArrowRight,
+  LogOut,
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
