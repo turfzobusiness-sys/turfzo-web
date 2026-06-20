@@ -1,4 +1,4 @@
-export type UserRole = "player" | "owner" | "admin";
+export type UserRole = "player" | "owner" | "admin" | "user";
 
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
 

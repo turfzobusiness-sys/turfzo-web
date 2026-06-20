@@ -8,7 +8,7 @@ export default defineSchema({
     display_name: v.optional(v.string()),
     phone_number: v.optional(v.string()),
     avatar_url: v.optional(v.string()),
-    role: v.union(v.literal("player"), v.literal("owner"), v.literal("admin")),
+    role: v.union(v.literal("player"), v.literal("owner"), v.literal("admin"), v.literal("user")),
     city: v.optional(v.string()),
     state: v.optional(v.string()),
     is_email_verified: v.boolean(),

@@ -23,6 +23,8 @@ export const updateTurf = mutation({
     is_indoor: v.optional(v.boolean()),
     ground_count: v.optional(v.number()),
     is_available: v.optional(v.boolean()),
+    image_url: v.optional(v.string()),
+    image_gallery: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
