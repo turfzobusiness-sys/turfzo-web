@@ -13,7 +13,9 @@ import {
   Phone, 
   Sparkles,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { convexClient } from "@/lib/convex";
@@ -26,6 +28,7 @@ export default function OwnerDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [ownerData, setOwnerData] = useState<OnboardingState | null>(null);
   const [venues, setVenues] = useState<Turf[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -53,8 +56,10 @@ export default function OwnerDashboardPage() {
 
           const ownerTurfs = await convexClient.query<Turf[]>("auth:getOwnerTurfs");
           setVenues(ownerTurfs);
+          setLoadError(null);
         } catch (err) {
           console.error("Failed to load owner dashboard details:", err);
+          setLoadError("Failed to load dashboard data. Please try again.");
         } finally {
           setLoading(false);
         }
@@ -71,6 +76,24 @@ export default function OwnerDashboardPage() {
       <div className="min-h-screen bg-bg flex flex-col items-center justify-center gap-3">
         <Loader2 className="h-8 w-8 animate-spin text-brand-lime" />
         <span className="font-sans text-sm text-text-muted">Loading partner dashboard...</span>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-bg flex flex-col items-center justify-center gap-4 p-6">
+        <div className="w-14 h-14 bg-error/10 rounded-full flex items-center justify-center border-2 border-error/30">
+          <AlertCircle className="w-7 h-7 text-error" />
+        </div>
+        <h2 className="font-sans text-xl font-bold text-text-main">Failed to Load Dashboard</h2>
+        <p className="font-sans text-sm text-text-muted text-center max-w-sm">{loadError}</p>
+        <button
+          onClick={() => { setLoadError(null); setLoading(true); window.location.reload(); }}
+          className="flex items-center gap-2 bg-brand-btn-bg border border-brand-lime/30 text-white hover:bg-brand-btn-bg-hover font-sans font-bold text-sm px-6 py-2.5 rounded-md transition-all"
+        >
+          <RefreshCw className="h-4 w-4" /> Retry
+        </button>
       </div>
     );
   }

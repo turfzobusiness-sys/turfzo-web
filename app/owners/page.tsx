@@ -73,16 +73,6 @@ export default function OwnersPage() {
           <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-16 py-16 sm:py-20 lg:py-24 px-6 sm:px-10 lg:px-20 max-w-[1760px] mx-auto w-full">
             {/* Left — copy */}
             <div className="flex-1 max-w-xl">
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, duration: 0.5 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-lime/10 border border-brand-lime/20 text-brand-lime text-[11px] font-semibold tracking-wider uppercase mb-6"
-              >
-                <HiSparkles className="w-3.5 h-3.5" />
-                Turfzo for Partners
-              </motion.div>
-
               <motion.h1
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -9,6 +9,7 @@ import { StepVenueSetup, type VenueDraftData } from "./step-venue-setup";
 import { StepPayoutDetails, type PayoutData } from "./step-payout-details";
 import { StepReviewSubmit } from "./step-review-submit";
 import { convexClient } from "@/lib/convex";
+import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
 import type { OnboardingState } from "@/lib/types";
 
@@ -81,6 +82,7 @@ export function OnboardingWizard() {
       setStep(2);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to save. Please try again.");
     } finally {
       setActionLoading(false);
     }
@@ -102,6 +104,7 @@ export function OnboardingWizard() {
       setStep(3);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to save. Please try again.");
     } finally {
       setActionLoading(false);
     }
@@ -123,6 +126,7 @@ export function OnboardingWizard() {
       setStep(4);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to save. Please try again.");
     } finally {
       setActionLoading(false);
     }
@@ -138,6 +142,7 @@ export function OnboardingWizard() {
       setIsSuccess(true);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to save. Please try again.");
     } finally {
       setActionLoading(false);
     }

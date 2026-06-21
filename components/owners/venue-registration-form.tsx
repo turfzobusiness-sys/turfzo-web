@@ -206,7 +206,8 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
 
       setStep("success");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Submission failed. Please try again.");
+      const { getErrorMessage } = await import("@/lib/errors");
+      setErrorMsg(getErrorMessage(err, "Submission failed. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -584,6 +585,7 @@ ${additionalNotes ? additionalNotes.trim() : "None provided."}`;
                     setTurnstileToken(token);
                     setErrorMsg(null);
                   }}
+                  onExpire={() => setTurnstileToken(null)}
                   className="w-full"
                 />
               </div>
