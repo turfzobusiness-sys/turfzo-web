@@ -1,9 +1,8 @@
-"use node";
-
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { action, internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 
-export const submitContact = mutation({
+export const submitContact = action({
   args: {
     name: v.string(),
     email: v.string(),
@@ -11,7 +10,7 @@ export const submitContact = mutation({
     message: v.string(),
     turnstileToken: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ success: boolean; contactId: any }> => {
     if (!args.name || !args.email || !args.subject || !args.message) {
       throw new Error("All fields are required.");
     }
@@ -45,7 +44,28 @@ export const submitContact = mutation({
       }
     }
 
-    const contactId = await ctx.db.insert("contactSubmissions", {
+    const contactId = await ctx.runMutation(internal.contact.insertContact, {
+      name: args.name,
+      email: args.email,
+      subject: args.subject,
+      message: args.message,
+      turnstileToken: args.turnstileToken,
+    });
+
+    return { success: true, contactId };
+  },
+});
+
+export const insertContact = internalMutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    subject: v.string(),
+    message: v.string(),
+    turnstileToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("contactSubmissions", {
       name: args.name,
       email: args.email,
       subject: args.subject,
@@ -54,7 +74,5 @@ export const submitContact = mutation({
       status: "new",
       created_at: Date.now(),
     });
-
-    return { success: true, contactId };
   },
 });

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { addNextjsError } from "@datadog/browser-rum-nextjs";
 
 export default function GlobalErrorBoundary({
   error,
@@ -11,7 +10,6 @@ export default function GlobalErrorBoundary({
   reset: () => void;
 }) {
   useEffect(() => {
-    addNextjsError(error);
     console.error("[global-error.tsx]", error);
   }, [error]);
   return (

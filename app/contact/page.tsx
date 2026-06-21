@@ -90,7 +90,7 @@ export default function ContactPage() {
     setFormStep('submitting');
     setErrorMsg(null);
     try {
-      await convexClient.mutation(
+      await convexClient.action(
         "contact:submitContact",
         { name, email, subject, message, turnstileToken },
         firebaseUser ? await firebaseUser.getIdToken() : undefined
