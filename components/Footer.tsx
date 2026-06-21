@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
-import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { Mail, Phone, MapPin, ArrowRight, Check } from "lucide-react";
 
 // Local SVG Brand Icons
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -25,31 +28,40 @@ const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState("");
+  const [showComingSoon, setShowComingSoon] = useState(false);
+
+  const handleSubscribe = () => {
+    if (!email || !email.includes("@")) return;
+    setShowComingSoon(true);
+    setEmail("");
+  };
 
   const socialLinks = [
-    { icon: InstagramIcon, href: "#", label: "Instagram" },
-    { icon: TwitterIcon, href: "#", label: "Twitter" },
-    { icon: YoutubeIcon, href: "#", label: "YouTube" },
+    { icon: InstagramIcon, href: "https://instagram.com/turfzo", label: "Instagram" },
+    { icon: TwitterIcon, href: "https://twitter.com/turfzo", label: "Twitter" },
+    { icon: YoutubeIcon, href: "https://youtube.com/@turfzo", label: "YouTube" },
   ];
 
 
   const companyLinks = [
-    { name: "About Us", href: "#" },
-    { name: "Careers", href: "#" },
+    { name: "About Us", href: "/about" },
+    { name: "Blog", href: "/blog" },
+    { name: "Careers", href: "/careers" },
     { name: "Terms of Use", href: "/terms" },
     { name: "Privacy Policy", href: "/privacy" },
   ];
 
   const exploreLinks = [
-    { name: "Football Grounds", href: "#" },
-    { name: "Cricket Nets", href: "#" },
-    { name: "Badminton Courts", href: "#" },
-    { name: "Tennis Courts", href: "#" },
+    { name: "Football Grounds", href: "/explore?sport=football" },
+    { name: "Cricket Nets", href: "/explore?sport=cricket" },
+    { name: "Badminton Courts", href: "/explore?sport=badminton" },
+    { name: "Tennis Courts", href: "/explore?sport=tennis" },
   ];
 
   const supportLinks = [
     { name: "List Your Turf", href: "/owners" },
-    { name: "Help Center", href: "#" },
+    { name: "Help Center", href: "/contact" },
     { name: "Refund Policy", href: "/refund-policy" },
     { name: "Contact Support", href: "/contact" },
   ];
@@ -90,15 +102,22 @@ export default function Footer() {
                 <input 
                   type="email" 
                   placeholder="Enter your email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubscribe()}
                   className="w-full max-w-sm bg-bg border border-border-default focus:border-border-strong focus:ring-1 focus:ring-border-strong rounded-md py-2.5 pl-3 pr-10 text-sm text-text-main placeholder-text-muted focus:outline-none transition-colors"
                 />
                 <button 
+                  onClick={handleSubscribe}
                   className="absolute right-1 p-1.5 text-text-muted hover:text-text-main transition-colors focus:outline-none"
                   aria-label="Subscribe"
                 >
-                  <ArrowRight className="w-4 h-4 stroke-[1.5]" />
+                  {showComingSoon ? <Check className="w-4 h-4 text-brand-lime stroke-[2]" /> : <ArrowRight className="w-4 h-4 stroke-[1.5]" />}
                 </button>
               </div>
+              {showComingSoon && (
+                <p className="text-xs text-text-muted font-sans">Newsletter coming soon!</p>
+              )}
             </div>
           </div>
 
