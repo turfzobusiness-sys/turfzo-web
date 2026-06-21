@@ -1,25 +1,36 @@
 "use client";
 
 import * as React from "react";
-import { User, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useAuthModal } from "@/lib/auth-modal-context";
 import { cn } from "@/lib/utils";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { toast } from "sonner";
 
 export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?: string }) {
   const { signUp, signInWithGoogle, error } = useAuth();
-  const { closeAuthModal } = useAuthModal();
+  const { closeAuthModal, returnTo } = useAuthModal();
+  const router = useRouter();
 
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = React.useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
+    if (!turnstileToken) {
+      setTurnstileError("Please complete the bot verification.");
+      return;
+    }
     setLoading(true);
+    setTurnstileError(null);
     try {
       await signUp({
         email,
@@ -28,7 +39,13 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
         displayName: name,
       });
       onSuccess?.();
-      closeAuthModal();
+      toast.success("Account created successfully!");
+      setTimeout(() => {
+        closeAuthModal();
+        if (returnTo) {
+          router.push(returnTo);
+        }
+      }, 2000);
     } catch {
       // error set in auth context
     } finally {
@@ -42,7 +59,13 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
     try {
       await signInWithGoogle();
       onSuccess?.();
-      closeAuthModal();
+      toast.success("Account created successfully!");
+      setTimeout(() => {
+        closeAuthModal();
+        if (returnTo) {
+          router.push(returnTo);
+        }
+      }, 2000);
     } catch {
       // error set in auth context
     } finally {
@@ -58,6 +81,21 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
           className="rounded-md border border-error/30 bg-error/10 px-3 py-2 font-sans text-xs text-error-light"
         >
           {error}
+        </div>
+      )}
+
+      {false && (
+        <div className="rounded-md border border-green-500/30 bg-green-500/10 px-3 py-2 font-sans text-xs text-green-400">
+          Account created successfully!
+        </div>
+      )}
+
+      {turnstileError && (
+        <div
+          role="alert"
+          className="rounded-md border border-error/30 bg-error/10 px-3 py-2 font-sans text-xs text-error-light flex items-center gap-2"
+        >
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {turnstileError}
         </div>
       )}
 
@@ -113,6 +151,21 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
         >
           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
+      </div>
+
+      {/* Turnstile */}
+      <div className="flex justify-center pt-1">
+        <TurnstileWidget
+          onVerify={(token) => {
+            setTurnstileToken(token);
+            setTurnstileError(null);
+          }}
+          onExpire={() => setTurnstileToken(null)}
+          onError={() => {
+            setTurnstileToken(null);
+            setTurnstileError("Verification failed. Please try again.");
+          }}
+        />
       </div>
 
       {/* Submit */}

@@ -20,6 +20,7 @@ import {
   User as FirebaseUser,
 } from "./firebase";
 import { convexClient } from "./convex";
+import { classifyError } from "./errors";
 import type { AppUser } from "./types";
 
 export type AuthStatus =
@@ -145,10 +146,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error: null,
       });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Sign up failed";
-      setState((prev) => ({ ...prev, status: "error", error: message }));
-      throw err;
+      const appError = classifyError(err);
+      setState((prev) => ({ ...prev, status: "error", error: appError.message }));
+      throw appError;
     }
   };
 
@@ -164,10 +164,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error: null,
       });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Sign in failed";
-      setState((prev) => ({ ...prev, status: "error", error: message }));
-      throw err;
+      const appError = classifyError(err);
+      setState((prev) => ({ ...prev, status: "error", error: appError.message }));
+      throw appError;
     }
   };
 
@@ -184,10 +183,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error: null,
       });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Google sign in failed";
-      setState((prev) => ({ ...prev, status: "error", error: message }));
-      throw err;
+      const appError = classifyError(err);
+      setState((prev) => ({ ...prev, status: "error", error: appError.message }));
+      throw appError;
     }
   };
 

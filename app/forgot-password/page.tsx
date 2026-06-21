@@ -6,30 +6,24 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Mail, ArrowLeft, Loader2, Check, AlertCircle } from "lucide-react";
 import { sendPasswordResetEmail, auth } from "@/lib/firebase";
-import { TurnstileWidget } from "@/components/TurnstileWidget";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    if (!turnstileToken) {
-      setError("Please complete the bot check before submitting.");
-      return;
-    }
     setLoading(true);
     setError(null);
     try {
       await sendPasswordResetEmail(auth, email);
       setSent(true);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to send reset email.";
-      setError(msg);
+      const { getErrorMessage } = await import("@/lib/errors");
+      setError(getErrorMessage(err, "Failed to send reset email. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -87,16 +81,9 @@ export default function ForgotPasswordPage() {
                 </div>
               </div>
 
-              <div className="flex justify-center">
-                <TurnstileWidget
-                  onVerify={setTurnstileToken}
-                  onExpire={() => setTurnstileToken(null)}
-                />
-              </div>
-
               <button
                 type="submit"
-                disabled={loading || !turnstileToken}
+                disabled={loading}
                 className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated disabled:text-text-muted/40 text-black font-sans font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Reset Link"}

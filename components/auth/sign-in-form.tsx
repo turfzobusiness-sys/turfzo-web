@@ -1,14 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useAuthModal } from "@/lib/auth-modal-context";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const { signIn, signInWithGoogle, error } = useAuth();
-  const { closeAuthModal } = useAuthModal();
+  const { closeAuthModal, returnTo } = useAuthModal();
+  const router = useRouter();
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -16,14 +19,24 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const [rememberMe, setRememberMe] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
+  const handlePostAuth = () => {
+    onSuccess?.();
+    toast.success("Signed in successfully!");
+    setTimeout(() => {
+      closeAuthModal();
+      if (returnTo) {
+        router.push(returnTo);
+      }
+    }, 2000);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
     try {
       await signIn(email, password);
-      onSuccess?.();
-      closeAuthModal();
+      handlePostAuth();
     } catch {
       // error set in auth context
     } finally {
@@ -36,8 +49,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
     setLoading(true);
     try {
       await signInWithGoogle();
-      onSuccess?.();
-      closeAuthModal();
+      handlePostAuth();
     } catch {
       // error set in auth context
     } finally {
@@ -53,6 +65,12 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
           className="rounded-md border border-error/30 bg-error/10 px-3 py-2 font-sans text-xs text-error-light"
         >
           {error}
+        </div>
+      )}
+
+      {false && (
+        <div className="rounded-md border border-green-500/30 bg-green-500/10 px-3 py-2 font-sans text-xs text-green-400 flex items-center gap-2">
+          <Check className="w-3.5 h-3.5" /> Signed in successfully!
         </div>
       )}
 
