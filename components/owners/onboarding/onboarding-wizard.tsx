@@ -22,12 +22,12 @@ export function OnboardingWizard() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Load initial onboarding state
   useEffect(() => {
     async function loadState() {
       if (!firebaseUser) return;
       try {
-        const state = await convexClient.query<OnboardingState | null>("auth:getOwnerProfile");
+        const token = await firebaseUser.getIdToken();
+        const state = await convexClient.query<OnboardingState | null>("auth:getOwnerProfile", {}, token);
         if (state) {
           setOnboardingState(state);
           const currentStep = state.profile?.onboarding_step || 1;
@@ -211,6 +211,7 @@ export function OnboardingWizard() {
       amenities: onboardingState.profile?.venue_draft?.amenities,
       ground_count: onboardingState.profile?.venue_draft?.ground_count,
       is_indoor: onboardingState.profile?.venue_draft?.is_indoor,
+      image_gallery: onboardingState.profile?.venue_draft?.image_gallery,
     },
     payout: {
       bank_account_holder_name: onboardingState.payout?.bank_account_holder_name,

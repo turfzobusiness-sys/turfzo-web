@@ -53,6 +53,14 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
     if (!state.trim()) {
       newErrors.state = "State is required";
     }
+    
+    if (gst.trim() && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst.trim())) {
+      newErrors.gst = "Invalid GST format (e.g., 29AAAAA1111A1Z1)";
+    }
+    
+    if (pan.trim() && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan.trim())) {
+      newErrors.pan = "Invalid PAN format (e.g., ABCDE1234F)";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -228,6 +236,9 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
               className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
+          {errors.gst && (
+            <span className="font-sans text-xs text-error-light">{errors.gst}</span>
+          )}
         </div>
 
         {/* PAN Number */}
@@ -250,6 +261,9 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
               className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
+          {errors.pan && (
+            <span className="font-sans text-xs text-error-light">{errors.pan}</span>
+          )}
         </div>
       </div>
 

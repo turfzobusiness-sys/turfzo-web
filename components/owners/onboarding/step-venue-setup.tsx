@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { MapPin, Info, ArrowLeft, ArrowRight, Loader2, IndianRupee, Layers, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ImageUploader } from "@/components/ui/image-uploader";
 
 export interface VenueDraftData {
   name?: string;
@@ -31,6 +32,7 @@ export interface VenueDraftData {
   has_first_aid?: boolean;
   is_indoor?: boolean;
   ground_count?: number;
+  image_gallery?: string[];
 }
 
 interface StepVenueSetupProps {
@@ -61,6 +63,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
   const [groundCount, setGroundCount] = useState(initialData.ground_count || 1);
   const [isIndoor, setIsIndoor] = useState(initialData.is_indoor || false);
   const [maxPlayers, setMaxPlayers] = useState(initialData.max_players || 14);
+  const [imageGallery, setImageGallery] = useState<string[]>(initialData.image_gallery || []);
 
   // Amenities
   const [hasFloodlights, setHasFloodlights] = useState(initialData.has_floodlights || false);
@@ -130,6 +133,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
       has_changing_room: hasChangingRoom,
       has_drinking_water: hasDrinkingWater,
       has_first_aid: hasFirstAid,
+      image_gallery: imageGallery,
     });
   };
 
@@ -373,6 +377,23 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Image Gallery Upload */}
+      <div className="space-y-3 bg-surface border border-border-default rounded-[14px] p-5">
+        <div>
+          <h3 className="font-sans text-xs font-bold text-brand-lime uppercase tracking-wider">
+            Venue Photos
+          </h3>
+          <p className="font-sans text-xs text-text-muted mt-1">
+            Upload up to 5 photos of your turf. Good photos increase bookings significantly.
+          </p>
+        </div>
+        <ImageUploader 
+          value={imageGallery} 
+          onChange={setImageGallery} 
+          maxFiles={5}
+        />
       </div>
 
       {/* Form Navigation */}

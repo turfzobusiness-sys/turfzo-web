@@ -18,7 +18,6 @@ import {
 import { HiSparkles } from "react-icons/hi2";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { VenueRegistrationForm } from "@/components/owners/venue-registration-form";
 
 const OWNER_FAQS = [
   {
@@ -351,22 +350,24 @@ export default function OwnersPage() {
           </div>
         </section>
 
-        {/* REGISTRATION FORM */}
+        {/* REGISTRATION CTA */}
         <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
-        <section id="register" className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14 scroll-mt-12">
-          <div className="text-center mb-10 max-w-2xl mx-auto">
-            <span className="text-[11px] font-semibold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
-              Partner Registration
-            </span>
+        <section id="register" className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-20 scroll-mt-12">
+          <div className="text-center max-w-2xl mx-auto bg-white dark:bg-[#1f1f1f] border border-gray-200 dark:border-[#2a2a2a] p-10 rounded-2xl">
             <h2 className="text-3xl font-bold mt-3 text-gray-900 dark:text-white tracking-tight">
-              Register Your Sports Facility
+              Ready to Upgrade Your Venue?
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-3">
-              Complete the details below to submit your venue listing request.
-              Our onboarding specialist will contact you to finalize.
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-4 mb-8 max-w-md mx-auto leading-relaxed">
+              Join the future of amateur sports. Register your facility now to get access to automated slot bookings, IoT lighting, and fast payouts.
             </p>
+            <button
+              onClick={() => router.push("/owners/register")}
+              className="inline-flex items-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white font-semibold px-8 py-3.5 rounded-lg transition-colors"
+            >
+              Start Partner Registration <ArrowRight className="w-4 h-4" />
+            </button>
+            <p className="text-xs text-gray-400 mt-4">Takes less than 5 minutes. No credit card required.</p>
           </div>
-          <VenueRegistrationForm />
         </section>
 
         {/* TRUST BADGES */}

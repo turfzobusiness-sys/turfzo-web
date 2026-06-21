@@ -27,6 +27,7 @@ interface SummaryData {
     amenities?: string[];
     ground_count?: number;
     is_indoor?: boolean;
+    image_gallery?: string[];
   };
   payout: {
     bank_account_holder_name?: string;
@@ -173,6 +174,10 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
                 </div>
               </div>
             )}
+            <div className="md:col-span-2">
+              <span className="text-text-muted/60 uppercase font-semibold block tracking-wider">Venue Photos</span>
+              <span className="text-text-main font-medium mt-0.5 block">{data.venue.image_gallery?.length || 0} photos uploaded</span>
+            </div>
           </div>
         </div>
 

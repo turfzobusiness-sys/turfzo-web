@@ -22,10 +22,11 @@ export default function OnboardingPage() {
         return;
       }
 
-      if (status === "authenticated" && convexUser) {
-        if (convexUser.role === "owner") {
+      if (status === "authenticated") {
+        if (convexUser?.role === "owner") {
           try {
-            const state = await convexClient.query<OnboardingState | null>("auth:getOwnerProfile");
+            const token = firebaseUser ? await firebaseUser.getIdToken() : undefined;
+            const state = await convexClient.query<OnboardingState | null>("auth:getOwnerProfile", {}, token);
             if (state?.profile?.onboarding_completed) {
               router.push("/owners/dashboard");
               return;
@@ -35,13 +36,15 @@ export default function OnboardingPage() {
           }
         }
         setChecking(false);
+      } else if (status === "error") {
+        setChecking(false);
       }
     }
     
     if (status !== "initial" && status !== "loading") {
       checkState();
     }
-  }, [status, convexUser, router]);
+  }, [status, convexUser, firebaseUser, router]);
 
   // Handle player account upgrading to owner account
   const handleUpgradeRole = async () => {
@@ -83,28 +86,21 @@ export default function OnboardingPage() {
   // Check if player role and needs to upgrade
   if (convexUser?.role === "player") {
     return (
-      <main className="min-h-screen bg-bg flex items-center justify-center p-6 relative overflow-hidden">
-        {/* Background glow */}
-        
-
-        <div className="max-w-md w-full bg-surface border border-border-default rounded-[16px] p-6 md:p-8 space-y-6 shadow-xl shadow-brand-lime/1">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-lime/10 border border-brand-lime/30 text-brand-lime">
+      <main className="min-h-screen bg-bg flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-surface border border-border-default rounded-[16px] p-6 md:p-8 space-y-6">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-surface border border-border-default text-text-main">
             <Building className="h-6 w-6" />
           </div>
 
           <div className="space-y-2">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-brand-lime/10 border border-brand-lime/20 text-brand-lime text-[10px] font-semibold uppercase tracking-wider">
-              Account Upgrade
-            </span>
-            <h2 className="font-sans text-xl font-bold text-text-main tracking-wide">Become a Turfzo Partner</h2>
+            <h2 className="font-sans text-xl font-bold text-text-main">Become a Turfzo Partner</h2>
             <p className="font-sans text-sm text-text-muted leading-relaxed">
-              Your account is currently registered as a **Player**. Would you like to upgrade your profile to a **Turf Owner** to list your venues and manage bookings?
+              Your account is currently registered as a Player. Would you like to upgrade your profile to a Turf Owner to list your venues and manage bookings?
             </p>
           </div>
 
-          <div className="bg-[#0f1f0f]/20 border border-brand-lime/10 p-4 rounded-[12px] font-sans text-xs text-text-muted/80 space-y-2.5">
-            <p className="font-semibold text-text-main flex items-center gap-1">
-              <Sparkles className="h-3.5 w-3.5 text-brand-lime fill-current" />
+          <div className="bg-elevated/40 border border-border-default p-4 rounded-lg font-sans text-sm text-text-muted space-y-2">
+            <p className="font-medium text-text-main">
               Upgrading will allow you to:
             </p>
             <ul className="list-disc pl-4 space-y-1">
@@ -114,30 +110,30 @@ export default function OnboardingPage() {
             </ul>
           </div>
 
-          <div className="flex flex-col gap-2 pt-2">
+          <div className="flex flex-col gap-3 pt-2">
             <Button
               onClick={handleUpgradeRole}
               disabled={upgrading}
-              className="w-full"
+              className="w-full bg-brand-btn-bg text-white hover:bg-brand-btn-bg-hover font-semibold"
             >
               {upgrading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Upgrading Account...
                 </>
               ) : (
                 <>
                   Upgrade to Turf Owner
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 ml-2" />
                 </>
               )}
             </Button>
 
             <button
               onClick={() => router.push("/")}
-              className="w-full inline-flex items-center justify-center gap-1.5 text-xs text-text-muted hover:text-text-main py-2 transition-colors font-medium font-sans"
+              className="w-full inline-flex items-center justify-center gap-1.5 text-sm text-text-muted hover:text-text-main py-2 transition-colors font-medium font-sans"
             >
-              <ChevronLeft className="h-3.5 w-3.5" />
+              <ChevronLeft className="h-4 w-4" />
               Return to Homepage
             </button>
           </div>
@@ -148,16 +144,12 @@ export default function OnboardingPage() {
 
   return (
     <main className="min-h-screen bg-bg relative py-12 px-6 md:py-20">
-      {/* Background glow decorations */}
-      
-      
-
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="space-y-2 border-b border-border-default pb-5">
-          <h1 className="font-sans text-2xl md:text-3xl font-extrabold text-text-main tracking-wide">
+          <h1 className="font-sans text-2xl md:text-3xl font-extrabold text-text-main">
             Partner Onboarding Flow
           </h1>
-          <p className="font-sans text-sm text-text-muted/80">
+          <p className="font-sans text-sm text-text-muted">
             Complete the verification details below to launch your venue in the Turfzo ecosystem.
           </p>
         </div>
