@@ -9,6 +9,7 @@ import { OrganizationSchema, WebSiteSchema, SiteNavigationSchema } from "@/lib/s
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { AuthModal } from "@/components/ui/auth-modal";
 import { Toaster } from "sonner";
+import { DatadogAppRouter } from "@datadog/browser-rum-nextjs";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -149,6 +150,7 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-bg text-text-main selection:bg-brand-lime/30 selection:text-text-main">
+        <DatadogAppRouter />
         <ThemeProvider>
           <AuthProvider>
             <AuthModalProvider>

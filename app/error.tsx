@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { addNextjsError } from "@datadog/browser-rum-nextjs";
 
 export default function GlobalError({
   error,
@@ -20,6 +21,8 @@ export default function GlobalError({
       };
       w.Sentry?.captureException(error);
     }
+    // Log to Datadog
+    addNextjsError(error);
     console.error("[error.tsx]", error);
   }, [error]);
 
