@@ -9,44 +9,54 @@ import Footer from "@/components/Footer";
 
 const blogPosts = [
   {
-    slug: "best-football-turfs-bangalore",
-    title: "Best Football Turfs in Bangalore [2026 Guide]",
+    slug: "book-football-turf-instantly",
+    title: "Tired of Calling? How to Book the Best Turfs Instantly",
     excerpt:
-      "Discover the top-rated football turfs in Bangalore with real-time pricing, amenities, and booking links. From HSR Layout to Whitefield, find the perfect pitch for your next game.",
-    category: "City Guide",
-    readTime: "8 min read",
-    date: "May 2026",
-    image: "/stadium_turf_bg.png",
-  },
-  {
-    slug: "turf-booking-price-india",
-    title: "Turf Booking Price in India [2026 Data]",
-    excerpt:
-      "How much does turf booking actually cost in India? We analyzed 50+ turfs across 8 cities to give you real pricing data — from budget options to premium venues.",
-    category: "Research",
-    readTime: "6 min read",
-    date: "May 2026",
-    image: "/stadium_turf_bg.png",
-  },
-  {
-    slug: "turf-vs-ground",
-    title: "Turf vs Ground: Which is Better for Football?",
-    excerpt:
-      "Confused between turf and natural ground for your next football game? We break down the differences in cost, playability, injury risk, and availability to help you decide.",
-    category: "Comparison",
+      "Wasting time calling multiple turfs, dealing with double bookings, and navigating lack of pricing transparency? Learn how to find and secure the best sports venues in your city instantly. Turfzo guarantees a seamless, confirmed booking every time.",
+    category: "For Players",
     readTime: "5 min read",
-    date: "May 2026",
-    image: "/stadium_turf_bg.png",
+    date: "June 2026",
+    image: "/players_playing_football_1781975762157.png",
   },
   {
-    slug: "how-to-book-turf-online",
-    title: "How to Book a Turf Online in 2 Minutes [Step-by-Step]",
+    slug: "organize-local-sports-tournaments",
+    title: "How to Organize the Perfect Local Sports Tournament",
     excerpt:
-      "Never booked a turf online before? This step-by-step guide walks you through searching, selecting slots, making payment, and getting your booking confirmed instantly.",
-    category: "How-To",
-    readTime: "4 min read",
-    date: "May 2026",
-    image: "/stadium_turf_bg.png",
+      "Struggling to find teammates or coordinate matches? Discover the best ways to bring your community together through sports, organize 5v5 tournaments, and foster local growth. Turfzo empowers community leaders with the right tools.",
+    category: "For Community",
+    readTime: "7 min read",
+    date: "June 2026",
+    image: "/community_sports_tournament_1781975774951.png",
+  },
+  {
+    slug: "maximize-turf-roi-booking-management",
+    title: "Maximizing Your Turf's ROI: The Ultimate Management Guide",
+    excerpt:
+      "Are empty slots, complex booking management, and high marketing costs hurting your business? Learn how to increase bookings during off-peak hours. Turfzo partners with owners to streamline operations and maximize revenue.",
+    category: "For Owners",
+    readTime: "6 min read",
+    date: "June 2026",
+    image: "/turf_owner_dashboard_1781975786523.png",
+  },
+  {
+    slug: "future-of-amateur-sports-india",
+    title: "The Future of Amateur Sports Infrastructure in India",
+    excerpt:
+      "As grassroots sports rapidly expand across India, the demand for high-quality, accessible playing facilities has never been higher. Explore how Turfzo is democratizing access to premium sports infrastructure in top metro cities.",
+    category: "Industry",
+    readTime: "8 min read",
+    date: "June 2026",
+    image: "/future_of_amateur_sports_1781976167558.png",
+  },
+  {
+    slug: "turf-vs-ground-injury-prevention",
+    title: "Turf Quality & Injury Prevention: What Players Need to Know",
+    excerpt:
+      "Not all artificial turfs are created equal. Understand the difference between FIFA-certified 3G/4G pitches and subpar surfaces, and learn why Turfzo stringently verifies every venue for player safety and optimal performance.",
+    category: "Educational",
+    readTime: "6 min read",
+    date: "June 2026",
+    image: "/turf_quality_closeup_1781976182142.png",
   },
 ];
 
@@ -59,7 +69,7 @@ export default function BlogIndex() {
           name="description"
           content="Expert guides on turf booking, football turf prices, city guides, and sports venue comparisons. Learn how to book the best turfs in India."
         />
-        <link rel="canonical" href="https://turfzo.com/blog" />
+        <link rel="canonical" href="https://turfzo.app/blog" />
       </head>
       <Header />
 
@@ -67,9 +77,6 @@ export default function BlogIndex() {
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
           {/* Hero */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
-              <Tag className="w-3.5 h-3.5" /> Turfzo Blog
-            </span>
             <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight">
               Turf Booking <span className="text-brand-lime">Guides & Tips</span>
             </h1>

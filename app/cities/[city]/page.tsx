@@ -94,9 +94,6 @@ export default async function CityPage({ params }: Props) {
                 <ChevronRight className="w-3 h-3" />
                 <span className="text-brand-lime">{data.name}</span>
               </nav>
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-surface border border-border-default text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime mb-4">
-                <MapPin className="w-3.5 h-3.5" /> {data.state}
-              </span>
               <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main leading-tight tracking-tight">
                 Book Turfs in <span className="text-brand-lime">{data.name}</span>
               </h1>

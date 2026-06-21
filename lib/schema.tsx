@@ -15,6 +15,7 @@ export interface OrganizationSchemaProps {
     telephone: string;
     contactType: string;
     availableLanguage?: string[];
+    areaServed?: string;
   };
 }
 
@@ -224,18 +225,20 @@ export function BreadcrumbListSchema({ items }: BreadcrumbListSchemaProps) {
 export interface WebSiteSchemaProps {
   name: string;
   url: string;
+  description?: string;
   potentialAction?: {
     target: string;
     "query-input": string;
   };
 }
 
-export function WebSiteSchema({ name, url, potentialAction }: WebSiteSchemaProps) {
+export function WebSiteSchema({ name, url, description, potentialAction }: WebSiteSchemaProps) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name,
     url,
+    ...(description && { description }),
     ...(potentialAction && {
       potentialAction: {
         "@type": "SearchAction",

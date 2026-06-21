@@ -75,7 +75,7 @@ export default function TurfBookingPriceIndia() {
         />
         <link
           rel="canonical"
-          href="https://turfzo.com/blog/turf-booking-price-india"
+          href="https://turfzo.app/blog/turf-booking-price-india"
         />
         <meta
           property="og:title"
@@ -87,7 +87,7 @@ export default function TurfBookingPriceIndia() {
         />
         <meta
           property="og:url"
-          content="https://turfzo.com/blog/turf-booking-price-india"
+          content="https://turfzo.app/blog/turf-booking-price-india"
         />
       </head>
       <ArticleSchema
@@ -99,7 +99,7 @@ export default function TurfBookingPriceIndia() {
         publisher={{
           "@type": "Organization",
           name: "Turfzo",
-          logo: { "@type": "ImageObject", url: "https://turfzo.com/turfzo_mascot.svg" },
+          logo: { "@type": "ImageObject", url: "https://turfzo.app/turfzo_mascot.svg" },
         }}
       />
       <FAQPageSchema items={faqItems} />

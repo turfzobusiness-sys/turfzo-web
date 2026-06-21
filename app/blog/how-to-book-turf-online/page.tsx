@@ -21,7 +21,7 @@ const faqItems = [
   {
     question: "How do I book a turf online?",
     answer:
-      "Visit turfzo.com/explore, select your city, browse available turfs, choose your date and time slot, and complete payment online. You'll receive a QR code confirmation instantly.",
+      "Visit turfzo.app/explore, select your city, browse available turfs, choose your date and time slot, and complete payment online. You'll receive a QR code confirmation instantly.",
   },
   {
     question: "How long does it take to book a turf on Turfzo?",
@@ -65,7 +65,7 @@ const steps = [
     icon: Search,
     title: "Search for Turfs",
     description:
-      "Visit turfzo.com/explore and select your city. Use filters to narrow down by sport, price, amenities, and location. The search shows real-time availability for each turf.",
+      "Visit turfzo.app/explore and select your city. Use filters to narrow down by sport, price, amenities, and location. The search shows real-time availability for each turf.",
     tip: "Pro tip: Filter by 'Flood Lights' if you're planning an evening game.",
   },
   {
@@ -111,7 +111,7 @@ export default function HowToBookTurfOnline() {
         />
         <link
           rel="canonical"
-          href="https://turfzo.com/blog/how-to-book-turf-online"
+          href="https://turfzo.app/blog/how-to-book-turf-online"
         />
         <meta
           property="og:title"
@@ -123,7 +123,7 @@ export default function HowToBookTurfOnline() {
         />
         <meta
           property="og:url"
-          content="https://turfzo.com/blog/how-to-book-turf-online"
+          content="https://turfzo.app/blog/how-to-book-turf-online"
         />
       </head>
       <ArticleSchema
@@ -135,7 +135,7 @@ export default function HowToBookTurfOnline() {
         publisher={{
           "@type": "Organization",
           name: "Turfzo",
-          logo: { "@type": "ImageObject", url: "https://turfzo.com/turfzo_mascot.svg" },
+          logo: { "@type": "ImageObject", url: "https://turfzo.app/turfzo_mascot.svg" },
         }}
       />
       <HowToSchema
@@ -183,7 +183,7 @@ export default function HowToBookTurfOnline() {
           <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
             <h2 className="font-sans font-bold text-base text-brand-lime mb-2">Quick Answer</h2>
             <p className="text-sm text-text-main font-sans leading-relaxed">
-              To book a turf on Turfzo: (1) Visit turfzo.com/explore and select your city, (2) Browse available turfs and click &ldquo;View Slots&rdquo;, (3) Pick your date and time slot, (4) Pay online via UPI or card, (5) Receive your QR code ticket. The entire process takes about 2 minutes.
+              To book a turf on Turfzo: (1) Visit turfzo.app/explore and select your city, (2) Browse available turfs and click &ldquo;View Slots&rdquo;, (3) Pick your date and time slot, (4) Pay online via UPI or card, (5) Receive your QR code ticket. The entire process takes about 2 minutes.
             </p>
           </div>
 

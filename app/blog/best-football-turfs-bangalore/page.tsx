@@ -137,7 +137,7 @@ export default function BestFootballTurfsBangalore() {
         />
         <link
           rel="canonical"
-          href="https://turfzo.com/blog/best-football-turfs-bangalore"
+          href="https://turfzo.app/blog/best-football-turfs-bangalore"
         />
         <meta
           property="og:title"
@@ -149,7 +149,7 @@ export default function BestFootballTurfsBangalore() {
         />
         <meta
           property="og:url"
-          content="https://turfzo.com/blog/best-football-turfs-bangalore"
+          content="https://turfzo.app/blog/best-football-turfs-bangalore"
         />
       </head>
       <ArticleSchema
@@ -161,7 +161,7 @@ export default function BestFootballTurfsBangalore() {
         publisher={{
           "@type": "Organization",
           name: "Turfzo",
-          logo: { "@type": "ImageObject", url: "https://turfzo.com/turfzo_mascot.svg" },
+          logo: { "@type": "ImageObject", url: "https://turfzo.app/turfzo_mascot.svg" },
         }}
       />
       <FAQPageSchema items={faqItems} />
@@ -376,7 +376,7 @@ export default function BestFootballTurfsBangalore() {
               How to Book a Football Turf in Bangalore
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-6">
-              Booking a football turf on Turfzo takes 2 minutes. Visit turfzo.com/explore, select Bangalore as your city, browse available turfs, choose your date and time slot, and complete payment online. You&apos;ll receive a QR code ticket that you can scan at the turf entrance.
+              Booking a football turf on Turfzo takes 2 minutes. Visit turfzo.app/explore, select Bangalore as your city, browse available turfs, choose your date and time slot, and complete payment online. You&apos;ll receive a QR code ticket that you can scan at the turf entrance.
             </p>
 
             {/* CTA */}

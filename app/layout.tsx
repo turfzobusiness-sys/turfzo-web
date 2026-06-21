@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/lib/theme-context";
 import { OrganizationSchema, WebSiteSchema, SiteNavigationSchema } from "@/lib/schema";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { AuthModal } from "@/components/ui/auth-modal";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
       "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly across 8+ cities.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/turfzo_mascot.svg",
         width: 1200,
         height: 630,
         alt: "Turfzo - Premium Turf Booking",
@@ -70,7 +71,7 @@ export const metadata: Metadata = {
     title: "Turfzo | Book Premium Turfs & Sports Venues Instantly",
     description:
       "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly.",
-    images: ["/og-image.png"],
+    images: ["/turfzo_mascot.svg"],
   },
   robots: {
     index: true,
@@ -100,6 +101,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('turfzo-theme');if(t==='light'||t==='dark'){document.documentElement.classList.add(t)}else{document.documentElement.classList.add(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')}}catch(e){document.documentElement.classList.add('dark')}})()`,
@@ -116,6 +119,12 @@ export default function RootLayout({
             "https://youtube.com/@turfzo",
             "https://linkedin.com/company/turfzo",
           ]}
+          contactPoint={{
+            telephone: "+91-78452-41686",
+            contactType: "customer service",
+            areaServed: "IN",
+            availableLanguage: ["en", "hi"],
+          }}
         />
         <WebSiteSchema
           name="Turfzo"
@@ -124,6 +133,7 @@ export default function RootLayout({
             target: `${SITE_URL}/explore?q={search_term_string}`,
             "query-input": "required name=search_term_string",
           }}
+          description="Book sports venues instantly across India"
         />
         <SiteNavigationSchema
           items={[
@@ -143,6 +153,7 @@ export default function RootLayout({
           <AuthProvider>
             <AuthModalProvider>
               <AnalyticsProvider>{children}</AnalyticsProvider>
+              <Toaster position="top-right" richColors />
               <AuthModal />
             </AuthModalProvider>
           </AuthProvider>

@@ -73,7 +73,7 @@ export default function TurfVsGround() {
         />
         <link
           rel="canonical"
-          href="https://turfzo.com/blog/turf-vs-ground"
+          href="https://turfzo.app/blog/turf-vs-ground"
         />
         <meta
           property="og:title"
@@ -85,7 +85,7 @@ export default function TurfVsGround() {
         />
         <meta
           property="og:url"
-          content="https://turfzo.com/blog/turf-vs-ground"
+          content="https://turfzo.app/blog/turf-vs-ground"
         />
       </head>
       <ArticleSchema
@@ -97,7 +97,7 @@ export default function TurfVsGround() {
         publisher={{
           "@type": "Organization",
           name: "Turfzo",
-          logo: { "@type": "ImageObject", url: "https://turfzo.com/turfzo_mascot.svg" },
+          logo: { "@type": "ImageObject", url: "https://turfzo.app/turfzo_mascot.svg" },
         }}
       />
       <FAQPageSchema items={faqItems} />
