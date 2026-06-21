@@ -23,6 +23,7 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/lib/auth-context";
 import { convexClient } from "@/lib/convex";
 import { toast } from "sonner";
+import { AdminAddOwnerForm } from "@/components/admin/admin-add-owner-form";
 
 interface PendingOwner {
   id: string;
@@ -67,7 +68,7 @@ interface ContactMessage {
   created_at: string;
 }
 
-type Tab = "pending" | "users" | "messages";
+type Tab = "pending" | "users" | "messages" | "add-owner";
 
 export default function AdminPage() {
   const { status, convexUser, firebaseUser } = useAuth();
@@ -235,6 +236,12 @@ export default function AdminPage() {
               label="Contact Messages"
               badge={messages.filter((m) => m.status === "new").length}
             />
+            <TabButton
+              active={tab === "add-owner"}
+              onClick={() => setTab("add-owner")}
+              icon={<Building2 className="w-4 h-4" />}
+              label="Add Owner"
+            />
           </div>
 
           {error && (
@@ -256,6 +263,8 @@ export default function AdminPage() {
             />
           ) : tab === "users" ? (
             <UsersList users={users} />
+          ) : tab === "add-owner" ? (
+            <AdminAddOwnerForm onSuccess={() => setTab("pending")} />
           ) : (
             <MessagesList messages={messages} />
           )}

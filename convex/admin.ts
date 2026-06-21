@@ -420,6 +420,133 @@ export const setupFirstAdmin = mutation({
   },
 });
 
+export const createOwnerWithVenue = mutation({
+  args: {
+    email: v.string(),
+    full_name: v.string(),
+    phone_number: v.string(),
+    city: v.string(),
+    business: v.object({
+      business_name: v.string(),
+      address: v.string(),
+      city: v.string(),
+      state: v.string(),
+      zip_code: v.string(),
+      gst_number: v.optional(v.string()),
+      pan_number: v.optional(v.string()),
+    }),
+    venue: v.object({
+      name: v.string(),
+      description: v.optional(v.string()),
+      address: v.string(),
+      city: v.string(),
+      state: v.string(),
+      zip_code: v.string(),
+      price_per_hour: v.number(),
+      sport_type: v.string(),
+      amenities: v.array(v.string()),
+      ground_count: v.number(),
+      is_indoor: v.boolean(),
+      image_gallery: v.optional(v.array(v.string())),
+    }),
+    payout: v.object({
+      bank_account_holder_name: v.string(),
+      bank_account_number: v.string(),
+      bank_ifsc_code: v.string(),
+      bank_name: v.string(),
+      bank_branch: v.optional(v.string()),
+      upi_id: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, args) => {
+    const admin = await requireAdmin(ctx);
+
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .unique();
+
+    if (existingUser) {
+      throw new Error("User with this email already exists");
+    }
+
+    const now = new Date().toISOString();
+
+    const userId = await ctx.db.insert("users", {
+      email: args.email,
+      full_name: args.full_name,
+      display_name: args.business.business_name,
+      phone_number: args.phone_number,
+      city: args.city,
+      role: "owner",
+      is_email_verified: true, // Trusted admin creation
+      is_phone_verified: true,
+      is_approved: true, // Auto-approved
+      notifications_enabled: true,
+      approved_at: Date.now(),
+      approved_by: admin._id,
+      created_at: now,
+      updated_at: now,
+    });
+
+    await ctx.db.insert("ownerProfiles", {
+      user_id: userId,
+      business_name: args.business.business_name,
+      phone_number: args.phone_number,
+      gst_number: args.business.gst_number,
+      pan_number: args.business.pan_number,
+      address: args.business.address,
+      city: args.business.city,
+      state: args.business.state,
+      zip_code: args.business.zip_code,
+      onboarding_step: 4,
+      onboarding_completed: true,
+      onboarding_completed_at: Date.now(),
+      agreement_accepted: true,
+      agreement_accepted_at: Date.now(),
+    });
+
+    await ctx.db.insert("turfs", {
+      user_id: userId,
+      name: args.venue.name,
+      description: args.venue.description,
+      address: args.venue.address,
+      city: args.venue.city,
+      state: args.venue.state,
+      zip_code: args.venue.zip_code,
+      price_per_hour: args.venue.price_per_hour,
+      sport_type: args.venue.sport_type,
+      amenities: args.venue.amenities,
+      ground_count: args.venue.ground_count,
+      is_indoor: args.venue.is_indoor,
+      is_available: true,
+      status: "active",
+      image_gallery: args.venue.image_gallery,
+      approved_at: Date.now(),
+      approved_by: admin._id,
+      created_at: now,
+      updated_at: now,
+    });
+
+    await ctx.db.insert("payoutDetails", {
+      owner_id: userId,
+      bank_account_holder_name: args.payout.bank_account_holder_name,
+      bank_account_number: args.payout.bank_account_number,
+      bank_ifsc_code: args.payout.bank_ifsc_code,
+      bank_name: args.payout.bank_name,
+      bank_branch: args.payout.bank_branch,
+      upi_id: args.payout.upi_id,
+      is_verified: true,
+      verified_at: Date.now(),
+      verified_by: admin._id,
+    });
+
+    await logAuditEvent(ctx, "admin_create_owner", userId, admin._id);
+
+    return { success: true, userId };
+  },
+});
+
 export const checkAdminExists = query({
   handler: async (ctx) => {
     const admins = await ctx.db
@@ -459,5 +586,23 @@ export const resetSetup = mutation({
       success: true,
       message: `Reset ${admins.length} admin(s) to player role.`,
     };
+  },
+});
+
+export const resetOwners = mutation({
+  handler: async (ctx) => {
+    const owners = await ctx.db
+      .query("users")
+      .withIndex("by_role", (q) => q.eq("role", "owner"))
+      .collect();
+
+    let count = 0;
+    for (const owner of owners) {
+      if (owner.is_approved) {
+        await ctx.db.patch(owner._id, { is_approved: false });
+        count++;
+      }
+    }
+    return `Reset ${count} owners to pending state.`;
   },
 });
