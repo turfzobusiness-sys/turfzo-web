@@ -21,6 +21,7 @@ declare global {
           "expired-callback"?: () => void;
           theme?: "light" | "dark" | "auto";
           size?: "normal" | "compact";
+          action?: string;
         }
       ) => string;
       reset: (widgetId: string) => void;
@@ -84,17 +85,12 @@ export async function verifyTurnstileToken(
     return { ok: false, errorCodes: ["missing-input-response"] };
   }
 
-  const form = new URLSearchParams();
-  form.append("secret", TURNSTILE_SECRET_KEY);
-  form.append("response", token);
-  if (remoteIp) form.append("remoteip", remoteIp);
-
   const res = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    "https://turnstile-siteverify-turfzo.shaikhakramshakil.workers.dev/",
     {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: form,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, remoteip: remoteIp }),
     }
   );
   if (!res.ok) {

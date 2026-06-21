@@ -38,6 +38,7 @@ export function TurnstileWidget({
         widgetId = window.turnstile.render(containerRef.current, {
           sitekey: TURNSTILE_SITE_KEY,
           theme,
+          action: "turnstile-spin-v1",
           callback: (token) => onVerify(token),
           "expired-callback": () => onExpire?.(),
           "error-callback": () => {

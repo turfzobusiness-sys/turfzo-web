@@ -21,16 +21,12 @@ export const submitContact = mutation({
 
     const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
     if (TURNSTILE_SECRET_KEY) {
-      const form = new URLSearchParams();
-      form.append("secret", TURNSTILE_SECRET_KEY);
-      form.append("response", args.turnstileToken);
-
       const res = await fetch(
-        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        "https://turnstile-siteverify-turfzo.shaikhakramshakil.workers.dev/",
         {
           method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: form,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: args.turnstileToken }),
         }
       );
 
