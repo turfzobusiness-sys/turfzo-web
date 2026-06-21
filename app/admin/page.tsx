@@ -22,6 +22,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/lib/auth-context";
 import { convexClient } from "@/lib/convex";
+import { toast } from "sonner";
 
 interface PendingOwner {
   id: string;
@@ -109,7 +110,8 @@ export default function AdminPage() {
         setMessages(data);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load data");
+      const { getErrorMessage } = await import("@/lib/errors");
+      setError(getErrorMessage(err, "Failed to load data. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -132,8 +134,10 @@ export default function AdminPage() {
         token
       );
       await fetchData();
+      toast.success("Owner approved!");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to approve");
+      const { getErrorMessage } = await import("@/lib/errors");
+      setError(getErrorMessage(err, "Failed to approve. Please try again."));
     } finally {
       setActionLoading(null);
     }
@@ -150,8 +154,10 @@ export default function AdminPage() {
         token
       );
       await fetchData();
+      toast.success("Owner rejected.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reject");
+      const { getErrorMessage } = await import("@/lib/errors");
+      setError(getErrorMessage(err, "Failed to reject. Please try again."));
     } finally {
       setActionLoading(null);
     }

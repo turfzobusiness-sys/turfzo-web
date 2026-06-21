@@ -44,7 +44,7 @@ import { FAQPageSchema } from "@/lib/schema";
 import QRCode from "qrcode";
 
 const exploreFaqItems = [
-  { question: "How do I find a football turf near me?", answer: "Visit turfzo.com/explore, select your city, and browse available football turfs. You can filter by location, price, amenities, and availability. Real-time slots are shown for each venue." },
+  { question: "How do I find a football turf near me?", answer: "Visit turfzo.app/explore, select your city, and browse available football turfs. You can filter by location, price, amenities, and availability. Real-time slots are shown for each venue." },
   { question: "What is the average turf booking price in India?", answer: "Turf booking prices in India range from ₹500 to ₹2000 per hour. Football turfs typically cost ₹800-1500/hour in metro cities like Bangalore, Mumbai, and Delhi. Prices vary by location, amenities, and time of day." },
   { question: "Can I book a turf for tonight?", answer: "Yes, Turfzo shows real-time availability. If a turf has open slots for tonight, you can book it instantly. The booking is confirmed immediately with a QR code ticket." },
   { question: "How many turfs are available on Turfzo?", answer: "Turfzo has 50+ verified turfs across 8 major Indian cities including Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, and Ahmedabad." },
@@ -583,8 +583,8 @@ export default function ExplorePage() {
       setDownloadQrUrl(qrDataUrl);
       setFlowStep("confirmed");
     } catch (err) {
-      console.error("Payment/booking error:", err);
-      setBookingError(err instanceof Error ? err.message : "Something went wrong.");
+      const { getErrorMessage } = await import("@/lib/errors");
+      setBookingError(getErrorMessage(err));
       setFlowStep("error");
     }
   };
@@ -665,7 +665,7 @@ export default function ExplorePage() {
                           exit={{ opacity: 0, y: -8, scale: 0.97 }}
                           transition={{ duration: 0.2 }}
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-2xl shadow-xl p-5 min-w-[320px]"
+                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-2xl shadow-xl p-5 w-[calc(100vw-2rem)] max-w-[320px]"
                         >
                           <CalendarPicker
                             selected={searchDate}
@@ -833,7 +833,11 @@ export default function ExplorePage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
                       onClick={() => handleOpenSlots(turf)}
-                      className="bg-surface border border-border-default rounded-2xl overflow-hidden hover:shadow-lg hover:border-border-strong transition-all duration-300 cursor-pointer group flex flex-col h-full relative"
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleOpenSlots(turf); } }}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`View slots for ${turf.name}`}
+                      className="bg-surface border border-border-default rounded-2xl overflow-hidden hover:shadow-lg hover:border-border-strong transition-all duration-300 cursor-pointer group flex flex-col h-full relative focus-visible:outline-2 focus-visible:outline-brand-lime focus-visible:outline-offset-2"
                     >
                       {/* Heart Save button */}
                       <button
@@ -1281,7 +1285,7 @@ export default function ExplorePage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"
-              onClick={() => setFlowStep("listing")}
+              onClick={() => { setFlowStep("listing"); setViewMode("details"); }}
             />
 
             {/* Checkout Form Modal Card */}
@@ -1295,7 +1299,7 @@ export default function ExplorePage() {
               <div className="flex items-center justify-between pb-3 border-b border-border-default">
                 <h3 className="text-lg font-bold text-text-main">Request to Book</h3>
                 <button
-                  onClick={() => setFlowStep("listing")}
+                  onClick={() => { setFlowStep("listing"); setViewMode("details"); }}
                   className="p-1 hover:bg-elevated rounded-full border border-border-default transition-colors text-text-muted hover:text-text-main"
                 >
                   <X className="w-4 h-4" />

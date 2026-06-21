@@ -336,9 +336,8 @@ export default function TournamentsPage() {
       setDownloadQrUrl(qrDataUrl);
       setRegStep("confirmed");
     } catch (err) {
-      console.error("Registration error:", err);
-      const msg = err instanceof Error ? err.message : "Registration failed. Please try again.";
-      setRegError(msg);
+      const { getErrorMessage } = await import("@/lib/errors");
+      setRegError(getErrorMessage(err, "Registration failed. Please try again."));
       setRegStep("error");
     }
   };
@@ -365,7 +364,7 @@ export default function TournamentsPage() {
       <head>
         <title>Sports Tournaments | Find & Join Local Tournaments | Turfzo</title>
         <meta name="description" content="Discover and join football, cricket, and badminton tournaments in your city. Register your team, compete, and win prizes on Turfzo." />
-        <link rel="canonical" href="https://turfzo.com/tournaments" />
+        <link rel="canonical" href="https://turfzo.app/tournaments" />
       </head>
 
       <Header />
@@ -1034,6 +1033,8 @@ export default function TournamentsPage() {
                     <input
                       type="text"
                       required
+                      minLength={2}
+                      maxLength={50}
                       placeholder="Enter team / club name"
                       value={teamName}
                       onChange={(e) => setTeamName(e.target.value)}
@@ -1049,6 +1050,8 @@ export default function TournamentsPage() {
                       <input
                         type="text"
                         required
+                        minLength={2}
+                        maxLength={50}
                         placeholder="Enter captain name"
                         value={captainName}
                         onChange={(e) => setCaptainName(e.target.value)}
@@ -1065,9 +1068,12 @@ export default function TournamentsPage() {
                       <input
                         type="tel"
                         required
-                        placeholder="Enter phone number"
+                        pattern="[0-9]{10}"
+                        minLength={10}
+                        maxLength={10}
+                        placeholder="Enter 10-digit phone number"
                         value={captainPhone}
-                        onChange={(e) => setCaptainPhone(e.target.value)}
+                        onChange={(e) => setCaptainPhone(e.target.value.replace(/\D/g, ""))}
                         className="w-full bg-bg border border-border-strong rounded-xl pl-10 pr-4 py-3 text-text-main placeholder-text-muted focus:outline-none focus:border-brand-lime transition-colors text-sm"
                       />
                     </div>

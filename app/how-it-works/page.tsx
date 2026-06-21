@@ -29,13 +29,13 @@ const howToSteps = [
 ];
 
 const faqItems = [
-  { question: "How do I book a turf on Turfzo?", answer: "Visit turfzo.com/explore, select your city, browse available turfs, choose your date and time slot, and complete payment online. Your booking is confirmed instantly with a QR code ticket pass." },
+  { question: "How do I book a turf on Turfzo?", answer: "Visit turfzo.app/explore, select your city, browse available turfs, choose your date and time slot, and complete payment online. Your booking is confirmed instantly with a QR code ticket pass." },
   { question: "How much does turf booking cost?", answer: "Turf booking prices in India range from ₹500 to ₹2000 per hour depending on the city, sport, and facilities. Football turfs typically cost ₹800-1500/hour in metro cities." },
   { question: "Can I cancel my booking?", answer: "Yes, you can cancel your booking up to 6 hours before the scheduled time for a full refund. Cancellations within 6 hours receive a 50% refund." },
   { question: "How does bill splitting work?", answer: "When you book a turf on Turfzo, you can add your teammates' phone numbers at checkout. Each teammate receives a payment request for their share. Everyone pays their portion online." },
   { question: "What sports can I book on Turfzo?", answer: "Turfzo supports football, cricket, badminton, tennis, and multipurpose sports venues. We have 50+ turfs across 8 major Indian cities." },
   { question: "Is online payment safe on Turfzo?", answer: "Yes, Turfzo uses Cashfree for payment processing, which is PCI DSS compliant. We support UPI, credit cards, debit cards, and net banking." },
-  { question: "Do I need to download an app to book?", answer: "No, you can book directly on turfzo.com from any browser. We also have a mobile app for Android and iOS if you prefer." },
+  { question: "Do I need to download an app to book?", answer: "No, you can book directly on turfzo.app from any browser. We also have a mobile app for Android and iOS if you prefer." },
   { question: "What happens if it rains on my booking day?", answer: "If the turf is outdoor and weather conditions prevent play, you can reschedule or get a full refund. Indoor turfs are not affected by weather." },
 ];
 
@@ -215,10 +215,10 @@ export default function HowItWorksPage() {
       <head>
         <title>How It Works | Book a Turf in 2 Minutes | Turfzo</title>
         <meta name="description" content="Learn how to book a football turf, cricket ground, or sports venue on Turfzo. Search, select your slot, pay online, and show up to play. It takes 2 minutes." />
-        <link rel="canonical" href="https://turfzo.com/how-it-works" />
+        <link rel="canonical" href="https://turfzo.app/how-it-works" />
         <meta property="og:title" content="How It Works | Turfzo" />
         <meta property="og:description" content="Book a turf in 2 minutes. Search, pick a slot, pay online, and show up to play." />
-        <meta property="og:url" content="https://turfzo.com/how-it-works" />
+        <meta property="og:url" content="https://turfzo.app/how-it-works" />
       </head>
       
       <HowToSchema
@@ -240,9 +240,6 @@ export default function HowItWorksPage() {
           
           {/* Page Hero Header */}
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-brand-lime/25 bg-brand-lime/5 text-[10px] font-sans font-bold uppercase tracking-wider text-brand-lime">
-              <Sparkles className="w-3.5 h-3.5" /> Simplifying Sports Bookings
-            </span>
             <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main mt-4 leading-tight tracking-tight">
               Discover How <span className="text-brand-lime">Turfzo Works</span>
             </h1>

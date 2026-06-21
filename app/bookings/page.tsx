@@ -20,6 +20,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/lib/auth-context";
 import { convexClient } from "@/lib/convex";
+import { toast } from "sonner";
 import type { Booking, Turf } from "@/lib/types";
 import QRCode from "qrcode";
 
@@ -114,8 +115,8 @@ export default function BookingsPage() {
       });
       await loadBookings();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to cancel booking.";
-      alert(msg);
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(getErrorMessage(err, "Failed to cancel booking. Please try again."));
     }
   };
 
@@ -160,7 +161,7 @@ export default function BookingsPage() {
       <head>
         <title>My Bookings | Turfzo</title>
         <meta name="description" content="View and manage your turf bookings on Turfzo. See upcoming slots, past bookings, and download tickets." />
-        <link rel="canonical" href="https://turfzo.com/bookings" />
+        <link rel="canonical" href="https://turfzo.app/bookings" />
       </head>
       <Header />
 

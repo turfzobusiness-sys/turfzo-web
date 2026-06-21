@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Terms of Service | Turfzo",
   description:
     "Terms of Service for using Turfzo — India's premium turf and sports venue booking platform.",
-  alternates: { canonical: "https://turfzo.com/terms" },
+  alternates: { canonical: "https://turfzo.app/terms" },
 };
 
 export default function TermsPage() {
@@ -30,7 +30,7 @@ export default function TermsPage() {
 
           <Section title="1. Acceptance of Terms">
             <p>
-              Welcome to Turfzo (the &ldquo;Platform&rdquo;), owned and operated by Turfzo Sports Technologies Pvt. Ltd. (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;). By accessing, browsing, registering for, or using the Platform, website (turfzo.com), or mobile application, you agree to be bound by these Terms of Service (&ldquo;Terms&rdquo;) and all applicable laws. If you do not agree to these Terms, you must immediately cease all use of our services.
+              Welcome to Turfzo (the &ldquo;Platform&rdquo;), owned and operated by Turfzo Sports Technologies Pvt. Ltd. (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;). By accessing, browsing, registering for, or using the Platform, website (turfzo.app), or mobile application, you agree to be bound by these Terms of Service (&ldquo;Terms&rdquo;) and all applicable laws. If you do not agree to these Terms, you must immediately cease all use of our services.
             </p>
           </Section>
 

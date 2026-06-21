@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Privacy Policy | Turfzo",
   description:
     "How Turfzo collects, uses, and protects your personal data under the DPDP Act 2023.",
-  alternates: { canonical: "https://turfzo.com/privacy" },
+  alternates: { canonical: "https://turfzo.app/privacy" },
 };
 
 export default function PrivacyPage() {
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
 
           <Section title="1. Introduction">
             <p>
-              Turfzo Sports Technologies Pvt. Ltd. (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) is committed to protecting the privacy of our users (&ldquo;you&rdquo;). This Privacy Policy explains how we collect, store, share, and process your personal information when you use our website (turfzo.com), mobile application, or any associated venue booking services. We strictly adhere to the Digital Personal Data Protection (DPDP) Act, 2023, of India and other applicable data security regulations.
+              Turfzo Sports Technologies Pvt. Ltd. (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) is committed to protecting the privacy of our users (&ldquo;you&rdquo;). This Privacy Policy explains how we collect, store, share, and process your personal information when you use our website (turfzo.app), mobile application, or any associated venue booking services. We strictly adhere to the Digital Personal Data Protection (DPDP) Act, 2023, of India and other applicable data security regulations.
             </p>
           </Section>
 

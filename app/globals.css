@@ -965,4 +965,27 @@ body {
   display: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   FOCUS VISIBLE — keyboard navigation accessibility
+   ═══════════════════════════════════════════════════════════════════ */
+:focus-visible {
+  outline: 2px solid var(--color-brand-lime);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-brand-lime);
+  outline-offset: 2px;
+}
+
+/* Remove default focus ring for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* CACHE BUSTER Sat Jun  6 03:58:17 PM IST 2026 */

@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import { ArrowRight, Trophy, Users, Calendar } from "lucide-react";
 
 export default function Hero() {
+  const [showComingSoon, setShowComingSoon] = useState(false);
   const containerVariants: Variants = {
     hidden: { opacity: 0, y: 15 },
     visible: {
@@ -64,14 +66,7 @@ export default function Hero() {
           animate="visible"
           className="lg:col-span-7 flex flex-col justify-center text-center lg:text-left"
         >
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-surface border border-border-default w-fit mx-auto lg:mx-0 mb-6 text-xs text-text-main font-sans font-semibold tracking-wide shadow-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-lime opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-lime"></span>
-            </span>
-            <span>Now Live in 8+ Cities</span>
-          </div>
+          {/* Heading in Google Anton Font */}
 
           {/* Heading in Google Anton Font */}
           <h1 className="font-anton italic text-5xl sm:text-7xl lg:text-[5.8rem] font-normal leading-[0.9] tracking-tighter text-text-main dark:text-white uppercase text-left max-w-2xl transition-all duration-200">
@@ -152,8 +147,8 @@ export default function Hero() {
             </span>
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
               {/* App Store */}
-              <a
-                href="#"
+              <button
+                onClick={() => setShowComingSoon(true)}
                 className="flex items-center gap-2 bg-[#09090b] text-white hover:bg-black/90 h-11 w-[135px] px-3.5 rounded-lg transition-all border border-white/10 shadow-sm shrink-0"
               >
                 <svg className="w-5 h-5 shrink-0 select-none" viewBox="0 0 24 24">
@@ -164,11 +159,11 @@ export default function Hero() {
                   <span className="text-[8px] font-sans uppercase font-semibold text-white/75 tracking-tight">Download on the</span>
                   <span className="text-[11px] font-sans font-bold leading-none">App Store</span>
                 </div>
-              </a>
+              </button>
 
               {/* Google Play */}
-              <a
-                href="#"
+              <button
+                onClick={() => setShowComingSoon(true)}
                 className="flex items-center gap-2 bg-[#09090b] text-white hover:bg-black/90 h-11 w-[135px] px-3.5 rounded-lg transition-all border border-white/10 shadow-sm shrink-0"
               >
                 <svg className="w-5 h-5 shrink-0 select-none" viewBox="0 0 16 16">
@@ -185,8 +180,11 @@ export default function Hero() {
                   <span className="text-[8px] font-sans uppercase font-semibold text-white/75 tracking-tight">Get it on</span>
                   <span className="text-[11px] font-sans font-bold leading-none">Google Play</span>
                 </div>
-              </a>
+              </button>
             </div>
+            {showComingSoon && (
+              <p className="text-xs text-text-muted font-sans mt-1">App coming soon on Play Store & App Store</p>
+            )}
           </div>
 
         </motion.div>

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Refund & Cancellation Policy | Turfzo",
   description:
     "Turfzo's refund and cancellation policy for turf bookings and tournament registrations.",
-  alternates: { canonical: "https://turfzo.com/refund-policy" },
+  alternates: { canonical: "https://turfzo.app/refund-policy" },
 };
 
 export default function RefundPolicyPage() {
@@ -88,7 +88,7 @@ export default function RefundPolicyPage() {
               Cancellations must be processed directly through the Turfzo platform:
             </p>
             <ol className="list-decimal pl-6 space-y-2 text-text-muted text-sm leading-relaxed">
-              <li>Log in to your account on <Link href="/" className="text-brand-lime hover:underline">turfzo.com</Link> or the mobile app.</li>
+              <li>Log in to your account on <Link href="/" className="text-brand-lime hover:underline">turfzo.app</Link> or the mobile app.</li>
               <li>Navigate to your <Link href="/bookings" className="text-brand-lime underline">Booking History</Link>.</li>
               <li>Select the active booking slot or tournament registration you wish to cancel.</li>
               <li>Click &ldquo;Cancel Booking&rdquo; and confirm. The refund calculations will display on-screen.</li>
