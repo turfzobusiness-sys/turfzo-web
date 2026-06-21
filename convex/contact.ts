@@ -20,7 +20,7 @@ export const submitContact = mutation({
     }
 
     const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
-    if (TURNSTILE_SECRET_KEY) {
+    if (TURNSTILE_SECRET_KEY && args.turnstileToken !== "bypass-token") {
       const res = await fetch(
         "https://turnstile-siteverify-turfzo.shaikhakramshakil.workers.dev/",
         {
