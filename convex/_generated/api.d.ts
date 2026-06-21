@@ -11,6 +11,10 @@
 import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
 import type * as bookings from "../bookings.js";
+import type * as contact from "../contact.js";
+import type * as files from "../files.js";
+import type * as payments from "../payments.js";
+import type * as payments_internal from "../payments_internal.js";
 import type * as turfs from "../turfs.js";
 import type * as venues from "../venues.js";
 
@@ -24,6 +28,10 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   auth: typeof auth;
   bookings: typeof bookings;
+  contact: typeof contact;
+  files: typeof files;
+  payments: typeof payments;
+  payments_internal: typeof payments_internal;
   turfs: typeof turfs;
   venues: typeof venues;
 }>;

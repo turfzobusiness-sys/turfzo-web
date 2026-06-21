@@ -152,6 +152,7 @@ export interface OwnerProfile {
     has_first_aid?: boolean;
     is_indoor?: boolean;
     ground_count?: number;
+    image_gallery?: string[];
   };
 }
 

@@ -17,6 +17,7 @@ export const syncFirebaseUser = mutation({
     phoneNumber: v.optional(v.string()),
     city: v.optional(v.string()),
     photoURL: v.optional(v.string()),
+    role: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -34,26 +35,36 @@ export const syncFirebaseUser = mutation({
     const existingUser = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", firebaseUid))
-      .unique();
+      .first();
 
     const now = new Date().toISOString();
 
     if (existingUser) {
+      // If role is passed, we update it. E.g. upgrading player to owner.
+      const newRole = args.role && (args.role === "owner" || args.role === "admin" || args.role === "player") 
+        ? args.role 
+        : existingUser.role;
+
+      const isUpgradingToOwner = newRole === "owner" && existingUser.role !== "owner";
+
       await ctx.db.patch(existingUser._id, {
         display_name: existingUser.display_name || args.displayName || name || email.split("@")[0],
         full_name: existingUser.full_name || args.displayName || name || "",
         avatar_url: existingUser.avatar_url || args.photoURL || picture || "",
         phone_number: existingUser.phone_number || args.phoneNumber,
         city: existingUser.city || args.city,
+        role: newRole,
         is_email_verified: emailVerified,
+        // If they upgrade to owner, require approval again
+        ...(isUpgradingToOwner ? { is_approved: false } : {}),
         updated_at: now,
       });
 
-      if (existingUser.role === "owner") {
+      if (newRole === "owner") {
         const existingProfile = await ctx.db
           .query("ownerProfiles")
           .withIndex("by_user_id", (q) => q.eq("user_id", existingUser._id))
-          .unique();
+          .first();
         if (!existingProfile) {
           await ctx.db.insert("ownerProfiles", {
             user_id: existingUser._id,
@@ -75,23 +86,43 @@ export const syncFirebaseUser = mutation({
       return { success: true, user: updatedUser, session_token: "" };
     }
 
+    const initialRole = args.role && (args.role === "owner" || args.role === "admin" || args.role === "player") 
+      ? args.role 
+      : "player";
+
     const newUser = await ctx.db.insert("users", {
       email,
       full_name: args.displayName || name || "",
       display_name: args.displayName || name || email.split("@")[0],
       phone_number: args.phoneNumber || "",
       avatar_url: args.photoURL || picture || "",
-      role: "player",
+      role: initialRole,
       city: args.city || "",
       state: "",
       is_email_verified: emailVerified,
       is_phone_verified: false,
-      is_approved: true,
+      is_approved: initialRole === "player", // Auto-approve players, require admin approval for owners
       firebase_uid: firebaseUid,
       notifications_enabled: true,
       created_at: now,
       updated_at: now,
     });
+
+    if (initialRole === "owner") {
+      await ctx.db.insert("ownerProfiles", {
+        user_id: newUser,
+        business_name: "",
+        phone_number: args.phoneNumber || "",
+        gst_number: "",
+        pan_number: "",
+        address: "",
+        city: args.city || "",
+        state: "",
+        zip_code: "",
+        onboarding_step: 1,
+        onboarding_completed: false,
+      });
+    }
 
     const userDoc = await ctx.db.get(newUser);
     return { success: true, user: userDoc, session_token: "" };
@@ -108,7 +139,7 @@ export const getCurrentUser = query({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     return user || null;
   },
@@ -134,7 +165,7 @@ export const updateUserProfile = mutation({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     if (!user) {
       throw new Error("User not found");
@@ -159,7 +190,7 @@ export const getOwnerProfile = query({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     if (!user || user.role !== "owner") {
       return null;
@@ -168,12 +199,12 @@ export const getOwnerProfile = query({
     const profile = await ctx.db
       .query("ownerProfiles")
       .withIndex("by_user_id", (q) => q.eq("user_id", user._id))
-      .unique();
+      .first();
 
     const payout = await ctx.db
       .query("payoutDetails")
       .withIndex("by_owner_id", (q) => q.eq("owner_id", user._id))
-      .unique();
+      .first();
 
     return { user, profile, payout };
   },
@@ -200,7 +231,7 @@ export const updateOwnerProfile = mutation({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     if (!user || user.role !== "owner") {
       throw new Error("Not authorized");
@@ -209,7 +240,7 @@ export const updateOwnerProfile = mutation({
     const profile = await ctx.db
       .query("ownerProfiles")
       .withIndex("by_user_id", (q) => q.eq("user_id", user._id))
-      .unique();
+      .first();
 
     if (!profile) {
       throw new Error("Owner profile not found");
@@ -262,7 +293,7 @@ export const createTurf = mutation({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     if (!user || user.role !== "owner") {
       throw new Error("Only owners can create turfs");
@@ -321,7 +352,7 @@ export const getOwnerTurfs = query({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     if (!user || user.role !== "owner") {
       return [];
@@ -352,7 +383,7 @@ export const updatePayoutDetails = mutation({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     if (!user || user.role !== "owner") {
       throw new Error("Only owners can update payout details");
@@ -361,7 +392,7 @@ export const updatePayoutDetails = mutation({
     const existing = await ctx.db
       .query("payoutDetails")
       .withIndex("by_owner_id", (q) => q.eq("owner_id", user._id))
-      .unique();
+      .first();
 
     if (existing) {
       await ctx.db.patch(existing._id, {
@@ -391,7 +422,7 @@ export const getPayoutDetails = query({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     if (!user || user.role !== "owner") {
       return null;
@@ -400,7 +431,7 @@ export const getPayoutDetails = query({
     return await ctx.db
       .query("payoutDetails")
       .withIndex("by_owner_id", (q) => q.eq("owner_id", user._id))
-      .unique();
+      .first();
   },
 });
 
@@ -455,7 +486,7 @@ export const completeOnboardingStep = mutation({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     if (!user || user.role !== "owner") {
       throw new Error("Not authorized");
@@ -464,7 +495,7 @@ export const completeOnboardingStep = mutation({
     const profile = await ctx.db
       .query("ownerProfiles")
       .withIndex("by_user_id", (q) => q.eq("user_id", user._id))
-      .unique();
+      .first();
 
     if (!profile) {
       throw new Error("Owner profile not found");
@@ -497,7 +528,7 @@ export const completeOnboardingStep = mutation({
       const existingPayout = await ctx.db
         .query("payoutDetails")
         .withIndex("by_owner_id", (q) => q.eq("owner_id", user._id))
-        .unique();
+        .first();
 
       if (existingPayout) {
         await ctx.db.patch(existingPayout._id, {
@@ -534,7 +565,7 @@ export const submitOnboarding = mutation({
     const user = await ctx.db
       .query("users")
       .withIndex("by_firebase_uid", (q) => q.eq("firebase_uid", identity.subject))
-      .unique();
+      .first();
 
     if (!user || user.role !== "owner") {
       throw new Error("Not authorized");
@@ -543,7 +574,7 @@ export const submitOnboarding = mutation({
     const profile = await ctx.db
       .query("ownerProfiles")
       .withIndex("by_user_id", (q) => q.eq("user_id", user._id))
-      .unique();
+      .first();
 
     if (!profile) {
       throw new Error("Owner profile not found");

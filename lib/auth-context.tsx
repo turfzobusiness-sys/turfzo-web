@@ -114,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (opts: {
     email: string;
     password: string;
+    role?: string;
     displayName?: string;
     phoneNumber?: string;
     city?: string;
@@ -132,6 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }>(
         "auth:syncFirebaseUser",
         {
+          role: opts.role,
           displayName: opts.displayName,
           phoneNumber: opts.phoneNumber,
           city: opts.city,
