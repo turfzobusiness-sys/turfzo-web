@@ -43,7 +43,8 @@ export default function SetupPage() {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to check");
+          const { getErrorMessage } = await import("@/lib/errors");
+          setError(getErrorMessage(err, "Failed to check admin status. Please try again."));
           setLoading(false);
         }
       }
@@ -64,7 +65,8 @@ export default function SetupPage() {
       await convexClient.mutation("admin:setupFirstAdmin", {}, token);
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Setup failed");
+      const { getErrorMessage } = await import("@/lib/errors");
+      setError(getErrorMessage(err, "Setup failed. Please try again."));
     } finally {
       setSetupLoading(false);
     }

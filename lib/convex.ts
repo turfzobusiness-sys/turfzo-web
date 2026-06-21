@@ -1,3 +1,5 @@
+import { AppError, classifyError } from "./errors";
+
 const DEPLOYMENT_URL = process.env.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL;
 
 if (!DEPLOYMENT_URL && process.env.NODE_ENV === "production") {
@@ -5,25 +7,6 @@ if (!DEPLOYMENT_URL && process.env.NODE_ENV === "production") {
 }
 
 const FINAL_DEPLOYMENT_URL = DEPLOYMENT_URL ?? "https://woozy-husky-516.eu-west-1.convex.cloud";
-
-export class ConvexApiException extends Error {
-  code?: string;
-  statusCode?: number;
-  cause?: unknown;
-
-  constructor(opts: {
-    message: string;
-    code?: string;
-    statusCode?: number;
-    cause?: unknown;
-  }) {
-    super(opts.message);
-    this.name = "ConvexApiException";
-    this.code = opts.code;
-    this.statusCode = opts.statusCode;
-    this.cause = opts.cause;
-  }
-}
 
 type ConvexEndpoint = "query" | "mutation" | "action";
 
@@ -88,36 +71,79 @@ export class ConvexHttpClient {
       headers["Convex-Admin-Auth"] = this.adminKey;
     }
 
-    const res = await fetch(
-      `${this.deploymentUrl}/api/${endpoint}`,
-      {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ path, args }),
-      }
-    );
+    let res: Response;
+    try {
+      res = await fetch(
+        `${this.deploymentUrl}/api/${endpoint}`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ path, args }),
+        }
+      );
+    } catch (err) {
+      throw classifyError(err);
+    }
 
-    const payload = await res.json();
-
-    if (!res.ok) {
-      throw new ConvexApiException({
-        message:
-          (payload?.errorMessage as string) ??
-          (payload?.message as string) ??
-          `Convex ${endpoint} "${path}" failed`,
-        code: payload?.code as string | undefined,
-        statusCode: res.status,
+    let payload: Record<string, unknown>;
+    try {
+      payload = await res.json();
+    } catch {
+      throw new AppError("CONVEX_INVALID_RESPONSE", "Something went wrong. Please try again.", {
+        severity: "warning",
+        reportable: true,
       });
     }
 
+    if (!res.ok) {
+      const rawMessage =
+        (payload?.errorMessage as string) ??
+        (payload?.message as string) ??
+        "";
+      const code = payload?.code as string | undefined;
+
+      // Log the full error for engineering (Sentry, console, etc.)
+      if (process.env.NODE_ENV !== "production") {
+        console.error(`[Convex ${endpoint}] ${path}:`, rawMessage, code);
+      }
+
+      // Classify based on HTTP status
+      if (res.status === 401) {
+        throw new AppError("CONVEX_UNAUTHORIZED", "Please sign in to continue.", {
+          severity: "warning",
+        });
+      }
+      if (res.status === 403) {
+        throw new AppError("CONVEX_FORBIDDEN", "You don't have permission to do this.", {
+          severity: "warning",
+        });
+      }
+      if (res.status === 404) {
+        throw new AppError("CONVEX_NOT_FOUND", "The requested resource was not found.", {
+          severity: "warning",
+        });
+      }
+      if (res.status === 429) {
+        throw new AppError("CONVEX_RATE_LIMITED", "Too many requests. Please wait a moment.", {
+          severity: "info",
+        });
+      }
+      if (res.status >= 500) {
+        throw new AppError("CONVEX_SERVER_ERROR", "Something went wrong. Please try again.", {
+          severity: "critical",
+          reportable: true,
+        });
+      }
+
+      // For other errors, classify the message
+      throw classifyError(new Error(rawMessage));
+    }
+
     if (payload?.status !== "success") {
-      throw new ConvexApiException({
-        message:
-          (payload?.errorMessage as string) ??
-          `Convex ${endpoint} "${path}" failed`,
-        code: payload?.code as string | undefined,
-        statusCode: res.status,
-      });
+      const rawMessage =
+        (payload?.errorMessage as string) ??
+        "";
+      throw classifyError(new Error(rawMessage));
     }
 
     return payload.value as T;
