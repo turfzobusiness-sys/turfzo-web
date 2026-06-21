@@ -37,12 +37,12 @@ function shell(cmd) {
   }
 }
 
-if (!shell("vercel --version")) {
+if (shell("npx vercel --version") === null) {
   console.error("❌ Vercel CLI not installed. Run:  npm i -g vercel");
   process.exit(1);
 }
 
-if (!shell("vercel project ls")) {
+if (shell("npx vercel project ls") === null) {
   console.error("❌ Not linked to a Vercel project. Run:  vercel link");
   process.exit(1);
 }
@@ -63,11 +63,12 @@ function parseEnv(path) {
 }
 
 function listVercelEnv() {
-  const out = shell("vercel env ls --format json");
+  const out = shell("npx vercel env ls --format json");
   if (!out) return new Set();
   try {
     const parsed = JSON.parse(out);
-    return new Set(parsed.map((e) => e.key));
+    const envList = Array.isArray(parsed) ? parsed : (parsed.envs || []);
+    return new Set(envList.map((e) => e.key));
   } catch {
     return new Set();
   }
@@ -100,13 +101,19 @@ for (const [key, value] of local) {
   const isPublic = key.startsWith("NEXT_PUBLIC_");
   const isSecret = !isPublic;
 
-  const envs = isSecret ? "production" : "production preview development";
-  const cmd = `vercel env add ${key} ${envs} <<< "${value.replace(/"/g, '\\"')}"`;
-  const ok = shell(cmd);
+  const targetEnvs = isSecret ? ["production"] : ["production", "preview", "development"];
+  let allOk = true;
+  for (const env of targetEnvs) {
+    const cmd = `npx vercel env add ${key} ${env} "" --value "${value.replace(/"/g, '\\"')}" --yes --force`;
+    const ok = shell(cmd);
+    if (ok === null) {
+      allOk = false;
+    }
+  }
 
-  if (ok !== null) {
+  if (allOk) {
     const masked = value.length > 8 ? `${value.slice(0, 4)}...${value.slice(-4)}` : "***";
-    console.log(`  ✅ ${key}  = ${masked}  (added to ${envs})`);
+    console.log(`  ✅ ${key}  = ${masked}  (added to ${targetEnvs.join(" ")})`);
     added++;
   } else {
     console.log(`  ❌ ${key}  (failed to add)`);
