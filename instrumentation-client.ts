@@ -7,18 +7,24 @@ const site = process.env.NEXT_PUBLIC_DD_SITE || "us5.datadoghq.com";
 const service = process.env.NEXT_PUBLIC_DD_SERVICE || "turfzo-web";
 const env = process.env.NEXT_PUBLIC_DD_ENV || process.env.NODE_ENV || "development";
 
-if (typeof window !== "undefined" && appId && clientToken) {
-  datadogRum.init({
-    applicationId: appId,
-    clientToken: clientToken,
-    site: site,
-    service: service,
-    env: env,
-    sessionSampleRate: 100, // capture 100% of sessions
-    sessionReplaySampleRate: 20, // capture 20% of sessions with replay
-    trackResources: true, // Enable Resource tracking
-    trackUserInteractions: true, // Enable Action tracking
-    trackLongTasks: true, // Enable Long Tasks tracking
-    plugins: [nextjsPlugin()],
-  });
+export function initDatadog() {
+  if (typeof window !== "undefined" && appId && clientToken) {
+    // Only initialize if not already initialized
+    if (!datadogRum.getInternalContext()) {
+      datadogRum.init({
+        applicationId: appId,
+        clientToken: clientToken,
+        site: site,
+        service: service,
+        env: env,
+        sessionSampleRate: 100, // capture 100% of sessions
+        sessionReplaySampleRate: 100, // capture 100% of sessions with replay
+        trackResources: true, // Enable Resource tracking
+        trackUserInteractions: true, // Enable Action tracking
+        trackLongTasks: true, // Enable Long Tasks tracking
+        plugins: [nextjsPlugin()],
+      });
+      datadogRum.startSessionReplayRecording();
+    }
+  }
 }
