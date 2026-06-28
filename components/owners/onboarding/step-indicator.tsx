@@ -41,9 +41,10 @@ const STEPS: Step[] = [
 interface StepIndicatorProps {
   currentStep: number;
   completedSteps: number[];
+  onStepClick?: (step: number) => void;
 }
 
-export function StepIndicator({ currentStep, completedSteps }: StepIndicatorProps) {
+export function StepIndicator({ currentStep, completedSteps, onStepClick }: StepIndicatorProps) {
   return (
     <div className="w-full">
       {/* Mobile Stepper: Horizontal */}
@@ -52,10 +53,16 @@ export function StepIndicator({ currentStep, completedSteps }: StepIndicatorProp
           const isCompleted = completedSteps.includes(step.number);
           const isActive = currentStep === step.number;
           const Icon = step.icon;
+          const isClickable = onStepClick && (isCompleted || isActive || step.number < currentStep);
 
           return (
             <React.Fragment key={step.number}>
-              <div className="flex flex-col items-center gap-1.5 relative">
+              <button
+                type="button"
+                onClick={() => isClickable && onStepClick?.(step.number)}
+                disabled={!isClickable}
+                className="flex flex-col items-center gap-1.5 relative focus:outline-none disabled:cursor-default cursor-pointer"
+              >
                 <div
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-full border-2 font-sans text-xs font-bold transition-all duration-300",
@@ -76,7 +83,7 @@ export function StepIndicator({ currentStep, completedSteps }: StepIndicatorProp
                 >
                   {step.title.split(" ")[0]}
                 </span>
-              </div>
+              </button>
               {idx < STEPS.length - 1 && (
                 <div
                   className={cn(
@@ -106,13 +113,18 @@ export function StepIndicator({ currentStep, completedSteps }: StepIndicatorProp
           const isCompleted = completedSteps.includes(step.number);
           const isActive = currentStep === step.number;
           const Icon = step.icon;
+          const isClickable = onStepClick && (isCompleted || isActive || step.number < currentStep);
 
           return (
-            <div
+            <button
               key={step.number}
+              type="button"
+              onClick={() => isClickable && onStepClick?.(step.number)}
+              disabled={!isClickable}
               className={cn(
-                "flex items-center gap-4 p-3 rounded-[12px] transition-all duration-300 group cursor-default",
-                isActive && "bg-brand-lime/5 border border-brand-lime/10"
+                "w-full text-left flex items-center gap-4 p-3 rounded-[12px] transition-all duration-300 group focus:outline-none focus:ring-1 focus:ring-brand-lime/30 border border-transparent",
+                isActive && "bg-brand-lime/5 border-brand-lime/10",
+                isClickable ? "cursor-pointer" : "cursor-default"
               )}
             >
               <div
@@ -141,7 +153,7 @@ export function StepIndicator({ currentStep, completedSteps }: StepIndicatorProp
                   {step.subtitle}
                 </span>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

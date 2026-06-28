@@ -223,11 +223,56 @@ export function OnboardingWizard() {
     },
   };
 
+  const percentComplete = Math.round(((step - 1) / 4) * 100);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+      {/* Progress header showing owner details & draft save state */}
+      <div className="md:col-span-12 bg-surface border border-border-default rounded-[16px] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-md shadow-brand-lime/1">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime font-bold font-sans text-sm">
+            {onboardingState.user.display_name ? onboardingState.user.display_name[0].toUpperCase() : onboardingState.user.email[0].toUpperCase()}
+          </div>
+          <div>
+            <h3 className="font-sans text-sm font-bold text-text-main">
+              {onboardingState.user.display_name || "Turf Owner Partner"}
+            </h3>
+            <p className="font-sans text-xs text-text-muted">
+              {onboardingState.user.email}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-6 sm:self-center">
+          <div className="flex flex-col text-right">
+            <span className="font-sans text-xs font-semibold text-text-main">
+              Application Progress: {percentComplete}%
+            </span>
+            <span className="font-sans text-[11px] text-[#22c55e] flex items-center gap-1 mt-0.5 justify-end">
+              <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" />
+              Draft saved ✓
+            </span>
+          </div>
+          <div className="w-24 h-2 bg-border-default rounded-full overflow-hidden shrink-0">
+            <div 
+              className="h-full bg-brand-lime transition-all duration-500 rounded-full"
+              style={{ width: `${percentComplete}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Stepper column (Desktop 4/12, Mobile full width) */}
       <div className="md:col-span-4 lg:col-span-3">
-        <StepIndicator currentStep={step} completedSteps={completedSteps} />
+        <StepIndicator 
+          currentStep={step} 
+          completedSteps={completedSteps} 
+          onStepClick={(targetStep) => {
+            if (completedSteps.includes(targetStep) || targetStep < step) {
+              setStep(targetStep);
+            }
+          }}
+        />
       </div>
 
       {/* Form panel (Desktop 8/12, Mobile full width) */}

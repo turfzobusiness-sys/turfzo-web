@@ -17,6 +17,15 @@ export default function OwnerRegisterPage() {
   const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("login") === "true" || params.get("mode") === "login") {
+        setIsLogin(true);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     async function checkRedirect() {
       if (status === "authenticated" && convexUser) {
         if (convexUser.role === "owner") {
@@ -123,9 +132,9 @@ export default function OwnerRegisterPage() {
 
           <div className="bg-surface border border-border-default rounded-[16px] p-6 shadow-xl shadow-brand-lime/1">
             {isLogin ? (
-              <SignInForm onSuccess={() => router.push("/owners/onboarding")} />
+              <SignInForm onSuccess={() => router.push("/owners/dashboard")} />
             ) : (
-              <SignUpForm role="owner" onSuccess={() => router.push("/owners/onboarding")} />
+              <SignUpForm role="owner" onSuccess={() => router.push("/owners/dashboard")} />
             )}
           </div>
 

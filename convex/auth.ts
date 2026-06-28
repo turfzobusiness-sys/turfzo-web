@@ -467,6 +467,7 @@ export const completeOnboardingStep = mutation({
       has_first_aid: v.optional(v.boolean()),
       is_indoor: v.optional(v.boolean()),
       ground_count: v.optional(v.number()),
+      image_gallery: v.optional(v.array(v.string())),
     })),
     payoutDetails: v.optional(v.object({
       bank_account_holder_name: v.string(),
@@ -510,8 +511,8 @@ export const completeOnboardingStep = mutation({
       }
     }
 
-    if (args.step !== profile.onboarding_step + 1 && args.step !== 1) {
-      throw new Error(`Cannot skip steps. Current step: ${profile.onboarding_step}, requested: ${args.step}`);
+    if (args.step > profile.onboarding_step) {
+      throw new Error(`Cannot skip steps. Unlocked step: ${profile.onboarding_step}, requested: ${args.step}`);
     }
 
     if (args.step === 1 && args.businessProfile) {
@@ -600,8 +601,8 @@ export const submitOnboarding = mutation({
       state: draft.state || "",
       zip_code: draft.zip_code || "",
       price_per_hour: draft.price_per_hour || 0,
-      image_url: "",
-      image_gallery: [],
+      image_url: (draft.image_gallery && draft.image_gallery.length > 0) ? draft.image_gallery[0] : "",
+      image_gallery: draft.image_gallery || [],
       is_available: true,
       sport_type: draft.sport_type || "",
       amenities: draft.amenities || [],

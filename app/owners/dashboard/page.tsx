@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   Loader2, 
@@ -21,6 +21,7 @@ import { useAuth } from "@/lib/auth-context";
 import { convexClient } from "@/lib/convex";
 import type { OnboardingState, Turf } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function OwnerDashboardPage() {
   const { status, convexUser } = useAuth();
@@ -29,47 +30,73 @@ export default function OwnerDashboardPage() {
   const [ownerData, setOwnerData] = useState<OnboardingState | null>(null);
   const [venues, setVenues] = useState<Turf[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const prevVenueStatus = useRef<string | null>(null);
 
-  useEffect(() => {
-    async function loadData() {
-      if (status === "unauthenticated") {
-        router.push("/owners/register");
+  const loadData = useCallback(async (isPolling = false) => {
+    if (status === "unauthenticated") {
+      router.push("/owners/register?login=true");
+      return;
+    }
+
+    if (status === "authenticated" && convexUser) {
+      if (convexUser.role !== "owner") {
+        router.push("/owners/onboarding");
         return;
       }
 
-      if (status === "authenticated" && convexUser) {
-        if (convexUser.role !== "owner") {
+      try {
+        const profileState = await convexClient.query<OnboardingState | null>("auth:getOwnerProfile");
+        
+        if (profileState && !profileState.profile?.onboarding_completed) {
           router.push("/owners/onboarding");
           return;
         }
 
-        try {
-          const profileState = await convexClient.query<OnboardingState | null>("auth:getOwnerProfile");
-          
-          // If onboarding not completed, redirect back to onboarding wizard
-          if (profileState && !profileState.profile?.onboarding_completed) {
-            router.push("/owners/onboarding");
-            return;
-          }
+        setOwnerData(profileState);
 
-          setOwnerData(profileState);
+        const ownerTurfs = await convexClient.query<Turf[]>("auth:getOwnerTurfs");
+        
+        // Detect approval transition
+        const newStatus = ownerTurfs[0]?.status || "pending";
+        if (prevVenueStatus.current === "pending" && (newStatus === "approved" || newStatus === "active")) {
+          toast.success("Your venue has been approved! 🎉", {
+            description: "Your turf listing is now live on Turfzo.",
+            duration: 8000,
+          });
+        }
+        prevVenueStatus.current = newStatus;
 
-          const ownerTurfs = await convexClient.query<Turf[]>("auth:getOwnerTurfs");
-          setVenues(ownerTurfs);
-          setLoadError(null);
-        } catch (err) {
+        setVenues(ownerTurfs);
+        setLoadError(null);
+      } catch (err) {
+        if (!isPolling) {
           console.error("Failed to load owner dashboard details:", err);
           setLoadError("Failed to load dashboard data. Please try again.");
-        } finally {
-          setLoading(false);
         }
+      } finally {
+        if (!isPolling) setLoading(false);
       }
     }
+  }, [status, convexUser, router]);
 
+  // Initial load
+  useEffect(() => {
     if (status !== "initial" && status !== "loading") {
       loadData();
     }
-  }, [status, convexUser, router]);
+  }, [status, loadData]);
+
+  // Poll for approval status when venue is pending
+  useEffect(() => {
+    const primaryVenue = venues[0];
+    const venueStatus = primaryVenue?.status || "pending";
+    if (venueStatus === "pending" && ownerData) {
+      const interval = setInterval(() => {
+        loadData(true);
+      }, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [venues, ownerData, loadData]);
 
   if (status === "initial" || status === "loading" || loading) {
     return (

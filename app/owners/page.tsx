@@ -61,7 +61,7 @@ export default function OwnersPage() {
         >
           {/* Background image — subtle */}
           <div
-            className="absolute inset-0 z-0 opacity-25 dark:opacity-20 bg-cover bg-center brightness-[0.80] dark:brightness-100"
+            className="absolute inset-0 z-0 opacity-85 dark:opacity-20 bg-cover bg-center brightness-90 dark:brightness-100"
             style={{ backgroundImage: "url('/stadium_cinematic_bg.png')" }}
           />
 
@@ -69,14 +69,14 @@ export default function OwnersPage() {
           <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#4ADE80]/8 rounded-full blur-3xl z-0" />
           <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#4ADE80]/5 rounded-full blur-3xl z-0" />
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-16 py-16 sm:py-20 lg:py-24 px-6 sm:px-10 lg:px-20 max-w-[1760px] mx-auto w-full">
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-28 py-16 sm:py-20 lg:py-24 px-6 sm:px-10 lg:px-20 max-w-[1760px] mx-auto w-full">
             {/* Left — copy */}
             <div className="flex-1 max-w-xl">
               <motion.h1
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25, duration: 0.5 }}
-                className="font-[family-name:var(--font-anton)] text-4xl sm:text-5xl lg:text-[3.5rem] text-text-main dark:text-white uppercase leading-[1.08] tracking-wide mb-5"
+                className="font-[family-name:var(--font-anton)] text-4xl sm:text-5xl lg:text-[3.5rem] text-white uppercase leading-[1.08] tracking-wide mb-5"
               >
                 Run Your Venue
                 <br />
@@ -87,7 +87,7 @@ export default function OwnersPage() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35, duration: 0.5 }}
-                className="text-text-muted dark:text-white/60 text-sm sm:text-[15px] leading-relaxed mb-8 max-w-md"
+                className="text-white/80 text-sm sm:text-[15px] leading-relaxed mb-8 max-w-md"
               >
                 Connect your venue to India&apos;s premium sports automation suite.
                 Maximize court occupancy, trigger floodlights automatically, and
@@ -108,7 +108,7 @@ export default function OwnersPage() {
                 </button>
                 <a
                   href="#features"
-                  className="flex items-center gap-2 bg-surface hover:bg-elevated/50 text-text-main dark:bg-white/5 dark:hover:bg-white/10 dark:text-white/80 font-medium px-7 py-3.5 rounded-xl transition-colors text-sm border border-border-strong dark:border-white/10"
+                  className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-7 py-3.5 rounded-xl transition-colors text-sm border border-white/20 backdrop-blur-sm"
                 >
                   Explore Technology
                 </a>
@@ -119,9 +119,9 @@ export default function OwnersPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
                 href="/owners/dashboard"
-                className="inline-block mt-6 text-xs text-text-muted/65 hover:text-brand-lime dark:text-white/30 dark:hover:text-brand-lime transition-colors"
+                className="inline-block mt-6 text-xs text-white/60 hover:text-brand-lime transition-colors"
               >
-                Already registered? Check your application status →
+                Already registered? Sign In or check application status →
               </motion.a>
             </div>
 
@@ -171,14 +171,14 @@ export default function OwnersPage() {
         {/* FEATURES */}
         <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
         <section id="features" className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14">
-          <div className="text-center mb-12 max-w-2xl mx-auto">
-            <span className="text-[11px] font-semibold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
+          <div className="text-center mb-16 max-w-2xl mx-auto">
+            <span className="text-[11px] font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase">
               Next-Gen Manager Tech
             </span>
             <h2 className="text-3xl font-bold mt-3 text-gray-900 dark:text-white tracking-tight">
               Smart Automation, Not Just Bookings
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-3">
+            <p className="text-gray-600 dark:text-gray-300 text-base mt-4">
               We replace clunky spreadsheets and midnight WhatsApp calls with
               complete venue IoT orchestration.
             </p>
@@ -193,36 +193,36 @@ export default function OwnersPage() {
               transition={{ duration: 0.5 }}
               className="bg-white dark:bg-[#282828] rounded-2xl p-7 flex flex-col"
             >
-              <div className="w-11 h-11 rounded-2xl bg-[#4ADE80]/10 flex items-center justify-center mb-5">
-                <TbCalendarTime className="w-5 h-5 text-[#4ADE80]" />
+              <div className="w-11 h-11 rounded-2xl bg-[#22c55e]/15 flex items-center justify-center mb-5">
+                <TbCalendarTime className="w-5 h-5 text-[#16a34a]" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 Automated Slot Booking
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
                 Real-time scheduling grid updates instantly. Adjust pricing
                 dynamically for morning discounts or peak evening slots.
               </p>
 
-              <div className="mt-auto bg-gray-50 dark:bg-[#1a1a1a] border border-gray-100 dark:border-[#2a2a2a] rounded-xl p-4 text-xs">
-                <div className="flex justify-between items-center text-gray-400 dark:text-gray-500 mb-3 border-b border-gray-100 dark:border-[#2a2a2a] pb-2 font-semibold tracking-wider uppercase text-[10px]">
+              <div className="mt-auto bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] rounded-xl p-4 text-xs shadow-sm">
+                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-[#2a2a2a] pb-2 font-semibold tracking-wider uppercase text-[10px]">
                   <span>Timetable</span>
-                  <span className="text-[#4ADE80]">Live Sync</span>
+                  <span className="text-[#16a34a]">Live Sync</span>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2.5 bg-[#4ADE80]/8 border border-[#4ADE80]/15 rounded-lg">
-                    <span className="font-bold text-[#4ADE80]">06:00 PM – 07:00 PM</span>
-                    <span className="text-[#4ADE80] font-bold">Paid via Turfzo</span>
+                  <div className="flex items-center justify-between p-2.5 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-lg">
+                    <span className="font-bold text-[#16a34a]">06:00 PM – 07:00 PM</span>
+                    <span className="text-[#16a34a] font-bold">Paid via Turfzo</span>
                   </div>
-                  <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#282828] border border-gray-100 dark:border-[#2a2a2a] rounded-lg">
-                    <span className="font-medium text-gray-500 dark:text-gray-400">07:00 PM – 08:00 PM</span>
-                    <span className="text-[#4ADE80] font-bold">
+                  <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#282828] border border-gray-200 dark:border-[#2a2a2a] rounded-lg shadow-sm">
+                    <span className="font-medium text-gray-600 dark:text-gray-300">07:00 PM – 08:00 PM</span>
+                    <span className="text-[#16a34a] font-bold">
                       ₹1,500 <TbBolt className="inline w-3 h-3" />
                     </span>
                   </div>
-                  <div className="flex items-center justify-between p-2.5 bg-[#4ADE80]/8 border border-[#4ADE80]/15 rounded-lg">
-                    <span className="font-bold text-[#4ADE80]">08:00 PM – 09:00 PM</span>
-                    <span className="text-[#4ADE80] font-bold">Paid via Turfzo</span>
+                  <div className="flex items-center justify-between p-2.5 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-lg">
+                    <span className="font-bold text-[#16a34a]">08:00 PM – 09:00 PM</span>
+                    <span className="text-[#16a34a] font-bold">Paid via Turfzo</span>
                   </div>
                 </div>
               </div>
@@ -236,45 +236,45 @@ export default function OwnersPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="bg-white dark:bg-[#282828] rounded-2xl p-7 flex flex-col"
             >
-              <div className="w-11 h-11 rounded-2xl bg-[#4ADE80]/10 flex items-center justify-center mb-5">
-                <TbCpu className="w-5 h-5 text-[#4ADE80]" />
+              <div className="w-11 h-11 rounded-2xl bg-[#22c55e]/15 flex items-center justify-center mb-5">
+                <TbCpu className="w-5 h-5 text-[#16a34a]" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 IoT Light & Gate Automation
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
                 Forget staff overhead. Lights activate automatically when a
                 booking begins and shut down at the end. Gates open via dynamic
                 PIN codes.
               </p>
 
-              <div className="mt-auto bg-gray-50 dark:bg-[#1a1a1a] border border-gray-100 dark:border-[#2a2a2a] rounded-xl p-4 text-xs">
-                <div className="flex justify-between items-center text-gray-400 dark:text-gray-500 mb-3 border-b border-gray-100 dark:border-[#2a2a2a] pb-2 font-semibold tracking-wider uppercase text-[10px]">
+              <div className="mt-auto bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] rounded-xl p-4 text-xs shadow-sm">
+                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-[#2a2a2a] pb-2 font-semibold tracking-wider uppercase text-[10px]">
                   <span>IoT Smart Box</span>
-                  <span className="text-[#4ADE80] flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-[#4ADE80] rounded-full animate-pulse" />{" "}
+                  <span className="text-[#16a34a] flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-[#16a34a] rounded-full animate-pulse" />{" "}
                     Connected
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between py-1.5">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">
                     Smart Gate PIN Lock
                   </span>
-                  <span className="font-mono bg-white dark:bg-[#282828] px-2.5 py-0.5 rounded-lg border border-gray-200 dark:border-[#3a3a3a] text-gray-900 dark:text-white text-[11px]">
+                  <span className="font-mono bg-white dark:bg-[#282828] px-2.5 py-0.5 rounded-lg border border-gray-200 dark:border-[#3a3a3a] text-gray-900 dark:text-white text-[11px] shadow-sm">
                     #4819
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between py-1.5 mt-1 border-t border-gray-100 dark:border-[#2a2a2a]">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">
+                <div className="flex items-center justify-between py-1.5 mt-1 border-t border-gray-200 dark:border-[#2a2a2a]">
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">
                     Floodlight Controller
                   </span>
                   <button
                     onClick={() => setIotLightOn((v) => !v)}
                     className={`px-3 py-1 rounded-lg font-bold text-[10px] uppercase transition-colors select-none cursor-pointer ${
                       iotLightOn
-                        ? "bg-[#4ADE80] text-white"
+                        ? "bg-[#16a34a] text-white shadow-sm"
                         : "bg-white dark:bg-[#282828] border border-gray-200 dark:border-[#3a3a3a] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
@@ -282,9 +282,9 @@ export default function OwnersPage() {
                   </button>
                 </div>
 
-                <div className="mt-3 h-1 w-full bg-gray-100 dark:bg-[#2a2a2a] rounded-full overflow-hidden">
+                <div className="mt-3 h-1 w-full bg-gray-200 dark:bg-[#2a2a2a] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#4ADE80] transition-all duration-300 rounded-full"
+                    className="h-full bg-[#16a34a] transition-all duration-300 rounded-full"
                     style={{ width: iotLightOn ? "100%" : "0%" }}
                   />
                 </div>
@@ -299,48 +299,48 @@ export default function OwnersPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="bg-white dark:bg-[#282828] rounded-2xl p-7 flex flex-col"
             >
-              <div className="w-11 h-11 rounded-2xl bg-[#4ADE80]/10 flex items-center justify-center mb-5">
-                <TbWallet className="w-5 h-5 text-[#4ADE80]" />
+              <div className="w-11 h-11 rounded-2xl bg-[#22c55e]/15 flex items-center justify-center mb-5">
+                <TbWallet className="w-5 h-5 text-[#16a34a]" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 24h Settlement Payouts
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
                 Accept online, split payments, and direct deposits. Earnings
                 clear instantly and transfer into your bank within 24 hours
                 automatically.
               </p>
 
-              <div className="mt-auto bg-gray-50 dark:bg-[#1a1a1a] border border-gray-100 dark:border-[#2a2a2a] rounded-xl p-4 text-xs">
-                <div className="flex justify-between items-center text-gray-400 dark:text-gray-500 mb-3 border-b border-gray-100 dark:border-[#2a2a2a] pb-2 font-semibold tracking-wider uppercase text-[10px]">
+              <div className="mt-auto bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] rounded-xl p-4 text-xs shadow-sm">
+                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-[#2a2a2a] pb-2 font-semibold tracking-wider uppercase text-[10px]">
                   <span>Settlement SLA</span>
-                  <span className="text-[#4ADE80]">Processing</span>
+                  <span className="text-[#16a34a]">Processing</span>
                 </div>
-                <div className="relative pl-4 border-l border-gray-200 dark:border-[#3a3a3a] space-y-3 py-1 text-[11px]">
+                <div className="relative pl-4 border-l border-gray-300 dark:border-[#3a3a3a] space-y-3 py-1 text-[11px]">
                   <div className="relative">
-                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-[#4ADE80] border-2 border-gray-50 dark:border-[#1a1a1a]" />
+                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-[#16a34a] border-2 border-gray-50 dark:border-[#1a1a1a]" />
                     <div className="font-semibold text-gray-900 dark:text-white">
                       Booking Complete
                     </div>
-                    <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                    <div className="text-[10px] text-gray-500 dark:text-gray-400">
                       Player checked out · 5:00 PM
                     </div>
                   </div>
                   <div className="relative">
-                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-[#4ADE80] border-2 border-gray-50 dark:border-[#1a1a1a]" />
+                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-[#16a34a] border-2 border-gray-50 dark:border-[#1a1a1a]" />
                     <div className="font-semibold text-gray-900 dark:text-white">
                       Escrow Cleared
                     </div>
-                    <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                    <div className="text-[10px] text-gray-500 dark:text-gray-400">
                       Cashfree split settled · 5:05 PM
                     </div>
                   </div>
                   <div className="relative">
-                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-[#4ADE80] border-2 border-gray-50 dark:border-[#1a1a1a]" />
-                    <div className="font-semibold text-[#4ADE80]">
+                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-[#16a34a] border-2 border-gray-50 dark:border-[#1a1a1a]" />
+                    <div className="font-semibold text-[#16a34a]">
                       Bank Transfer SLA
                     </div>
-                    <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                    <div className="text-[10px] text-gray-500 dark:text-gray-400">
                       Settlement to Bank · Pending 24h
                     </div>
                   </div>
