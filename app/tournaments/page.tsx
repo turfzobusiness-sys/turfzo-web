@@ -361,12 +361,6 @@ export default function TournamentsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>Sports Tournaments | Find & Join Local Tournaments | Turfzo</title>
-        <meta name="description" content="Discover and join football, cricket, and badminton tournaments in your city. Register your team, compete, and win prizes on Turfzo." />
-        <link rel="canonical" href="https://turfzo.app/tournaments" />
-      </head>
-
       <Header />
 
       <main className="flex-grow pt-24 pb-16">
