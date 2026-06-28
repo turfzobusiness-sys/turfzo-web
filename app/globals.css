@@ -23,14 +23,14 @@
   /* Dark Green Button Hover Bg */
 
   /* Text */
-  --color-text-main: #EDEDED;
-  --color-text-muted: #888888;
+  --color-text-main: #F5F5F5;
+  --color-text-muted: #A3A3A3;
 
   /* Borders */
-  --color-border-subtle: rgba(255, 255, 255, 0.06);
-  --color-border-default: rgba(255, 255, 255, 0.10);
-  --color-border-strong: rgba(255, 255, 255, 0.16);
-  --color-border-glow: rgba(255, 255, 255, 0.10);
+  --color-border-subtle: rgba(255, 255, 255, 0.10);
+  --color-border-default: rgba(255, 255, 255, 0.15);
+  --color-border-strong: rgba(255, 255, 255, 0.25);
+  --color-border-glow: rgba(255, 255, 255, 0.15);
 
   /* Status */
   --color-error: #E05A47;
@@ -70,13 +70,13 @@
   --color-brand-lime-hover: #15803D;
   --color-brand-btn-bg: #0f1f0f;
   --color-brand-btn-bg-hover: #162f16;
-  --color-text-main: #171717;
-  --color-text-muted: #666666;
-  --color-border-subtle: rgba(0, 0, 0, 0.04);
-  --color-border-default: rgba(0, 0, 0, 0.10);
-  --color-border-strong: rgba(0, 0, 0, 0.15);
-  --color-border-glow: rgba(0, 0, 0, 0.05);
-  --color-overlay: rgba(0, 0, 0, 0.4);
+  --color-text-main: #111111;
+  --color-text-muted: #4B4B4B;
+  --color-border-subtle: rgba(0, 0, 0, 0.08);
+  --color-border-default: rgba(0, 0, 0, 0.15);
+  --color-border-strong: rgba(0, 0, 0, 0.25);
+  --color-border-glow: rgba(0, 0, 0, 0.10);
+  --color-overlay: rgba(0, 0, 0, 0.5);
   --color-overlay-heavy: rgba(0, 0, 0, 0.6);
   --shadow-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -90,13 +90,13 @@
   --color-brand-lime-hover: #22C55E;
   --color-brand-btn-bg: #0f1f0f;
   --color-brand-btn-bg-hover: #162f16;
-  --color-text-main: #EDEDED;
-  --color-text-muted: #888888;
-  --color-border-subtle: rgba(255, 255, 255, 0.06);
-  --color-border-default: rgba(255, 255, 255, 0.10);
-  --color-border-strong: rgba(255, 255, 255, 0.16);
-  --color-border-glow: rgba(255, 255, 255, 0.10);
-  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-text-main: #F5F5F5;
+  --color-text-muted: #A3A3A3;
+  --color-border-subtle: rgba(255, 255, 255, 0.10);
+  --color-border-default: rgba(255, 255, 255, 0.15);
+  --color-border-strong: rgba(255, 255, 255, 0.25);
+  --color-border-glow: rgba(255, 255, 255, 0.15);
+  --color-overlay: rgba(0, 0, 0, 0.6);
   --color-overlay-heavy: rgba(0, 0, 0, 0.8);
   --shadow-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
@@ -198,15 +198,15 @@ body {
   --ae-surface-strong: #f2f2f2;
 
   /* Hairlines & Borders */
-  --ae-hairline: #dddddd;
-  --ae-hairline-soft: #ebebeb;
-  --ae-border-strong: #c1c1c1;
+  --ae-hairline: #d1d1d1;
+  --ae-hairline-soft: #e2e2e2;
+  --ae-border-strong: #a3a3a3;
 
   /* Text — Light mode */
-  --ae-ink: #222222;
-  --ae-body: #3f3f3f;
-  --ae-muted: #6a6a6a;
-  --ae-muted-soft: #929292;
+  --ae-ink: #111111;
+  --ae-body: #2b2b2b;
+  --ae-muted: #555555;
+  --ae-muted-soft: #767676;
 
   /* Semantic */
   --ae-error: #c13515;
@@ -236,14 +236,14 @@ body {
   --ae-canvas: #1a1a1a;
   --ae-surface-soft: #222222;
   --ae-surface-strong: #2a2a2a;
-  --ae-hairline: rgba(255, 255, 255, 0.12);
-  --ae-hairline-soft: rgba(255, 255, 255, 0.08);
-  --ae-border-strong: rgba(255, 255, 255, 0.2);
-  --ae-ink: #f0f0f0;
-  --ae-body: #d4d4d4;
-  --ae-muted: #a0a0a0;
-  --ae-muted-soft: #707070;
-  --ae-scrim: rgba(0, 0, 0, 0.7);
+  --ae-hairline: rgba(255, 255, 255, 0.20);
+  --ae-hairline-soft: rgba(255, 255, 255, 0.12);
+  --ae-border-strong: rgba(255, 255, 255, 0.30);
+  --ae-ink: #ffffff;
+  --ae-body: #e5e5e5;
+  --ae-muted: #b3b3b3;
+  --ae-muted-soft: #8a8a8a;
+  --ae-scrim: rgba(0, 0, 0, 0.8);
   --ae-shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.06),
     0 2px 8px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
   --ae-shadow-search: 0 0 0 1px rgba(255, 255, 255, 0.08),
