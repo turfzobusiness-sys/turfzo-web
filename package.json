@@ -12,7 +12,7 @@
     "test:watch": "vitest",
     "convex:dev": "convex dev",
     "convex:deploy": "convex deploy",
-    "seed": "convex run seed:seedAll",
+    "seed": "node scripts/seed-real-data.mjs",
     "preflight": "node scripts/preflight.mjs",
     "env:diff": "node scripts/env-diff.mjs",
     "env:diff:strict": "node scripts/env-diff.mjs --strict",
