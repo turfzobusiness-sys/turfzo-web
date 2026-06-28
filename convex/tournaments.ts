@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
 
 async function requireUserId(ctx: any) {
   const identity = await ctx.auth.getUserIdentity();
@@ -37,7 +38,7 @@ export const getOpen = query({
       let cityName = "Mumbai";
 
       if (t.turf_id) {
-        const turf = await ctx.db.get(t.turf_id as any);
+        const turf = await ctx.db.get(t.turf_id as Id<"turfs">);
         if (turf) {
           venueName = turf.name;
           cityName = turf.city;
@@ -97,7 +98,7 @@ export const register = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);
-    const tournament = await ctx.db.get(args.tournament_id as any);
+    const tournament = await ctx.db.get(args.tournament_id as Id<"tournaments">);
     if (!tournament) throw new Error("Tournament not found");
     if (tournament.status !== "open") throw new Error("Tournament registration is closed");
 
