@@ -29,7 +29,13 @@ import {
   Share2,
   Heart,
 } from "lucide-react";
-import { GiSoccerBall, GiCricketBat, GiShuttlecock, GiTennisRacket, GiAmericanFootballBall } from "react-icons/gi";
+import {
+  GiSoccerBall,
+  GiCricketBat,
+  GiShuttlecock,
+  GiTennisRacket,
+  GiAmericanFootballBall,
+} from "react-icons/gi";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
@@ -57,72 +63,67 @@ interface Tournament {
   created_at: string;
 }
 
-const mockTournaments: Tournament[] = [
-  {
-    _id: "mock_1",
-    _creationTime: Date.now(),
-    title: "Turfzo Champions Cup 2026",
-    sport: "Football",
-    format: "5v5 Football",
-    description: "Prepare your squad for the ultimate football battle. The Turfzo Champions Cup brings together the top amateur clubs in the city to compete in a high-intensity 5v5 league-style format. Featuring AIFF-certified referees, HD video streaming of all matches, and massive cash prizes, this is where legends are made. Winners receive a grand trophy and medals.",
-    start_date: "2026-06-18T09:00:00.000Z",
-    end_date: "2026-06-19T18:00:00.000Z",
-    venue: "Turfzo HSR Arena (Pitch A)",
-    city: "Bengaluru",
-    entry_fee: 1500,
-    prize_pool: "₹25,000",
-    max_teams: 16,
-    registered_teams: 12,
-    status: "open",
-    image_url: "/stadium_turf_bg.png",
-    created_at: new Date().toISOString()
-  },
-  {
-    _id: "mock_2",
-    _creationTime: Date.now(),
-    title: "Monsoon Box Cricket Bash",
-    sport: "Cricket",
-    format: "6v6 Box Cricket",
-    description: "Rain or shine, the game goes on! Turfzo's Monsoon Box Cricket Bash is the premier indoor box cricket league of the season. 6 players per side, fast-paced matches, and unique underarm/overarm rules. Secure your turf slot and lead your team to victory in this action-packed weekend tournament.",
-    start_date: "2026-06-25T08:00:00.000Z",
-    end_date: "2026-06-26T20:00:00.000Z",
-    venue: "Whitefield Sports Center (Indoors)",
-    city: "Bengaluru",
-    entry_fee: 2000,
-    prize_pool: "₹35,000",
-    max_teams: 12,
-    registered_teams: 8,
-    status: "open",
-    image_url: "/stadium_cinematic_bg.png",
-    created_at: new Date().toISOString()
-  },
-  {
-    _id: "mock_3",
-    _creationTime: Date.now(),
-    title: "Indiranagar Badminton Doubles Challenge",
-    sport: "Badminton",
-    format: "Doubles (Open)",
-    description: "Grab your racket and partner up for the ultimate Badminton Doubles Challenge. Open to all skill levels, this knockout tournament will test your coordination, speed, and endurance. Standard BWF rules apply. Hydration stations and professional tournament feather shuttlecocks will be provided to all players.",
-    start_date: "2026-07-02T10:00:00.000Z",
-    end_date: "2026-07-03T17:00:00.000Z",
-    venue: "Indiranagar Club Badminton Arena",
-    city: "Bengaluru",
-    entry_fee: 800,
-    prize_pool: "₹12,000",
-    max_teams: 32,
-    registered_teams: 24,
-    status: "open",
-    image_url: "/feature_verified.jpg",
-    created_at: new Date().toISOString()
-  }
-];
+interface MyRegistration {
+  _id: string;
+  registration_code?: string;
+  team_name?: string | null;
+  registration_type?: string;
+  status: string;
+  registered_at: string;
+  tournament: (Tournament & { id: string }) | null;
+}
 
 const leagueStandings = [
-  { rank: "1", team: "HSR Strikers FC", played: "8", wins: "7", draws: "0", losses: "1", goalDiff: "+18", points: "21" },
-  { rank: "2", team: "Koramangala Wizards", played: "8", wins: "6", draws: "1", losses: "1", goalDiff: "+12", points: "19" },
-  { rank: "3", team: "Indiranagar Blazers", played: "8", wins: "5", draws: "2", losses: "1", goalDiff: "+8", points: "17" },
-  { rank: "4", team: "Whitefield Rovers", played: "8", wins: "4", draws: "1", losses: "3", goalDiff: "+2", points: "13" },
-  { rank: "5", team: "Marathahalli Titans", played: "8", wins: "3", draws: "0", losses: "5", goalDiff: "-4", points: "9" },
+  {
+    rank: "1",
+    team: "HSR Strikers FC",
+    played: "8",
+    wins: "7",
+    draws: "0",
+    losses: "1",
+    goalDiff: "+18",
+    points: "21",
+  },
+  {
+    rank: "2",
+    team: "Koramangala Wizards",
+    played: "8",
+    wins: "6",
+    draws: "1",
+    losses: "1",
+    goalDiff: "+12",
+    points: "19",
+  },
+  {
+    rank: "3",
+    team: "Indiranagar Blazers",
+    played: "8",
+    wins: "5",
+    draws: "2",
+    losses: "1",
+    goalDiff: "+8",
+    points: "17",
+  },
+  {
+    rank: "4",
+    team: "Whitefield Rovers",
+    played: "8",
+    wins: "4",
+    draws: "1",
+    losses: "3",
+    goalDiff: "+2",
+    points: "13",
+  },
+  {
+    rank: "5",
+    team: "Marathahalli Titans",
+    played: "8",
+    wins: "3",
+    draws: "0",
+    losses: "5",
+    goalDiff: "-4",
+    points: "9",
+  },
 ];
 
 const topScorers = [
@@ -143,20 +144,27 @@ const reviewRatings = [
 type RegStep = "closed" | "form" | "processing" | "confirmed" | "error";
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 export default function TournamentsPage() {
   const router = useRouter();
-  const { status, firebaseUser, convexUser } = useAuth();
+  const { status, firebaseUser, convexUser, getFreshToken } = useAuth();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
+  const [selectedTournament, setSelectedTournament] =
+    useState<Tournament | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "details">("list");
   const [regStep, setRegStep] = useState<RegStep>("closed");
   const [regError, setRegError] = useState<string | null>(null);
   const [wishlist, setWishlist] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<"standings" | "scorers">("standings");
+  const [activeTab, setActiveTab] = useState<"standings" | "scorers">(
+    "standings",
+  );
 
   const [teamName, setTeamName] = useState("");
   const [captainName, setCaptainName] = useState("");
@@ -167,6 +175,9 @@ export default function TournamentsPage() {
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [downloadQrUrl, setDownloadQrUrl] = useState("");
 
+  const [myRegistrations, setMyRegistrations] = useState<MyRegistration[]>([]);
+  const [myRegQrs, setMyRegQrs] = useState<Record<string, string>>({});
+
   const [searchSport, setSearchSport] = useState("all");
   const [searchCity, setSearchCity] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -174,18 +185,20 @@ export default function TournamentsPage() {
   useEffect(() => {
     async function fetchTournaments() {
       try {
-        const data = await convexClient.query<Tournament[]>("tournaments:getOpen", {});
+        const data = await convexClient.query<Tournament[]>(
+          "tournaments:getOpen",
+          {},
+        );
+        // NOTE: no mock fallback — mock mode is served by the mock
+        // client (lib/mock-convex.ts); an empty live result means no
+        // open tournaments right now.
+        setTournaments(data ?? []);
         if (data && data.length > 0) {
-          setTournaments(data);
           setSelectedTournament(data[0]);
-        } else {
-          setTournaments(mockTournaments);
-          setSelectedTournament(mockTournaments[0]);
         }
       } catch (err) {
-        console.error("Failed to fetch tournaments, loading mock tournaments:", err);
-        setTournaments(mockTournaments);
-        setSelectedTournament(mockTournaments[0]);
+        console.error("Failed to fetch tournaments:", err);
+        setTournaments([]);
       } finally {
         setLoading(false);
       }
@@ -193,16 +206,64 @@ export default function TournamentsPage() {
     fetchTournaments();
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchMyRegistrations() {
+      if (status !== "authenticated" || !convexUser) {
+        setMyRegistrations([]);
+        return;
+      }
+      try {
+        const token = await getFreshToken();
+        const data = await convexClient.query<MyRegistration[]>(
+          "tournaments:getMyRegistrations",
+          { userId: convexUser._id },
+          token,
+        );
+        if (cancelled) return;
+        setMyRegistrations(data ?? []);
+        const qrs: Record<string, string> = {};
+        for (const reg of data ?? []) {
+          if (!reg.registration_code) continue;
+          const payload = JSON.stringify({
+            code: reg.registration_code,
+            tournament: reg.tournament?.title ?? "Tournament",
+            team: reg.team_name ?? "Individual",
+          });
+          qrs[reg._id] = await QRCode.toDataURL(payload, {
+            width: 256,
+            margin: 1,
+          });
+        }
+        if (!cancelled) setMyRegQrs(qrs);
+      } catch (err) {
+        console.error("Failed to fetch my registrations:", err);
+      }
+    }
+    fetchMyRegistrations();
+    return () => {
+      cancelled = true;
+    };
+  }, [status, convexUser, getFreshToken]);
+
   const filteredTournaments = tournaments.filter((t) => {
-    const matchSport = searchSport === "all" || t.sport.toLowerCase() === searchSport.toLowerCase();
-    const matchCity = !searchCity || t.city.toLowerCase().includes(searchCity.toLowerCase());
-    const matchQuery = !searchQuery || t.title.toLowerCase().includes(searchQuery.toLowerCase()) || t.venue.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSport =
+      searchSport === "all" ||
+      t.sport.toLowerCase() === searchSport.toLowerCase();
+    const matchCity =
+      !searchCity || t.city.toLowerCase().includes(searchCity.toLowerCase());
+    const matchQuery =
+      !searchQuery ||
+      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.venue.toLowerCase().includes(searchQuery.toLowerCase());
     return matchSport && matchCity && matchQuery;
   });
 
   const toggleWishlist = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setWishlist((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setWishlist((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
   };
 
   const handleOpenRegistration = (t: Tournament) => {
@@ -213,13 +274,14 @@ export default function TournamentsPage() {
     setSelectedTournament(t);
     if (convexUser) {
       setCaptainName(
-        (convexUser.full_name && convexUser.full_name.trim() !== "")
+        convexUser.full_name && convexUser.full_name.trim() !== ""
           ? convexUser.full_name
-          : (convexUser.display_name && convexUser.display_name.trim() !== "")
+          : convexUser.display_name && convexUser.display_name.trim() !== ""
             ? convexUser.display_name
             : firebaseUser?.displayName
               ? firebaseUser.displayName
-              : (convexUser.email ?? firebaseUser?.email)?.split("@")[0] ?? ""
+              : ((convexUser.email ?? firebaseUser?.email)?.split("@")[0] ??
+                ""),
       );
       setCaptainEmail(convexUser.email ?? firebaseUser?.email ?? "");
       setCaptainPhone(convexUser.phone_number ?? "");
@@ -230,114 +292,165 @@ export default function TournamentsPage() {
 
   const handleSubmitRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedTournament || !teamName || !captainName || !captainEmail || !captainPhone) {
+    if (
+      !selectedTournament ||
+      !teamName ||
+      !captainName ||
+      !captainEmail ||
+      !captainPhone
+    ) {
       setRegError("Please fill in all fields.");
+      return;
+    }
+    if (!/^\d{10}$/.test(captainPhone)) {
+      setRegError("Please enter a valid 10-digit phone number.");
       return;
     }
     setRegStep("processing");
     setRegError(null);
 
-    // Check if registering for a mock tournament, bypass database call
-    if (selectedTournament._id.startsWith("mock_")) {
-      setTimeout(async () => {
-        try {
-          const code = `PASS-${Math.floor(100000 + Math.random() * 900000)}`;
-          setRegistrationCode(code);
-          setTournaments((prev) =>
-            prev.map((t) =>
-              t._id === selectedTournament._id
-                ? { ...t, registered_teams: Math.min(t.registered_teams + 1, t.max_teams) }
-                : t
-            )
-          );
-          if (selectedTournament._id === selectedTournament._id) {
-            setSelectedTournament((prev) =>
-              prev ? { ...prev, registered_teams: Math.min(prev.registered_teams + 1, prev.max_teams) } : null
-            );
-          }
-          const qrPayload = JSON.stringify({
-            code,
-            tournament: selectedTournament.title,
-            team: teamName,
-          });
-          const qrDataUrl = await QRCode.toDataURL(qrPayload, { width: 256, margin: 1 });
-          setQrCodeUrl(qrDataUrl);
-          setDownloadQrUrl(qrDataUrl);
-          setRegStep("confirmed");
-        } catch {
-          setRegError("Failed to generate QR pass.");
-          setRegStep("error");
-        }
-      }, 1500);
-      return;
-    }
-
-    const receipt = `tournament_${Date.now()}`;
-    const amountInPaise = selectedTournament.entry_fee * 100;
-    const clientRequestId = `tour_${firebaseUser?.uid ?? "anon"}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    let paymentOrderId: string | undefined;
+    let token: string | undefined;
 
     try {
-      const order = await convexClient.action<{ id: string; payment_session_id?: string; amount: number; mock?: boolean; idempotent_replay?: boolean }>(
-        "payments:createCashfreeOrder",
-        { amount: amountInPaise, currency: "INR", receipt, client_request_id: clientRequestId, type: "tournament_registration" }
-      );
+      console.log("[Tournament Reg] Step 0: Refreshing auth token...");
+      token = await getFreshToken();
+      console.log("[Tournament Reg] Token refreshed:", token ? "yes" : "NO TOKEN");
 
-      if (!order.payment_session_id) {
-        throw new Error("Failed to initialize payment session");
+      // Paid tournaments: order → Cashfree checkout → server-side
+      // verification. Free tournaments (entry_fee = 0) skip payment — the
+      // backend accepts registrations without a payment order for them.
+      if (selectedTournament.entry_fee > 0) {
+        // ── Step 1: Create a Cashfree order for the entry fee ──
+        console.log("[Tournament Reg] Step 1: Creating Cashfree order via payments:createTournamentOrder...");
+        const order = await convexClient.action<{
+          success: boolean;
+          cf_order_id: string;
+          payment_session_id: string;
+          order_amount: number;
+          error?: string;
+        }>(
+          "payments:createTournamentOrder",
+          {
+            tournament_id: selectedTournament._id,
+            customer_name: captainName,
+            customer_email: captainEmail,
+            customer_phone: captainPhone,
+          },
+          token
+        );
+        console.log("[Tournament Reg] Step 1 result:", order);
+        if (!order.success || !order.payment_session_id) {
+          throw new Error(order.error || "Failed to initialize payment session.");
+        }
+
+        // ── Step 2: Open the Cashfree checkout modal ──
+        console.log("[Tournament Reg] Step 2: Opening Cashfree checkout modal...");
+        await openCashfreeCheckout({
+          paymentSessionId: order.payment_session_id,
+        });
+        console.log("[Tournament Reg] Step 2 complete: Cashfree checkout done.");
+
+        // ── Step 3: Verify the payment server-side (single source of truth) ──
+        console.log("[Tournament Reg] Step 3: Verifying payment via payments:verifyTournamentCashfreePayment...");
+        const verify = await convexClient.action<{
+          success: boolean;
+          payment_verified: boolean;
+          payment_id?: string;
+          error?: string;
+        }>(
+          "payments:verifyTournamentCashfreePayment",
+          {
+            cf_order_id: order.cf_order_id,
+          },
+          token
+        );
+        console.log("[Tournament Reg] Step 3 result:", verify);
+        if (!verify.success || !verify.payment_verified) {
+          throw new Error(verify.error || "Payment verification failed.");
+        }
+        paymentOrderId = order.cf_order_id;
       }
 
-      await openCashfreeCheckout({
-        paymentSessionId: order.payment_session_id,
-      });
-
-      const verify = await convexClient.action<{ verified: boolean; payment_id?: string; mock?: boolean }>(
-        "payments:verifyCashfreePayment",
-        {
-          order_id: order.id,
-        }
-      );
-      if (!verify.verified) throw new Error("Payment verification failed.");
-
+      // ── Step 4: Register the team with the verified payment order ID ──
+      console.log("[Tournament Reg] Step 4: Registering team via tournaments:register...");
       const registration = await convexClient.mutation<{
         registration_code: string;
         team_name: string;
         _id: string;
-      }>("tournaments:register", {
-        tournament_id: selectedTournament._id,
-        team_name: teamName,
-        captain_name: captainName,
-        captain_email: captainEmail,
-        captain_phone: captainPhone,
-        entry_fee_paid: selectedTournament.entry_fee,
-        payment_order_id: order.id,
-      });
+      }>(
+        "tournaments:register",
+        {
+          tournament_id: selectedTournament._id,
+          team_name: teamName,
+          captain_name: captainName,
+          captain_email: captainEmail,
+          captain_phone: captainPhone,
+          entry_fee_paid: selectedTournament.entry_fee,
+          ...(paymentOrderId ? { payment_order_id: paymentOrderId } : {}),
+        },
+        token
+      );
+      console.log("[Tournament Reg] Step 4 result:", registration);
 
       setRegistrationCode(registration.registration_code);
       setTournaments((prev) =>
         prev.map((t) =>
           t._id === selectedTournament._id
-            ? { ...t, registered_teams: Math.min(t.registered_teams + 1, t.max_teams) }
-            : t
-        )
+            ? {
+                ...t,
+                registered_teams: Math.min(t.registered_teams + 1, t.max_teams),
+              }
+            : t,
+        ),
       );
-      if (selectedTournament._id === selectedTournament._id) {
-        setSelectedTournament((prev) =>
-          prev ? { ...prev, registered_teams: Math.min(prev.registered_teams + 1, prev.max_teams) } : null
-        );
-      }
+      setSelectedTournament((prev) =>
+        prev
+          ? {
+              ...prev,
+              registered_teams: Math.min(
+                prev.registered_teams + 1,
+                prev.max_teams,
+              ),
+            }
+          : null,
+      );
 
       const qrPayload = JSON.stringify({
         code: registration.registration_code,
         tournament: selectedTournament.title,
         team: teamName,
       });
-      const qrDataUrl = await QRCode.toDataURL(qrPayload, { width: 256, margin: 1 });
+      const qrDataUrl = await QRCode.toDataURL(qrPayload, {
+        width: 256,
+        margin: 1,
+      });
       setQrCodeUrl(qrDataUrl);
       setDownloadQrUrl(qrDataUrl);
       setRegStep("confirmed");
     } catch (err) {
+      console.error("[Tournament Reg] FAILED:", err);
+      // SECURITY (T13): payment was verified but registration failed (full,
+      // deadline, duplicate, etc.) — auto-refund the unconsumed entry fee so
+      // the player's money isn't stuck.
+      if (paymentOrderId) {
+        try {
+          await convexClient.action(
+            "payments:refundTournamentEntry",
+            { cf_order_id: paymentOrderId },
+            token,
+          );
+        } catch (refundErr) {
+          console.error(
+            "[Tournament Reg] Refund request failed:",
+            refundErr,
+          );
+        }
+      }
       const { getErrorMessage } = await import("@/lib/errors");
-      setRegError(getErrorMessage(err, "Registration failed. Please try again."));
+      setRegError(
+        getErrorMessage(err, "Registration failed. Please try again."),
+      );
       setRegStep("error");
     }
   };
@@ -350,9 +463,7 @@ export default function TournamentsPage() {
     link.click();
   };
 
-
-
-  // Switch to details page and load mock photos
+  // Switch to details page
   const openDetails = (t: Tournament) => {
     setSelectedTournament(t);
     setViewMode("details");
@@ -371,14 +482,25 @@ export default function TournamentsPage() {
             transition={{ duration: 0.6 }}
             className="relative -mt-24 overflow-hidden min-h-[320px] sm:min-h-[380px] flex flex-col items-start justify-end mb-6"
           >
-            <div className="absolute inset-0 bg-cover bg-center z-0 opacity-50" style={{ backgroundImage: `url('/stadium_light_bg.png')` }} />
-            <div className="absolute inset-0 z-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.05) 100%)" }} />
+            <div
+              className="absolute inset-0 bg-cover bg-center z-0 opacity-50"
+              style={{ backgroundImage: `url('/stadium_light_bg.png')` }}
+            />
+            <div
+              className="absolute inset-0 z-0"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.05) 100%)",
+              }}
+            />
             <div className="relative z-10 px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full pb-10 sm:pb-14">
               <h1 className="font-[family-name:var(--font-anton)] text-4xl sm:text-5xl lg:text-6xl text-white uppercase leading-[1.1] tracking-wide mb-2">
-                Leagues &<br />Tournaments
+                Leagues &<br />
+                Tournaments
               </h1>
               <p className="text-white/70 text-sm sm:text-base max-w-xl">
-                Register your team, climb the regional leaderboards, and compete for grand cash prizes on the finest turfs.
+                Register your team, climb the regional leaderboards, and compete
+                for grand cash prizes on the finest turfs.
               </p>
             </div>
           </motion.section>
@@ -397,9 +519,17 @@ export default function TournamentsPage() {
                     { id: "all", label: "All Sports", icon: Trophy },
                     { id: "Football", label: "Football", icon: GiSoccerBall },
                     { id: "Cricket", label: "Cricket", icon: GiCricketBat },
-                    { id: "Badminton", label: "Badminton", icon: GiShuttlecock },
+                    {
+                      id: "Badminton",
+                      label: "Badminton",
+                      icon: GiShuttlecock,
+                    },
                     { id: "Tennis", label: "Tennis", icon: GiTennisRacket },
-                    { id: "Multipurpose", label: "Multipurpose", icon: GiAmericanFootballBall }
+                    {
+                      id: "Multipurpose",
+                      label: "Multipurpose",
+                      icon: GiAmericanFootballBall,
+                    },
                   ].map((s) => {
                     const Icon = s.icon;
                     const isActive = searchSport === s.id;
@@ -415,7 +545,9 @@ export default function TournamentsPage() {
                           }`}
                       >
                         <Icon className="w-7 h-7 shrink-0" />
-                        <span className="text-[11px] font-medium tracking-wide">{s.label}</span>
+                        <span className="text-[11px] font-medium tracking-wide">
+                          {s.label}
+                        </span>
                       </button>
                     );
                   })}
@@ -425,7 +557,8 @@ export default function TournamentsPage() {
               {/* Sub-Filters and Count Row */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div className="text-sm text-text-muted font-medium">
-                  {filteredTournaments.length} tournament{filteredTournaments.length !== 1 ? "s" : ""} available
+                  {filteredTournaments.length} tournament
+                  {filteredTournaments.length !== 1 ? "s" : ""} available
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -440,7 +573,10 @@ export default function TournamentsPage() {
                       className="w-full bg-transparent text-xs text-text-main placeholder-text-muted focus:outline-none"
                     />
                     {searchCity && (
-                      <button onClick={() => setSearchCity("")} className="text-text-muted hover:text-text-main">
+                      <button
+                        onClick={() => setSearchCity("")}
+                        className="text-text-muted hover:text-text-main"
+                      >
                         <X className="w-3 h-3" />
                       </button>
                     )}
@@ -457,7 +593,10 @@ export default function TournamentsPage() {
                       className="w-full bg-transparent text-xs text-text-main placeholder-text-muted focus:outline-none"
                     />
                     {searchQuery && (
-                      <button onClick={() => setSearchQuery("")} className="text-text-muted hover:text-text-main">
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="text-text-muted hover:text-text-main"
+                      >
                         <X className="w-3.5 h-3.5" />
                       </button>
                     )}
@@ -465,19 +604,104 @@ export default function TournamentsPage() {
                 </div>
               </div>
 
+              {/* My Registrations — persisted tournament passes */}
+              {myRegistrations.length > 0 && (
+                <div className="mb-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-brand-lime" />
+                      My Registrations
+                    </h2>
+                    <span className="text-xs text-text-muted font-medium">
+                      {myRegistrations.length} pass
+                      {myRegistrations.length !== 1 ? "es" : ""}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {myRegistrations.map((reg) => {
+                      const t = reg.tournament;
+                      return (
+                        <div
+                          key={reg._id}
+                          className="bg-elevated border border-border-default rounded-2xl p-5"
+                        >
+                          <div className="flex items-center justify-between pb-3 border-b border-dashed border-border-strong mb-4">
+                            <span className="font-extrabold text-brand-lime text-base tracking-wide">
+                              {reg.registration_code ?? "No pass ID"}
+                            </span>
+                            <span className="bg-brand-lime text-bg text-[9px] font-black px-2.5 py-1 rounded-md uppercase">
+                              {reg.status}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            {myRegQrs[reg._id] ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={myRegQrs[reg._id]}
+                                alt="Tournament Pass QR"
+                                className="w-28 h-28 rounded-xl bg-white p-1.5 border border-border-default shrink-0"
+                              />
+                            ) : (
+                              <div className="w-28 h-28 bg-surface animate-pulse rounded-xl shrink-0" />
+                            )}
+                            <div className="min-w-0">
+                              <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                                Tournament
+                              </span>
+                              <span className="font-bold text-text-main text-sm line-clamp-2">
+                                {t?.title ?? "Tournament"}
+                              </span>
+                              <span className="block mt-1.5 text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                                {reg.team_name ? "Team" : "Entrant"}
+                              </span>
+                              <span className="font-semibold text-text-main text-xs truncate">
+                                {reg.team_name ?? "Individual"}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border-default">
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-text-muted">
+                              Scan at venue gate
+                            </span>
+                            {reg.registration_code && (
+                              <a
+                                href={myRegQrs[reg._id]}
+                                download={`turfzo-pass-${reg.registration_code}.png`}
+                                className="flex items-center gap-1.5 bg-text-main hover:bg-text-main/90 text-bg text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                Pass
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Tournament Grid */}
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-32 gap-4">
                   <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
-                  <p className="text-sm text-text-muted">Loading tournaments list...</p>
+                  <p className="text-sm text-text-muted">
+                    Loading tournaments list...
+                  </p>
                 </div>
               ) : filteredTournaments.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4 bg-surface border border-border-default rounded-2xl text-center p-8">
-                  <Trophy className="w-14 h-14 text-text-muted" strokeWidth={1.2} />
+                  <Trophy
+                    className="w-14 h-14 text-text-muted"
+                    strokeWidth={1.2}
+                  />
                   <div>
-                    <h3 className="font-bold text-lg text-text-main">No tournaments found</h3>
+                    <h3 className="font-bold text-lg text-text-main">
+                      No tournaments found
+                    </h3>
                     <p className="text-sm text-text-muted mt-1 max-w-sm">
-                      We couldn&apos;t find any tournaments matching your filters. Try resetting the search filters.
+                      We couldn&apos;t find any tournaments matching your
+                      filters. Try resetting the search filters.
                     </p>
                   </div>
                   <button
@@ -496,7 +720,8 @@ export default function TournamentsPage() {
                   {filteredTournaments.map((t) => {
                     const spotsLeft = t.max_teams - t.registered_teams;
                     const isFull = spotsLeft <= 0;
-                    const progressPercent = (t.registered_teams / t.max_teams) * 100;
+                    const progressPercent =
+                      (t.registered_teams / t.max_teams) * 100;
                     const inWishlist = wishlist.includes(t._id);
 
                     return (
@@ -542,7 +767,9 @@ export default function TournamentsPage() {
                           <div>
                             <div className="flex items-center gap-1.5 text-xs text-text-muted mb-1.5">
                               <MapPin className="w-3.5 h-3.5 text-brand-lime shrink-0" />
-                              <span className="truncate">{t.venue}, {t.city}</span>
+                              <span className="truncate">
+                                {t.venue}, {t.city}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1.5 text-xs text-text-muted mb-2">
                               <Calendar className="w-3.5 h-3.5 text-brand-lime shrink-0" />
@@ -556,7 +783,9 @@ export default function TournamentsPage() {
                             {/* Spot status indicator */}
                             <div className="mt-4 pt-1">
                               <div className="flex justify-between items-center text-xs font-semibold mb-1.5">
-                                <span className="text-text-muted">Teams Registered</span>
+                                <span className="text-text-muted">
+                                  Teams Registered
+                                </span>
                                 <span className="text-text-main">
                                   {t.registered_teams}/{t.max_teams}
                                 </span>
@@ -569,21 +798,28 @@ export default function TournamentsPage() {
                                 />
                               </div>
                               <span className="block text-[10px] font-medium text-text-muted mt-1.5">
-                                {isFull ? "Registration Closed" : `${spotsLeft} team slots left`}
+                                {isFull
+                                  ? "Registration Closed"
+                                  : `${spotsLeft} team slots left`}
                               </span>
                             </div>
                           </div>
 
                           <div className="border-t border-border-default mt-5 pt-4 flex items-center justify-between">
                             <div>
-                              <span className="block text-[9px] text-text-muted uppercase tracking-wider font-semibold">Entry Fee</span>
+                              <span className="block text-[9px] text-text-muted uppercase tracking-wider font-semibold">
+                                Entry Fee
+                              </span>
                               <span className="text-lg font-extrabold text-brand-lime">
                                 ₹{t.entry_fee.toLocaleString("en-IN")}
-                                <span className="text-xs text-text-muted font-normal ml-0.5">/team</span>
+                                <span className="text-xs text-text-muted font-normal ml-0.5">
+                                  /team
+                                </span>
                               </span>
                             </div>
                             <span className="flex items-center gap-1.5 text-xs font-bold text-text-main group-hover:text-brand-lime transition-colors duration-200">
-                              View details <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                              View details{" "}
+                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </span>
                           </div>
                         </div>
@@ -606,7 +842,8 @@ export default function TournamentsPage() {
                   onClick={() => setViewMode("list")}
                   className="flex items-center gap-2 text-sm font-semibold text-text-main hover:text-brand-lime transition-colors group cursor-pointer"
                 >
-                  <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to all tournaments
+                  <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />{" "}
+                  Back to all tournaments
                 </button>
                 <div className="flex items-center gap-4 text-sm font-semibold">
                   <button className="flex items-center gap-1.5 text-text-main hover:text-brand-lime transition-colors">
@@ -619,7 +856,9 @@ export default function TournamentsPage() {
                     <Heart
                       className={`w-4 h-4 ${wishlist.includes(selectedTournament._id) ? "fill-brand-lime text-brand-lime" : ""}`}
                     />
-                    {wishlist.includes(selectedTournament._id) ? "Saved" : "Save"}
+                    {wishlist.includes(selectedTournament._id)
+                      ? "Saved"
+                      : "Save"}
                   </button>
                 </div>
               </div>
@@ -631,13 +870,17 @@ export default function TournamentsPage() {
                 </h1>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text-muted mt-2">
                   <span className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 fill-text-main text-text-main" /> 4.9
+                    <Star className="w-3.5 h-3.5 fill-text-main text-text-main" />{" "}
+                    4.9
                   </span>
                   <span>·</span>
-                  <span className="underline cursor-pointer hover:text-text-main">12 reviews</span>
+                  <span className="underline cursor-pointer hover:text-text-main">
+                    12 reviews
+                  </span>
                   <span>·</span>
                   <span className="flex items-center gap-1 font-semibold text-text-main">
-                    <MapPin className="w-3.5 h-3.5 text-brand-lime" /> {selectedTournament.venue}, {selectedTournament.city}
+                    <MapPin className="w-3.5 h-3.5 text-brand-lime" />{" "}
+                    {selectedTournament.venue}, {selectedTournament.city}
                   </span>
                 </div>
               </div>
@@ -650,6 +893,7 @@ export default function TournamentsPage() {
                     src={selectedTournament.image_url || "/stadium_turf_bg.png"}
                     alt={selectedTournament.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, 66vw"
                     className="object-cover group-hover:brightness-95 transition-all duration-300"
                   />
                 </div>
@@ -660,6 +904,7 @@ export default function TournamentsPage() {
                       src="/feature_verified.jpg"
                       alt="Verified turf conditions"
                       fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover group-hover:brightness-95 transition-all duration-300"
                     />
                   </div>
@@ -668,6 +913,7 @@ export default function TournamentsPage() {
                       src="/stadium_cinematic_bg.png"
                       alt="Cinematic stadium lighting"
                       fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover group-hover:brightness-95 transition-all duration-300"
                     />
                   </div>
@@ -681,7 +927,6 @@ export default function TournamentsPage() {
 
               {/* Airbnb-style Split Content Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12 mt-8 items-start">
-                
                 {/* LEFT COLUMN: Tournament details info */}
                 <div className="space-y-6">
                   {/* Overview details */}
@@ -690,7 +935,9 @@ export default function TournamentsPage() {
                       {selectedTournament.format} organized by Turfzo
                     </h2>
                     <p className="text-text-muted mt-1 text-sm">
-                      {selectedTournament.max_teams} Teams tournament capacity · Matches on {selectedTournament.sport} turf · Trophy & medal ceremony
+                      {selectedTournament.max_teams} Teams tournament capacity ·
+                      Matches on {selectedTournament.sport} turf · Trophy &
+                      medal ceremony
                     </p>
                   </div>
 
@@ -701,8 +948,12 @@ export default function TournamentsPage() {
                         TZ
                       </div>
                       <div>
-                        <h3 className="font-bold text-text-main">Hosted by Turfzo Sports</h3>
-                        <p className="text-xs text-text-muted">Superhost · 3 seasons organizing local leagues</p>
+                        <h3 className="font-bold text-text-main">
+                          Hosted by Turfzo Sports
+                        </h3>
+                        <p className="text-xs text-text-muted">
+                          Superhost · 3 seasons organizing local leagues
+                        </p>
                       </div>
                     </div>
                     <div className="hidden sm:flex items-center gap-1 text-xs font-bold px-3 py-1 bg-brand-lime/10 text-brand-lime rounded-full border border-brand-lime/20 shrink-0">
@@ -716,9 +967,12 @@ export default function TournamentsPage() {
                     <div className="flex items-start gap-4">
                       <Zap className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-bold text-text-main text-sm">Instant Digital Pass</h4>
+                        <h4 className="font-bold text-text-main text-sm">
+                          Instant Digital Pass
+                        </h4>
                         <p className="text-xs text-text-muted mt-0.5">
-                          Complete team entry payment to receive a download pass and QR ticket to check in at venue gate.
+                          Complete team entry payment to receive a download pass
+                          and QR ticket to check in at venue gate.
                         </p>
                       </div>
                     </div>
@@ -726,9 +980,12 @@ export default function TournamentsPage() {
                     <div className="flex items-start gap-4">
                       <ShieldCheck className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-bold text-text-main text-sm">AIFF Certified Referees</h4>
+                        <h4 className="font-bold text-text-main text-sm">
+                          AIFF Certified Referees
+                        </h4>
                         <p className="text-xs text-text-muted mt-0.5">
-                          Professional officiating for all league and knockout stage matches to ensure fair gameplay.
+                          Professional officiating for all league and knockout
+                          stage matches to ensure fair gameplay.
                         </p>
                       </div>
                     </div>
@@ -736,9 +993,12 @@ export default function TournamentsPage() {
                     <div className="flex items-start gap-4">
                       <Users className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-bold text-text-main text-sm">Spectator & Stream Friendly</h4>
+                        <h4 className="font-bold text-text-main text-sm">
+                          Spectator & Stream Friendly
+                        </h4>
                         <p className="text-xs text-text-muted mt-0.5">
-                          Family seating zones, hydration setups, and live game updates for fans attending or checking scores online.
+                          Family seating zones, hydration setups, and live game
+                          updates for fans attending or checking scores online.
                         </p>
                       </div>
                     </div>
@@ -746,7 +1006,9 @@ export default function TournamentsPage() {
 
                   {/* About rules / description block */}
                   <div className="pb-6 border-b border-border-default">
-                    <h3 className="text-lg font-bold text-text-main mb-3">About this tournament</h3>
+                    <h3 className="text-lg font-bold text-text-main mb-3">
+                      About this tournament
+                    </h3>
                     <p className="text-text-muted text-sm leading-relaxed whitespace-pre-line">
                       {selectedTournament.description}
                     </p>
@@ -754,17 +1016,44 @@ export default function TournamentsPage() {
 
                   {/* What is provided / Amenities Grid */}
                   <div className="pb-6 border-b border-border-default">
-                    <h3 className="text-lg font-bold text-text-main mb-4">What this tournament offers</h3>
+                    <h3 className="text-lg font-bold text-text-main mb-4">
+                      What this tournament offers
+                    </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6">
                       {[
-                        { label: "BWF certified shuttles / FIFA grass turf", icon: <Award className="w-4 h-4 text-text-muted" /> },
-                        { label: "Free vehicle parking on premises", icon: <Users className="w-4 h-4 text-text-muted" /> },
-                        { label: "Hydration & energy drink station", icon: <Info className="w-4 h-4 text-text-muted" /> },
-                        { label: "Changing rooms & shower amenities", icon: <User className="w-4 h-4 text-text-muted" /> },
-                        { label: "Live scoring updates & screen", icon: <Sparkles className="w-4 h-4 text-text-muted" /> },
-                        { label: "On-site first aid & medical kit", icon: <ShieldCheck className="w-4 h-4 text-text-muted" /> },
+                        {
+                          label: "BWF certified shuttles / FIFA grass turf",
+                          icon: <Award className="w-4 h-4 text-text-muted" />,
+                        },
+                        {
+                          label: "Free vehicle parking on premises",
+                          icon: <Users className="w-4 h-4 text-text-muted" />,
+                        },
+                        {
+                          label: "Hydration & energy drink station",
+                          icon: <Info className="w-4 h-4 text-text-muted" />,
+                        },
+                        {
+                          label: "Changing rooms & shower amenities",
+                          icon: <User className="w-4 h-4 text-text-muted" />,
+                        },
+                        {
+                          label: "Live scoring updates & screen",
+                          icon: (
+                            <Sparkles className="w-4 h-4 text-text-muted" />
+                          ),
+                        },
+                        {
+                          label: "On-site first aid & medical kit",
+                          icon: (
+                            <ShieldCheck className="w-4 h-4 text-text-muted" />
+                          ),
+                        },
                       ].map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-3 text-sm text-text-main">
+                        <div
+                          key={idx}
+                          className="flex items-center gap-3 text-sm text-text-main"
+                        >
                           {item.icon}
                           <span>{item.label}</span>
                         </div>
@@ -775,22 +1064,31 @@ export default function TournamentsPage() {
                   {/* League leaderboards & Competitive review ratings */}
                   <div className="pb-6">
                     <h3 className="text-lg font-bold text-text-main flex items-center gap-1.5 mb-2">
-                      <Star className="w-5 h-5 fill-text-main text-text-main" /> 4.9 · 12 tournament ratings
+                      <Star className="w-5 h-5 fill-text-main text-text-main" />{" "}
+                      4.9 · 12 tournament ratings
                     </h3>
                     <p className="text-xs text-text-muted mb-6">
-                      Metrics calculated from surveys collected from team captains during past tournament seasons.
+                      Metrics calculated from surveys collected from team
+                      captains during past tournament seasons.
                     </p>
 
                     {/* Progress bars matching Airbnb design */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4">
                       {reviewRatings.map((rating, idx) => (
-                        <div key={idx} className="flex items-center justify-between gap-4">
-                          <span className="text-sm text-text-main">{rating.label}</span>
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between gap-4"
+                        >
+                          <span className="text-sm text-text-main">
+                            {rating.label}
+                          </span>
                           <div className="flex items-center gap-3 shrink-0 w-36 sm:w-44">
                             <div className="h-1.5 flex-grow bg-border-default rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-text-main rounded-full"
-                                style={{ width: `${(parseFloat(rating.score) / 5) * 100}%` }}
+                                style={{
+                                  width: `${(parseFloat(rating.score) / 5) * 100}%`,
+                                }}
                               />
                             </div>
                             <span className="text-xs font-bold text-text-main text-right w-5">
@@ -842,12 +1140,25 @@ export default function TournamentsPage() {
                             </thead>
                             <tbody>
                               {leagueStandings.map((row) => (
-                                <tr key={row.rank} className="border-b border-border-subtle last:border-b-0">
-                                  <td className="py-3 font-bold text-text-muted pr-2">{row.rank}</td>
-                                  <td className="py-3 font-semibold text-text-main">{row.team}</td>
-                                  <td className="py-3 text-center text-text-muted">{row.played}</td>
-                                  <td className="py-3 text-center font-semibold text-brand-lime">{row.goalDiff}</td>
-                                  <td className="py-3 text-right font-extrabold text-brand-lime">{row.points}</td>
+                                <tr
+                                  key={row.rank}
+                                  className="border-b border-border-subtle last:border-b-0"
+                                >
+                                  <td className="py-3 font-bold text-text-muted pr-2">
+                                    {row.rank}
+                                  </td>
+                                  <td className="py-3 font-semibold text-text-main">
+                                    {row.team}
+                                  </td>
+                                  <td className="py-3 text-center text-text-muted">
+                                    {row.played}
+                                  </td>
+                                  <td className="py-3 text-center font-semibold text-brand-lime">
+                                    {row.goalDiff}
+                                  </td>
+                                  <td className="py-3 text-right font-extrabold text-brand-lime">
+                                    {row.points}
+                                  </td>
                                 </tr>
                               ))}
                             </tbody>
@@ -858,14 +1169,24 @@ export default function TournamentsPage() {
                       {activeTab === "scorers" && (
                         <div className="space-y-4">
                           {topScorers.map((scorer, i) => (
-                            <div key={i} className="flex items-center justify-between pb-3 border-b border-border-subtle last:border-b-0 last:pb-0">
+                            <div
+                              key={i}
+                              className="flex items-center justify-between pb-3 border-b border-border-subtle last:border-b-0 last:pb-0"
+                            >
                               <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-elevated border border-border-default flex items-center justify-center text-xs font-bold text-text-main">
-                                  {scorer.name.split(" ").map((n) => n[0]).join("")}
+                                  {scorer.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
                                 </div>
                                 <div>
-                                  <span className="block text-sm font-semibold text-text-main">{scorer.name}</span>
-                                  <span className="block text-[10px] text-text-muted mt-0.5">{scorer.team}</span>
+                                  <span className="block text-sm font-semibold text-text-main">
+                                    {scorer.name}
+                                  </span>
+                                  <span className="block text-[10px] text-text-muted mt-0.5">
+                                    {scorer.team}
+                                  </span>
                                 </div>
                               </div>
                               <span className="bg-brand-lime/10 text-brand-lime text-xs font-bold px-3 py-1 rounded-full border border-brand-lime/15">
@@ -887,11 +1208,16 @@ export default function TournamentsPage() {
                       <span className="text-2xl font-extrabold text-text-main">
                         ₹{selectedTournament.entry_fee.toLocaleString("en-IN")}
                       </span>
-                      <span className="text-sm text-text-muted font-medium ml-1">/ team entry</span>
+                      <span className="text-sm text-text-muted font-medium ml-1">
+                        / team entry
+                      </span>
                     </div>
                     <div className="flex items-center gap-1 text-xs text-text-muted">
-                      <Star className="w-3 h-3 fill-text-main text-text-main" /> 4.9 ·
-                      <span className="underline cursor-pointer hover:text-text-main">12 reviews</span>
+                      <Star className="w-3 h-3 fill-text-main text-text-main" />{" "}
+                      4.9 ·
+                      <span className="underline cursor-pointer hover:text-text-main">
+                        12 reviews
+                      </span>
                     </div>
                   </div>
 
@@ -900,21 +1226,32 @@ export default function TournamentsPage() {
                     {/* Top half split */}
                     <div className="grid grid-cols-2 border-b border-border-strong">
                       <div className="p-3 border-r border-border-strong">
-                        <label className="block text-[9px] uppercase font-bold text-text-muted">Sport format</label>
+                        <label className="block text-[9px] uppercase font-bold text-text-muted">
+                          Sport format
+                        </label>
                         <span className="font-semibold text-text-main mt-0.5 block truncate">
                           {selectedTournament.format}
                         </span>
                       </div>
                       <div className="p-3">
-                        <label className="block text-[9px] uppercase font-bold text-text-muted">Schedule Date</label>
+                        <label className="block text-[9px] uppercase font-bold text-text-muted">
+                          Schedule Date
+                        </label>
                         <span className="font-semibold text-text-main mt-0.5 block truncate">
-                          {new Date(selectedTournament.start_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          {new Date(
+                            selectedTournament.start_date,
+                          ).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}
                         </span>
                       </div>
                     </div>
                     {/* Bottom half */}
                     <div className="p-3">
-                      <label className="block text-[9px] uppercase font-bold text-text-muted">Venue Arena</label>
+                      <label className="block text-[9px] uppercase font-bold text-text-muted">
+                        Venue Arena
+                      </label>
                       <span className="font-semibold text-text-main mt-0.5 block truncate">
                         {selectedTournament.venue}
                       </span>
@@ -922,7 +1259,9 @@ export default function TournamentsPage() {
                   </div>
 
                   {/* Action Register Button */}
-                  {selectedTournament.max_teams - selectedTournament.registered_teams <= 0 ? (
+                  {selectedTournament.max_teams -
+                    selectedTournament.registered_teams <=
+                  0 ? (
                     <button
                       disabled
                       className="w-full bg-border-default text-text-muted font-bold text-sm py-3.5 rounded-xl cursor-not-allowed text-center"
@@ -949,7 +1288,9 @@ export default function TournamentsPage() {
                   <div className="space-y-2.5 text-sm text-text-muted">
                     <div className="flex justify-between">
                       <span className="underline">Entry fee</span>
-                      <span className="text-text-main">₹{selectedTournament.entry_fee.toLocaleString("en-IN")}</span>
+                      <span className="text-text-main">
+                        ₹{selectedTournament.entry_fee.toLocaleString("en-IN")}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="underline">Turfzo convenience fee</span>
@@ -957,15 +1298,22 @@ export default function TournamentsPage() {
                     </div>
                     <div className="flex justify-between font-bold text-text-main border-t border-border-default pt-2.5 text-base">
                       <span>Total</span>
-                      <span>₹{selectedTournament.entry_fee.toLocaleString("en-IN")}</span>
+                      <span>
+                        ₹{selectedTournament.entry_fee.toLocaleString("en-IN")}
+                      </span>
                     </div>
                   </div>
 
                   {/* Remaining slots alert */}
-                  {selectedTournament.max_teams - selectedTournament.registered_teams > 0 && (
+                  {selectedTournament.max_teams -
+                    selectedTournament.registered_teams >
+                    0 && (
                     <div className="p-3 rounded-xl bg-brand-lime/10 border border-brand-lime/15 text-center text-xs font-semibold text-text-main flex items-center justify-center gap-1.5 mt-2">
                       <Info className="w-4 h-4 text-brand-lime shrink-0" />
-                      Only {selectedTournament.max_teams - selectedTournament.registered_teams} team slots left!
+                      Only{" "}
+                      {selectedTournament.max_teams -
+                        selectedTournament.registered_teams}{" "}
+                      team slots left!
                     </div>
                   )}
                 </div>
@@ -1000,7 +1348,9 @@ export default function TournamentsPage() {
                 className="relative bg-surface border border-border-default rounded-2xl max-w-md w-full p-6 shadow-2xl z-10 flex flex-col gap-4 text-left"
               >
                 <div className="flex items-center justify-between pb-3 border-b border-border-default">
-                  <h3 className="text-lg font-bold text-text-main">Team Registration</h3>
+                  <h3 className="text-lg font-bold text-text-main">
+                    Team Registration
+                  </h3>
                   <button
                     onClick={() => setRegStep("closed")}
                     className="p-1 hover:bg-elevated rounded-full border border-border-default transition-colors text-text-muted hover:text-text-main"
@@ -1010,8 +1360,12 @@ export default function TournamentsPage() {
                 </div>
 
                 <div className="text-center py-2 bg-elevated border border-border-default rounded-xl">
-                  <span className="block text-[10px] uppercase tracking-wider text-text-muted font-bold">Tournament</span>
-                  <span className="font-bold text-text-main text-sm">{selectedTournament.title}</span>
+                  <span className="block text-[10px] uppercase tracking-wider text-text-muted font-bold">
+                    Tournament
+                  </span>
+                  <span className="font-bold text-text-main text-sm">
+                    {selectedTournament.title}
+                  </span>
                 </div>
 
                 {regError && (
@@ -1020,10 +1374,15 @@ export default function TournamentsPage() {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmitRegistration} className="flex flex-col gap-4 text-xs font-medium">
+                <form
+                  onSubmit={handleSubmitRegistration}
+                  className="flex flex-col gap-4 text-xs font-medium"
+                >
                   {/* Team Name */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Team Name</label>
+                    <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                      Team Name
+                    </label>
                     <input
                       type="text"
                       required
@@ -1038,7 +1397,9 @@ export default function TournamentsPage() {
 
                   {/* Captain Name */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Captain Name</label>
+                    <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                      Captain Name
+                    </label>
                     <div className="relative">
                       <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                       <input
@@ -1056,7 +1417,9 @@ export default function TournamentsPage() {
 
                   {/* Phone */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Phone Number</label>
+                    <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                      Phone Number
+                    </label>
                     <div className="relative">
                       <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                       <input
@@ -1067,7 +1430,9 @@ export default function TournamentsPage() {
                         maxLength={10}
                         placeholder="Enter 10-digit phone number"
                         value={captainPhone}
-                        onChange={(e) => setCaptainPhone(e.target.value.replace(/\D/g, ""))}
+                        onChange={(e) =>
+                          setCaptainPhone(e.target.value.replace(/\D/g, ""))
+                        }
                         className="w-full bg-bg border border-border-strong rounded-xl pl-10 pr-4 py-3 text-text-main placeholder-text-muted focus:outline-none focus:border-brand-lime transition-colors text-sm"
                       />
                     </div>
@@ -1075,7 +1440,9 @@ export default function TournamentsPage() {
 
                   {/* Email */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Email Address</label>
+                    <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                      Email Address
+                    </label>
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                       <input
@@ -1091,7 +1458,9 @@ export default function TournamentsPage() {
 
                   {/* Pricing Details */}
                   <div className="bg-elevated border border-border-default rounded-xl p-4 flex justify-between items-center mt-1">
-                    <span className="text-sm font-semibold text-text-muted">Total Entry Fee</span>
+                    <span className="text-sm font-semibold text-text-muted">
+                      Total Entry Fee
+                    </span>
                     <span className="text-lg font-extrabold text-brand-lime">
                       ₹{selectedTournament.entry_fee.toLocaleString("en-IN")}
                     </span>
@@ -1116,8 +1485,12 @@ export default function TournamentsPage() {
                 className="relative bg-surface border border-border-default rounded-2xl max-w-sm w-full p-8 shadow-2xl z-10 flex flex-col items-center justify-center gap-4 text-center"
               >
                 <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
-                <h3 className="text-lg font-bold text-text-main">Processing Registration</h3>
-                <p className="text-xs text-text-muted">Booking your squad slot in the tournament bracket...</p>
+                <h3 className="text-lg font-bold text-text-main">
+                  Processing Registration
+                </h3>
+                <p className="text-xs text-text-muted">
+                  Booking your squad slot in the tournament bracket...
+                </p>
               </motion.div>
             )}
 
@@ -1132,15 +1505,23 @@ export default function TournamentsPage() {
                 <div className="w-16 h-16 bg-brand-lime/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-lime/20">
                   <Check className="w-8 h-8 text-brand-lime" strokeWidth={3} />
                 </div>
-                <h3 className="text-xl font-extrabold text-text-main">Team Registered!</h3>
-                <p className="text-xs text-text-muted mt-1">Your team has successfully secured a tournament slot.</p>
+                <h3 className="text-xl font-extrabold text-text-main">
+                  Team Registered!
+                </h3>
+                <p className="text-xs text-text-muted mt-1">
+                  Your team has successfully secured a tournament slot.
+                </p>
 
                 {/* Ticket Receipt Pass */}
                 <div className="bg-bg border border-border-default rounded-2xl p-5 mt-6 text-left relative overflow-hidden">
                   <div className="flex justify-between items-center pb-3 border-b border-dashed border-border-strong mb-4">
                     <div>
-                      <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">Registration Pass ID</span>
-                      <span className="font-extrabold text-brand-lime text-base tracking-wide">{registrationCode}</span>
+                      <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                        Registration Pass ID
+                      </span>
+                      <span className="font-extrabold text-brand-lime text-base tracking-wide">
+                        {registrationCode}
+                      </span>
                     </div>
                     <span className="bg-brand-lime text-bg text-[9px] font-black px-2.5 py-1 rounded-md uppercase">
                       Paid
@@ -1148,22 +1529,38 @@ export default function TournamentsPage() {
                   </div>
 
                   <div className="mb-4">
-                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">Tournament</span>
-                    <span className="font-bold text-text-main text-sm">{selectedTournament.title}</span>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                      Tournament
+                    </span>
+                    <span className="font-bold text-text-main text-sm">
+                      {selectedTournament.title}
+                    </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div>
-                      <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">Team Name</span>
-                      <span className="font-semibold text-text-main text-xs">{teamName}</span>
+                      <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                        Team Name
+                      </span>
+                      <span className="font-semibold text-text-main text-xs">
+                        {teamName}
+                      </span>
                     </div>
                     <div>
-                      <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">Captain</span>
-                      <span className="font-semibold text-text-main text-xs">{captainName}</span>
+                      <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                        Captain
+                      </span>
+                      <span className="font-semibold text-text-main text-xs">
+                        {captainName}
+                      </span>
                     </div>
                     <div className="col-span-2">
-                      <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">Venue Arena</span>
-                      <span className="font-semibold text-text-main text-xs">{selectedTournament.venue}</span>
+                      <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                        Venue Arena
+                      </span>
+                      <span className="font-semibold text-text-main text-xs">
+                        {selectedTournament.venue}
+                      </span>
                     </div>
                   </div>
 
@@ -1171,7 +1568,11 @@ export default function TournamentsPage() {
                   <div className="border-t border-dashed border-border-strong pt-4 flex flex-col items-center gap-2.5">
                     {qrCodeUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={qrCodeUrl} alt="Tournament Pass QR" className="w-28 h-28 rounded-xl bg-white p-1.5 border border-border-default" />
+                      <img
+                        src={qrCodeUrl}
+                        alt="Tournament Pass QR"
+                        className="w-28 h-28 rounded-xl bg-white p-1.5 border border-border-default"
+                      />
                     ) : (
                       <div className="w-28 h-28 bg-elevated animate-pulse rounded-xl" />
                     )}
@@ -1209,7 +1610,9 @@ export default function TournamentsPage() {
                 <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 border border-red-500/25">
                   <AlertCircle className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-text-main">Registration Failed</h3>
+                <h3 className="text-lg font-bold text-text-main">
+                  Registration Failed
+                </h3>
                 <p className="text-xs text-text-muted">{regError}</p>
                 <div className="flex gap-3 mt-4 w-full justify-center text-xs font-semibold">
                   <button

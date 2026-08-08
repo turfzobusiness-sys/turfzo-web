@@ -6,6 +6,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { BreadcrumbListSchema, SportsActivityLocationSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
+import { FavoriteButton } from "@/components/ui/favorite-button";
 import type { Turf } from "@/lib/types";
 
 type Props = { params: Promise<{ venueId: string }> };
@@ -13,7 +14,7 @@ type Props = { params: Promise<{ venueId: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { venueId } = await params;
   try {
-    const turf = await convexClient.query<Turf>("turfs:getById", { id: venueId });
+    const turf = await convexClient.query<Turf>("turfs:getById", { turfId: venueId });
     if (!turf) return { title: "Venue Not Found" };
 
     const sport = turf.sport_type || "Sports";
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       keywords: [`${turf.name}`, `${sport} turf ${city}`, `book ${turf.name}`, `turf booking near me`],
       alternates: { canonical: `https://turfzo.app/venues/${venueId}` },
     };
-  } catch (error) {
+  } catch {
     return { title: "Venue Not Found" };
   }
 }
@@ -37,7 +38,7 @@ export default async function VenuePage({ params }: Props) {
   
   let turf: Turf | null = null;
   try {
-    turf = await convexClient.query<Turf>("turfs:getById", { id: venueId });
+    turf = await convexClient.query<Turf>("turfs:getById", { turfId: venueId });
   } catch (err) {
     console.error("Failed to fetch venue:", err);
   }
@@ -144,6 +145,10 @@ export default async function VenuePage({ params }: Props) {
                   Check Availability & Book
                   <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                 </Link>
+                <FavoriteButton
+                  turfId={venueId}
+                  className="w-full py-3 px-6 mt-3"
+                />
                 <p className="text-center text-xs text-text-muted mt-4">
                   Free cancellation up to 24 hours in advance.
                 </p>

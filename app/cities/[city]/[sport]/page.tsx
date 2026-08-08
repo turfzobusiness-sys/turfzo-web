@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { MapPin, Star, ChevronRight, Trophy, CheckCircle2 } from "lucide-react";
+import { MapPin, ChevronRight } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, BreadcrumbListSchema, SportsActivityLocationSchema } from "@/lib/schema";
