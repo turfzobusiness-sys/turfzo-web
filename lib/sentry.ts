@@ -9,25 +9,32 @@ import { getOptionalEnv } from "./env";
 
 const dsn = getOptionalEnv("NEXT_PUBLIC_SENTRY_DSN");
 
-// Use `new Function` to make the dynamic import truly lazy at runtime,
-// so the missing-module TS error doesn't fail the build when Sentry isn't installed.
-const importSentry = new Function(
-  "return import('@sentry/nextjs')"
-) as () => Promise<{ init: (opts: Record<string, unknown>) => void }>;
+// @sentry/nextjs is an optional dependency that may not be installed.
+// `webpackIgnore` keeps the dynamic import unbundled (no build failure
+// when the package is absent) and lazy. `new Function` is not used because
+// the strict CSP forbids 'unsafe-eval'.
+async function loadSentry(): Promise<{
+  init: (opts: Record<string, unknown>) => void;
+} | null> {
+  try {
+    // @ts-expect-error @sentry/nextjs is an optional dependency (not installed)
+    const sdkModule = await import(/* webpackIgnore: true */ "@sentry/nextjs");
+    return sdkModule as { init: (opts: Record<string, unknown>) => void };
+  } catch {
+    // @sentry/nextjs not installed — silently skip.
+    return null;
+  }
+}
 
 if (typeof window !== "undefined" && dsn) {
-  void importSentry()
-    .then((Sentry) => {
-      Sentry.init({
-        dsn,
-        tracesSampleRate: 0.1,
-        replaysOnErrorSampleRate: 1.0,
-        replaysSessionSampleRate: 0,
-      });
-    })
-    .catch(() => {
-      // @sentry/nextjs not installed — silently skip.
+  void loadSentry().then((Sentry) => {
+    Sentry?.init({
+      dsn,
+      tracesSampleRate: 0.1,
+      replaysOnErrorSampleRate: 1.0,
+      replaysSessionSampleRate: 0,
     });
+  });
 }
 
 export const sentryEnabled = Boolean(dsn);

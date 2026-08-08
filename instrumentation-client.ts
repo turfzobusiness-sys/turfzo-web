@@ -23,6 +23,18 @@ export function initDatadog() {
         trackUserInteractions: true, // Enable Action tracking
         trackLongTasks: true, // Enable Long Tasks tracking
         plugins: [nextjsPlugin()],
+        beforeSend: (event) => {
+          // W4: strip URL fragments before RUM/session-replay uploads.
+          // One-time reset tokens ride in the fragment and must never
+          // reach Datadog.
+          if (event.type === "view") {
+            const url = event.view?.url;
+            if (typeof url === "string" && url.includes("#")) {
+              event.view!.url = url.split("#")[0];
+            }
+          }
+          return true;
+        },
       });
       datadogRum.startSessionReplayRecording();
     }

@@ -41,6 +41,8 @@ export interface Turf {
   is_indoor?: boolean;
   ground_count?: number;
   status?: "pending" | "approved" | "rejected" | "active" | "inactive";
+  convenience_fee?: number;
+  gst_tax?: number;
 }
 
 export interface AppUser {
@@ -175,4 +177,84 @@ export interface OnboardingState {
   user: AppUser;
   profile: OwnerProfile | null;
   payout: PayoutDetails | null;
+}
+
+// =====================================================================
+// Payment history (web app "Payments" tab)
+// =====================================================================
+export interface PaymentOrder {
+  _id: string;
+  _creationTime: number;
+  id: string;
+  user_id?: string;
+  booking_id?: string;
+  cashfree_order_id: string;
+  cashfree_payment_session_id?: string;
+  amount: number;
+  currency: string;
+  receipt: string;
+  status: string;
+  cashfree_payment_id?: string;
+  payment_status?: string;
+  verified?: boolean;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+// =====================================================================
+// Favourites (web app "Favourites" tab) — backend hydrates the turf
+// =====================================================================
+export interface FavoriteTurf {
+  id: string;
+  name: string;
+  city?: string;
+  image_url?: string;
+  price_per_hour: number;
+  rating?: number;
+  sport_type?: string;
+  is_available: boolean;
+}
+
+export interface FavoriteWithTurf {
+  _id: string;
+  _creationTime: number;
+  id: string;
+  user_id: string;
+  turf_id: string;
+  created_at: string;
+  turf: FavoriteTurf | null;
+}
+
+// =====================================================================
+// Reviews (web app "Reviews" tab)
+// =====================================================================
+export interface UserReview {
+  _id: string;
+  _creationTime: number;
+  id: string;
+  user_id: string;
+  turf_id: string;
+  booking_id: string;
+  rating: number;
+  comment?: string;
+  owner_reply?: string;
+  owner_replied_at?: string;
+  updated_at?: string;
+}
+
+// =====================================================================
+// Notifications (web app "Notifications" tab + header bell)
+// =====================================================================
+export interface UserNotification {
+  _id: string;
+  _creationTime: number;
+  id: string;
+  user_id: string;
+  title: string;
+  body: string;
+  type: string;
+  data?: unknown;
+  is_read: boolean;
+  created_at?: string;
 }

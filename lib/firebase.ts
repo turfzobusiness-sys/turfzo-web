@@ -11,6 +11,9 @@ import {
   signInWithPopup,
   sendPasswordResetEmail,
   getIdToken,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -45,5 +48,8 @@ export {
   signInWithPopup,
   sendPasswordResetEmail,
   getIdToken,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
 };
 export type { User };

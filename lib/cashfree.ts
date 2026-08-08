@@ -6,16 +6,32 @@ import { load } from "@cashfreepayments/cashfree-js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let cashfreeInstance: any = null;
 
+/**
+ * Determines whether Cashfree should run in production or sandbox mode.
+ *
+ * Priority:
+ *   1. Explicit `NEXT_PUBLIC_CASHFREE_ENV` env var ("production" | "sandbox")
+ *   2. Fallback: infer from the APP ID (TEST keys contain "test", case-insensitive)
+ */
+function resolveCashfreeMode(): "production" | "sandbox" {
+  const explicit = process.env.NEXT_PUBLIC_CASHFREE_ENV;
+  if (explicit === "production" || explicit === "sandbox") {
+    return explicit;
+  }
+  const appId = process.env.NEXT_PUBLIC_CASHFREE_APP_ID;
+  if (appId && !appId.toLowerCase().includes("test")) {
+    return "production";
+  }
+  return "sandbox";
+}
+
 export async function initializeCashfree() {
   if (cashfreeInstance) return cashfreeInstance;
-  
-  const isProd = process.env.NEXT_PUBLIC_CASHFREE_ENVIRONMENT === "production" || 
-                 (process.env.NEXT_PUBLIC_CASHFREE_APP_ID && !process.env.NEXT_PUBLIC_CASHFREE_APP_ID.includes("test"));
-                 
+
   cashfreeInstance = await load({
-    mode: isProd ? "production" : "sandbox",
+    mode: resolveCashfreeMode(),
   });
-  
+
   return cashfreeInstance;
 }
 
@@ -23,28 +39,50 @@ export interface OpenCheckoutArgs {
   paymentSessionId: string;
 }
 
-export async function openCashfreeCheckout(args: OpenCheckoutArgs): Promise<void> {
+/**
+ * Opens the Cashfree checkout in a modal popup on the current page.
+ *
+ * Resolves when the user completes the payment inside the modal.
+ * Rejects with a descriptive Error if the payment fails, the user
+ * closes the modal, or an unexpected SDK error occurs.
+ *
+ * NOTE: Even on resolve, the caller MUST verify the payment server-side
+ * via `payments:verifyCashfreePayment` — the frontend result is not
+ * a guarantee that funds were captured.
+ */
+export async function openCashfreeCheckout(
+  args: OpenCheckoutArgs,
+): Promise<void> {
   const cashfree = await initializeCashfree();
-  
+
   return new Promise((resolve, reject) => {
-    cashfree.checkout({
-      paymentSessionId: args.paymentSessionId,
-      returnUrl: window.location.href, // Cashfree will redirect back here if redirect is chosen, but we can also use seamless popup if possible.
-      // With Cashfree JS, calling checkout opens a modal if redirect is not forced.
-      // But we can just use the popup mode.
-    }).then((result: { error?: { message?: string }; redirect?: boolean; paymentDetails?: unknown }) => {
-      if(result.error){
-        reject(new Error(result.error.message || "Payment failed or cancelled"));
-      }
-      if(result.redirect){
-        // This won't happen if we use redirect: "if_required" and popup succeeds
-        // But if it does redirect, it will leave the page.
-        console.log("Redirection...")
-      }
-      if(result.paymentDetails){
-        console.log("Payment completed via popup");
-        resolve();
-      }
-    }).catch((err: unknown) => reject(err));
+    cashfree
+      .checkout({
+        paymentSessionId: args.paymentSessionId,
+        redirectTarget: "_modal",
+      })
+      .then(
+        (result: {
+          error?: { message?: string };
+          redirect?: boolean;
+          paymentDetails?: unknown;
+        }) => {
+          if (result.error) {
+            reject(
+              new Error(result.error.message || "Payment failed or cancelled"),
+            );
+            return;
+          }
+          if (result.paymentDetails) {
+            resolve();
+            return;
+          }
+          // Neither error nor paymentDetails — user dismissed the modal
+          reject(new Error("Payment was cancelled."));
+        },
+      )
+      .catch((err: unknown) => {
+        reject(err instanceof Error ? err : new Error("Checkout error."));
+      });
   });
 }
