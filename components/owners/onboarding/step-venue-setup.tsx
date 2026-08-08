@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { MapPin, Info, ArrowLeft, ArrowRight, Loader2, IndianRupee, Layers, Calendar } from "lucide-react";
+import { MapPin, Info, ArrowLeft, ArrowRight, Loader2, IndianRupee, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/ui/image-uploader";
 
@@ -57,12 +57,12 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
   const [address, setAddress] = useState(initialData.address || "");
   const [city, setCity] = useState(initialData.city || "");
   const [state, setState] = useState(initialData.state || "");
-  const [zipCode, setZipCode] = useState(initialData.zip_code || "");
+  const [zipCode] = useState(initialData.zip_code || "");
   const [price, setPrice] = useState(initialData.price_per_hour?.toString() || "");
   const [sportType, setSportType] = useState(initialData.sport_type || "football");
   const [groundCount, setGroundCount] = useState(initialData.ground_count || 1);
   const [isIndoor, setIsIndoor] = useState(initialData.is_indoor || false);
-  const [maxPlayers, setMaxPlayers] = useState(initialData.max_players || 14);
+  const [maxPlayers] = useState(initialData.max_players || 14);
   const [imageGallery, setImageGallery] = useState<string[]>(initialData.image_gallery || []);
 
   // Amenities

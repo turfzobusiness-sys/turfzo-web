@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ShieldAlert, ArrowLeft, ArrowRight, Loader2, CreditCard, Landmark, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, CreditCard, Landmark, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface PayoutData {

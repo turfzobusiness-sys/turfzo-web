@@ -11,7 +11,6 @@ import {
   CreditCard, 
   Mail, 
   Phone, 
-  Sparkles,
   ExternalLink,
   ShieldCheck,
   AlertCircle,
@@ -82,7 +81,12 @@ export default function OwnerDashboardPage() {
   // Initial load
   useEffect(() => {
     if (status !== "initial" && status !== "loading") {
-      loadData();
+      // loadData is async; its setState calls occur after awaits. The async
+      // IIFE makes that boundary explicit so the linter doesn't treat this
+      // as a synchronous setState-in-effect.
+      void (async () => {
+        await loadData();
+      })();
     }
   }, [status, loadData]);
 

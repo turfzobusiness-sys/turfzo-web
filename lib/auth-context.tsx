@@ -20,7 +20,7 @@ import {
   User as FirebaseUser,
 } from "./firebase";
 import { convexClient } from "./convex";
-import { classifyError } from "./errors";
+import { AppError, classifyError } from "./errors";
 import type { AppUser } from "./types";
 
 export type AuthStatus =
@@ -49,6 +49,16 @@ interface AuthContextValue extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  /** Current Firebase ID token for the signed-in user, if any. */
+  getIdToken: (user: FirebaseUser) => Promise<string>;
+  /**
+   * Force-refreshes the Firebase ID token and updates convexClient.authToken.
+   * Call this before any authenticated Convex action/mutation to guarantee
+   * the token hasn't expired (Firebase tokens expire after 1 hour).
+   * Returns the fresh token string, or undefined if no user is signed in.
+   */
+  getFreshToken: () => Promise<string | undefined>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -61,31 +71,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error: null,
   });
 
-  const syncConvexUser = useCallback(
-    async (firebaseUser: FirebaseUser) => {
-      try {
-        const token = await getIdToken(firebaseUser);
-        const response = await convexClient.mutation<{
-          success: boolean;
-          user: AppUser;
-          session_token: string;
-        }>("auth:syncFirebaseUser", {
+  const syncConvexUser = useCallback(async (firebaseUser: FirebaseUser) => {
+    try {
+      const token = await getIdToken(firebaseUser);
+      const response = await convexClient.action<{
+        success: boolean;
+        user: AppUser;
+        session_token: string;
+      }>(
+        "auth:syncFirebaseUser",
+        {
           displayName: firebaseUser.displayName || undefined,
-          photoURL: firebaseUser.photoURL || undefined,
+          avatarUrl: firebaseUser.photoURL || undefined,
           phoneNumber: firebaseUser.phoneNumber || undefined,
-        }, token);
-        convexClient.authToken = token;
-        if (response.success && response.user) {
-          return response.user;
-        }
-        return null;
-      } catch {
-        convexClient.authToken = null;
-        return null;
+        },
+        token,
+      );
+      convexClient.authToken = token;
+      if (response.success && response.user) {
+        return response.user;
       }
-    },
-    []
-  );
+      return null;
+    } catch {
+      convexClient.authToken = null;
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -124,12 +135,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const cred = await createUserWithEmailAndPassword(
         auth,
         opts.email,
-        opts.password
+        opts.password,
       );
       const token = await getIdToken(cred.user);
-      await convexClient.mutation<{
+      const syncResult = await convexClient.action<{
         success: boolean;
         user: AppUser;
+        error?: string;
       }>(
         "auth:syncFirebaseUser",
         {
@@ -138,8 +150,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           phoneNumber: opts.phoneNumber,
           city: opts.city,
         },
-        token
+        token,
       );
+      if (!syncResult?.success) {
+        const message =
+          syncResult?.error ?? "Account setup failed. Please try again.";
+        throw new AppError("ACCOUNT_SETUP_FAILED", message, {
+          severity: "warning",
+        });
+      }
       const convexUser = await syncConvexUser(cred.user);
       setState({
         status: "authenticated",
@@ -149,7 +168,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     } catch (err: unknown) {
       const appError = classifyError(err);
-      setState((prev) => ({ ...prev, status: "error", error: appError.message }));
+      setState((prev) => ({
+        ...prev,
+        status: "error",
+        error: appError.message,
+      }));
       throw appError;
     }
   };
@@ -167,7 +190,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     } catch (err: unknown) {
       const appError = classifyError(err);
-      setState((prev) => ({ ...prev, status: "error", error: appError.message }));
+      setState((prev) => ({
+        ...prev,
+        status: "error",
+        error: appError.message,
+      }));
       throw appError;
     }
   };
@@ -186,7 +213,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     } catch (err: unknown) {
       const appError = classifyError(err);
-      setState((prev) => ({ ...prev, status: "error", error: appError.message }));
+      setState((prev) => ({
+        ...prev,
+        status: "error",
+        error: appError.message,
+      }));
       throw appError;
     }
   };
@@ -202,6 +233,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const refreshUser = async () => {
+    const firebaseUser = auth.currentUser;
+    if (!firebaseUser) {
+      convexClient.authToken = null;
+      setState({
+        status: "unauthenticated",
+        firebaseUser: null,
+        convexUser: null,
+        error: null,
+      });
+      return;
+    }
+
+    setState((prev) => ({ ...prev, status: "loading", error: null }));
+    try {
+      const convexUser = await syncConvexUser(firebaseUser);
+      setState({
+        status: "authenticated",
+        firebaseUser,
+        convexUser,
+        error: null,
+      });
+    } catch (err: unknown) {
+      const appError = classifyError(err);
+      setState((prev) => ({
+        ...prev,
+        status: "error",
+        error: appError.message,
+      }));
+      throw appError;
+    }
+  };
+
+  /**
+   * Force-refreshes the Firebase ID token and updates convexClient.authToken.
+   * This prevents stale-token "Authentication required" errors that happen
+   * when the user has been on the page for over 1 hour.
+   */
+  const getFreshToken = useCallback(async (): Promise<string | undefined> => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return undefined;
+    const token = await getIdToken(currentUser, /* forceRefresh */ true);
+    convexClient.authToken = token;
+    return token;
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -210,6 +287,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signInWithGoogle,
         signOut,
+        refreshUser,
+        getIdToken,
+        getFreshToken,
       }}
     >
       {children}

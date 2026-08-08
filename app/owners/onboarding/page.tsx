@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowRight, Sparkles, Building, ChevronLeft } from "lucide-react";
+import { Loader2, ArrowRight, Building, ChevronLeft } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { OnboardingWizard } from "@/components/owners/onboarding/onboarding-wizard";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { convexClient } from "@/lib/convex";
 import type { OnboardingState, AppUser } from "@/lib/types";
 
 export default function OnboardingPage() {
-  const { status, convexUser, firebaseUser, signUp } = useAuth();
+  const { status, convexUser, firebaseUser } = useAuth();
   const router = useRouter();
   const [checking, setChecking] = useState(true);
   const [upgrading, setUpgrading] = useState(false);
@@ -53,7 +53,7 @@ export default function OnboardingPage() {
     try {
       const token = await firebaseUser.getIdToken();
       // Sync Firebase User with the role "owner"
-      await convexClient.mutation<{
+      await convexClient.action<{
         success: boolean;
         user: AppUser;
       }>(

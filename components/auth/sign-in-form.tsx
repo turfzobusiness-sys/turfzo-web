@@ -5,6 +5,8 @@ import { Mail, Lock, Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useAuthModal } from "@/lib/auth-modal-context";
+import { auth, setPersistence, browserLocalPersistence, browserSessionPersistence } from "@/lib/firebase";
+import { safeRedirectTarget } from "@/lib/redirect";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -24,8 +26,10 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
     toast.success("Signed in successfully!");
     setTimeout(() => {
       closeAuthModal();
-      if (returnTo) {
-        router.push(returnTo);
+      // W1: defense in depth — never push an external URL.
+      const target = safeRedirectTarget(returnTo);
+      if (target) {
+        router.push(target);
       }
     }, 2000);
   };
@@ -35,6 +39,12 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
     if (loading) return;
     setLoading(true);
     try {
+      // W10: "Remember me" now actually controls Firebase persistence —
+      // unchecked means the session dies with the browser tab.
+      await setPersistence(
+        auth,
+        rememberMe ? browserLocalPersistence : browserSessionPersistence,
+      );
       await signIn(email, password);
       handlePostAuth();
     } catch {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Check, ClipboardCheck, ArrowLeft, Loader2, Sparkles, AlertCircle, Edit2 } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles, AlertCircle, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface SummaryData {

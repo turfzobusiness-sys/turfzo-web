@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { safeRedirectTarget } from "@/lib/redirect";
 
 export type AuthMode = "signin" | "signup";
 
@@ -22,7 +23,9 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
 
   const openAuthModal = React.useCallback((nextMode: AuthMode = "signin", nextReturnTo?: string | null) => {
     setMode(nextMode);
-    setReturnTo(nextReturnTo ?? null);
+    // W1: never accept an external destination from a caller-controlled
+    // string — only same-site paths may be used post-auth.
+    setReturnTo(safeRedirectTarget(nextReturnTo));
     setIsOpen(true);
   }, []);
 

@@ -15,7 +15,6 @@ import {
   TbMapPin,
   TbChevronDown,
 } from "react-icons/tb";
-import { HiSparkles } from "react-icons/hi2";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 

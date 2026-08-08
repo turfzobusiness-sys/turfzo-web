@@ -2,28 +2,21 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Sparkles, Building, Calendar, CreditCard, ShieldCheck } from "lucide-react";
+import { Building, Calendar, CreditCard, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { SignUpForm } from "@/components/auth/sign-up-form";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { convexClient } from "@/lib/convex";
 import type { OnboardingState } from "@/lib/types";
-import { useAuthModal } from "@/lib/auth-modal-context";
 
 export default function OwnerRegisterPage() {
   const { status, convexUser } = useAuth();
-  const { openAuthModal } = useAuthModal();
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("login") === "true" || params.get("mode") === "login") {
-        setIsLogin(true);
-      }
-    }
-  }, []);
+  const [isLogin, setIsLogin] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.get("login") === "true" || params.get("mode") === "login";
+  });
 
   useEffect(() => {
     async function checkRedirect() {
