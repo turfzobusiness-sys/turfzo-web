@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   Shield,
@@ -19,50 +19,42 @@ import { convexClient } from "@/lib/convex";
 export default function SetupPage() {
   const { status, convexUser, firebaseUser } = useAuth();
   const [adminExists, setAdminExists] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [bootstrapKey, setBootstrapKey] = useState("");
   const [setupLoading, setSetupLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  useEffect(() => {
-    if (status !== "authenticated" || !firebaseUser) return;
-
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      try {
-        const token = await firebaseUser.getIdToken();
-        const result = await convexClient.query<{
-          adminExists: boolean;
-          adminCount: number;
-        }>("admin:checkAdminExists", {}, token);
-
-        if (!cancelled) {
-          setAdminExists(result.adminExists);
-          setLoading(false);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          const { getErrorMessage } = await import("@/lib/errors");
-          setError(getErrorMessage(err, "Failed to check admin status. Please try again."));
-          setLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [status, firebaseUser]);
+  // Derived (no effect): if the signed-in user is already an admin, setup is
+  // complete. Otherwise wait for the explicit check in handleSetup.
+  const isAdminUser = status === "authenticated" && convexUser?.role === "admin";
+  const effectiveAdminExists = adminExists !== null ? adminExists : isAdminUser;
 
   const handleSetup = async () => {
     if (!firebaseUser) return;
+    if (!bootstrapKey.trim()) {
+      setError("Enter the admin bootstrap key to continue.");
+      return;
+    }
     setSetupLoading(true);
     setError(null);
 
     try {
       const token = await firebaseUser.getIdToken();
-      await convexClient.mutation("admin:setupFirstAdmin", {}, token);
+      const result = await convexClient.query<{
+        adminExists: boolean;
+        adminCount: number;
+      }>("admin:checkAdminExists", { bootstrapKey: bootstrapKey.trim() }, token);
+
+      if (result.adminExists) {
+        setAdminExists(true);
+        return;
+      }
+
+      await convexClient.mutation(
+        "admin:setupFirstAdmin",
+        { bootstrapKey: bootstrapKey.trim() },
+        token,
+      );
       setSuccess(true);
     } catch (err) {
       const { getErrorMessage } = await import("@/lib/errors");
@@ -133,11 +125,7 @@ export default function SetupPage() {
               </p>
             </div>
 
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-brand-lime animate-spin" />
-              </div>
-            ) : success ? (
+            {success ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 rounded-full bg-brand-lime/20 flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-8 h-8 text-brand-lime" />
@@ -159,7 +147,7 @@ export default function SetupPage() {
                   Go to Admin Dashboard
                 </Link>
               </div>
-            ) : adminExists ? (
+            ) : effectiveAdminExists ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 rounded-full bg-error/20 flex items-center justify-center mx-auto mb-4">
                   <AlertTriangle className="w-8 h-8 text-error" />
@@ -197,6 +185,28 @@ export default function SetupPage() {
                     {error}
                   </div>
                 )}
+
+                <div>
+                  <label
+                    htmlFor="bootstrap-key"
+                    className="block text-sm font-medium text-text-main mb-1.5"
+                  >
+                    Admin Bootstrap Key
+                  </label>
+                  <input
+                    id="bootstrap-key"
+                    type="password"
+                    autoComplete="off"
+                    value={bootstrapKey}
+                    onChange={(e) => setBootstrapKey(e.target.value)}
+                    placeholder="Set via `npx convex env set ADMIN_BOOTSTRAP_KEY`"
+                    className="w-full bg-elevated border border-border-subtle rounded-md px-3 py-2.5 text-sm text-text-main placeholder:text-text-muted focus:outline-none focus:border-brand-lime"
+                  />
+                  <p className="text-text-muted text-xs mt-1.5">
+                    Required to create the first admin and to check whether
+                    setup has already been completed.
+                  </p>
+                </div>
 
                 <button
                   onClick={handleSetup}

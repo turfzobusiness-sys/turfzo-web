@@ -55,18 +55,6 @@ export default function HowItWorks() {
     },
   };
 
-  const itemVariants = {
-    hidden: { y: 15, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut" as const,
-      },
-    },
-  };
-
   return (
     <section id="how-it-works" className="py-24 sm:py-32 bg-bg border-t border-border-subtle relative overflow-hidden">
       {/* Background ambient light */}
@@ -150,7 +138,6 @@ export default function HowItWorks() {
               {/* Tactical Nodes */}
               {STEPS.map((step, idx) => {
                 const isActive = activeIdx === idx;
-                const Icon = step.icon;
                 return (
                   <div
                     key={idx}

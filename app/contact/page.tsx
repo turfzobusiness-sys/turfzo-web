@@ -18,7 +18,6 @@ import Footer from "@/components/Footer";
 import { FAQPageSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
-import { TurnstileWidget } from "@/components/TurnstileWidget";
 
 const contactFaqItems = [
   { question: "How do I contact Turfzo support?", answer: "You can reach us via email at support@turfzo.com, call us at +91 (80) 4567-8900, or use the contact form on this page. We respond within 24 hours." },
@@ -78,21 +77,16 @@ export default function ContactPage() {
   const [subject, setSubject] = useState("General Inquiry");
   const [message, setMessage] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
-    if (!turnstileToken) {
-      setErrorMsg("Please complete the bot check before submitting.");
-      return;
-    }
     setFormStep('submitting');
     setErrorMsg(null);
     try {
       await convexClient.action(
         "contact:submitContact",
-        { name, email, subject, message, turnstileToken },
+        { name, email, subject, message },
         firebaseUser ? await firebaseUser.getIdToken() : undefined
       );
       setFormStep('submitted');
@@ -108,7 +102,6 @@ export default function ContactPage() {
     setEmail("");
     setSubject("General Inquiry");
     setMessage("");
-    setTurnstileToken(null);
     setFormStep('form');
   };
 
@@ -326,20 +319,11 @@ export default function ContactPage() {
                       />
                     </div>
 
-                    {/* Bot protection */}
-                    <div className="flex justify-center py-2">
-                      <TurnstileWidget
-                        onVerify={setTurnstileToken}
-                        onExpire={() => setTurnstileToken(null)}
-                      />
-                    </div>
-
                     {/* Submit Button */}
                     <button
                       id="contact-submit"
                       type="submit"
-                      disabled={!turnstileToken}
-                      className="bg-brand-btn-bg border border-brand-lime/30 text-white hover:border-brand-lime/60 hover:bg-brand-btn-bg-hover disabled:bg-elevated/50 disabled:text-text-muted/50 disabled:border-border-default disabled:cursor-not-allowed font-sans font-bold text-sm py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-sm"
+                      className="bg-brand-btn-bg border border-brand-lime/30 text-white hover:border-brand-lime/60 hover:bg-brand-btn-bg-hover font-sans font-bold text-sm py-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-sm"
                     >
                       Send Message
                       <Send className="w-4 h-4" />

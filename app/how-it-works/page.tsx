@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Compass, 
@@ -10,11 +9,7 @@ import {
   MapPin, 
   Calendar, 
   BarChart3, 
-  Sparkles,
-  ChevronDown,
-  Clock,
-  ArrowRight,
-  CheckCircle2
+  ChevronDown
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
@@ -280,7 +275,6 @@ export default function HowItWorksPage() {
                 className="space-y-24"
               >
                 {(activeTab === "player" ? playerFlow : ownerFlow).map((step, idx) => {
-                  const Icon = step.icon;
                   const isEven = idx % 2 === 0;
                   
                   return (

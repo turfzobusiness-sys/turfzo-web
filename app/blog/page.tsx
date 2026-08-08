@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Calendar, Clock, ArrowRight, Tag } from "lucide-react";
+import { Calendar, Clock, ArrowRight } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 

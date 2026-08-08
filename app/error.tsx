@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { RefreshCw, Home } from "lucide-react";
 import { addNextjsError } from "@datadog/browser-rum-nextjs";
 
 export default function GlobalError({

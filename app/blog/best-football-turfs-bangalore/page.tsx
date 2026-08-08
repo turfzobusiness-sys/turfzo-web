@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import {
   MapPin,
   Star,
-  Clock,
   CheckCircle2,
   ArrowRight,
   ChevronDown,

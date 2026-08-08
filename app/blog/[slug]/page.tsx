@@ -5,9 +5,12 @@ import Image from "next/image";
 import { Calendar, Clock, ChevronRight } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
+import { safeJsonLd } from "@/lib/schema";
 
 // We define our schema component locally for the blog Article
-function ArticleSchema({ article }: { article: any }) {
+type ArticleSchemaArticle = { title: string; image: string };
+
+function ArticleSchema({ article }: { article: ArticleSchemaArticle }) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -21,7 +24,7 @@ function ArticleSchema({ article }: { article: any }) {
         "url": "https://turfzo.app"
       }]
   };
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />;
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }} />;
 }
 
 const blogPosts: Record<string, { title: string; category: string; readTime: string; date: string; image: string; content: React.ReactNode; excerpt: string }> = {
@@ -34,7 +37,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
     image: "/players_playing_football_1781975762157.png",
     content: (
       <>
-        <p className="mb-6">Are you tired of calling multiple turfs in your city only to find out they are fully booked? Or worse, arriving at the ground to discover your slot was double-booked? In today's fast-paced world, organizing a simple game of football or cricket with friends shouldn't feel like a part-time job.</p>
+        <p className="mb-6">Are you tired of calling multiple turfs in your city only to find out they are fully booked? Or worse, arriving at the ground to discover your slot was double-booked? In today&apos;s fast-paced world, organizing a simple game of football or cricket with friends shouldn&apos;t feel like a part-time job.</p>
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">The Broken Traditional System</h2>
         <p className="mb-4">The traditional method of booking sports venues is inherently flawed. It relies on endless WhatsApp messages, unreturned phone calls, and manual ledger books managed by turf staff. This leads to:</p>
         <ul className="list-disc pl-6 mb-6 space-y-2">
@@ -45,7 +48,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">The Turfzo Ideology: Players First</h2>
         <p className="mb-4">At Turfzo, we believe that sports should be accessible and frictionless. Our ideology is simple: <strong>Players deserve a premium, digital-first experience from discovery to kickoff.</strong> We have built our platform specifically to eliminate the friction of organizing local sports.</p>
         <h3 className="text-xl font-bold mt-8 mb-4">1. Real-Time Availability & Instant Confirmation</h3>
-        <p className="mb-4">No more waiting for a callback. Our platform syncs directly with the venue's inventory. What you see is exactly what is available. When you book a slot on Turfzo, it is instantly locked in our secure database, guaranteeing your playtime.</p>
+        <p className="mb-4">No more waiting for a callback. Our platform syncs directly with the venue&apos;s inventory. What you see is exactly what is available. When you book a slot on Turfzo, it is instantly locked in our secure database, guaranteeing your playtime.</p>
         <h3 className="text-xl font-bold mt-8 mb-4">2. Verified Venues & Authentic Reviews</h3>
         <p className="mb-4">We personally verify every turf listed on our platform. From the quality of the artificial grass to the brightness of the floodlights, we ensure the facilities meet our high standards. Plus, our community review system means you can read authentic feedback from other players before you spend a dime.</p>
         <h3 className="text-xl font-bold mt-8 mb-4">3. Transparent, Upfront Pricing</h3>
@@ -71,7 +74,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
     image: "/community_sports_tournament_1781975774951.png",
     content: (
       <>
-        <p className="mb-6">Sports have always been the ultimate community builder. Whether it's a neighborhood 5v5 football cup, a corporate weekend cricket league, or a charity badminton tournament, nothing brings people together like friendly competition. However, organizing these events can feel like a logistical nightmare.</p>
+        <p className="mb-6">Sports have always been the ultimate community builder. Whether it&apos;s a neighborhood 5v5 football cup, a corporate weekend cricket league, or a charity badminton tournament, nothing brings people together like friendly competition. However, organizing these events can feel like a logistical nightmare.</p>
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">The Logistical Nightmare of Local Tournaments</h2>
         <p className="mb-4">Community leaders and tournament organizers often face significant hurdles:</p>
         <ul className="list-disc pl-6 mb-6 space-y-2">
@@ -84,7 +87,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
         <h3 className="text-xl font-bold mt-8 mb-4">Step 1: Finding the Right Venue on Turfzo</h3>
         <p className="mb-4">The most critical part of any tournament is the venue. You need a place with consistent playability, good lighting, and proper amenities like washrooms, first-aid, and spectator seating. Artificial turfs are the most reliable option, as they are rarely affected by bad weather.</p>
         <p className="mb-4">Using Turfzo, you can filter venues that specifically cater to large events. You can easily view the exact dimensions of the pitch, the available facilities, and book consecutive slots across multiple pitches simultaneously.</p>
-        <h3 className="text-xl font-bold mt-8 mb-4">Step 2: Leveraging Turfzo's Tournament Tools (Coming Soon)</h3>
+        <h3 className="text-xl font-bold mt-8 mb-4">Step 2: Leveraging Turfzo&apos;s Tournament Tools (Coming Soon)</h3>
         <p className="mb-4">We are actively building features specifically designed for organizers:</p>
         <ul className="list-disc pl-6 mb-6 space-y-2">
           <li><strong>Bulk Booking Discounts:</strong> Seamlessly book multi-hour slots across multiple pitches at automatically applied discounted rates.</li>
@@ -94,9 +97,9 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">Tips for a Successful Event</h2>
         <p className="mb-4">While we handle the digital side, here are a few physical elements to ensure your tournament is a hit:</p>
         <ul className="list-disc pl-6 mb-6 space-y-2">
-          <li><strong>Hire Certified Referees:</strong> Don't rely on players to ref. Professional referees ensure fair play and reduce arguments.</li>
+          <li><strong>Hire Certified Referees:</strong> Don&apos;t rely on players to ref. Professional referees ensure fair play and reduce arguments.</li>
           <li><strong>Arrange Hydration and First Aid:</strong> Ensure you have plenty of water, electrolytes, and a basic medical kit on hand. (Pro-tip: Filter turfs on Turfzo that provide these amenities by default!)</li>
-          <li><strong>Document the Event:</strong> Hire a local photographer or assign someone to take high-quality photos. It adds immense value to the players' experience.</li>
+          <li><strong>Document the Event:</strong> Hire a local photographer or assign someone to take high-quality photos. It adds immense value to the players&apos; experience.</li>
         </ul>
         <p className="mb-4 font-semibold italic">Ready to host your next big event? Browse our premium multi-pitch venues today.</p>
       </>
@@ -113,9 +116,9 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
       <>
         <p className="mb-6">Running a sports facility is a capital-intensive business. Between the high cost of real estate, the installation of FIFA-certified artificial grass, and ongoing maintenance (like brushing and infill top-ups), owners need a robust strategy to ensure profitability. Maximizing the utilization rate of your pitches is the only way to achieve a strong Return on Investment (ROI).</p>
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">The High Cost of Empty Slots</h2>
-        <p className="mb-4">Every unbooked hour is lost revenue. While peak hours (evenings from 6 PM to 10 PM and weekends) might naturally sell out due to high demand, the "dead zones" (early mornings, mid-afternoons) often remain empty. The traditional approach of relying entirely on walk-ins or word-of-mouth is no longer sufficient in a competitive market.</p>
+        <p className="mb-4">Every unbooked hour is lost revenue. While peak hours (evenings from 6 PM to 10 PM and weekends) might naturally sell out due to high demand, the &quot;dead zones&quot; (early mornings, mid-afternoons) often remain empty. The traditional approach of relying entirely on walk-ins or word-of-mouth is no longer sufficient in a competitive market.</p>
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">The Turfzo Partnership Model</h2>
-        <p className="mb-4">We view turf owners as our primary partners. Turfzo isn't just another booking aggregator; it is a <strong>comprehensive management suite designed to streamline operations and aggressively drive revenue</strong>. Our platform solves the biggest headaches of facility management.</p>
+        <p className="mb-4">We view turf owners as our primary partners. Turfzo isn&apos;t just another booking aggregator; it is a <strong>comprehensive management suite designed to streamline operations and aggressively drive revenue</strong>. Our platform solves the biggest headaches of facility management.</p>
         <h3 className="text-xl font-bold mt-8 mb-4">1. Dynamic Pricing Strategies</h3>
         <p className="mb-4">To combat empty off-peak slots, Turfzo allows you to implement dynamic pricing. You can automatically lower prices during dead zones to attract students or flexible workers, while maintaining premium pricing during high-demand evening slots. Our data shows that dynamic pricing can increase overall utilization by up to 35%.</p>
         <h3 className="text-xl font-bold mt-8 mb-4">2. The Owner Dashboard Analytics</h3>
@@ -144,7 +147,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
       <>
         <p className="mb-6">For decades, amateur sports in India were confined to dusty, unmaintained public parks or expensive private club memberships. However, a massive cultural shift is currently underway. A growing middle class, increased focus on physical fitness, and the rise of local franchise leagues (like the ISL and PKL) have sparked an unprecedented demand for high-quality, accessible sports infrastructure.</p>
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">The Rise of the Pay-and-Play Model</h2>
-        <p className="mb-4">The solution to India's space constraint in sprawling metro cities like Mumbai, Bangalore, and Delhi has been the aggressive expansion of the "pay-and-play" turf model. Independent entrepreneurs are transforming unused rooftops, warehouse spaces, and vacant lots into state-of-the-art 5v5 football pitches and box cricket arenas.</p>
+        <p className="mb-4">The solution to India&apos;s space constraint in sprawling metro cities like Mumbai, Bangalore, and Delhi has been the aggressive expansion of the &quot;pay-and-play&quot; turf model. Independent entrepreneurs are transforming unused rooftops, warehouse spaces, and vacant lots into state-of-the-art 5v5 football pitches and box cricket arenas.</p>
         <p className="mb-4">This decentralized model is brilliant because it brings premium facilities directly into residential neighborhoods. Players no longer need to commute an hour to reach a decent ground.</p>
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">The Turfzo Ideology: Democratizing Access</h2>
         <p className="mb-4">While the physical infrastructure is growing, the digital infrastructure to support it has lagged behind. This is where Turfzo enters the picture. <strong>Our ideology is rooted in the democratization of sports access.</strong> We believe that finding and booking a world-class pitch should be as easy as ordering food or hailing a cab.</p>
@@ -152,7 +155,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
         <p className="mb-4">By bringing hundreds of independent sports facilities onto a single, unified digital platform, Turfzo is actively organizing a highly fragmented industry. We provide a centralized hub where players can instantly discover the best infrastructure their city has to offer, compare amenities, and secure a booking.</p>
         <h3 className="text-xl font-bold mt-8 mb-4">Supporting Grassroots Growth</h3>
         <p className="mb-4">By ensuring that these independent turf owners have the software tools to maximize their revenue and survive, we are indirectly ensuring the continued growth of grassroots sports infrastructure in India. When turf owners succeed, they build more facilities. When more facilities are built, more people play.</p>
-        <p className="mb-4 font-semibold italic">Turfzo is proud to be the digital backbone of India's amateur sports revolution.</p>
+        <p className="mb-4 font-semibold italic">Turfzo is proud to be the digital backbone of India&apos;s amateur sports revolution.</p>
       </>
     )
   },
@@ -167,9 +170,9 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
       <>
         <p className="mb-6">The debate between playing on natural grass versus artificial turf has existed since the invention of Astroturf. While natural grass is the gold standard for professional leagues, it is incredibly difficult and expensive to maintain in a high-traffic, amateur setting. Artificial turf solves the durability problem, allowing 10+ hours of play per day regardless of the weather. But what about player safety?</p>
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">The Evolution of Artificial Turf</h2>
-        <p className="mb-4">First-generation turfs (essentially thin green carpets over concrete) were notorious for causing severe abrasions ("turf burn") and joint injuries due to the lack of shock absorption. However, modern turfs have evolved drastically.</p>
+        <p className="mb-4">First-generation turfs (essentially thin green carpets over concrete) were notorious for causing severe abrasions (&quot;turf burn&quot;) and joint injuries due to the lack of shock absorption. However, modern turfs have evolved drastically.</p>
         <h3 className="text-xl font-bold mt-8 mb-4">Understanding 3G and 4G Pitches</h3>
-        <p className="mb-4">Today's premium venues use Third Generation (3G) or Fourth Generation (4G) surfaces. These feature:</p>
+        <p className="mb-4">Today&apos;s premium venues use Third Generation (3G) or Fourth Generation (4G) surfaces. These feature:</p>
         <ul className="list-disc pl-6 mb-6 space-y-2">
           <li><strong>Longer Synthetic Grass Blades:</strong> Usually 40mm to 60mm in length, mimicking the feel of real grass.</li>
           <li><strong>Shock Pads:</strong> A layer of padding underneath the carpet to absorb impact, drastically reducing stress on the knees and ankles.</li>
@@ -177,12 +180,12 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
         </ul>
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">Why Venue Verification Matters</h2>
         <p className="mb-4">The reality is that not all turfs are created equal. Some owners cut costs by skipping the shock pad or neglecting to top-up the rubber infill. Playing on a degraded turf significantly increases the risk of ACL tears and impact injuries.</p>
-        <p className="mb-4"><strong>This is where Turfzo's verification process steps in.</strong> Our ideology dictates that player safety is non-negotiable. Before a venue is listed as "Premium" or "Verified" on our platform, we assess the quality of the surface. We look for adequate infill levels, proper shock absorption, and overall maintenance standards.</p>
+        <p className="mb-4"><strong>This is where Turfzo&apos;s verification process steps in.</strong> Our ideology dictates that player safety is non-negotiable. Before a venue is listed as &quot;Premium&quot; or &quot;Verified&quot; on our platform, we assess the quality of the surface. We look for adequate infill levels, proper shock absorption, and overall maintenance standards.</p>
         <h2 className="text-2xl font-extrabold text-text-main mt-10 mb-4">Tips for Injury Prevention on Turf</h2>
         <ul className="list-disc pl-6 mb-6 space-y-2">
           <li><strong>Wear the Right Boots:</strong> Do not use firm ground (FG) metal studs or long plastic studs on artificial turf; they grip the surface too tightly and can cause knee torque injuries. Always use Artificial Grass (AG) boots or turf shoes (TF) with small rubber dimples.</li>
           <li><strong>Warm Up Properly:</strong> Artificial surfaces generate more friction. A thorough dynamic warm-up is essential to prepare your joints.</li>
-          <li><strong>Book Verified Venues:</strong> Stick to venues that maintain their pitches. Use Turfzo's filters to find highly-rated, premium venues that prioritize player safety.</li>
+          <li><strong>Book Verified Venues:</strong> Stick to venues that maintain their pitches. Use Turfzo&apos;s filters to find highly-rated, premium venues that prioritize player safety.</li>
         </ul>
         <p className="mb-4 font-semibold italic">Play hard, but play safe. Book your next game on a verified, high-quality pitch through Turfzo.</p>
       </>

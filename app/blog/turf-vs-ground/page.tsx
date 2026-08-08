@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   CheckCircle2,
-  X,
   ArrowRight,
   ChevronDown,
   ArrowLeft,

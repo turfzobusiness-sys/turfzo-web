@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  TrendingUp,
-  CheckCircle2,
   ArrowRight,
   ChevronDown,
   ArrowLeft,
