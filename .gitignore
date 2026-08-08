@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.tsscratch/
+
+# Agent and documentation files
+AGENTS.md
+DEPLOYMENT.md
+SETUP.md
+.claude/
