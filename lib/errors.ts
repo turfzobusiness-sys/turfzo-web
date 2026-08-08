@@ -41,9 +41,13 @@ export class AppError extends Error {
 // =============================================================================
 
 const FIREBASE_AUTH_MESSAGES: Record<string, string> = {
-  "auth/user-not-found": "No account found with this email.",
-  "auth/wrong-password": "Incorrect password. Please try again.",
-  "auth/email-already-in-use": "An account already exists with this email.",
+  // W5: enumeration-resistant — failed sign-in and duplicate sign-up
+  // produce the same generic outcome on the sign-in side, and sign-up
+  // duplicates are not distinguished either.
+  "auth/user-not-found": "Invalid email or password.",
+  "auth/wrong-password": "Invalid email or password.",
+  "auth/invalid-credential": "Invalid email or password.",
+  "auth/email-already-in-use": "Unable to create account. Please try again.",
   "auth/weak-password": "Password must be at least 6 characters.",
   "auth/invalid-email": "Please enter a valid email address.",
   "auth/too-many-requests":
@@ -53,7 +57,6 @@ const FIREBASE_AUTH_MESSAGES: Record<string, string> = {
   "auth/popup-closed-by-user": "Sign-in popup was closed. Try again.",
   "auth/popup-blocked":
     "Pop-up was blocked by your browser. Allow pop-ups for this site.",
-  "auth/invalid-credential": "Invalid email or password.",
   "auth/user-disabled": "This account has been disabled. Contact support.",
   "auth/operation-not-allowed":
     "This sign-in method is not enabled. Contact support.",
@@ -186,18 +189,10 @@ export function classifyError(err: unknown): AppError {
   }
 
   // --- Cashfree payment errors ---
-  if (msg.includes("cashfree") || msg.includes("Cashfree") || msg.includes("payment")) {
+  if ((msg.includes("cashfree") || msg.includes("Cashfree") || msg.includes("payment")) && !msg.includes("Could not find")) {
     return new AppError("PAYMENT_ERROR", "Payment failed. Please try again.", {
       severity: "warning",
       reportable: true,
-      cause: raw,
-    });
-  }
-
-  // --- Turnstile errors ---
-  if (msg.includes("turnstile") || msg.includes("Turnstile") || msg.includes("verification")) {
-    return new AppError("TURNSTILE_ERROR", "Verification failed. Please try again.", {
-      severity: "info",
       cause: raw,
     });
   }

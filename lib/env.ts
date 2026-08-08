@@ -15,10 +15,9 @@ type EnvKey =
   | "NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL"
   | "CONVEX_DEPLOY_KEY"
   | "NEXT_PUBLIC_CASHFREE_APP_ID"
+  | "NEXT_PUBLIC_CASHFREE_ENV"
   | "CASHFREE_SECRET_KEY"
   | "CASHFREE_WEBHOOK_SECRET"
-  | "NEXT_PUBLIC_TURNSTILE_SITE_KEY"
-  | "TURNSTILE_SECRET_KEY"
   | "NEXT_PUBLIC_SENTRY_DSN"
   | "SENTRY_AUTH_TOKEN"
   | "NEXT_PUBLIC_POSTHOG_KEY"
@@ -45,13 +44,21 @@ const PROD_REQUIRED: EnvKey[] = [
 
 const OPTIONAL_BUT_RECOMMENDED: EnvKey[] = [
   "CASHFREE_WEBHOOK_SECRET",
-  "TURNSTILE_SECRET_KEY",
   "NEXT_PUBLIC_SENTRY_DSN",
   "NEXT_PUBLIC_POSTHOG_KEY",
   "EMAIL_PROVIDER_API_KEY",
 ];
 
 function readEnv(key: EnvKey): string | undefined {
+  return readEnvRaw(key);
+}
+
+/**
+ * Read any environment variable by name (including ones outside the typed
+ * `EnvKey` union, e.g. `CONVEX_DEPLOYMENT`). Returns the trimmed value or
+ * `undefined` when unset/empty.
+ */
+function readEnvRaw(key: string): string | undefined {
   const v = process.env[key];
   if (v && v.trim().length > 0) return v.trim();
   return undefined;
@@ -70,8 +77,14 @@ export function validateEnv(): { ok: true } | { ok: false; missing: EnvKey[] } {
 
   if (missing.length > 0 && isProd) {
     const message = `[env] Missing required env vars in production: ${missing.join(", ")}`;
-    console.error(message);
-    return { ok: false, missing };
+    // W8: fail fast at RUNTIME in production — never serve a site missing
+    // core configuration. Next sets NEXT_PHASE during `next build`, where
+    // secrets are intentionally absent; builds must still succeed.
+    if (process.env.NEXT_PHASE !== "phase-production-build") {
+      console.error(message);
+      throw new Error(message);
+    }
+    console.warn(`${message} (build-time — will be enforced at runtime)`);
   }
 
   if (!isProd && !warnedOnce) {
@@ -119,18 +132,36 @@ export function isCashfreeConfigured(): boolean {
 }
 
 export function isCashfreeProdMode(): boolean {
+  const explicit = readEnv("NEXT_PUBLIC_CASHFREE_ENV");
+  if (explicit === "production") return true;
+  if (explicit === "sandbox") return false;
+  // Fallback: infer from APP ID
   const appId = readEnv("NEXT_PUBLIC_CASHFREE_APP_ID");
-  return Boolean(appId && !appId.includes("test")); // Very basic check, you could configure NEXT_PUBLIC_CASHFREE_ENVIRONMENT
+  return Boolean(appId && !appId.toLowerCase().includes("test"));
 }
 
-export function isTurnstileConfigured(): boolean {
-  return Boolean(readEnv("TURNSTILE_SECRET_KEY"));
-}
-
+/**
+ * Classify the active Convex deployment as dev/prod/unknown.
+ *
+ * Both dev and production Convex deployments are served from
+ * `*.convex.cloud`, so the deployment URL alone cannot distinguish them
+ * (the earlier heuristic returned "prod" for the dev deployment
+ * `woozy-husky-516`, which was wrong). The reliable signal is the
+ * `CONVEX_DEPLOYMENT` env var, which Convex prefixes with `dev:` or
+ * `prod:`. We fall back to the URL only when that var is unavailable.
+ */
 export function getConvexEnvironment(): "dev" | "prod" | "unknown" {
+  const deployment = readEnvRaw("CONVEX_DEPLOYMENT");
+  if (deployment) {
+    if (deployment.startsWith("dev:")) return "dev";
+    if (deployment.startsWith("prod:")) return "prod";
+  }
+
   const url = readEnv("NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL");
   if (!url) return "unknown";
-  if (url.includes(".convex.cloud")) return "prod";
+  // `*.convex.site` hosts HTTP actions and is only present on dev
+  // deployments; treat it as a dev signal. A bare `*.convex.cloud` URL
+  // is ambiguous, so we don't claim "prod" from it.
   if (url.includes(".convex.site")) return "dev";
   return "unknown";
 }
@@ -144,7 +175,6 @@ export type EnvironmentInfo = {
   convexEnvironment: "dev" | "prod" | "unknown";
   cashfreeConfigured: boolean;
   cashfreeMode: "prod" | "test" | "none";
-  turnstileConfigured: boolean;
   sentryConfigured: boolean;
   posthogConfigured: boolean;
 };
@@ -160,7 +190,6 @@ export function getEnvironmentInfo(): EnvironmentInfo {
     convexEnvironment: getConvexEnvironment(),
     cashfreeConfigured: isCashfreeConfigured(),
     cashfreeMode: isCashfreeConfigured() ? (isProdMode ? "prod" : "test") : "none",
-    turnstileConfigured: isTurnstileConfigured(),
     sentryConfigured: Boolean(readEnv("NEXT_PUBLIC_SENTRY_DSN")),
     posthogConfigured: Boolean(readEnv("NEXT_PUBLIC_POSTHOG_KEY")),
   };
@@ -173,7 +202,6 @@ export function logEnvironmentInfo(): void {
     `  Node:           ${info.nodeEnv}${info.isVercel ? ` (Vercel: ${info.vercelEnv}, region: ${info.vercelRegion})` : ""}`,
     `  Convex:         ${info.convexEnvironment}`,
     `  Cashfree:       ${info.cashfreeConfigured ? info.cashfreeMode : "not configured"}`,
-    `  Turnstile:      ${info.turnstileConfigured ? "configured" : "not configured (bot protection disabled)"}`,
     `  Sentry:         ${info.sentryConfigured ? "configured" : "not configured"}`,
     `  PostHog:        ${info.posthogConfigured ? "configured" : "not configured"}`,
   ];

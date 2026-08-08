@@ -21,17 +21,31 @@ const securityHeaders = [
     : []),
 ];
 
+// Strict CSP: no 'unsafe-eval' — SDK lazy-loaders (PostHog, Sentry) use
+// real dynamic imports, not `new Function`, so eval is never required.
+const scriptSrc = [
+  "'self'",
+  "'unsafe-inline'",
+  !isProd ? "'unsafe-eval'" : "",
+  "https://sdk.cashfree.com",
+  "https://*.cashfree.com",
+  "https://*.convex.cloud",
+  "https://apis.google.com",
+]
+  .filter(Boolean)
+  .join(" ");
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sdk.cashfree.com https://*.cashfree.com https://*.convex.cloud https://challenges.cloudflare.com https://apis.google.com",
-  "frame-src 'self' https://api.cashfree.com https://sandbox.cashfree.com https://*.cashfree.com https://challenges.cloudflare.com https://*.firebaseapp.com https://*.firebaseauth.com",
-  "connect-src 'self' https://*.cashfree.com https://api.cashfree.com https://sandbox.cashfree.com https://*.convex.cloud https://*.convex.site wss://*.convex.cloud https://*.googleapis.com https://challenges.cloudflare.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.firebaseauth.com",
+  `script-src ${scriptSrc}`,
+  "frame-src 'self' https://api.cashfree.com https://sandbox.cashfree.com https://*.cashfree.com https://*.firebaseapp.com https://*.firebaseauth.com",
+  "connect-src 'self' https://*.cashfree.com https://api.cashfree.com https://sandbox.cashfree.com https://*.convex.cloud https://*.convex.site wss://*.convex.cloud https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.firebaseauth.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self' https://*.firebaseapp.com https://*.firebaseauth.com",
+  "form-action 'self' https://*.firebaseapp.com https://*.firebaseauth.com https://*.cashfree.com https://api.cashfree.com https://sandbox.cashfree.com",
 ].join("; ");
 
 const nextConfig: NextConfig = {
