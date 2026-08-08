@@ -895,6 +895,7 @@ export default function ExplorePage() {
         cf_order_id: string;
         payment_session_id: string;
         order_amount: number;
+        error?: string;
       }>(
         "payments:createCashfreeOrder",
         {
@@ -907,6 +908,10 @@ export default function ExplorePage() {
         },
         token,
       );
+
+      if (!order.success) {
+        throw new Error(order.error || "Failed to initialize payment session.");
+      }
 
       if (!order.payment_session_id) {
         throw new Error("Failed to initialize payment session.");
