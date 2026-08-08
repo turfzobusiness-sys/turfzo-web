@@ -15,7 +15,6 @@ import {
   XCircle,
   UserCheck,
   Building2,
-  FileText,
   AlertTriangle,
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
@@ -84,10 +83,12 @@ export default function AdminPage() {
 
   const fetchData = useCallback(async () => {
     if (!firebaseUser) return;
-    setLoading(true);
-    setError(null);
     try {
       const token = await firebaseUser.getIdToken();
+      // Set state only after the first await so no setState happens
+      // synchronously within the effect that calls this function.
+      setLoading(true);
+      setError(null);
       if (tab === "pending") {
         const data = await convexClient.query<PendingOwner[]>(
           "admin:listPendingOwners",
@@ -120,7 +121,12 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (status === "authenticated" && isAdmin) {
-      fetchData();
+      // fetchData is async and its setState calls happen after an await.
+      // Wrapping in an async IIFE makes that async boundary explicit so the
+      // linter doesn't treat it as a synchronous setState-in-effect.
+      void (async () => {
+        await fetchData();
+      })();
     }
   }, [status, isAdmin, fetchData]);
 

@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/ui/image-uploader";
-import { Loader2, ArrowRight, Save, UserPlus, Image as ImageIcon } from "lucide-react";
+import { Loader2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
+import { convexClient } from "@/lib/convex";
 
 interface AdminAddOwnerFormProps {
   onSuccess: () => void;
@@ -23,7 +23,7 @@ const SPORTS_OPTIONS = [
 
 export function AdminAddOwnerForm({ onSuccess }: AdminAddOwnerFormProps) {
   const [loading, setLoading] = useState(false);
-  const createOwnerWithVenue = useMutation(api.admin.createOwnerWithVenue);
+  const { firebaseUser } = useAuth();
 
   // Form State
   const [email, setEmail] = useState("");
@@ -40,7 +40,7 @@ export function AdminAddOwnerForm({ onSuccess }: AdminAddOwnerFormProps) {
   const [panNumber, setPanNumber] = useState("");
 
   const [venueName, setVenueName] = useState("");
-  const [venueDescription, setVenueDescription] = useState("");
+  const [venueDescription] = useState("");
   const [venueAddress, setVenueAddress] = useState("");
   const [venueCity, setVenueCity] = useState("");
   const [venueState, setVenueState] = useState("");
@@ -65,6 +65,10 @@ export function AdminAddOwnerForm({ onSuccess }: AdminAddOwnerFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!firebaseUser) {
+      toast.error("You must be signed in to register an owner.");
+      return;
+    }
     setLoading(true);
     
     try {
@@ -75,7 +79,8 @@ export function AdminAddOwnerForm({ onSuccess }: AdminAddOwnerFormProps) {
       if (hasDrinkingWater) amenities.push("drinking_water");
       if (hasFirstAid) amenities.push("first_aid");
 
-      await createOwnerWithVenue({
+      const token = await firebaseUser.getIdToken();
+      await convexClient.mutation("admin:createOwnerWithVenue", {
         email,
         full_name: fullName,
         phone_number: phone,
@@ -110,14 +115,18 @@ export function AdminAddOwnerForm({ onSuccess }: AdminAddOwnerFormProps) {
           bank_ifsc_code: ifscCode,
           upi_id: upiId || undefined,
         }
-      });
+      }, token);
       
       toast.success("Owner successfully registered & approved!");
       onSuccess();
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(error.message || "Failed to register owner");
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to register owner";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -246,7 +255,23 @@ export function AdminAddOwnerForm({ onSuccess }: AdminAddOwnerFormProps) {
   );
 }
 
-function Input({ label, value, onChange, type = "text", required = false, className = "" }: any) {
+interface InputProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  required?: boolean;
+  className?: string;
+}
+
+function Input({
+  label,
+  value,
+  onChange,
+  type = "text",
+  required = false,
+  className = "",
+}: InputProps) {
   return (
     <div className={`space-y-1.5 ${className}`}>
       <label className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
@@ -263,7 +288,13 @@ function Input({ label, value, onChange, type = "text", required = false, classN
   );
 }
 
-function Checkbox({ label, checked, onChange }: any) {
+interface CheckboxProps {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+function Checkbox({ label, checked, onChange }: CheckboxProps) {
   return (
     <button
       type="button"
