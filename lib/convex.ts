@@ -1,4 +1,5 @@
 import { AppError, classifyError } from "./errors";
+import { MockConvexHttpClient } from "./mock-convex";
 
 const DEPLOYMENT_URL = process.env.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL;
 
@@ -7,6 +8,16 @@ if (!DEPLOYMENT_URL && process.env.NODE_ENV === "production") {
 }
 
 const FINAL_DEPLOYMENT_URL = DEPLOYMENT_URL ?? "https://woozy-husky-516.eu-west-1.convex.cloud";
+
+// Testing-phase toggle: NEXT_PUBLIC_USE_MOCK=true runs the whole site on
+// fixture data from lib/mock-convex.ts with zero backend calls.
+// Guard: the mock client MUST NEVER be enabled in a production build —
+// fixture data with fake auth and hardcoded PII would masquerade as the
+// real backend.
+const USE_MOCK =
+  process.env.NODE_ENV === "production"
+    ? false
+    : process.env.NEXT_PUBLIC_USE_MOCK === "true";
 
 type ConvexEndpoint = "query" | "mutation" | "action";
 
@@ -143,6 +154,7 @@ export class ConvexHttpClient {
       const rawMessage =
         (payload?.errorMessage as string) ??
         "";
+      console.error("[Convex Error]", path, rawMessage);
       throw classifyError(new Error(rawMessage));
     }
 
@@ -150,4 +162,6 @@ export class ConvexHttpClient {
   }
 }
 
-export const convexClient = new ConvexHttpClient();
+export const convexClient = USE_MOCK
+  ? new MockConvexHttpClient()
+  : new ConvexHttpClient();
