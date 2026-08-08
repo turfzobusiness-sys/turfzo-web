@@ -10,7 +10,6 @@ import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { AuthModal } from "@/components/ui/auth-modal";
 import { Toaster } from "sonner";
 import { DatadogAppRouter } from "@datadog/browser-rum-nextjs";
-import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -153,15 +152,13 @@ export default function RootLayout({
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-bg text-text-main selection:bg-brand-lime/30 selection:text-text-main">
         <DatadogAppRouter />
         <ThemeProvider>
-          <ConvexClientProvider>
-            <AuthProvider>
-              <AuthModalProvider>
-                <AnalyticsProvider>{children}</AnalyticsProvider>
-                <Toaster position="top-right" richColors />
-                <AuthModal />
-              </AuthModalProvider>
-            </AuthProvider>
-          </ConvexClientProvider>
+          <AuthProvider>
+            <AuthModalProvider>
+              <AnalyticsProvider>{children}</AnalyticsProvider>
+              <Toaster position="top-right" richColors />
+              <AuthModal />
+            </AuthModalProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

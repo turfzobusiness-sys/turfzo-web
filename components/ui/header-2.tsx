@@ -4,7 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LogOut, User as UserIcon, Sun, Moon, Monitor } from "lucide-react";
+import { LogOut, User as UserIcon, Sun, Moon, Monitor, Bell } from "lucide-react";
+import { convexClient } from "@/lib/convex";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { MenuToggleIcon } from "@/components/ui/menu-toggle-icon";
 import { useScroll } from "@/components/ui/use-scroll";
@@ -57,6 +58,54 @@ function HeaderThemeButton({ className }: { className?: string }) {
     >
       <ThemeIcon mode={mode} />
     </button>
+  );
+}
+
+function HeaderNotificationsButton({ className }: { className?: string }) {
+  const { status, convexUser } = useAuth();
+  const [unread, setUnread] = React.useState(0);
+  const isAuthed = status === "authenticated";
+
+  React.useEffect(() => {
+    if (!isAuthed || !convexUser?._id) {
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const count = await convexClient.query<number>(
+          "notifications:getUnreadCount",
+          { user_id: convexUser._id },
+        );
+        if (!cancelled) setUnread(count);
+      } catch {
+        if (!cancelled) setUnread(0);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthed, convexUser?._id]);
+
+  if (!isAuthed) return null;
+
+  return (
+    <Link
+      href="/profile?tab=notifications"
+      title="Notifications"
+      aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ""}`}
+      className={cn(
+        "relative inline-flex items-center justify-center rounded-md text-text-muted hover:bg-elevated hover:text-text-main transition-colors",
+        className,
+      )}
+    >
+      <Bell className="size-5" />
+      {unread > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 min-w-[1rem] h-4 px-1 inline-flex items-center justify-center text-[10px] font-bold bg-brand-lime text-black rounded-full">
+          {unread > 9 ? "9+" : unread}
+        </span>
+      )}
+    </Link>
   );
 }
 
@@ -169,6 +218,7 @@ export function Header() {
           <HeaderThemeButton />
           {isAuthed ? (
             <>
+              <HeaderNotificationsButton className="h-12 w-12" />
               <Link
                 href="/profile"
                 className={cn(
@@ -226,6 +276,7 @@ export function Header() {
 
         <div className="flex items-center gap-2.5 md:hidden">
           <HeaderThemeButton className="h-12 w-12" />
+          <HeaderNotificationsButton className="h-12 w-12" />
           <Button
             size="icon"
             variant="outline"

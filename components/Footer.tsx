@@ -45,9 +45,8 @@ export default function Footer() {
 
 
   const companyLinks = [
-    { name: "About Us", href: "/about" },
+    { name: "How It Works", href: "/how-it-works" },
     { name: "Blog", href: "/blog" },
-    { name: "Careers", href: "/careers" },
     { name: "Terms of Use", href: "/terms" },
     { name: "Privacy Policy", href: "/privacy" },
   ];

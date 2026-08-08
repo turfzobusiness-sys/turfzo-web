@@ -1,10 +1,20 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
-import { UploadCloud, X, Loader2, Image as ImageIcon } from "lucide-react";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import React, { useCallback, useEffect, useState } from "react";
+import { UploadCloud, X, Loader2 } from "lucide-react";
+import { convexClient } from "@/lib/convex";
 import { cn } from "@/lib/utils";
+
+// W12: images only, no SVG (script-carrying), max 5 MB each.
+const ALLOWED_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+  "image/heic",
+]);
+const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
 interface ImageUploaderProps {
   value: string[];
@@ -16,15 +26,25 @@ interface ImageUploaderProps {
 export function ImageUploader({ value = [], onChange, maxFiles = 5, className }: ImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
-  const handleUpload = async (files: FileList | null) => {
+  const handleUpload = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     
     if (value.length + files.length > maxFiles) {
       alert(`You can only upload a maximum of ${maxFiles} images.`);
       return;
+    }
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!ALLOWED_TYPES.has(file.type)) {
+        alert(`"${file.name}" is not a supported image type.`);
+        return;
+      }
+      if (file.size > MAX_FILE_BYTES) {
+        alert(`"${file.name}" exceeds the 5 MB size limit.`);
+        return;
+      }
     }
 
     setIsUploading(true);
@@ -36,8 +56,8 @@ export function ImageUploader({ value = [], onChange, maxFiles = 5, className }:
         const file = files[i];
         if (!file.type.startsWith("image/")) continue;
 
-        // 1. Get an upload URL from Convex
-        const postUrl = await generateUploadUrl();
+        // 1. Get an upload URL from Convex (auth:generateUploadUrl)
+        const postUrl = await convexClient.mutation<string>("auth:generateUploadUrl", {});
 
         // 2. Upload the file to the URL
         const result = await fetch(postUrl, {
@@ -57,7 +77,7 @@ export function ImageUploader({ value = [], onChange, maxFiles = 5, className }:
     } finally {
       setIsUploading(false);
     }
-  };
+  }, [value, maxFiles, onChange]);
 
   const removeImage = (idToRemove: string) => {
     onChange(value.filter((id) => id !== idToRemove));
@@ -81,7 +101,7 @@ export function ImageUploader({ value = [], onChange, maxFiles = 5, className }:
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       handleUpload(e.dataTransfer.files);
     }
-  }, [value, maxFiles]);
+  }, [handleUpload]);
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -144,10 +164,23 @@ export function ImageUploader({ value = [], onChange, maxFiles = 5, className }:
   );
 }
 
-import { Id } from "@/convex/_generated/dataModel";
-
 function ImagePreview({ storageId, onRemove }: { storageId: string; onRemove: () => void }) {
-  const url = useQuery(api.files.getFileUrl, { storageId: storageId as Id<"_storage"> });
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    convexClient
+      .query<string | null>("auth:resolveStorageUrl", { storageId })
+      .then((resolved) => {
+        if (!cancelled) setUrl(resolved);
+      })
+      .catch((error) => {
+        console.error("Failed to resolve image URL:", error);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [storageId]);
 
   return (
     <div className="group relative aspect-video rounded-lg overflow-hidden border border-border-default bg-surface flex items-center justify-center">
