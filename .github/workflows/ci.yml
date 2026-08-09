@@ -17,9 +17,11 @@ jobs:
 
       - name: Checkout turfzo-backend
         uses: actions/checkout@v4
+        continue-on-error: true
         with:
           repository: shaikhakramshakil/turfzo-backend
           path: turfzo-backend
+          token: ${{ secrets.GH_PAT || github.token }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
