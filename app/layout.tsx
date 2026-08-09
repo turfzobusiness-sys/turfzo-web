@@ -10,7 +10,6 @@ import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { AuthModal } from "@/components/ui/auth-modal";
 import { Toaster } from "sonner";
 import { DatadogAppRouter } from "@datadog/browser-rum-nextjs";
-import Script from "next/script";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -99,19 +98,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${nunito.variable} ${anton.variable} h-full antialiased scroll-smooth`}
+      className={`${nunito.variable} ${anton.variable} h-full antialiased scroll-smooth dark`}
       suppressHydrationWarning
     >
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/favicon.svg" />
-        <Script
-          id="theme-script"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('turfzo-theme');if(t==='light'||t==='dark'){document.documentElement.classList.add(t)}else{document.documentElement.classList.add(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')}}catch(e){document.documentElement.classList.add('dark')}})()`,
-          }}
-        />
         <OrganizationSchema
           name="Turfzo"
           url={SITE_URL}

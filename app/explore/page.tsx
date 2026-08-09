@@ -1886,7 +1886,7 @@ export default function ExplorePage() {
               </div>
 
               {/* Summary details card */}
-              <div className="bg-elevated border border-border-default rounded-xl p-4 text-xs font-semibold space-y-3">
+              <div className="bg-transparent border border-border-default rounded-xl p-4 text-xs font-semibold space-y-3">
                 <div className="flex justify-between border-b border-border-strong pb-2">
                   <div>
                     <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
@@ -1938,7 +1938,7 @@ export default function ExplorePage() {
                             Math.max(2, Math.min(22, Number(e.target.value))),
                           )
                         }
-                        className="w-full bg-surface border border-border-strong rounded-lg pl-3 pr-2 py-1.5 text-text-main text-xs font-semibold focus:outline-none focus:border-brand-lime focus:ring-1 focus:ring-brand-lime/50 transition-all"
+                        className="w-full bg-black border border-border-strong rounded-lg pl-3 pr-2 py-1.5 text-text-main text-xs font-semibold focus:outline-none focus:border-brand-lime transition-all"
                       />
                     </div>
                   </div>
@@ -1979,7 +1979,7 @@ export default function ExplorePage() {
                         key={method.key}
                         onClick={() => setSelectedPayment(method.key)}
                         className={`flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition-all duration-200
-                          ${isSelected ? "border-brand-lime bg-brand-lime/10" : "border-border-default hover:bg-elevated"}`}
+                          ${isSelected ? "border-brand-lime bg-transparent" : "border-border-default hover:bg-elevated"}`}
                       >
                         <div
                           className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 mt-0.5
@@ -2004,7 +2004,7 @@ export default function ExplorePage() {
               </div>
 
               {/* Pricing breakdown summary */}
-              <div className="bg-elevated border border-border-default rounded-xl p-4 flex flex-col gap-2 text-xs text-text-muted">
+              <div className="bg-transparent border border-border-default rounded-xl p-4 flex flex-col gap-2 text-xs text-text-muted">
                 <div className="flex justify-between">
                   <span>Base slot price</span>
                   <span className="text-text-main">

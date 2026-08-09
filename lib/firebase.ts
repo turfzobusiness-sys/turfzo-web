@@ -29,15 +29,25 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-let app: FirebaseApp;
+let app: FirebaseApp | undefined;
 let auth: Auth;
 
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
+const isConfigured = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+
+if (isConfigured) {
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+  } else {
+    app = getApps()[0];
+    auth = getAuth(app);
+  }
 } else {
-  app = getApps()[0];
-  auth = getAuth(app);
+  // Provide a safe mock to prevent page crashes during local UI development
+  auth = {
+    currentUser: null,
+    onAuthStateChanged: () => () => {},
+  } as unknown as Auth;
 }
 
 export {
