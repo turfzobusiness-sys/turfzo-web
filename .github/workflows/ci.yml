@@ -15,6 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout turfzo-backend
+        uses: actions/checkout@v4
+        with:
+          repository: shaikhakramshakil/turfzo-backend
+          path: ../turfzo-backend
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
