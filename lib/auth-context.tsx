@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useRef,
   ReactNode,
 } from "react";
 import {
@@ -17,7 +18,10 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   getIdToken,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
   User as FirebaseUser,
+  ConfirmationResult,
 } from "./firebase";
 import { convexClient } from "./convex";
 import { AppError, classifyError } from "./errors";
@@ -48,6 +52,10 @@ interface AuthContextValue extends AuthState {
   }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  /** Sends an SMS OTP to the given phone number and stores the pending confirmation. */
+  signInWithPhone: (phone: string) => Promise<void>;
+  /** Verifies the SMS OTP for a pending phone sign-in and completes login/signup. */
+  verifyPhoneOtp: (code: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
   /** Current Firebase ID token for the signed-in user, if any. */
@@ -59,6 +67,19 @@ interface AuthContextValue extends AuthState {
    * Returns the fresh token string, or undefined if no user is signed in.
    */
   getFreshToken: () => Promise<string | undefined>;
+}
+
+/**
+ * Normalizes an Indian mobile number to E.164 (+91...).
+ * Accepts "9876543210", "919876543210", "09876543210", "+919876543210".
+ * Returns the trimmed input unchanged if it can't be normalized.
+ */
+function normalizePhoneNumber(input: string): string {
+  const digits = input.replace(/\D/g, "");
+  if (digits.length === 10) return `+91${digits}`;
+  if (digits.length === 12 && digits.startsWith("91")) return `+${digits}`;
+  if (digits.length === 11 && digits.startsWith("0")) return `+91${digits.slice(1)}`;
+  return input.trim();
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -97,6 +118,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     }
   }, []);
+
+  const phoneConfirmationRef = useRef<ConfirmationResult | null>(null);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -222,7 +246,85 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInWithPhone = async (phone: string) => {
+    setState((prev) => ({ ...prev, status: "loading", error: null }));
+    let verifier: RecaptchaVerifier | null = null;
+    try {
+      // The invisible reCAPTCHA verifier must be fresh per send, and any
+      // previous widget must be cleared first (a verifier cannot be reused).
+      if (recaptchaVerifierRef.current) {
+        try {
+          recaptchaVerifierRef.current.clear();
+        } catch {
+          // widget may already be gone (e.g. modal closed) — ignore
+        }
+        recaptchaVerifierRef.current = null;
+      }
+      verifier = new RecaptchaVerifier(auth, "phone-recaptcha-container", {
+        size: "invisible",
+        callback: () => {},
+      });
+      recaptchaVerifierRef.current = verifier;
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        normalizePhoneNumber(phone),
+        verifier,
+      );
+      phoneConfirmationRef.current = confirmation;
+      // Stay in the modal on the OTP step — not fully authenticated yet.
+      setState((prev) => ({ ...prev, status: "initial", error: null }));
+    } catch (err: unknown) {
+      try {
+        verifier?.clear();
+      } catch {
+        // ignore
+      }
+      recaptchaVerifierRef.current = null;
+      const appError = classifyError(err);
+      setState((prev) => ({
+        ...prev,
+        status: "error",
+        error: appError.message,
+      }));
+      throw appError;
+    }
+  };
+
+  const verifyPhoneOtp = async (code: string) => {
+    const confirmation = phoneConfirmationRef.current;
+    if (!confirmation) {
+      const err = new AppError(
+        "PHONE_OTP_EXPIRED",
+        "Your OTP session has expired. Please request a new code.",
+        { severity: "warning" },
+      );
+      setState((prev) => ({ ...prev, status: "error", error: err.message }));
+      throw err;
+    }
+    setState((prev) => ({ ...prev, status: "loading", error: null }));
+    try {
+      const result = await confirmation.confirm(code);
+      const convexUser = await syncConvexUser(result.user);
+      phoneConfirmationRef.current = null;
+      setState({
+        status: "authenticated",
+        firebaseUser: result.user,
+        convexUser,
+        error: null,
+      });
+    } catch (err: unknown) {
+      const appError = classifyError(err);
+      setState((prev) => ({
+        ...prev,
+        status: "error",
+        error: appError.message,
+      }));
+      throw appError;
+    }
+  };
+
   const signOut = async () => {
+    phoneConfirmationRef.current = null;
     await firebaseSignOut(auth);
     convexClient.authToken = null;
     setState({
@@ -286,6 +388,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signUp,
         signIn,
         signInWithGoogle,
+        signInWithPhone,
+        verifyPhoneOtp,
         signOut,
         refreshUser,
         getIdToken,

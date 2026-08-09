@@ -161,7 +161,8 @@ export function OnboardingWizard() {
         <div className="space-y-2">
           <h2 className="font-sans text-2xl font-bold text-text-main tracking-wide">Application Submitted!</h2>
           <p className="font-sans text-sm text-text-muted leading-relaxed">
-            Thank you for registering with Turfzo! Your venue details and business credentials have been successfully logged. Our onboarding success team is verifying your registration.
+            Thank you for registering with Turfzo! Your venue details and business credentials have
+            been logged. Our onboarding team is verifying your registration.
           </p>
         </div>
         <div className="bg-[#0f1f0f]/30 border border-brand-lime/10 p-4 rounded-[12px] font-sans text-xs text-text-muted/80 text-left space-y-2">
@@ -170,9 +171,10 @@ export function OnboardingWizard() {
             What happens next?
           </p>
           <ul className="list-disc pl-4 space-y-1">
-            <li>We will review your account holder credentials and IFSC matching (typically 2-4 hours).</li>
-            <li>Once approved, your venue will appear in the Turfzo search catalog.</li>
-            <li>You will receive an email confirmation and immediate access to booking calendars.</li>
+            <li>We review your account-holder credentials and IFSC matching (typically 2-4 hours).</li>
+            <li>You will receive an email confirmation once your application is approved.</li>
+            <li>Then manage your venue — slots, pricing, bookings, and payouts — from the Turfzo app.</li>
+            <li>This page shows your live venue analytics once approved.</li>
           </ul>
         </div>
         <div className="pt-2">
@@ -180,7 +182,7 @@ export function OnboardingWizard() {
             onClick={() => window.location.href = "/owners/dashboard"}
             className="inline-flex items-center justify-center rounded-md bg-brand-btn-bg border border-brand-lime/30 text-white hover:bg-brand-btn-bg-hover hover:border-brand-lime/60 shadow-sm px-6 py-2.5 font-sans font-bold text-sm tracking-wide transition-all shadow-md shadow-brand-lime/10 cursor-pointer"
           >
-            Go to Partner Dashboard
+            Track Application Status
           </button>
         </div>
       </motion.div>

@@ -140,6 +140,10 @@ export default function AdminPage() {
         { userId },
         token
       );
+      // Best-effort approval email — never blocks the admin UI.
+      void convexClient
+        .action("admin:sendOwnerDecisionEmail", { userId, decision: "approved" }, token)
+        .catch(() => {});
       await fetchData();
       toast.success("Owner approved!");
     } catch (err) {
@@ -160,6 +164,14 @@ export default function AdminPage() {
         { userId, reason },
         token
       );
+      // Best-effort rejection email — never blocks the admin UI.
+      void convexClient
+        .action(
+          "admin:sendOwnerDecisionEmail",
+          { userId, decision: "rejected", reason },
+          token
+        )
+        .catch(() => {});
       await fetchData();
       toast.success("Owner rejected.");
     } catch (err) {

@@ -406,16 +406,38 @@ const routes: Record<string, MockHandler> = {
   "auth:syncFirebaseUser": () => ({ success: true, user: MOCK_USER }),
   "auth:updateUserProfile": () => ({ success: true }),
   "auth:getOwnerProfile": () => ({
-    success: true,
+    user: MOCK_OWNER_USER,
     profile: {
-      user: MOCK_OWNER_USER,
-      onboarding: { step: 4, completed: true },
-      turfs: mockTurfs,
+      _id: "owner_profile_mock_1",
+      user_id: "user_mock_owner_1",
+      business_name: "Akram's Sports Arena",
+      phone_number: "+919876543210",
+      gst_number: "29ABCDE1234F1Z5",
+      pan_number: "ABCDE1234F",
+      address: "Sports Complex, JP Road",
+      city: "Mumbai",
+      state: "Maharashtra",
+      zip_code: "400053",
+      onboarding_step: 4,
+      onboarding_completed: true,
+      onboarding_completed_at: "2026-07-01T00:00:00.000Z",
+      agreement_accepted: true,
+    },
+    payout: {
+      _id: "payout_mock_1",
+      owner_id: "user_mock_owner_1",
+      bank_account_holder_name: "Akram Shakil",
+      bank_account_number: "XXXXXX1234",
+      bank_ifsc_code: "HDFC0001234",
+      bank_name: "HDFC Bank",
+      upi_id: "akram@upi",
+      is_verified: true,
     },
   }),
   "auth:getOwnerTurfs": () => mockTurfs,
   "auth:completeOnboardingStep": () => ({ success: true }),
   "auth:submitOnboarding": () => ({ success: true }),
+  "auth:reapplyAsOwner": () => ({ success: true }),
   "auth:sendPasswordReset": () => ({ success: true }),
   "auth:resetPassword": () => ({ success: true }),
   "auth:resolveStorageUrl": ({ storageId }) =>
@@ -646,7 +668,20 @@ const routes: Record<string, MockHandler> = {
   "admin:listContactMessages": () => [],
   "admin:approveOwner": () => ({ success: true }),
   "admin:rejectOwner": () => ({ success: true }),
+  "admin:sendOwnerDecisionEmail": () => ({ success: true, emailSent: true }),
   "admin:createOwnerWithVenue": () => ({ success: true }),
+
+  // ── Owner analytics (display-only on web) ──────────────────────────
+  "owner_dashboard:getSummary": () => ({
+    totalEarnings: 184500,
+    availableBalance: 147600,
+    totalBookings: 412,
+    completedBookings: 358,
+    pendingBookings: 31,
+    cancelledBookings: 23,
+    completionRate: 86.89,
+    turfCount: 3,
+  }),
 };
 
 export class MockConvexHttpClient {

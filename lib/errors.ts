@@ -68,6 +68,16 @@ const FIREBASE_AUTH_MESSAGES: Record<string, string> = {
   "auth/unauthorized-continue-uri":
     "This domain is not authorized. Contact support.",
   "auth/invalid-continue-uri": "The continue URL is invalid.",
+  "auth/invalid-verification-code":
+    "Invalid OTP. Please try again.",
+  "auth/invalid-phone-number":
+    "Please enter a valid phone number.",
+  "auth/code-expired":
+    "This OTP has expired. Please request a new one.",
+  "auth/missing-verification-code":
+    "Please enter the OTP sent to your phone.",
+  "auth/quota-exceeded":
+    "OTP limit reached. Please try again later.",
 };
 
 // =============================================================================

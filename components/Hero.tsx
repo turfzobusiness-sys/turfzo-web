@@ -146,24 +146,11 @@ export default function Hero() {
               Book on the go — Get the app
             </span>
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
-              {/* App Store */}
-              <button
-                onClick={() => setShowComingSoon(true)}
-                className="flex items-center gap-2 bg-[#09090b] text-white hover:bg-black/90 h-11 w-[135px] px-3.5 rounded-lg transition-all border border-white/10 shadow-sm shrink-0"
-              >
-                <svg className="w-5 h-5 shrink-0 select-none" viewBox="0 0 24 24">
-                  <rect width="24" height="24" rx="5" fill="#007AFF" />
-                  <path fill="#ffffff" d="M12 5.5c-.3 0-.6.1-.8.4l-3.3 6.9c-.3.4-.1 1 .4 1.2.4.3 1 .1 1.2-.4l.7-1.4h5.6l.7 1.4c.2.3.5.5.8.5.2 0 .3 0 .5-.1.5-.3.6-.9.4-1.3l-3.3-6.9c-.2-.2-.5-.4-.8-.4zm-1.5 5.5l1.5-3.1 1.5 3.1h-3.0z" />
-                </svg>
-                <div className="flex flex-col items-start leading-none gap-0.5">
-                  <span className="text-[8px] font-sans uppercase font-semibold text-white/75 tracking-tight">Download on the</span>
-                  <span className="text-[11px] font-sans font-bold leading-none">App Store</span>
-                </div>
-              </button>
-
-              {/* Google Play */}
-              <button
-                onClick={() => setShowComingSoon(true)}
+              {/* Google Play (live on Play Store) */}
+              <a
+                href="https://play.google.com/store/apps/details?id=com.turfzo.app"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-[#09090b] text-white hover:bg-black/90 h-11 w-[135px] px-3.5 rounded-lg transition-all border border-white/10 shadow-sm shrink-0"
               >
                 <svg className="w-5 h-5 shrink-0 select-none" viewBox="0 0 16 16">
@@ -180,10 +167,25 @@ export default function Hero() {
                   <span className="text-[8px] font-sans uppercase font-semibold text-white/75 tracking-tight">Get it on</span>
                   <span className="text-[11px] font-sans font-bold leading-none">Google Play</span>
                 </div>
+              </a>
+
+              {/* App Store (not yet live) */}
+              <button
+                onClick={() => setShowComingSoon(true)}
+                className="flex items-center gap-2 bg-[#09090b] text-white hover:bg-black/90 h-11 w-[135px] px-3.5 rounded-lg transition-all border border-white/10 shadow-sm shrink-0"
+              >
+                <svg className="w-5 h-5 shrink-0 select-none" viewBox="0 0 24 24">
+                  <rect width="24" height="24" rx="5" fill="#007AFF" />
+                  <path fill="#ffffff" d="M12 5.5c-.3 0-.6.1-.8.4l-3.3 6.9c-.3.4-.1 1 .4 1.2.4.3 1 .1 1.2-.4l.7-1.4h5.6l.7 1.4c.2.3.5.5.8.5.2 0 .3 0 .5-.1.5-.3.6-.9.4-1.3l-3.3-6.9c-.2-.2-.5-.4-.8-.4zm-1.5 5.5l1.5-3.1 1.5 3.1h-3.0z" />
+                </svg>
+                <div className="flex flex-col items-start leading-none gap-0.5">
+                  <span className="text-[8px] font-sans uppercase font-semibold text-white/75 tracking-tight">Download on the</span>
+                  <span className="text-[11px] font-sans font-bold leading-none">App Store</span>
+                </div>
               </button>
             </div>
             {showComingSoon && (
-              <p className="text-xs text-text-muted font-sans mt-1">App coming soon on Play Store & App Store</p>
+              <p className="text-xs text-text-muted font-sans mt-1">The App Store version is coming soon — get it on Google Play today.</p>
             )}
           </div>
 

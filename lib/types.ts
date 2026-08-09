@@ -59,6 +59,9 @@ export interface AppUser {
   is_email_verified: boolean;
   is_phone_verified: boolean;
   is_approved: boolean;
+  approved_at?: string;
+  rejection_reason?: string;
+  rejection_reason_at?: string;
   firebase_uid?: string;
   favorite_sports?: string[];
   notifications_enabled: boolean;
@@ -177,6 +180,17 @@ export interface OnboardingState {
   user: AppUser;
   profile: OwnerProfile | null;
   payout: PayoutDetails | null;
+}
+
+export interface OwnerDashboardSummary {
+  totalEarnings: number;
+  availableBalance: number;
+  totalBookings: number;
+  completedBookings: number;
+  pendingBookings: number;
+  cancelledBookings: number;
+  completionRate: number;
+  turfCount: number;
 }
 
 // =====================================================================
