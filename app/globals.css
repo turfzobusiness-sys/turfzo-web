@@ -9,9 +9,9 @@
   --font-poppins: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   /* Backgrounds */
-  --color-bg: #0a0a0a;
-  --color-surface: #111111;
-  --color-elevated: #1a1a1a;
+  --color-bg: #000000;
+  --color-surface: #0a0a0a;
+  --color-elevated: #111111;
 
   /* Brand Accent & Buttons */
   --color-brand-lime: #4ADE80;
@@ -83,9 +83,9 @@
 
 /* Backward compat aliases */
 .dark {
-  --color-bg: #0a0a0a;
-  --color-surface: #111111;
-  --color-elevated: #1a1a1a;
+  --color-bg: #000000;
+  --color-surface: #0a0a0a;
+  --color-elevated: #111111;
   --color-brand-lime: #4ADE80;
   --color-brand-lime-hover: #22C55E;
   --color-brand-btn-bg: #0f1f0f;
@@ -233,9 +233,9 @@ body {
 
 /* ── Dark mode overrides ── */
 .dark .airbnb-explore-theme {
-  --ae-canvas: #1a1a1a;
-  --ae-surface-soft: #222222;
-  --ae-surface-strong: #2a2a2a;
+  --ae-canvas: #000000;
+  --ae-surface-soft: #111111;
+  --ae-surface-strong: #1a1a1a;
   --ae-hairline: rgba(255, 255, 255, 0.20);
   --ae-hairline-soft: rgba(255, 255, 255, 0.12);
   --ae-border-strong: rgba(255, 255, 255, 0.30);
