@@ -80,7 +80,7 @@ export default function HowItWorks() {
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-16 lg:gap-24 items-center">
           
           {/* LEFT PANEL: Tactical Soccer Pitch Board */}
-          <div className="relative w-full aspect-[1.5/1] max-w-[640px] bg-[#07170F] border border-brand-lime/20 rounded-2xl overflow-hidden shadow-2xl p-4 flex items-center justify-center">
+          <div className="relative w-full aspect-[1.5/1] max-w-[640px] bg-brand-btn-bg border border-brand-lime/20 rounded-2xl overflow-hidden shadow-2xl p-4 flex items-center justify-center">
             
             {/* Soccer Pitch Markings (SVG) */}
             <svg 
@@ -153,7 +153,7 @@ export default function HowItWorks() {
                     <div className={cn(
                       "w-10 h-10 -ml-5 -mt-5 rounded-full flex items-center justify-center border-2 font-sans text-xs font-extrabold transition-all duration-300",
                       isActive 
-                        ? "bg-[#16211B] border-brand-lime text-brand-lime shadow-[0_0_15px_rgba(159,232,112,0.35)] scale-110" 
+                        ? "bg-surface border-brand-lime text-brand-lime shadow-[0_0_15px_rgba(109,182,49,0.35)] scale-110" 
                         : "bg-surface border-border-default text-text-muted hover:border-border-strong hover:text-text-main hover:scale-105"
                     )}>
                       {step.num}

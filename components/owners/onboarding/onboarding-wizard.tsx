@@ -165,7 +165,7 @@ export function OnboardingWizard() {
             been logged. Our onboarding team is verifying your registration.
           </p>
         </div>
-        <div className="bg-[#0f1f0f]/30 border border-brand-lime/10 p-4 rounded-[12px] font-sans text-xs text-text-muted/80 text-left space-y-2">
+        <div className="bg-brand-btn-bg/30 border border-brand-lime/10 p-4 rounded-[12px] font-sans text-xs text-text-muted/80 text-left space-y-2">
           <p className="font-semibold text-text-main flex items-center gap-1">
             <Sparkles className="h-3.5 w-3.5 text-brand-lime fill-current" />
             What happens next?
@@ -250,8 +250,8 @@ export function OnboardingWizard() {
             <span className="font-sans text-xs font-semibold text-text-main">
               Application Progress: {percentComplete}%
             </span>
-            <span className="font-sans text-[11px] text-[#22c55e] flex items-center gap-1 mt-0.5 justify-end">
-              <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" />
+            <span className="font-sans text-[11px] text-brand-lime flex items-center gap-1 mt-0.5 justify-end">
+              <span className="w-1.5 h-1.5 bg-brand-lime rounded-full animate-pulse" />
               Draft saved ✓
             </span>
           </div>

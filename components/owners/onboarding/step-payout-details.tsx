@@ -85,7 +85,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
         </p>
       </div>
 
-      <div className="bg-[#0f1c0f]/40 border border-brand-lime/10 p-3.5 rounded-[12px] flex items-start gap-3">
+      <div className="bg-brand-btn-bg/40 border border-brand-lime/10 p-3.5 rounded-[12px] flex items-start gap-3">
         <Landmark className="h-5 w-5 text-brand-lime mt-0.5 shrink-0" />
         <div className="text-xs font-sans text-text-muted/80 leading-normal">
           <p className="font-semibold text-text-main">Automatic Daily Settlements</p>

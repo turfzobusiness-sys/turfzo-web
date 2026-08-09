@@ -71,7 +71,7 @@ export default function Hero() {
           {/* Heading in Google Anton Font */}
           <h1 className="font-anton italic text-5xl sm:text-7xl lg:text-[5.8rem] font-normal leading-[0.9] tracking-tighter text-text-main dark:text-white uppercase text-left max-w-2xl transition-all duration-200">
             YOUR GAME<br />
-            STARTS <span className="text-[#5eb13c] dark:text-[#6DFF7A]">HERE</span>
+            STARTS <span className="text-brand-lime">HERE</span>
           </h1>
 
           {/* Subheading */}
@@ -83,7 +83,7 @@ export default function Hero() {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-start gap-4 w-full max-w-sm mx-auto lg:mx-0 lg:max-w-none">
             <a
               href="#explore"
-              className="group bg-[#5eb13c] hover:bg-brand-lime-hover text-white dark:bg-[#6DFF7A] dark:hover:bg-[#52E05E] dark:text-[#0a1c12] font-sans font-semibold px-6 py-3.5 rounded-md transition-all duration-200 flex items-center gap-2 w-full sm:w-auto justify-center shadow-md cursor-pointer text-sm"
+              className="group bg-brand-lime hover:bg-brand-lime-hover text-brand-btn-bg font-sans font-semibold px-6 py-3.5 rounded-md transition-all duration-200 flex items-center gap-2 w-full sm:w-auto justify-center shadow-md cursor-pointer text-sm"
             >
               Book a Turf
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -95,7 +95,7 @@ export default function Hero() {
             >
               How it works
               <span className="flex items-center justify-center w-5 h-5 rounded-full bg-text-main/5 border border-border-default group-hover:bg-brand-lime/10 group-hover:border-brand-lime/20 transition-all">
-                <svg className="w-1.5 h-1.5 fill-current text-text-main group-hover:text-[#5eb13c] dark:group-hover:text-brand-lime ml-0.5" viewBox="0 0 24 24">
+                <svg className="w-1.5 h-1.5 fill-current text-text-main group-hover:text-brand-lime ml-0.5" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </span>
@@ -108,8 +108,8 @@ export default function Hero() {
           <div className="mt-16 pt-8 border-t border-border-default/50 grid grid-cols-3 gap-6 text-left max-w-xl">
             {/* Stat 1 */}
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl border border-[#5eb13c]/35 dark:border-[#6DFF7A]/30 flex items-center justify-center shrink-0">
-                <Calendar className="w-5 h-5 text-[#5eb13c] dark:text-[#6DFF7A]" />
+              <div className="w-11 h-11 rounded-xl border border-brand-lime/30 flex items-center justify-center shrink-0">
+                <Calendar className="w-5 h-5 text-brand-lime" />
               </div>
               <div className="flex flex-col">
                 <span className="font-sans text-xl font-bold text-text-main dark:text-white leading-none">500+</span>
@@ -119,8 +119,8 @@ export default function Hero() {
 
             {/* Stat 2 */}
             <div className="flex items-center gap-3.5 pl-2">
-              <div className="w-11 h-11 rounded-xl border border-[#5eb13c]/35 dark:border-[#6DFF7A]/30 flex items-center justify-center shrink-0">
-                <Users className="w-5 h-5 text-[#5eb13c] dark:text-[#6DFF7A]" />
+              <div className="w-11 h-11 rounded-xl border border-brand-lime/30 flex items-center justify-center shrink-0">
+                <Users className="w-5 h-5 text-brand-lime" />
               </div>
               <div className="flex flex-col">
                 <span className="font-sans text-xl font-bold text-text-main dark:text-white leading-none">50K+</span>
@@ -130,8 +130,8 @@ export default function Hero() {
 
             {/* Stat 3 */}
             <div className="flex items-center gap-3.5 pl-2">
-              <div className="w-11 h-11 rounded-xl border border-[#5eb13c]/35 dark:border-[#6DFF7A]/30 flex items-center justify-center shrink-0">
-                <Trophy className="w-5 h-5 text-[#5eb13c] dark:text-[#6DFF7A]" />
+              <div className="w-11 h-11 rounded-xl border border-brand-lime/30 flex items-center justify-center shrink-0">
+                <Trophy className="w-5 h-5 text-brand-lime" />
               </div>
               <div className="flex flex-col">
                 <span className="font-sans text-xl font-bold text-text-main dark:text-white leading-none">1000+</span>

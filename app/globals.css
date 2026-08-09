@@ -4,32 +4,33 @@
 
 /* shadcn-style data-slot animation utilities used by <Header /> mobile menu */
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
   --font-anton: var(--font-anton), Impact, sans-serif;
-  --font-poppins: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-poppins: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
 
   /* Backgrounds */
   --color-bg: #000000;
-  --color-surface: #0a0a0a;
-  --color-elevated: #111111;
+  --color-surface: #000000;
+  --color-elevated: #0a0a0a;
 
   /* Brand Accent & Buttons */
-  --color-brand-lime: #4ADE80;
-  /* Warm Grass Green Accent */
-  --color-brand-lime-hover: #22C55E;
-  --color-brand-btn-bg: #0f1f0f;
-  /* Dark Green Button Bg */
-  --color-brand-btn-bg-hover: #162f16;
-  /* Dark Green Button Hover Bg */
+  --color-brand-lime: #6DB631;
+  --color-brand-lime-hover: #5CA426;
+  --color-brand-lime-light: #8ED45A;
+  --color-brand-btn-bg: #0D0D0D;
+  --color-brand-btn-bg-hover: #161C19;
 
   /* Text */
-  --color-text-main: #F5F5F5;
-  --color-text-muted: #A3A3A3;
+  --color-text-main: #F4F7F4;
+  --color-text-secondary: #C3CBC4;
+  --color-text-muted: #8B9E93;
+  --color-text-hint: #707D73;
 
   /* Borders */
-  --color-border-subtle: rgba(255, 255, 255, 0.10);
-  --color-border-default: rgba(255, 255, 255, 0.15);
-  --color-border-strong: rgba(255, 255, 255, 0.25);
+  --color-border-subtle: #2A362F;
+  --color-border-default: #324138;
+  --color-border-strong: #324138;
+  --color-border-focused: #6DB631;
   --color-border-glow: rgba(255, 255, 255, 0.15);
 
   /* Status */
@@ -50,14 +51,15 @@
   /* QR code */
   --color-qr-bg: #FFFFFF;
 
-  /* Radii - Tightened for Geist */
-  --radius-sm: 6px;
-  --radius-md: 8px;
+  /* Radii - Aligned with Flutter app */
+  --radius-sm: 8px;
+  --radius-md: 10px;
   --radius-lg: 12px;
-  --radius-pill: 999px;
+  --radius-xl: 14px;
+  --radius-pill: 24px;
 
   /* Shadows - Flattened */
-  --shadow-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-card-shadow: 0 12px 20px rgba(0, 0, 0, 0.09);
 }
 
 /* ========== LIGHT MODE ========== */
@@ -84,21 +86,25 @@
 /* Backward compat aliases */
 .dark {
   --color-bg: #000000;
-  --color-surface: #0a0a0a;
-  --color-elevated: #111111;
-  --color-brand-lime: #4ADE80;
-  --color-brand-lime-hover: #22C55E;
-  --color-brand-btn-bg: #0f1f0f;
-  --color-brand-btn-bg-hover: #162f16;
-  --color-text-main: #F5F5F5;
-  --color-text-muted: #A3A3A3;
-  --color-border-subtle: rgba(255, 255, 255, 0.10);
-  --color-border-default: rgba(255, 255, 255, 0.15);
-  --color-border-strong: rgba(255, 255, 255, 0.25);
+  --color-surface: #000000;
+  --color-elevated: #0a0a0a;
+  --color-brand-lime: #6DB631;
+  --color-brand-lime-hover: #5CA426;
+  --color-brand-lime-light: #8ED45A;
+  --color-brand-btn-bg: #0D0D0D;
+  --color-brand-btn-bg-hover: #161C19;
+  --color-text-main: #F4F7F4;
+  --color-text-secondary: #C3CBC4;
+  --color-text-muted: #8B9E93;
+  --color-text-hint: #707D73;
+  --color-border-subtle: #2A362F;
+  --color-border-default: #324138;
+  --color-border-strong: #324138;
+  --color-border-focused: #6DB631;
   --color-border-glow: rgba(255, 255, 255, 0.15);
   --color-overlay: rgba(0, 0, 0, 0.6);
   --color-overlay-heavy: rgba(0, 0, 0, 0.8);
-  --shadow-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-card-shadow: 0 12px 20px rgba(0, 0, 0, 0.09);
 }
 
 /* Base custom resets */
@@ -110,7 +116,7 @@
 body {
   background-color: var(--color-bg);
   color: var(--color-text-main);
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-nunito), sans-serif;
   overflow-x: hidden;
 }
 
@@ -187,8 +193,8 @@ body {
    ================================================================ */
 .airbnb-explore-theme {
   /* Brand Accent — "Rausch" */
-  --ae-primary: #4ADE80;
-  --ae-primary-active: #22C55E;
+  --ae-primary: #6DB631;
+  --ae-primary-active: #5CA426;
   --ae-primary-disabled: #bbf7d0;
   --ae-on-primary: #ffffff;
 
@@ -234,15 +240,15 @@ body {
 /* ── Dark mode overrides ── */
 .dark .airbnb-explore-theme {
   --ae-canvas: #000000;
-  --ae-surface-soft: #111111;
-  --ae-surface-strong: #1a1a1a;
-  --ae-hairline: rgba(255, 255, 255, 0.20);
-  --ae-hairline-soft: rgba(255, 255, 255, 0.12);
-  --ae-border-strong: rgba(255, 255, 255, 0.30);
-  --ae-ink: #ffffff;
-  --ae-body: #e5e5e5;
-  --ae-muted: #b3b3b3;
-  --ae-muted-soft: #8a8a8a;
+  --ae-surface-soft: #161C19;
+  --ae-surface-strong: #1E2622;
+  --ae-hairline: #2A362F;
+  --ae-hairline-soft: #2A362F;
+  --ae-border-strong: #324138;
+  --ae-ink: #F4F7F4;
+  --ae-body: #C3CBC4;
+  --ae-muted: #8B9E93;
+  --ae-muted-soft: #707D73;
   --ae-scrim: rgba(0, 0, 0, 0.8);
   --ae-shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.06),
     0 2px 8px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);

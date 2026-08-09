@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Anton } from "next/font/google";
+import { Nunito, Anton } from "next/font/google";
 import "./globals.css";
 import "@/lib/env-init";
 import { AuthProvider } from "@/lib/auth-context";
@@ -10,10 +10,11 @@ import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { AuthModal } from "@/components/ui/auth-modal";
 import { Toaster } from "sonner";
 import { DatadogAppRouter } from "@datadog/browser-rum-nextjs";
+import Script from "next/script";
 
-const inter = Inter({
+const nunito = Nunito({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-nunito",
 });
 
 const anton = Anton({
@@ -98,13 +99,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${anton.variable} h-full antialiased scroll-smooth`}
+      className={`${nunito.variable} ${anton.variable} h-full antialiased scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/favicon.svg" />
-        <script
+        <Script
+          id="theme-script"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('turfzo-theme');if(t==='light'||t==='dark'){document.documentElement.classList.add(t)}else{document.documentElement.classList.add(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')}}catch(e){document.documentElement.classList.add('dark')}})()`,
           }}

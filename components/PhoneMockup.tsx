@@ -149,7 +149,7 @@ export default function PhoneMockup() {
 
                 {/* Discount Badge — Bottom Center */}
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
-                  <div className="bg-[#0f1f0f] border border-brand-lime/30 text-brand-lime font-sans font-bold text-[9px] px-4 py-[6px] rounded-full tracking-wider whitespace-nowrap shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
+                  <div className="bg-brand-btn-bg border border-brand-lime/30 text-brand-lime font-sans font-bold text-[9px] px-4 py-[6px] rounded-full tracking-wider whitespace-nowrap shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
                     UP TO 20% OFF
                   </div>
                 </div>

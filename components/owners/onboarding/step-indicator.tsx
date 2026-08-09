@@ -133,7 +133,7 @@ export function StepIndicator({ currentStep, completedSteps, onStepClick }: Step
                   isCompleted
                     ? "bg-brand-lime/15 border-brand-lime text-brand-lime shadow-md shadow-brand-lime/5"
                     : isActive
-                    ? "bg-[#0f1f0f] border-brand-lime text-brand-lime ring-4 ring-brand-lime/10 scale-105"
+                    ? "bg-brand-btn-bg border-brand-lime text-brand-lime ring-4 ring-brand-lime/10 scale-105"
                     : "bg-surface border-border-default text-text-muted group-hover:border-border-strong group-hover:bg-elevated"
                 )}
               >

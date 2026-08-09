@@ -13,10 +13,10 @@ import {
   TbShieldCheck,
   TbDeviceMobile,
   TbMapPin,
-  TbChevronDown,
 } from "react-icons/tb";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
+import { FaqAccordion } from "@/components/ui/faq-accordion";
 
 const OWNER_FAQS = [
   {
@@ -43,11 +43,10 @@ const OWNER_FAQS = [
 
 export default function OwnersPage() {
   const router = useRouter();
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [iotLightOn, setIotLightOn] = useState(true);
 
   return (
-    <div className="airbnb-explore-theme flex flex-col min-h-screen bg-[#fafafa] dark:bg-[#1a1a1a]">
+    <div className="airbnb-explore-theme flex flex-col min-h-screen bg-[#fafafa] dark:bg-elevated">
       <Header />
 
       <main className="flex-grow pt-24 pb-16">
@@ -56,7 +55,7 @@ export default function OwnersPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="relative -mt-24 overflow-hidden bg-gradient-to-br from-[#dcfce7] via-[#f0fdf4] to-[#bbf7d0] dark:from-[#0f1f0f] dark:via-[#162016] dark:to-[#0d1a0d]"
+          className="relative -mt-24 overflow-hidden bg-gradient-to-br from-[#dcfce7] via-[#f0fdf4] to-[#bbf7d0] dark:from-brand-btn-bg dark:via-surface dark:to-elevated"
         >
           {/* Background image — subtle */}
           <div
@@ -65,8 +64,8 @@ export default function OwnersPage() {
           />
 
           {/* Decorative green gradient orb */}
-          <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#4ADE80]/8 rounded-full blur-3xl z-0" />
-          <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#4ADE80]/5 rounded-full blur-3xl z-0" />
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-brand-lime/8 rounded-full blur-3xl z-0" />
+          <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-brand-lime/5 rounded-full blur-3xl z-0" />
 
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-28 py-16 sm:py-20 lg:py-24 px-6 sm:px-10 lg:px-20 max-w-[1760px] mx-auto w-full">
             {/* Left — copy */}
@@ -168,7 +167,7 @@ export default function OwnersPage() {
         </motion.section>
 
         {/* FEATURES */}
-        <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
+        <div className="border-t border-gray-200 dark:border-border-default" />
         <section id="features" className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14">
           <div className="text-center mb-16 max-w-2xl mx-auto">
             <span className="text-[11px] font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase">
@@ -190,10 +189,10 @@ export default function OwnersPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="bg-white dark:bg-[#282828] rounded-2xl p-7 flex flex-col"
+              className="bg-white dark:bg-surface rounded-2xl p-7 flex flex-col"
             >
-              <div className="w-11 h-11 rounded-2xl bg-[#22c55e]/15 flex items-center justify-center mb-5">
-                <TbCalendarTime className="w-5 h-5 text-[#16a34a]" />
+              <div className="w-11 h-11 rounded-2xl bg-brand-lime/15 flex items-center justify-center mb-5">
+                <TbCalendarTime className="w-5 h-5 text-brand-lime" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 Automated Slot Booking
@@ -203,25 +202,25 @@ export default function OwnersPage() {
                 dynamically for morning discounts or peak evening slots.
               </p>
 
-              <div className="mt-auto bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] rounded-xl p-4 text-xs shadow-sm">
-                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-[#2a2a2a] pb-2 font-semibold tracking-wider uppercase text-[10px]">
+              <div className="mt-auto bg-gray-50 dark:bg-elevated border border-gray-200 dark:border-border-default rounded-xl p-4 text-xs shadow-sm">
+                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-border-default pb-2 font-semibold tracking-wider uppercase text-[10px]">
                   <span>Timetable</span>
-                  <span className="text-[#16a34a]">Live Sync</span>
+                  <span className="text-brand-lime">Live Sync</span>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2.5 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-lg">
-                    <span className="font-bold text-[#16a34a]">06:00 PM – 07:00 PM</span>
-                    <span className="text-[#16a34a] font-bold">Paid via Turfzo</span>
+                  <div className="flex items-center justify-between p-2.5 bg-brand-lime/10 border border-brand-lime/20 rounded-lg">
+                    <span className="font-bold text-brand-lime">06:00 PM – 07:00 PM</span>
+                    <span className="text-brand-lime font-bold">Paid via Turfzo</span>
                   </div>
-                  <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#282828] border border-gray-200 dark:border-[#2a2a2a] rounded-lg shadow-sm">
+                  <div className="flex items-center justify-between p-2.5 bg-white dark:bg-surface border border-gray-200 dark:border-border-default rounded-lg shadow-sm">
                     <span className="font-medium text-gray-600 dark:text-gray-300">07:00 PM – 08:00 PM</span>
-                    <span className="text-[#16a34a] font-bold">
+                    <span className="text-brand-lime font-bold">
                       ₹1,500 <TbBolt className="inline w-3 h-3" />
                     </span>
                   </div>
-                  <div className="flex items-center justify-between p-2.5 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-lg">
-                    <span className="font-bold text-[#16a34a]">08:00 PM – 09:00 PM</span>
-                    <span className="text-[#16a34a] font-bold">Paid via Turfzo</span>
+                  <div className="flex items-center justify-between p-2.5 bg-brand-lime/10 border border-brand-lime/20 rounded-lg">
+                    <span className="font-bold text-brand-lime">08:00 PM – 09:00 PM</span>
+                    <span className="text-brand-lime font-bold">Paid via Turfzo</span>
                   </div>
                 </div>
               </div>
@@ -233,10 +232,10 @@ export default function OwnersPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-white dark:bg-[#282828] rounded-2xl p-7 flex flex-col"
+              className="bg-white dark:bg-surface rounded-2xl p-7 flex flex-col"
             >
-              <div className="w-11 h-11 rounded-2xl bg-[#22c55e]/15 flex items-center justify-center mb-5">
-                <TbCpu className="w-5 h-5 text-[#16a34a]" />
+              <div className="w-11 h-11 rounded-2xl bg-brand-lime/15 flex items-center justify-center mb-5">
+                <TbCpu className="w-5 h-5 text-brand-lime" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 IoT Light & Gate Automation
@@ -247,11 +246,11 @@ export default function OwnersPage() {
                 PIN codes.
               </p>
 
-              <div className="mt-auto bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] rounded-xl p-4 text-xs shadow-sm">
-                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-[#2a2a2a] pb-2 font-semibold tracking-wider uppercase text-[10px]">
+              <div className="mt-auto bg-gray-50 dark:bg-elevated border border-gray-200 dark:border-border-default rounded-xl p-4 text-xs shadow-sm">
+                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-border-default pb-2 font-semibold tracking-wider uppercase text-[10px]">
                   <span>IoT Smart Box</span>
-                  <span className="text-[#16a34a] flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-[#16a34a] rounded-full animate-pulse" />{" "}
+                  <span className="text-brand-lime flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-brand-lime rounded-full animate-pulse" />{" "}
                     Connected
                   </span>
                 </div>
@@ -260,12 +259,12 @@ export default function OwnersPage() {
                   <span className="text-gray-600 dark:text-gray-300 font-medium">
                     Smart Gate PIN Lock
                   </span>
-                  <span className="font-mono bg-white dark:bg-[#282828] px-2.5 py-0.5 rounded-lg border border-gray-200 dark:border-[#3a3a3a] text-gray-900 dark:text-white text-[11px] shadow-sm">
+                  <span className="font-mono bg-white dark:bg-surface px-2.5 py-0.5 rounded-lg border border-gray-200 dark:border-border-strong text-gray-900 dark:text-white text-[11px] shadow-sm">
                     #4819
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between py-1.5 mt-1 border-t border-gray-200 dark:border-[#2a2a2a]">
+                <div className="flex items-center justify-between py-1.5 mt-1 border-t border-gray-200 dark:border-border-default">
                   <span className="text-gray-600 dark:text-gray-300 font-medium">
                     Floodlight Controller
                   </span>
@@ -273,17 +272,17 @@ export default function OwnersPage() {
                     onClick={() => setIotLightOn((v) => !v)}
                     className={`px-3 py-1 rounded-lg font-bold text-[10px] uppercase transition-colors select-none cursor-pointer ${
                       iotLightOn
-                        ? "bg-[#16a34a] text-white shadow-sm"
-                        : "bg-white dark:bg-[#282828] border border-gray-200 dark:border-[#3a3a3a] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                        ? "bg-brand-lime text-white shadow-sm"
+                        : "bg-white dark:bg-surface border border-gray-200 dark:border-border-strong text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
                     {iotLightOn ? "Lights: ON" : "Lights: OFF"}
                   </button>
                 </div>
 
-                <div className="mt-3 h-1 w-full bg-gray-200 dark:bg-[#2a2a2a] rounded-full overflow-hidden">
+                <div className="mt-3 h-1 w-full bg-gray-200 dark:bg-border-default rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#16a34a] transition-all duration-300 rounded-full"
+                    className="h-full bg-brand-lime transition-all duration-300 rounded-full"
                     style={{ width: iotLightOn ? "100%" : "0%" }}
                   />
                 </div>
@@ -296,10 +295,10 @@ export default function OwnersPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white dark:bg-[#282828] rounded-2xl p-7 flex flex-col"
+              className="bg-white dark:bg-surface rounded-2xl p-7 flex flex-col"
             >
-              <div className="w-11 h-11 rounded-2xl bg-[#22c55e]/15 flex items-center justify-center mb-5">
-                <TbWallet className="w-5 h-5 text-[#16a34a]" />
+              <div className="w-11 h-11 rounded-2xl bg-brand-lime/15 flex items-center justify-center mb-5">
+                <TbWallet className="w-5 h-5 text-brand-lime" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 24h Settlement Payouts
@@ -310,14 +309,14 @@ export default function OwnersPage() {
                 automatically.
               </p>
 
-              <div className="mt-auto bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] rounded-xl p-4 text-xs shadow-sm">
-                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-[#2a2a2a] pb-2 font-semibold tracking-wider uppercase text-[10px]">
+              <div className="mt-auto bg-gray-50 dark:bg-elevated border border-gray-200 dark:border-border-default rounded-xl p-4 text-xs shadow-sm">
+                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-border-default pb-2 font-semibold tracking-wider uppercase text-[10px]">
                   <span>Settlement SLA</span>
-                  <span className="text-[#16a34a]">Processing</span>
+                  <span className="text-brand-lime">Processing</span>
                 </div>
-                <div className="relative pl-4 border-l border-gray-300 dark:border-[#3a3a3a] space-y-3 py-1 text-[11px]">
+                <div className="relative pl-4 border-l border-gray-300 dark:border-border-strong space-y-3 py-1 text-[11px]">
                   <div className="relative">
-                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-[#16a34a] border-2 border-gray-50 dark:border-[#1a1a1a]" />
+                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-brand-lime border-2 border-gray-50 dark:border-elevated" />
                     <div className="font-semibold text-gray-900 dark:text-white">
                       Booking Complete
                     </div>
@@ -326,7 +325,7 @@ export default function OwnersPage() {
                     </div>
                   </div>
                   <div className="relative">
-                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-[#16a34a] border-2 border-gray-50 dark:border-[#1a1a1a]" />
+                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-brand-lime border-2 border-gray-50 dark:border-elevated" />
                     <div className="font-semibold text-gray-900 dark:text-white">
                       Escrow Cleared
                     </div>
@@ -335,8 +334,8 @@ export default function OwnersPage() {
                     </div>
                   </div>
                   <div className="relative">
-                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-[#16a34a] border-2 border-gray-50 dark:border-[#1a1a1a]" />
-                    <div className="font-semibold text-[#16a34a]">
+                    <span className="absolute -left-[20.5px] top-1 w-2.5 h-2.5 rounded-full bg-brand-lime border-2 border-gray-50 dark:border-elevated" />
+                    <div className="font-semibold text-brand-lime">
                       Bank Transfer SLA
                     </div>
                     <div className="text-[10px] text-gray-500 dark:text-gray-400">
@@ -350,9 +349,9 @@ export default function OwnersPage() {
         </section>
 
         {/* REGISTRATION CTA */}
-        <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
+        <div className="border-t border-gray-200 dark:border-border-default" />
         <section id="register" className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-20 scroll-mt-12">
-          <div className="text-center max-w-2xl mx-auto bg-white dark:bg-[#1f1f1f] border border-gray-200 dark:border-[#2a2a2a] p-10 rounded-2xl">
+          <div className="text-center max-w-2xl mx-auto bg-white dark:bg-surface border border-gray-200 dark:border-border-default p-10 rounded-2xl">
             <h2 className="text-3xl font-bold mt-3 text-gray-900 dark:text-white tracking-tight">
               Ready to Upgrade Your Venue?
             </h2>
@@ -370,22 +369,22 @@ export default function OwnersPage() {
         </section>
 
         {/* TRUST BADGES */}
-        <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
+        <div className="border-t border-gray-200 dark:border-border-default" />
         <section className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                icon: <TbShieldCheck className="w-5 h-5 text-[#4ADE80]" />,
+                icon: <TbShieldCheck className="w-5 h-5 text-brand-lime" />,
                 title: "Secure & Certified",
                 desc: "All IoT hardware is CE/FCC certified, with custom server firewall protection to prevent lighting malfunctions or power overload.",
               },
               {
-                icon: <TbDeviceMobile className="w-5 h-5 text-[#4ADE80]" />,
+                icon: <TbDeviceMobile className="w-5 h-5 text-brand-lime" />,
                 title: "Partner App Controls",
                 desc: "Manage slots, override floodlights manually, block academy schedule hours, and review analytics directly from our iOS and Android partner app.",
               },
               {
-                icon: <TbMapPin className="w-5 h-5 text-[#4ADE80]" />,
+                icon: <TbMapPin className="w-5 h-5 text-brand-lime" />,
                 title: "Local Visibility",
                 desc: "Get discovered by thousands of players searching for turfs, pitches, and courts in your city. Boost occupancy during off-peak morning hours.",
               },
@@ -396,9 +395,9 @@ export default function OwnersPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-white dark:bg-[#282828] rounded-2xl p-6 flex items-start gap-4"
+                className="bg-white dark:bg-surface rounded-2xl p-6 flex items-start gap-4"
               >
-                <div className="w-11 h-11 rounded-2xl bg-[#4ADE80]/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-11 h-11 rounded-2xl bg-brand-lime/10 flex items-center justify-center flex-shrink-0">
                   {badge.icon}
                 </div>
                 <div>
@@ -415,7 +414,7 @@ export default function OwnersPage() {
         </section>
 
         {/* FAQ */}
-        <div className="border-t border-gray-200 dark:border-[#2a2a2a]" />
+        <div className="border-t border-gray-200 dark:border-border-default" />
         <section className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14">
           <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
@@ -427,48 +426,13 @@ export default function OwnersPage() {
             </h2>
           </div>
 
-          <div className="bg-white dark:bg-[#282828] rounded-2xl overflow-hidden">
-            {OWNER_FAQS.map((faq, index) => {
-              const isOpen = activeFaq === index;
-              return (
-                <div
-                  key={index}
-                  className={`border-b border-gray-100 dark:border-[#2a2a2a] last:border-b-0`}
-                >
-                  <button
-                    onClick={() => setActiveFaq(isOpen ? null : index)}
-                    className="w-full flex justify-between items-center text-left px-6 py-5 hover:bg-gray-50/50 dark:hover:bg-[#1a1a1a] transition-colors"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white pr-4">
-                      {faq.q}
-                    </span>
-                    <TbChevronDown
-                      className={`w-4 h-4 shrink-0 transition-transform duration-300 ${
-                        isOpen
-                          ? "rotate-180 text-[#4ADE80]"
-                          : "text-gray-300 dark:text-gray-600"
-                      }`}
-                    />
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                      >
-                        <p className="px-6 pb-5 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                          {faq.a}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
+          <div className="mt-8">
+            <FaqAccordion 
+              items={OWNER_FAQS.map(faq => ({ 
+                question: faq.q, 
+                answer: faq.a 
+              }))} 
+            />
           </div>
           </div>
         </section>
