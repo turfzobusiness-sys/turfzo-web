@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: shaikhakramshakil/turfzo-backend
-          path: ../turfzo-backend
+          path: turfzo-backend
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,6 +37,8 @@ jobs:
         run: npm run typecheck
 
       - name: Unit tests
+        env:
+          TURFZO_BACKEND_DIR: ${{ github.workspace }}/turfzo-backend
         run: npm run test
 
       - name: Build
