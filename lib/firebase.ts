@@ -16,6 +16,8 @@ import {
   browserSessionPersistence,
   RecaptchaVerifier,
   signInWithPhoneNumber,
+  PhoneAuthProvider,
+  linkWithCredential,
   type ConfirmationResult,
 } from "firebase/auth";
 
@@ -66,5 +68,7 @@ export {
   browserSessionPersistence,
   RecaptchaVerifier,
   signInWithPhoneNumber,
+  PhoneAuthProvider,
+  linkWithCredential,
 };
 export type { User, ConfirmationResult };

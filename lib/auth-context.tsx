@@ -20,6 +20,8 @@ import {
   getIdToken,
   RecaptchaVerifier,
   signInWithPhoneNumber,
+  PhoneAuthProvider,
+  linkWithCredential,
   User as FirebaseUser,
   ConfirmationResult,
 } from "./firebase";
@@ -56,6 +58,17 @@ interface AuthContextValue extends AuthState {
   signInWithPhone: (phone: string) => Promise<void>;
   /** Verifies the SMS OTP for a pending phone sign-in and completes login/signup. */
   verifyPhoneOtp: (code: string) => Promise<void>;
+  /**
+   * Sends an SMS OTP to LINK a phone number to the CURRENTLY signed-in
+   * account (email/Google users). Does not change auth state.
+   */
+  linkPhone: (phone: string) => Promise<void>;
+  /**
+   * Verifies the OTP for a pending phone LINK and attaches the phone
+   * credential to the current Firebase user, then re-syncs to Convex so
+   * `is_phone_verified` is set from the server-side identity claim.
+   */
+  verifyLinkedPhone: (code: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
   /** Current Firebase ID token for the signed-in user, if any. */
@@ -335,6 +348,90 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const linkPhone = async (phone: string) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new AppError(
+        "AUTH_REQUIRED",
+        "You must be signed in to verify a mobile number.",
+        { severity: "warning" },
+      );
+    }
+    // Same fresh-verifier pattern as signInWithPhone — never reused.
+    if (recaptchaVerifierRef.current) {
+      try {
+        recaptchaVerifierRef.current.clear();
+      } catch {
+        // widget may already be gone — ignore
+      }
+      recaptchaVerifierRef.current = null;
+    }
+    const verifier = new RecaptchaVerifier(auth, "phone-recaptcha-container", {
+      size: "invisible",
+      callback: () => {},
+    });
+    recaptchaVerifierRef.current = verifier;
+    setState((prev) => ({ ...prev, status: "loading", error: null }));
+    try {
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        normalizePhoneNumber(phone),
+        verifier,
+      );
+      phoneConfirmationRef.current = confirmation;
+      // Still the same authenticated session — verification is in progress.
+      setState((prev) => ({ ...prev, status: "authenticated", error: null }));
+    } catch (err: unknown) {
+      try {
+        verifier?.clear();
+      } catch {
+        // ignore
+      }
+      recaptchaVerifierRef.current = null;
+      const appError = classifyError(err);
+      setState((prev) => ({ ...prev, status: "authenticated", error: appError.message }));
+      throw appError;
+    }
+  };
+
+  const verifyLinkedPhone = async (code: string) => {
+    const confirmation = phoneConfirmationRef.current;
+    if (!confirmation) {
+      const err = new AppError(
+        "PHONE_OTP_EXPIRED",
+        "Your OTP session has expired. Please request a new code.",
+        { severity: "warning" },
+      );
+      setState((prev) => ({ ...prev, status: "authenticated", error: err.message }));
+      throw err;
+    }
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new AppError(
+        "AUTH_REQUIRED",
+        "You must be signed in to verify a mobile number.",
+        { severity: "warning" },
+      );
+    }
+    setState((prev) => ({ ...prev, status: "loading", error: null }));
+    try {
+      const credential = PhoneAuthProvider.credential(
+        confirmation.verificationId,
+        code,
+      );
+      await linkWithCredential(currentUser, credential);
+      phoneConfirmationRef.current = null;
+      // Backend syncFirebaseUser reads the phone_number claim from this
+      // linked identity and sets is_phone_verified=true server-side.
+      await refreshUser();
+    } catch (err: unknown) {
+      phoneConfirmationRef.current = null;
+      const appError = classifyError(err);
+      setState((prev) => ({ ...prev, status: "authenticated", error: appError.message }));
+      throw appError;
+    }
+  };
+
   const refreshUser = async () => {
     const firebaseUser = auth.currentUser;
     if (!firebaseUser) {
@@ -390,6 +487,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signInWithGoogle,
         signInWithPhone,
         verifyPhoneOtp,
+        linkPhone,
+        verifyLinkedPhone,
         signOut,
         refreshUser,
         getIdToken,
