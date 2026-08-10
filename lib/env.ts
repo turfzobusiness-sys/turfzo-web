@@ -28,7 +28,8 @@ type EnvKey =
   | "NEXT_PUBLIC_DD_CLIENT_TOKEN"
   | "NEXT_PUBLIC_DD_SITE"
   | "NEXT_PUBLIC_DD_SERVICE"
-  | "NEXT_PUBLIC_DD_ENV";
+  | "NEXT_PUBLIC_DD_ENV"
+  | "NEXT_PUBLIC_VIEW_ONLY_MODE";
 
 const PROD_REQUIRED: EnvKey[] = [
   "NEXT_PUBLIC_FIREBASE_API_KEY",
@@ -125,6 +126,16 @@ export function getCashfreeCredentials(): { appId: string; secretKey: string } {
     appId: getEnv("NEXT_PUBLIC_CASHFREE_APP_ID"),
     secretKey: getEnv("CASHFREE_SECRET_KEY"),
   };
+}
+
+/**
+ * View-only mode: when `NEXT_PUBLIC_VIEW_ONLY_MODE=true` the website hides
+ * all booking/payment entry points (turfs & tournaments become view-only and
+ * direct users to the mobile app). Toggle without code changes by flipping
+ * the env var and redeploying.
+ */
+export function isViewOnlyMode(): boolean {
+  return readEnv("NEXT_PUBLIC_VIEW_ONLY_MODE") === "true";
 }
 
 export function isCashfreeConfigured(): boolean {
