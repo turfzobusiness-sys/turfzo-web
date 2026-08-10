@@ -641,6 +641,49 @@ const routes: Record<string, MockHandler> = {
   "tournaments:getMyRegistrations": () => [],
   "tournaments:getById": ({ tournamentId }) =>
     mockTournaments.find((t) => t._id === tournamentId) ?? null,
+  "tournaments:getTournamentById": ({ tournamentId }) => {
+    const t = mockTournaments.find((x) => x._id === tournamentId);
+    if (!t) return null;
+    return {
+      _id: t._id,
+      id: t._id,
+      name: t.title,
+      description: t.description,
+      sport_type: t.sport,
+      tournament_type: t.format,
+      entry_fee: t.entry_fee,
+      prize_pool: null,
+      max_participants: t.max_teams,
+      status: "registration_open",
+      start_date: t.start_date,
+      can_manage: true,
+    };
+  },
+  "tournaments:getOwnerTournaments": () =>
+    mockTournaments.slice(0, 2).map((t) => ({
+      _id: t._id,
+      id: t._id,
+      name: t.title,
+      sport_type: t.sport,
+      tournament_type: t.format,
+      entry_fee: t.entry_fee,
+      max_participants: t.max_teams,
+      status: "registration_open",
+      start_date: t.start_date,
+    })),
+  "tournaments:getTournamentParticipants": () => [],
+  "tournaments:getTeams": () => [],
+  "tournaments:getMatches": () => [],
+  "tournaments:getAnnouncements": () => [],
+  "tournaments:createTournament": () => ({ success: true }),
+  "tournaments:updateTournamentStatus": () => true,
+  "tournaments:approveRegistration": () => true,
+  "tournaments:rejectRegistration": () => true,
+  "tournaments:generateInitialMatches": () => true,
+  "tournaments:updateMatchResult": () => true,
+  "tournaments:createAnnouncement": () => "ann_mock_1",
+  "tournaments:deleteAnnouncement": () => true,
+  "tournaments:deleteTournament": () => true,
   "tournaments:register": (args) => ({
     _id: "reg_mock_1",
     team_name: (args as { team_name?: string }).team_name ?? "Mock Team",
