@@ -3,7 +3,18 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  Users,
+  Star,
+  Trophy,
+  Building2,
+  Wallet,
+  Tag,
+  CalendarCheck,
+  Landmark,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   TbCalendarTime,
@@ -17,6 +28,112 @@ import {
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FaqAccordion } from "@/components/ui/faq-accordion";
+
+/* ------------------------------------------------------------------ */
+/*  Verified owner feature categories (code-audited, no false claims) */
+/* ------------------------------------------------------------------ */
+const OWNER_FEATURES = [
+  {
+    icon: Landmark,
+    title: "Turf Management",
+    bullets: [
+      "Create & publish turf listings in minutes — name, photos, address, city",
+      "Set your own hourly price (₹) with validation",
+      "Classify by sport type, format (5-a-side, 7-a-side…), tier & max players",
+      "Amenity toggles: Floodlights, Free Parking, Changing Room, Drinking Water, First Aid, Indoor",
+      "Set operating hours & working days (Mon–Sun)",
+      "One-tap \"Available for Booking\" to show or hide your turf",
+      "Edit any turf field in place — delete a turf any time",
+    ],
+  },
+  {
+    icon: CalendarCheck,
+    title: "Bookings & Calendar",
+    bullets: [
+      "Central bookings inbox with pending/confirmed status tabs & badges",
+      "One-tap Confirm / Reject on new bookings",
+      "\"Mark as Completed\" once a slot finishes",
+      "Safe cancellation with automatic refund policy",
+      "Server-side overlap detection — no double bookings, ever",
+      "Cash bookings auto-confirm; online payments auto-marked after verification",
+      "Monthly turf calendar with day/hour drill-down",
+      "Bulk slot blocking — block dates, ranges, weekends, with reasons (Maintenance / Private Event / Holiday)",
+    ],
+  },
+  {
+    icon: Tag,
+    title: "Pricing & Promotions",
+    bullets: [
+      "Automatic tier pricing — off-peak (0.8×) & premium (1.3×) multipliers",
+      "Dynamic pricing rule builder — time-of-day & day-of-week rules",
+      "Adjust prices by percentage or flat ₹, with rule priority (higher wins)",
+      "Toggle rules on/off, edit, or delete",
+      "Promo codes with discount type, value, validity window & usage limits",
+    ],
+  },
+  {
+    icon: BarChart3,
+    title: "Analytics & Insights",
+    bullets: [
+      "Earnings dashboard with available balance (95% of revenue after 5% platform fee)",
+      "Revenue history + monthly earnings charts",
+      "Booking stats by status & period",
+      "Popular slots analysis — see which hours sell best",
+      "Recent transactions feed",
+      "Revenue forecasting with period-based projections",
+      "Cross-venue comparison — revenue & occupancy bar charts across all your turfs",
+      "Dashboard stat cards: Today's Slots, Pending, Occupancy %",
+    ],
+  },
+  {
+    icon: Users,
+    title: "Customers",
+    bullets: [
+      "Customer list with search, sorted by total spend",
+      "Per-customer spend, booking count & repeat-customer detection",
+      "Customer segmentation — auto-segments, tags, corporate flag",
+      "Average booking value, preferred slots & days",
+    ],
+  },
+  {
+    icon: Wallet,
+    title: "Payments & Payouts",
+    bullets: [
+      "Request payouts to UPI or Bank (account number + IFSC)",
+      "Available balance with one-tap payout request",
+      "Earnings settle after slot completion — transferred to your bank",
+    ],
+  },
+  {
+    icon: Star,
+    title: "Reviews",
+    bullets: [
+      "Verified-booking 5★ rating system",
+      "Spam-protected — only players who completed a booking can review",
+      "Review history visible on your venue listing",
+    ],
+  },
+  {
+    icon: Trophy,
+    title: "Tournaments",
+    bullets: [
+      "Create tournaments — entry fees, caps, team sizes, rules & dates",
+      "Auto single-elimination bracket generation",
+      "Full status lifecycle (open → in progress → completed)",
+      "Entry-fee collection via Cashfree with auto-refund for unused payments",
+      "Registration pass codes for controlled entry",
+    ],
+  },
+  {
+    icon: Building2,
+    title: "Multi-Turf Dashboard",
+    bullets: [
+      "All venues on one screen — switch between turfs instantly",
+      "Per-turf bookings, occupancy & revenue at a glance",
+      "Unified analytics across your entire portfolio",
+    ],
+  },
+];
 
 const OWNER_FAQS = [
   {
@@ -345,6 +462,59 @@ export default function OwnersPage() {
                 </div>
               </div>
             </motion.div>
+          </div>
+        </section>
+
+        {/* COMPREHENSIVE FEATURE GRID */}
+        <div className="border-t border-gray-200 dark:border-border-default" />
+        <section className="px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full py-14">
+          <div className="text-center mb-14 max-w-2xl mx-auto">
+            <span className="text-[11px] font-semibold tracking-wider text-gray-500 dark:text-text-muted uppercase">
+              Full Platform Capabilities
+            </span>
+            <h2 className="text-3xl font-bold mt-3 text-gray-900 dark:text-white tracking-tight">
+              Everything You Need to Run Your Venue
+            </h2>
+            <p className="text-gray-600 dark:text-text-secondary text-base mt-4">
+              Every feature below is live and verified in the Turfzo Partner app.
+              No roadmap fluff — just what works today.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {OWNER_FEATURES.map((feature, i) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.45, delay: i * 0.06 }}
+                  className="bg-white dark:bg-surface border border-gray-200 dark:border-border-default rounded-2xl p-6 flex flex-col hover:border-brand-lime/40 transition-colors duration-300"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-brand-lime/15 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-5 h-5 text-brand-lime" />
+                    </div>
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                      {feature.title}
+                    </h3>
+                  </div>
+                  <ul className="space-y-2 flex-1">
+                    {feature.bullets.map((bullet, j) => (
+                      <li
+                        key={j}
+                        className="flex items-start gap-2 text-[13px] text-gray-600 dark:text-text-secondary leading-relaxed"
+                      >
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-lime flex-shrink-0" />
+                        {bullet}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              );
+            })}
           </div>
         </section>
 
