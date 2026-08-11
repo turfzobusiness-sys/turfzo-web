@@ -22,6 +22,7 @@ import {
   Users,
   Star,
   Search,
+  Smartphone,
   Sparkles,
   ShieldCheck,
   Zap,
@@ -41,6 +42,7 @@ import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
 import { openCashfreeCheckout } from "@/lib/cashfree";
+import { isViewOnlyMode } from "@/lib/env";
 import QRCode from "qrcode";
 
 interface Tournament {
@@ -154,6 +156,7 @@ function formatDate(iso: string) {
 export default function TournamentsPage() {
   const router = useRouter();
   const { status, firebaseUser, convexUser, getFreshToken } = useAuth();
+  const viewOnly = isViewOnlyMode();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTournament, setSelectedTournament] =
@@ -267,6 +270,7 @@ export default function TournamentsPage() {
   };
 
   const handleOpenRegistration = (t: Tournament) => {
+    if (viewOnly) return;
     if (status !== "authenticated") {
       router.push("/auth/login?redirect=/tournaments");
       return;
@@ -292,6 +296,7 @@ export default function TournamentsPage() {
 
   const handleSubmitRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (viewOnly) return;
     if (
       !selectedTournament ||
       !teamName ||
@@ -504,6 +509,49 @@ export default function TournamentsPage() {
               </p>
             </div>
           </motion.section>
+        )}
+
+        {/* ORGANIZER HIGHLIGHT SECTION */}
+        {viewMode === "list" && (
+          <section className="max-w-[1280px] mx-auto px-6 md:px-10 w-full mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-surface border border-border-default rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6"
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="w-9 h-9 rounded-xl bg-brand-lime/15 flex items-center justify-center">
+                    <Trophy className="w-4.5 h-4.5 text-brand-lime" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">
+                    Organize Your Tournament
+                  </h3>
+                </div>
+                <ul className="space-y-1.5 text-[13px] text-text-secondary">
+                  {[
+                    "Create tournaments with entry fees, team caps, sizes & rules",
+                    "Auto single-elimination bracket generation",
+                    "Full lifecycle management — open → in progress → completed",
+                    "Entry-fee collection via Cashfree with auto-refund",
+                    "Registration pass codes for controlled entry",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-lime flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button
+                onClick={() => router.push("/tournaments/create")}
+                className="flex items-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-bg font-semibold px-6 py-3 rounded-xl transition-colors text-sm cursor-pointer whitespace-nowrap flex-shrink-0"
+              >
+                Create Tournament <ArrowRight className="w-4 h-4" />
+              </button>
+            </motion.div>
+          </section>
         )}
 
         <div className="max-w-[1280px] mx-auto px-6 md:px-10 w-full">
@@ -1268,6 +1316,22 @@ export default function TournamentsPage() {
                     >
                       Registration Full
                     </button>
+                  ) : viewOnly ? (
+                    <div className="flex flex-col gap-2">
+                      <a
+                        href="https://play.google.com/store/apps/details?id=com.turfzo.app"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
+                      >
+                        <Smartphone className="w-4 h-4" />
+                        Register on the Turfzo App
+                      </a>
+                      <p className="text-center text-xs text-text-muted">
+                        Tournament registrations are available on the Turfzo
+                        app only.
+                      </p>
+                    </div>
                   ) : (
                     <button
                       onClick={() => handleOpenRegistration(selectedTournament)}
