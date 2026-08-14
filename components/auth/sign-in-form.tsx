@@ -9,7 +9,6 @@ import { auth, setPersistence, browserLocalPersistence, browserSessionPersistenc
 import { safeRedirectTarget } from "@/lib/redirect";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { PhoneOtpForm } from "@/components/auth/phone-otp-form";
 
 export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const { signIn, signInWithGoogle, error } = useAuth();
@@ -21,7 +20,6 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const [showPassword, setShowPassword] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [showPhone, setShowPhone] = React.useState(false);
 
   const handlePostAuth = () => {
     onSuccess?.();
@@ -71,7 +69,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2.5">
-      {error && !showPhone && (
+      {error && (
         <div
           role="alert"
           className="rounded-md border border-error/30 bg-error/10 px-3 py-2 font-sans text-xs text-error-light"
@@ -210,7 +208,10 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
       {/* Phone OTP */}
       <button
         type="button"
-        onClick={() => setShowPhone((v) => !v)}
+        onClick={() => {
+          closeAuthModal();
+          window.location.href = "/auth/verify-phone";
+        }}
         disabled={loading}
         className={cn(
           "w-full inline-flex items-center justify-center gap-2 rounded-md border border-border-default bg-elevated px-4 py-2.5 font-sans text-sm font-semibold text-text-main transition-all duration-300",
@@ -219,10 +220,8 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
         )}
       >
         <Phone className="h-4 w-4 text-brand-lime" />
-        {showPhone ? "Hide phone sign-in" : "Continue with Phone"}
+        Verify your phone number
       </button>
-
-      {showPhone && <PhoneOtpForm onSuccess={onSuccess} />}
     </form>
   );
 }

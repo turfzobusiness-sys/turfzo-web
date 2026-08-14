@@ -14,11 +14,9 @@ import {
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
-  RecaptchaVerifier,
   signInWithPhoneNumber,
+  RecaptchaVerifier,
   PhoneAuthProvider,
-  linkWithCredential,
-  type ConfirmationResult,
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -66,9 +64,8 @@ export {
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
-  RecaptchaVerifier,
   signInWithPhoneNumber,
+  RecaptchaVerifier,
   PhoneAuthProvider,
-  linkWithCredential,
 };
-export type { User, ConfirmationResult };
+export type { User, ConfirmationResult } from "firebase/auth";

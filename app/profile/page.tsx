@@ -422,6 +422,18 @@ export default function ProfilePage() {
                     <span className="flex items-center gap-2">
                       <Phone className="w-4 h-4" />
                       {convexUser?.phone_number || "Not added"}
+                      {convexUser?.is_phone_verified ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 text-[10px] font-bold">
+                          <Check className="w-3 h-3" strokeWidth={3} /> Verified
+                        </span>
+                      ) : (
+                        <a
+                          href="/auth/verify-phone"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-lime/15 text-brand-lime text-[10px] font-bold hover:bg-brand-lime/25 transition-colors"
+                        >
+                          Verify mobile
+                        </a>
+                      )}
                     </span>
                   </div>
                 </div>

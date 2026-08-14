@@ -18,12 +18,10 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   getIdToken,
-  RecaptchaVerifier,
   signInWithPhoneNumber,
-  PhoneAuthProvider,
-  linkWithCredential,
+  RecaptchaVerifier,
+  type ConfirmationResult,
   User as FirebaseUser,
-  ConfirmationResult,
 } from "./firebase";
 import { convexClient } from "./convex";
 import { AppError, classifyError } from "./errors";
@@ -54,10 +52,6 @@ interface AuthContextValue extends AuthState {
   }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  /** Sends an SMS OTP to the given phone number and stores the pending confirmation. */
-  signInWithPhone: (phone: string) => Promise<void>;
-  /** Verifies the SMS OTP for a pending phone sign-in and completes login/signup. */
-  verifyPhoneOtp: (code: string) => Promise<void>;
   /**
    * Sends an SMS OTP to LINK a phone number to the CURRENTLY signed-in
    * account (email/Google users). Does not change auth state.
@@ -65,10 +59,24 @@ interface AuthContextValue extends AuthState {
   linkPhone: (phone: string) => Promise<void>;
   /**
    * Verifies the OTP for a pending phone LINK and attaches the phone
-   * credential to the current Firebase user, then re-syncs to Convex so
-   * `is_phone_verified` is set from the server-side identity claim.
+   * number to the current Convex user, setting `is_phone_verified`
+   * server-side after the OTP check.
    */
   verifyLinkedPhone: (code: string) => Promise<void>;
+  /**
+   * Sends an SMS OTP to sign up with a phone number (Firebase phone auth).
+   * After the user enters the code, call [verifyPhoneSignUp].
+   */
+  phoneSignUp: (opts: {
+    phone: string;
+    role?: string;
+    displayName?: string;
+  }) => Promise<void>;
+  /**
+   * Confirms the phone sign-up OTP. Creates the Firebase identity (with
+   * the verified phone number) and syncs the Convex profile.
+   */
+  verifyPhoneSignUp: (code: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
   /** Current Firebase ID token for the signed-in user, if any. */
@@ -93,6 +101,49 @@ function normalizePhoneNumber(input: string): string {
   if (digits.length === 12 && digits.startsWith("91")) return `+${digits}`;
   if (digits.length === 11 && digits.startsWith("0")) return `+91${digits.slice(1)}`;
   return input.trim();
+}
+
+export type OtpErrorCode =
+  | "INVALID_PHONE"
+  | "RATE_LIMITED"
+  | "OTP_COOLDOWN"
+  | "OTP_EXPIRED"
+  | "SMS_SEND_FAILED"
+  | "INVALID_OTP"
+  | "NOT_AUTHENTICATED"
+  | "USER_NOT_FOUND";
+
+const OTP_ERROR_MESSAGES: Record<OtpErrorCode, string> = {
+  INVALID_PHONE: "Please enter a valid Indian mobile number.",
+  RATE_LIMITED: "Too many attempts. Please try again later.",
+  OTP_COOLDOWN: "Please wait a moment before requesting another code.",
+  OTP_EXPIRED: "This OTP has expired. Please request a new code.",
+  SMS_SEND_FAILED: "Couldn't send the OTP. Please try again.",
+  INVALID_OTP: "Incorrect OTP. Please check the code and try again.",
+  NOT_AUTHENTICATED: "Please sign in to continue.",
+  USER_NOT_FOUND: "Your account could not be found. Please sign in again.",
+};
+
+function otpErrorMessage(
+  code: OtpErrorCode | undefined,
+): string {
+  return OTP_ERROR_MESSAGES[code ?? "SMS_SEND_FAILED"];
+}
+
+function mapOtpErrorCode(code: string | undefined): string {
+  switch (code) {
+    case "INVALID_PHONE":
+    case "RATE_LIMITED":
+    case "OTP_COOLDOWN":
+    case "OTP_EXPIRED":
+    case "SMS_SEND_FAILED":
+    case "INVALID_OTP":
+    case "NOT_AUTHENTICATED":
+    case "USER_NOT_FOUND":
+      return `OTP_${code}`;
+    default:
+      return "OTP_SMS_SEND_FAILED";
+  }
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -132,8 +183,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const phoneConfirmationRef = useRef<ConfirmationResult | null>(null);
-  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+  // MSG91 phone OTP is used ONLY for linking/verifying a phone on an
+  // existing Firebase account (phone is not a login method on the web —
+  // the backend has no Firebase identity for phone-created users). We
+  // remember the number the user asked to link so verification targets
+  // the right OTP row.
+  const pendingLinkedPhoneRef = useRef<string | null>(null);
+
+  // Firebase phone auth for SIGN UP (new accounts). We hold the pending
+  // ConfirmationResult plus the signup metadata (role/display name) so the
+  // OTP step can complete the account creation with the right profile.
+  const pendingPhoneSignupRef = useRef<ConfirmationResult | null>(null);
+  const pendingPhoneSignupMetaRef = useRef<{
+    role: string;
+    displayName?: string;
+  }>({ role: "player" });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -259,95 +323,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signInWithPhone = async (phone: string) => {
-    setState((prev) => ({ ...prev, status: "loading", error: null }));
-    let verifier: RecaptchaVerifier | null = null;
-    try {
-      // The invisible reCAPTCHA verifier must be fresh per send, and any
-      // previous widget must be cleared first (a verifier cannot be reused).
-      if (recaptchaVerifierRef.current) {
-        try {
-          recaptchaVerifierRef.current.clear();
-        } catch {
-          // widget may already be gone (e.g. modal closed) — ignore
-        }
-        recaptchaVerifierRef.current = null;
-      }
-      verifier = new RecaptchaVerifier(auth, "phone-recaptcha-container", {
-        size: "invisible",
-        callback: () => {},
-      });
-      recaptchaVerifierRef.current = verifier;
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        normalizePhoneNumber(phone),
-        verifier,
-      );
-      phoneConfirmationRef.current = confirmation;
-      // Stay in the modal on the OTP step — not fully authenticated yet.
-      setState((prev) => ({ ...prev, status: "initial", error: null }));
-    } catch (err: unknown) {
-      try {
-        verifier?.clear();
-      } catch {
-        // ignore
-      }
-      recaptchaVerifierRef.current = null;
-      const appError = classifyError(err);
-      setState((prev) => ({
-        ...prev,
-        status: "error",
-        error: appError.message,
-      }));
-      throw appError;
-    }
-  };
-
-  const verifyPhoneOtp = async (code: string) => {
-    const confirmation = phoneConfirmationRef.current;
-    if (!confirmation) {
-      const err = new AppError(
-        "PHONE_OTP_EXPIRED",
-        "Your OTP session has expired. Please request a new code.",
-        { severity: "warning" },
-      );
-      setState((prev) => ({ ...prev, status: "error", error: err.message }));
-      throw err;
-    }
-    setState((prev) => ({ ...prev, status: "loading", error: null }));
-    try {
-      const result = await confirmation.confirm(code);
-      const convexUser = await syncConvexUser(result.user);
-      phoneConfirmationRef.current = null;
-      setState({
-        status: "authenticated",
-        firebaseUser: result.user,
-        convexUser,
-        error: null,
-      });
-    } catch (err: unknown) {
-      const appError = classifyError(err);
-      setState((prev) => ({
-        ...prev,
-        status: "error",
-        error: appError.message,
-      }));
-      throw appError;
-    }
-  };
-
-  const signOut = async () => {
-    phoneConfirmationRef.current = null;
-    await firebaseSignOut(auth);
-    convexClient.authToken = null;
-    setState({
-      status: "unauthenticated",
-      firebaseUser: null,
-      convexUser: null,
-      error: null,
-    });
-  };
-
   const linkPhone = async (phone: string) => {
     const currentUser = auth.currentUser;
     if (!currentUser) {
@@ -357,37 +332,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         { severity: "warning" },
       );
     }
-    // Same fresh-verifier pattern as signInWithPhone — never reused.
-    if (recaptchaVerifierRef.current) {
-      try {
-        recaptchaVerifierRef.current.clear();
-      } catch {
-        // widget may already be gone — ignore
-      }
-      recaptchaVerifierRef.current = null;
+    const normalized = normalizePhoneNumber(phone);
+    if (!normalized.startsWith("+")) {
+      throw new AppError(
+        "INVALID_PHONE",
+        "Please enter a valid 10-digit mobile number.",
+        { severity: "warning" },
+      );
     }
-    const verifier = new RecaptchaVerifier(auth, "phone-recaptcha-container", {
-      size: "invisible",
-      callback: () => {},
-    });
-    recaptchaVerifierRef.current = verifier;
     setState((prev) => ({ ...prev, status: "loading", error: null }));
     try {
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        normalizePhoneNumber(phone),
-        verifier,
-      );
-      phoneConfirmationRef.current = confirmation;
+      const result = await convexClient.action<{
+        success: boolean;
+        error?: string;
+        expiresAt?: string;
+      }>("otp:sendOtp", { phoneNumber: normalized });
+      if (!result.success) {
+        throw new AppError(
+          mapOtpErrorCode(result.error),
+          otpErrorMessage(result.error as OtpErrorCode),
+          { severity: "warning" },
+        );
+      }
+      pendingLinkedPhoneRef.current = normalized;
       // Still the same authenticated session — verification is in progress.
       setState((prev) => ({ ...prev, status: "authenticated", error: null }));
     } catch (err: unknown) {
-      try {
-        verifier?.clear();
-      } catch {
-        // ignore
-      }
-      recaptchaVerifierRef.current = null;
       const appError = classifyError(err);
       setState((prev) => ({ ...prev, status: "authenticated", error: appError.message }));
       throw appError;
@@ -395,8 +365,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const verifyLinkedPhone = async (code: string) => {
-    const confirmation = phoneConfirmationRef.current;
-    if (!confirmation) {
+    const pendingPhone = pendingLinkedPhoneRef.current;
+    if (!pendingPhone) {
       const err = new AppError(
         "PHONE_OTP_EXPIRED",
         "Your OTP session has expired. Please request a new code.",
@@ -415,21 +385,146 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setState((prev) => ({ ...prev, status: "loading", error: null }));
     try {
-      const credential = PhoneAuthProvider.credential(
-        confirmation.verificationId,
-        code,
-      );
-      await linkWithCredential(currentUser, credential);
-      phoneConfirmationRef.current = null;
-      // Backend syncFirebaseUser reads the phone_number claim from this
-      // linked identity and sets is_phone_verified=true server-side.
+      // The OTP is proven server-side against the logged-in Firebase
+      // identity — no Firebase phone credential involved.
+      const token = await getIdToken(currentUser);
+      const result = await convexClient.action<{
+        success: boolean;
+        user?: AppUser;
+        error?: string;
+      }>("otp:verifyAndLink", { phoneNumber: pendingPhone, otp: code }, token);
+      pendingLinkedPhoneRef.current = null;
+      if (!result.success) {
+        throw new AppError(
+          mapOtpErrorCode(result.error),
+          otpErrorMessage(result.error as OtpErrorCode),
+          { severity: "warning" },
+        );
+      }
+      // Reflect the server-set is_phone_verified flag immediately.
+      setState((prev) => ({ ...prev, status: "authenticated", error: null }));
       await refreshUser();
     } catch (err: unknown) {
-      phoneConfirmationRef.current = null;
+      pendingLinkedPhoneRef.current = null;
       const appError = classifyError(err);
       setState((prev) => ({ ...prev, status: "authenticated", error: appError.message }));
       throw appError;
     }
+  };
+
+  const phoneSignUp = async (opts: {
+    phone: string;
+    role?: string;
+    displayName?: string;
+  }) => {
+    const normalized = normalizePhoneNumber(opts.phone);
+    if (!normalized.startsWith("+")) {
+      throw new AppError(
+        "INVALID_PHONE",
+        "Please enter a valid 10-digit mobile number.",
+        { severity: "warning" },
+      );
+    }
+    setState((prev) => ({ ...prev, status: "loading", error: null }));
+    try {
+      // reCAPTCHA is required by Firebase phone auth on the web. The
+      // container is appended lazily so it works inside the auth modal.
+      const recaptchaId = "recaptcha-container";
+      let container = document.getElementById(recaptchaId);
+      if (!container) {
+        container = document.createElement("div");
+        container.id = recaptchaId;
+        document.body.appendChild(container);
+      }
+      const appVerifier = new RecaptchaVerifier(auth, container, {
+        size: "invisible",
+      });
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        normalized,
+        appVerifier,
+      );
+      pendingPhoneSignupRef.current = confirmationResult;
+      pendingPhoneSignupMetaRef.current = {
+        role: opts.role ?? "player",
+        displayName: opts.displayName,
+      };
+      // Still loading — the OTP step will finish the sign-up.
+      setState((prev) => ({ ...prev, status: "unauthenticated", error: null }));
+    } catch (err: unknown) {
+      const appError = classifyError(err);
+      setState((prev) => ({ ...prev, status: "unauthenticated", error: appError.message }));
+      throw appError;
+    }
+  };
+
+  const verifyPhoneSignUp = async (code: string) => {
+    const confirmationResult = pendingPhoneSignupRef.current;
+    if (!confirmationResult) {
+      const err = new AppError(
+        "PHONE_OTP_EXPIRED",
+        "Your OTP session has expired. Please request a new code.",
+        { severity: "warning" },
+      );
+      setState((prev) => ({ ...prev, status: "unauthenticated", error: err.message }));
+      throw err;
+    }
+    setState((prev) => ({ ...prev, status: "loading", error: null }));
+    try {
+      const userCredential = await confirmationResult.confirm(code);
+      const firebaseUser = userCredential.user;
+      pendingPhoneSignupRef.current = null;
+
+      // Create the Convex profile bound to this Firebase identity. The
+      // phone number is verified server-side from the Firebase ID token's
+      // `phone_number` claim (auth.ts sets is_phone_verified from it).
+      const token = await getIdToken(firebaseUser);
+      const meta = pendingPhoneSignupMetaRef.current;
+      const result = await convexClient.action<{
+        success: boolean;
+        user?: AppUser;
+        error?: string;
+      }>(
+        "auth:syncFirebaseUser",
+        {
+          role: meta.role,
+          displayName: meta.displayName,
+          phoneNumber: firebaseUser.phoneNumber ?? undefined,
+        },
+        token,
+      );
+      if (!result.success) {
+        throw new AppError(
+          "ACCOUNT_SETUP_FAILED",
+          result.error ?? "Account setup failed. Please try again.",
+          { severity: "warning" },
+        );
+      }
+      convexClient.authToken = token;
+      setState({
+        status: "authenticated",
+        firebaseUser,
+        convexUser: result.user ?? null,
+        error: null,
+      });
+    } catch (err: unknown) {
+      const appError = classifyError(err);
+      setState((prev) => ({ ...prev, status: "unauthenticated", error: appError.message }));
+      throw appError;
+    }
+  };
+
+  const signOut = async () => {
+    pendingLinkedPhoneRef.current = null;
+    pendingPhoneSignupRef.current = null;
+    await firebaseSignOut(auth);
+    convexClient.authToken = null;
+    setState({
+      status: "unauthenticated",
+      firebaseUser: null,
+      convexUser: null,
+      error: null,
+    });
   };
 
   const refreshUser = async () => {
@@ -485,10 +580,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signUp,
         signIn,
         signInWithGoogle,
-        signInWithPhone,
-        verifyPhoneOtp,
         linkPhone,
         verifyLinkedPhone,
+        phoneSignUp,
+        verifyPhoneSignUp,
         signOut,
         refreshUser,
         getIdToken,

@@ -402,6 +402,15 @@ function findTurf(id: string | undefined): MockTurf | null {
 
 const routes: Record<string, MockHandler> = {
   // ── Auth ───────────────────────────────────────────────────────────
+  // ── OTP (MSG91 phone verification, link flow) ──────────────────────
+  "otp:sendOtp": () => ({
+    success: true,
+    expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  }),
+  "otp:verifyAndLink": () => ({
+    success: true,
+    user: { ...MOCK_USER, phone_number: "+919876543210", is_phone_verified: true },
+  }),
   "auth:getCurrentUser": () => ({ success: true, user: MOCK_USER }),
   "auth:syncFirebaseUser": () => ({ success: true, user: MOCK_USER }),
   "auth:updateUserProfile": () => ({ success: true }),

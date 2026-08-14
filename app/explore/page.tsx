@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   AlertCircle,
   Search,
+  Smartphone,
   Sparkles,
   Info,
   Calendar,
@@ -46,6 +47,7 @@ import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
 import { openCashfreeCheckout } from "@/lib/cashfree";
+import { isViewOnlyMode } from "@/lib/env";
 import type {
   Turf as ConvexTurf,
   Booking,
@@ -420,6 +422,7 @@ function CalendarPicker({
 export default function ExplorePage() {
   const router = useRouter();
   const { status, firebaseUser, convexUser, getFreshToken } = useAuth();
+  const viewOnly = isViewOnlyMode();
 
   const [flowStep, setFlowStep] = useState<FlowStep>("listing");
   const [viewMode, setViewMode] = useState<"list" | "details">("list");
@@ -785,6 +788,7 @@ export default function ExplorePage() {
   };
 
   const handleProceedToCheckout = () => {
+    if (viewOnly) return;
     if (!selectedTimeSlot) return;
     if (status !== "authenticated") {
       router.push("/auth/login?redirect=/explore");
@@ -830,6 +834,7 @@ export default function ExplorePage() {
   };
 
   const handlePayNow = async () => {
+    if (viewOnly) return;
     if (!selectedTurf || !selectedTimeSlot || !firebaseUser) {
       setBookingError("Missing booking details. Please try again.");
       return;
@@ -1809,13 +1814,30 @@ export default function ExplorePage() {
                 </div>
 
                 {/* CTA Action button */}
-                <button
-                  disabled={!selectedTimeSlot}
-                  onClick={handleProceedToCheckout}
-                  className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-border-default disabled:text-text-muted text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm disabled:cursor-not-allowed active:scale-[0.99]"
-                >
-                  Book Turf
-                </button>
+                {viewOnly ? (
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://play.google.com/store/apps/details?id=com.turfzo.app"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
+                    >
+                      <Smartphone className="w-4 h-4" />
+                      Book on the Turfzo App
+                    </a>
+                    <p className="text-center text-xs text-text-muted">
+                      Turf bookings are available on the Turfzo app only.
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    disabled={!selectedTimeSlot}
+                    onClick={handleProceedToCheckout}
+                    className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-border-default disabled:text-text-muted text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm disabled:cursor-not-allowed active:scale-[0.99]"
+                  >
+                    Book Turf
+                  </button>
+                )}
 
                 {/* Fee calculation breakdown */}
                 {selectedTimeSlot && (

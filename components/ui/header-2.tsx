@@ -212,6 +212,24 @@ export function Header() {
               </Link>
             );
           })}
+          {isAuthed && (
+            <Link
+              href="/tournaments/manage"
+              aria-current={isActive(pathname, "/tournaments/manage") ? "page" : undefined}
+              className={cn(
+                buttonVariants({ variant: "ghost" }),
+                "relative h-12 px-4 font-sans text-sm font-medium",
+                isActive(pathname, "/tournaments/manage")
+                  ? "text-text-main"
+                  : "text-text-muted hover:text-text-main"
+              )}
+            >
+              My Tournaments
+              {isActive(pathname, "/tournaments/manage") && (
+                <span className="absolute inset-x-0 -bottom-[1px] h-[2px] bg-text-main" />
+              )}
+            </Link>
+          )}
         </div>
 
         <div className="hidden items-center gap-2.5 md:flex">
@@ -327,6 +345,27 @@ export function Header() {
                 </Link>
               );
             })}
+            {isAuthed && (
+              <Link
+                href="/tournaments/manage"
+                onClick={() => setOpen(false)}
+                aria-current={
+                  isActive(pathname, "/tournaments/manage") ? "page" : undefined
+                }
+                className={cn(
+                  buttonVariants({
+                    variant: "ghost",
+                    className: "justify-start",
+                  }),
+                  "h-14 px-4 text-base",
+                  isActive(pathname, "/tournaments/manage")
+                    ? "text-text-main bg-surface"
+                    : "text-text-muted"
+                )}
+              >
+                My Tournaments
+              </Link>
+            )}
           </div>
           <div className="flex flex-col gap-3">
             {isAuthed ? (
