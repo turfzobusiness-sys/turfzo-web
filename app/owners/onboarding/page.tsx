@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { OnboardingWizard } from "@/components/owners/onboarding/onboarding-wizard";
 import { Button } from "@/components/ui/button";
 import { convexClient } from "@/lib/convex";
+import { toast } from "sonner";
 import type { OnboardingState, AppUser } from "@/lib/types";
 
 export default function OnboardingPage() {
@@ -70,6 +71,10 @@ export default function OnboardingPage() {
       window.location.href = "/owners/onboarding";
     } catch (err) {
       console.error("Failed to upgrade account role:", err);
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(
+        getErrorMessage(err, "Could not upgrade your account. Please try again."),
+      );
       setUpgrading(false);
     }
   };

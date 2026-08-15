@@ -46,6 +46,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
+import { toast } from "sonner";
 import { openCashfreeCheckout } from "@/lib/cashfree";
 import { isViewOnlyMode } from "@/lib/env";
 import type {
@@ -774,6 +775,8 @@ export default function ExplorePage() {
       setWishlist((prev) =>
         isFavorited ? [...prev, id] : prev.filter((x) => x !== id),
       );
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(getErrorMessage(err, "Could not update favourite."));
     }
   };
 

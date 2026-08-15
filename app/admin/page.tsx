@@ -16,6 +16,8 @@ import {
   UserCheck,
   Building2,
   AlertTriangle,
+  Trophy,
+  ChevronRight,
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
@@ -67,7 +69,42 @@ interface ContactMessage {
   created_at: string;
 }
 
-type Tab = "pending" | "users" | "messages" | "add-owner";
+interface AdminTournament {
+  _id: string;
+  id: string;
+  name: string;
+  sport_type: string;
+  tournament_type: string;
+  entry_fee: number;
+  prize_pool: number | null;
+  max_participants: number;
+  status: string;
+  start_date: string;
+}
+
+const TOURNAMENT_STATUS_LABELS: Record<string, string> = {
+  draft: "Draft",
+  upcoming: "Upcoming",
+  registration_open: "Open",
+  open: "Open",
+  registration_closed: "Closed",
+  in_progress: "Live",
+  completed: "Ended",
+  cancelled: "Cancelled",
+};
+
+const TOURNAMENT_STATUS_COLORS: Record<string, string> = {
+  draft: "bg-border-default text-text-muted",
+  upcoming: "bg-sky-500/15 text-sky-500",
+  registration_open: "bg-emerald-500/15 text-emerald-500",
+  open: "bg-emerald-500/15 text-emerald-500",
+  registration_closed: "bg-amber-500/15 text-amber-500",
+  in_progress: "bg-violet-500/15 text-violet-500",
+  completed: "bg-brand-lime/15 text-brand-lime",
+  cancelled: "bg-error/15 text-error",
+};
+
+type Tab = "pending" | "users" | "messages" | "tournaments" | "add-owner";
 
 export default function AdminPage() {
   const { status, convexUser, firebaseUser } = useAuth();
@@ -75,6 +112,7 @@ export default function AdminPage() {
   const [pendingOwners, setPendingOwners] = useState<PendingOwner[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [tournaments, setTournaments] = useState<AdminTournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -103,6 +141,13 @@ export default function AdminPage() {
           token
         );
         setUsers(data);
+      } else if (tab === "tournaments") {
+        const data = await convexClient.query<AdminTournament[]>(
+          "tournaments:getAllTournaments",
+          {},
+          token
+        );
+        setTournaments(data ?? []);
       } else {
         const data = await convexClient.query<ContactMessage[]>(
           "admin:listContactMessages",
@@ -255,6 +300,12 @@ export default function AdminPage() {
               badge={messages.filter((m) => m.status === "new").length}
             />
             <TabButton
+              active={tab === "tournaments"}
+              onClick={() => setTab("tournaments")}
+              icon={<Trophy className="w-4 h-4" />}
+              label="Tournaments"
+            />
+            <TabButton
               active={tab === "add-owner"}
               onClick={() => setTab("add-owner")}
               icon={<Building2 className="w-4 h-4" />}
@@ -281,6 +332,8 @@ export default function AdminPage() {
             />
           ) : tab === "users" ? (
             <UsersList users={users} />
+          ) : tab === "tournaments" ? (
+            <TournamentsList tournaments={tournaments} />
           ) : tab === "add-owner" ? (
             <AdminAddOwnerForm onSuccess={() => setTab("pending")} />
           ) : (
@@ -547,6 +600,66 @@ function MessagesList({ messages }: { messages: ContactMessage[] }) {
             Reply via email
           </a>
         </div>
+      ))}
+    </div>
+  );
+}
+
+function TournamentsList({ tournaments }: { tournaments: AdminTournament[] }) {
+  if (tournaments.length === 0) {
+    return (
+      <div className="bg-surface border border-border-subtle rounded-md p-12 text-center">
+        <Trophy className="w-12 h-12 text-text-muted mx-auto mb-3" />
+        <p className="text-text-muted">No tournaments yet.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {tournaments.map((t) => (
+        <Link
+          key={t.id}
+          href={`/tournaments/manage/${t.id}`}
+          className="bg-surface border border-border-subtle rounded-md p-5 shadow-card-shadow hover:border-border-strong transition-colors group"
+        >
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="min-w-0">
+              <h3 className="font-sans font-semibold text-text-main group-hover:text-brand-lime transition-colors truncate">
+                {t.name}
+              </h3>
+              <p className="text-xs text-text-muted mt-0.5">
+                {t.sport_type} · {t.tournament_type}
+              </p>
+            </div>
+            <span
+              className={`shrink-0 inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold ${
+                TOURNAMENT_STATUS_COLORS[t.status] || "bg-border-default text-text-muted"
+              }`}
+            >
+              {TOURNAMENT_STATUS_LABELS[t.status] || t.status}
+            </span>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-text-muted">
+            <span className="inline-flex items-center gap-1">
+              <Users className="w-3.5 h-3.5" /> Max {t.max_participants}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5" />
+              {new Date(t.start_date).toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "short",
+              })}
+            </span>
+            {t.entry_fee > 0 && (
+              <span className="inline-flex items-center gap-1">
+                ₹{t.entry_fee} entry
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1 ml-auto text-brand-lime font-semibold">
+              Manage <ChevronRight className="w-3.5 h-3.5" />
+            </span>
+          </div>
+        </Link>
       ))}
     </div>
   );

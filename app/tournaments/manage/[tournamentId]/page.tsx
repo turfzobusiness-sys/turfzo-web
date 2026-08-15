@@ -320,26 +320,28 @@ export default function ManageTournamentPage() {
                           Team · {team.status}
                         </p>
                       </div>
-                      <button
-                        disabled={busy}
-                        onClick={() =>
-                          run(
-                            () =>
-                              convexClient.mutation(
-                                "tournaments:approveRegistration",
-                                {
-                                  tournamentId,
-                                  registrationId: team.id,
-                                  isTeam: true,
-                                },
-                              ),
-                            "Team approved",
-                          )
-                        }
-                        className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-3 py-1.5 bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25 disabled:opacity-50"
-                      >
-                        <Check className="w-3.5 h-3.5" /> Approve
-                      </button>
+                      {team.status !== "approved" && (
+                        <button
+                          disabled={busy}
+                          onClick={() =>
+                            run(
+                              () =>
+                                convexClient.mutation(
+                                  "tournaments:approveRegistration",
+                                  {
+                                    tournamentId,
+                                    registrationId: team.id,
+                                    isTeam: true,
+                                  },
+                                ),
+                              "Team approved",
+                            )
+                          }
+                          className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-3 py-1.5 bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25 disabled:opacity-50"
+                        >
+                          <Check className="w-3.5 h-3.5" /> Approve
+                        </button>
+                      )}
                       <button
                         disabled={busy}
                         onClick={() =>
@@ -377,22 +379,24 @@ export default function ManageTournamentPage() {
                             Individual · {p.status}
                           </p>
                         </div>
-                        <button
-                          disabled={busy}
-                          onClick={() =>
-                            run(
-                              () =>
-                                convexClient.mutation(
-                                  "tournaments:approveRegistration",
-                                  { tournamentId, registrationId: p.id },
-                                ),
-                              "Registration approved",
-                            )
-                          }
-                          className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-3 py-1.5 bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25 disabled:opacity-50"
-                        >
-                          <Check className="w-3.5 h-3.5" /> Approve
-                        </button>
+                        {p.status !== "approved" && (
+                          <button
+                            disabled={busy}
+                            onClick={() =>
+                              run(
+                                () =>
+                                  convexClient.mutation(
+                                    "tournaments:approveRegistration",
+                                    { tournamentId, registrationId: p.id },
+                                  ),
+                                "Registration approved",
+                              )
+                            }
+                            className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-3 py-1.5 bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25 disabled:opacity-50"
+                          >
+                            <Check className="w-3.5 h-3.5" /> Approve
+                          </button>
+                        )}
                         <button
                           disabled={busy}
                           onClick={() =>

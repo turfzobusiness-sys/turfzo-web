@@ -341,7 +341,11 @@ export default function ProfilePage() {
         error?: string;
       }>("auth:deleteAccount", {}, token);
       if (!result.success) {
-        toast.error(result.error ?? "Could not delete account.");
+        toast.error(
+          result.error === "NOT_AUTHENTICATED"
+            ? "Your session has expired. Please sign in again."
+            : "Could not delete account. Please try again.",
+        );
         return;
       }
       toast.success("Account deleted. Signing you out…");

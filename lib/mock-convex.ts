@@ -680,6 +680,18 @@ const routes: Record<string, MockHandler> = {
       status: "registration_open",
       start_date: t.start_date,
     })),
+  "tournaments:getAllTournaments": () =>
+    mockTournaments.map((t) => ({
+      _id: t._id,
+      id: t._id,
+      name: t.title,
+      sport_type: t.sport,
+      tournament_type: t.format,
+      entry_fee: t.entry_fee,
+      max_participants: t.max_teams,
+      status: "registration_open",
+      start_date: t.start_date,
+    })),
   "tournaments:getTournamentParticipants": () => [],
   "tournaments:getTeams": () => [],
   "tournaments:getMatches": () => [],

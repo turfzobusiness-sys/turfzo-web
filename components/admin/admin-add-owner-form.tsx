@@ -122,11 +122,8 @@ export function AdminAddOwnerForm({ onSuccess }: AdminAddOwnerFormProps) {
       
     } catch (error: unknown) {
       console.error(error);
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to register owner";
-      toast.error(message);
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(getErrorMessage(error, "Failed to register owner."));
     } finally {
       setLoading(false);
     }

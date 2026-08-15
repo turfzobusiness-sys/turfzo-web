@@ -16,6 +16,7 @@ import type { OnboardingState } from "@/lib/types";
 export function OnboardingWizard() {
   const { firebaseUser } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [onboardingState, setOnboardingState] = useState<OnboardingState | null>(null);
   const [step, setStep] = useState(1);
@@ -42,6 +43,7 @@ export function OnboardingWizard() {
         }
       } catch (err) {
         console.error("Failed to load onboarding state:", err);
+        setLoadError("Could not load your application. Please check your connection and try again.");
       } finally {
         setLoading(false);
       }
@@ -54,6 +56,21 @@ export function OnboardingWizard() {
       <div className="flex flex-col items-center justify-center min-h-[350px] gap-3">
         <Loader2 className="h-8 w-8 animate-spin text-brand-lime" />
         <span className="font-sans text-sm text-text-muted">Loading your partner application...</span>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="text-center p-6 border border-border-default rounded-[12px] bg-surface/50">
+        <p className="font-sans text-sm text-error-light">{loadError}</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="mt-4 font-sans text-sm font-semibold text-brand-lime hover:underline"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -82,7 +99,8 @@ export function OnboardingWizard() {
       setStep(2);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to save. Please try again.");
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(getErrorMessage(err, "Failed to save. Please try again."));
     } finally {
       setActionLoading(false);
     }
@@ -104,7 +122,8 @@ export function OnboardingWizard() {
       setStep(3);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to save. Please try again.");
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(getErrorMessage(err, "Failed to save. Please try again."));
     } finally {
       setActionLoading(false);
     }
@@ -142,7 +161,8 @@ export function OnboardingWizard() {
       setIsSuccess(true);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to save. Please try again.");
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(getErrorMessage(err, "Failed to submit your application. Please try again."));
     } finally {
       setActionLoading(false);
     }

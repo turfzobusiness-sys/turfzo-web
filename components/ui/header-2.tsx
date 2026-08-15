@@ -4,8 +4,10 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LogOut, User as UserIcon, Sun, Moon, Monitor, Bell } from "lucide-react";
+import { LogOut, User as UserIcon, Sun, Moon, Monitor, Bell, BellRing } from "lucide-react";
+import { toast } from "sonner";
 import { convexClient } from "@/lib/convex";
+import { enableWebPush, isWebPushSupported, wasWebPushEnabled } from "@/lib/push";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { MenuToggleIcon } from "@/components/ui/menu-toggle-icon";
 import { useScroll } from "@/components/ui/use-scroll";
@@ -106,6 +108,69 @@ function HeaderNotificationsButton({ className }: { className?: string }) {
         </span>
       )}
     </Link>
+  );
+}
+
+/**
+ * One-shot "turn on browser notifications" button. Visible only for
+ * signed-in users on browsers that support web push and haven't enabled it
+ * yet — disappears once enabled (or when unsupported / VAPID not set).
+ */
+function HeaderPushButton({ className }: { className?: string }) {
+  const { status } = useAuth();
+  const [visible, setVisible] = React.useState(false);
+  const [busy, setBusy] = React.useState(false);
+  const isAuthed = status === "authenticated";
+
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!isAuthed) {
+        if (!cancelled) setVisible(false);
+        return;
+      }
+      const supported = await isWebPushSupported();
+      if (!cancelled) setVisible(supported && !wasWebPushEnabled());
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthed]);
+
+  if (!isAuthed || !visible) return null;
+
+  const enable = async () => {
+    setBusy(true);
+    try {
+      await enableWebPush();
+      setVisible(false);
+      toast.success("Notifications enabled", {
+        description: "You'll get booking reminders on this device.",
+      });
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Couldn't enable notifications.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={enable}
+      disabled={busy}
+      title="Enable browser notifications"
+      aria-label="Enable browser notifications"
+      className={cn(
+        "relative inline-flex items-center justify-center rounded-md text-text-muted hover:bg-elevated hover:text-text-main transition-colors",
+        busy && "opacity-50",
+        className,
+      )}
+    >
+      <BellRing className="size-5" />
+    </button>
   );
 }
 
@@ -236,6 +301,7 @@ export function Header() {
           <HeaderThemeButton />
           {isAuthed ? (
             <>
+              <HeaderPushButton className="h-12 w-12" />
               <HeaderNotificationsButton className="h-12 w-12" />
               <Link
                 href="/profile"
@@ -294,6 +360,7 @@ export function Header() {
 
         <div className="flex items-center gap-2.5 md:hidden">
           <HeaderThemeButton className="h-12 w-12" />
+          <HeaderPushButton className="h-12 w-12" />
           <HeaderNotificationsButton className="h-12 w-12" />
           <Button
             size="icon"

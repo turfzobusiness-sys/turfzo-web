@@ -145,6 +145,22 @@ const reviewRatings = [
 
 type RegStep = "closed" | "form" | "processing" | "confirmed" | "error";
 
+/**
+ * Strips a phone number to the bare 10-digit national format expected by
+ * the registration form. The stored profile number is E.164 (+91...), but
+ * the form and Cashfree require a 10-digit Indian mobile.
+ */
+function toNationalNumber(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) {
+    return digits.slice(2);
+  }
+  if (digits.length === 11 && digits.startsWith("0")) {
+    return digits.slice(1);
+  }
+  return digits;
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
     day: "numeric",
@@ -288,7 +304,9 @@ export default function TournamentsPage() {
                 ""),
       );
       setCaptainEmail(convexUser.email ?? firebaseUser?.email ?? "");
-      setCaptainPhone(convexUser.phone_number ?? "");
+      setCaptainPhone(
+        toNationalNumber(convexUser.phone_number ?? ""),
+      );
     }
     setRegError(null);
     setRegStep("form");
@@ -450,6 +468,14 @@ export default function TournamentsPage() {
             "[Tournament Reg] Refund request failed:",
             refundErr,
           );
+          // SECURITY (T13): payment verified but registration failed AND the
+          // auto-refund also failed — tell the player their money may be
+          // stuck so they contact support instead of silently losing it.
+          setRegError(
+            "Your payment was collected but your registration could not be completed, and your entry fee refund could not be processed automatically. Please contact support for a manual refund.",
+          );
+          setRegStep("error");
+          return;
         }
       }
       const { getErrorMessage } = await import("@/lib/errors");
@@ -682,7 +708,8 @@ export default function TournamentsPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-4">
-                            {myRegQrs[reg._id] ? (
+                            {reg.status === "approved" &&
+                            myRegQrs[reg._id] ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img
                                 src={myRegQrs[reg._id]}
@@ -690,7 +717,15 @@ export default function TournamentsPage() {
                                 className="w-28 h-28 rounded-xl bg-white p-1.5 border border-border-default shrink-0"
                               />
                             ) : (
-                              <div className="w-28 h-28 bg-surface animate-pulse rounded-xl shrink-0" />
+                              <div className="w-28 h-28 rounded-xl border border-dashed border-border-strong flex flex-col items-center justify-center gap-1.5 bg-surface shrink-0">
+                                <span className="text-[9px] font-bold uppercase tracking-wider text-text-muted">
+                                  {reg.status === "approved"
+                                    ? "Loading pass…"
+                                    : reg.status === "rejected"
+                                      ? "Rejected"
+                                      : "Pending approval"}
+                                </span>
+                              </div>
                             )}
                             <div className="min-w-0">
                               <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
@@ -709,9 +744,13 @@ export default function TournamentsPage() {
                           </div>
                           <div className="flex items-center justify-between mt-4 pt-4 border-t border-border-default">
                             <span className="text-[9px] font-bold uppercase tracking-wider text-text-muted">
-                              Scan at venue gate
+                              {reg.status === "approved"
+                                ? "Scan at venue gate"
+                                : reg.status === "rejected"
+                                  ? "Not admitted — registration rejected"
+                                  : "Admitted after organizer approval"}
                             </span>
-                            {reg.registration_code && (
+                            {reg.status === "approved" && reg.registration_code && (
                               <a
                                 href={myRegQrs[reg._id]}
                                 download={`turfzo-pass-${reg.registration_code}.png`}
@@ -1573,7 +1612,9 @@ export default function TournamentsPage() {
                   Team Registered!
                 </h3>
                 <p className="text-xs text-text-muted mt-1">
-                  Your team has successfully secured a tournament slot.
+                  {selectedTournament.entry_fee > 0
+                    ? "Your team has successfully secured a tournament slot."
+                    : "Registration submitted — pending organizer approval."}
                 </p>
 
                 {/* Ticket Receipt Pass */}
@@ -1588,7 +1629,7 @@ export default function TournamentsPage() {
                       </span>
                     </div>
                     <span className="bg-brand-lime text-bg text-[9px] font-black px-2.5 py-1 rounded-md uppercase">
-                      Paid
+                      {selectedTournament.entry_fee > 0 ? "Paid" : "Free"}
                     </span>
                   </div>
 
