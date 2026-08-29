@@ -25,7 +25,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Changing Rooms", "Parking", "Water"],
     premium: true,
-    image: "/stadium_turf_bg.png",
+    image: "/stadium_turf_bg.webp",
   },
   {
     name: "Green Valley Turf",
@@ -36,7 +36,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Parking", "Cafeteria"],
     premium: false,
-    image: "/stadium_turf_bg.png",
+    image: "/stadium_turf_bg.webp",
   },
   {
     name: "Bangalore Football Arena",
@@ -47,7 +47,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Changing Rooms", "Parking", "Water"],
     premium: true,
-    image: "/stadium_turf_bg.png",
+    image: "/stadium_turf_bg.webp",
   },
   {
     name: "Whitefield Kickers",
@@ -58,7 +58,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Parking"],
     premium: false,
-    image: "/stadium_turf_bg.png",
+    image: "/stadium_turf_bg.webp",
   },
   {
     name: "JP Nagar Sports Hub",
@@ -69,7 +69,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Changing Rooms", "Water"],
     premium: false,
-    image: "/stadium_turf_bg.png",
+    image: "/stadium_turf_bg.webp",
   },
   {
     name: "Electronic City Turf",
@@ -80,7 +80,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Parking"],
     premium: false,
-    image: "/stadium_turf_bg.png",
+    image: "/stadium_turf_bg.webp",
   },
 ];
 
@@ -213,7 +213,7 @@ export default function BestFootballTurfsBangalore() {
           {/* Featured Image */}
           <div className="relative rounded-md overflow-hidden mb-12 h-64 sm:h-80">
             <Image
-              src="/stadium_turf_bg.png"
+              src="/stadium_turf_bg.webp"
               alt="Football turf in Bangalore"
               fill
               className="object-cover"

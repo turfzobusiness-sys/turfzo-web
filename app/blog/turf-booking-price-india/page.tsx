@@ -69,7 +69,7 @@ export default function TurfBookingPriceIndia() {
         </title>
         <meta
           name="description"
-          content="How much does turf booking cost in India? We analyzed 50+ turfs across 8 cities with real pricing data. Football, cricket, badminton prices from ₹400/hr."
+          content="How much does turf booking cost in India? We analyzed 50+ turfs across 9 cities with real pricing data. Football, cricket, badminton prices from ₹400/hr."
         />
         <link
           rel="canonical"
@@ -81,7 +81,7 @@ export default function TurfBookingPriceIndia() {
         />
         <meta
           property="og:description"
-          content="Real turf booking prices across 8 Indian cities. Football, cricket, and badminton pricing data from ₹400/hr."
+          content="Real turf booking prices across 9 Indian cities. Football, cricket, and badminton pricing data from ₹400/hr."
         />
         <meta
           property="og:url"
@@ -90,7 +90,7 @@ export default function TurfBookingPriceIndia() {
       </head>
       <ArticleSchema
         name="Turf Booking Price in India [2026 Data]"
-        description="How much does turf booking cost in India? Real pricing data from 50+ turfs across 8 cities."
+        description="How much does turf booking cost in India? Real pricing data from 50+ turfs across 9 cities."
         datePublished="2026-05-31"
         dateModified="2026-05-31"
         author={{ "@type": "Organization", name: "Turfzo" }}
@@ -127,7 +127,7 @@ export default function TurfBookingPriceIndia() {
               Turf Booking Price in India [2026 Data]
             </h1>
             <p className="mt-4 text-text-muted text-sm font-sans leading-relaxed">
-              We analyzed 50+ turfs across 8 major Indian cities to give you real pricing data for football, cricket, and badminton venues. This guide breaks down costs by city, sport, and time of day so you know exactly what to expect before booking.
+              We analyzed 50+ turfs across 9 major Indian cities to give you real pricing data for football, cricket, and badminton venues. This guide breaks down costs by city, sport, and time of day so you know exactly what to expect before booking.
             </p>
             <div className="mt-4 flex items-center gap-4 text-xs text-text-muted font-sans">
               <span>By Turfzo Team</span>

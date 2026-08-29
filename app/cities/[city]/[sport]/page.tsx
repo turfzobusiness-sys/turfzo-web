@@ -76,7 +76,7 @@ export default async function CitySportPage({ params }: Props) {
         address={{ streetAddress: data.highlights[0], addressLocality: data.name, addressRegion: data.state, postalCode: "560001" }}
         sportType={formattedSport}
         pricePerHour={parseInt(data.avgPrice.replace(/[^\d]/g, "")) || 1000}
-        image="/stadium_turf_bg.png"
+        image="/stadium_turf_bg.webp"
         openingHours="Mo-Su 06:00-23:00"
       />
       <Header />
@@ -84,7 +84,7 @@ export default async function CitySportPage({ params }: Props) {
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
           <div className="relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow p-8 sm:p-12 mb-12 min-h-[280px] flex flex-col justify-end">
-            <div className="absolute inset-0 bg-cover bg-center z-0 opacity-40" style={{ backgroundImage: `url('/stadium_turf_bg.png')` }} />
+            <div className="absolute inset-0 bg-cover bg-center z-0 opacity-40" style={{ backgroundImage: `url('/stadium_turf_bg.webp')` }} />
             
             <div className="relative z-10 text-left">
               <nav className="flex items-center gap-1.5 text-xs text-text-muted font-sans mb-4">

@@ -16,7 +16,7 @@ const blogPosts = [
     category: "For Players",
     readTime: "5 min read",
     date: "June 2026",
-    image: "/players_playing_football_1781975762157.png",
+    image: "/players_playing_football_1781975762157.webp",
   },
   {
     slug: "organize-local-sports-tournaments",
@@ -26,7 +26,7 @@ const blogPosts = [
     category: "For Community",
     readTime: "7 min read",
     date: "June 2026",
-    image: "/community_sports_tournament_1781975774951.png",
+    image: "/community_sports_tournament_1781975774951.webp",
   },
   {
     slug: "maximize-turf-roi-booking-management",
@@ -36,7 +36,7 @@ const blogPosts = [
     category: "For Owners",
     readTime: "6 min read",
     date: "June 2026",
-    image: "/turf_owner_dashboard_1781975786523.png",
+    image: "/turf_owner_dashboard_1781975786523.webp",
   },
   {
     slug: "future-of-amateur-sports-india",
@@ -46,7 +46,7 @@ const blogPosts = [
     category: "Industry",
     readTime: "8 min read",
     date: "June 2026",
-    image: "/future_of_amateur_sports_1781976167558.png",
+    image: "/future_of_amateur_sports_1781976167558.webp",
   },
   {
     slug: "turf-vs-ground-injury-prevention",
@@ -56,7 +56,7 @@ const blogPosts = [
     category: "Educational",
     readTime: "6 min read",
     date: "June 2026",
-    image: "/turf_quality_closeup_1781976182142.png",
+    image: "/turf_quality_closeup_1781976182142.webp",
   },
 ];
 

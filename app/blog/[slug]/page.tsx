@@ -34,7 +34,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
     category: "For Players",
     readTime: "5 min read",
     date: "June 2026",
-    image: "/players_playing_football_1781975762157.png",
+    image: "/players_playing_football_1781975762157.webp",
     content: (
       <>
         <p className="mb-6">Are you tired of calling multiple turfs in your city only to find out they are fully booked? Or worse, arriving at the ground to discover your slot was double-booked? In today&apos;s fast-paced world, organizing a simple game of football or cricket with friends shouldn&apos;t feel like a part-time job.</p>
@@ -71,7 +71,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
     category: "For Community",
     readTime: "7 min read",
     date: "June 2026",
-    image: "/community_sports_tournament_1781975774951.png",
+    image: "/community_sports_tournament_1781975774951.webp",
     content: (
       <>
         <p className="mb-6">Sports have always been the ultimate community builder. Whether it&apos;s a neighborhood 5v5 football cup, a corporate weekend cricket league, or a charity badminton tournament, nothing brings people together like friendly competition. However, organizing these events can feel like a logistical nightmare.</p>
@@ -111,7 +111,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
     category: "For Owners",
     readTime: "6 min read",
     date: "June 2026",
-    image: "/turf_owner_dashboard_1781975786523.png",
+    image: "/turf_owner_dashboard_1781975786523.webp",
     content: (
       <>
         <p className="mb-6">Running a sports facility is a capital-intensive business. Between the high cost of real estate, the installation of FIFA-certified artificial grass, and ongoing maintenance (like brushing and infill top-ups), owners need a robust strategy to ensure profitability. Maximizing the utilization rate of your pitches is the only way to achieve a strong Return on Investment (ROI).</p>
@@ -142,7 +142,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
     category: "Industry",
     readTime: "8 min read",
     date: "June 2026",
-    image: "/future_of_amateur_sports_1781976167558.png",
+    image: "/future_of_amateur_sports_1781976167558.webp",
     content: (
       <>
         <p className="mb-6">For decades, amateur sports in India were confined to dusty, unmaintained public parks or expensive private club memberships. However, a massive cultural shift is currently underway. A growing middle class, increased focus on physical fitness, and the rise of local franchise leagues (like the ISL and PKL) have sparked an unprecedented demand for high-quality, accessible sports infrastructure.</p>
@@ -165,7 +165,7 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
     category: "Educational",
     readTime: "6 min read",
     date: "June 2026",
-    image: "/turf_quality_closeup_1781976182142.png",
+    image: "/turf_quality_closeup_1781976182142.webp",
     content: (
       <>
         <p className="mb-6">The debate between playing on natural grass versus artificial turf has existed since the invention of Astroturf. While natural grass is the gold standard for professional leagues, it is incredibly difficult and expensive to maintain in a high-traffic, amateur setting. Artificial turf solves the durability problem, allowing 10+ hours of play per day regardless of the weather. But what about player safety?</p>
