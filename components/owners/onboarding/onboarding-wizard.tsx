@@ -9,6 +9,7 @@ import { StepVenueSetup, type VenueDraftData } from "./step-venue-setup";
 import { StepPayoutDetails, type PayoutData } from "./step-payout-details";
 import { StepReviewSubmit } from "./step-review-submit";
 import { convexClient } from "@/lib/convex";
+import { openCashfreeCheckout } from "@/lib/cashfree";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
 import type { OnboardingState } from "@/lib/types";
@@ -22,6 +23,12 @@ export function OnboardingWizard() {
   const [step, setStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isSuccess, setIsSuccess] = useState(false);
+  // One-time listing fee (null until loaded; amount 0 = free).
+  const [listingFee, setListingFee] = useState<{
+    amount: number;
+    currency: string;
+    required: boolean;
+  } | null>(null);
 
   useEffect(() => {
     async function loadState() {
@@ -50,6 +57,28 @@ export function OnboardingWizard() {
     }
     loadState();
   }, [firebaseUser]);
+
+  // Load the listing-fee config (amount comes from the backend env, never
+  // hardcoded here). Unset/0 means listing is free — nothing changes for
+  // the testing phase.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const cfg = await convexClient.query<{
+          amount: number;
+          currency: string;
+          required: boolean;
+        }>("payments_internal:getListingFeeConfig", {});
+        if (!cancelled) setListingFee(cfg);
+      } catch {
+        if (!cancelled) setListingFee({ amount: 0, currency: "INR", required: false });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -151,10 +180,48 @@ export function OnboardingWizard() {
     }
   };
 
-  // Handle Step 4 Final Submit
+  // Handle Step 4 Final Submit — pays the one-time listing fee first when
+  // configured, then submits. The backend re-verifies the paid order during
+  // submitOnboarding, so a tampered client cannot skip the fee.
   const handleFinalSubmit = async () => {
     setActionLoading(true);
     try {
+      if (listingFee && listingFee.required && listingFee.amount > 0) {
+        const token = firebaseUser ? await firebaseUser.getIdToken() : undefined;
+
+        // Already-paid accounts short-circuit to a free submit.
+        const order = await convexClient.action<{
+          success: boolean;
+          alreadyPaid?: boolean;
+          cf_order_id?: string;
+          payment_session_id?: string;
+          error?: string;
+        }>(
+          "payments:createListingOrder",
+          {},
+          token,
+        );
+
+        if (order.success && order.alreadyPaid) {
+          // Fee already settled on a previous application — submit free.
+        } else {
+          if (!order.success || !order.payment_session_id) {
+            throw new Error(order.error || "Failed to initialize payment.");
+          }
+          await openCashfreeCheckout({
+            paymentSessionId: order.payment_session_id,
+          });
+          const verify = await convexClient.action<{
+            success: boolean;
+            payment_verified: boolean;
+            error?: string;
+          }>("payments:verifyListingPayment", { cf_order_id: order.cf_order_id }, token);
+          if (!verify.success || !verify.payment_verified) {
+            throw new Error(verify.error || "Payment verification failed.");
+          }
+        }
+      }
+
       await convexClient.mutation("auth:submitOnboarding", {
         agreementAccepted: true,
       });
@@ -162,7 +229,9 @@ export function OnboardingWizard() {
     } catch (err) {
       console.error(err);
       const { getErrorMessage } = await import("@/lib/errors");
-      toast.error(getErrorMessage(err, "Failed to submit your application. Please try again."));
+      toast.error(
+        getErrorMessage(err, "Failed to submit your application. Please try again."),
+      );
     } finally {
       setActionLoading(false);
     }
@@ -340,6 +409,9 @@ export function OnboardingWizard() {
                 onBack={() => setStep(3)}
                 onSubmit={handleFinalSubmit}
                 loading={actionLoading}
+                listingFee={
+                  listingFee && listingFee.amount > 0 ? listingFee : null
+                }
               />
             )}
           </motion.div>

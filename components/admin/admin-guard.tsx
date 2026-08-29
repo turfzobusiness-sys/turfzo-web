@@ -4,8 +4,13 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 
+// Client-side UX gate only — it hides the admin panel from non-admins.
+// The security boundary is server-side: every admin Convex function
+// re-checks assertRole(user, "admin"). (A previous version also minted a
+// tz_admin_verified cookie that nothing consumed; that machinery was
+// removed so nobody mistakes it for enforcement.)
 export function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { convexUser, status, getIdToken, firebaseUser } = useAuth();
+  const { convexUser, status } = useAuth();
   const router = useRouter();
 
   // Authorization is derived from auth state during render (not stored in
@@ -28,26 +33,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
       router.push("/");
       return;
     }
-
-    // W3: server-side gate — ask the server to mint the httpOnly
-    // admin cookie (it independently verifies the Firebase token
-    // against Convex). Fire-and-forget; the layout blocks without it.
-    if (status === "authenticated" && convexUser?.role === "admin") {
-      void (async () => {
-        try {
-          if (!firebaseUser) return;
-          const token = await getIdToken(firebaseUser);
-          await fetch("/api/auth/admin-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idToken: token }),
-          });
-        } catch {
-          // Non-fatal: client-side guard still gates the UI.
-        }
-      })();
-    }
-  }, [status, convexUser, router, firebaseUser, getIdToken]);
+  }, [status, convexUser, router]);
 
   if (status === "loading" || !isAuthorized) {
     return (

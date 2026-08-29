@@ -22,13 +22,13 @@ import {
   Users,
   Star,
   Search,
-  Smartphone,
   Sparkles,
   ShieldCheck,
   Zap,
   Info,
   Share2,
   Heart,
+  Smartphone,
 } from "lucide-react";
 import {
   GiSoccerBall,
@@ -41,9 +41,8 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
-import { openCashfreeCheckout } from "@/lib/cashfree";
 import { isViewOnlyMode } from "@/lib/env";
-import QRCode from "qrcode";
+import { openCashfreeCheckout } from "@/lib/cashfree";
 
 interface Tournament {
   _id: string;
@@ -146,6 +145,16 @@ const reviewRatings = [
 type RegStep = "closed" | "form" | "processing" | "confirmed" | "error";
 
 /**
+ * Registration-flow breadcrumbs. Dev-only: these log Cashfree order and
+ * payment payloads, which must never reach a production browser console.
+ */
+function debugLog(...args: unknown[]) {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(...args);
+  }
+}
+
+/**
  * Strips a phone number to the bare 10-digit national format expected by
  * the registration form. The stored profile number is E.164 (+91...), but
  * the form and Cashfree require a 10-digit Indian mobile.
@@ -172,7 +181,6 @@ function formatDate(iso: string) {
 export default function TournamentsPage() {
   const router = useRouter();
   const { status, firebaseUser, convexUser, getFreshToken } = useAuth();
-  const viewOnly = isViewOnlyMode();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTournament, setSelectedTournament] =
@@ -249,6 +257,7 @@ export default function TournamentsPage() {
             tournament: reg.tournament?.title ?? "Tournament",
             team: reg.team_name ?? "Individual",
           });
+          const { default: QRCode } = await import("qrcode");
           qrs[reg._id] = await QRCode.toDataURL(payload, {
             width: 256,
             margin: 1,
@@ -284,6 +293,8 @@ export default function TournamentsPage() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
+
+  const viewOnly = isViewOnlyMode();
 
   const handleOpenRegistration = (t: Tournament) => {
     if (viewOnly) return;
@@ -336,16 +347,16 @@ export default function TournamentsPage() {
     let token: string | undefined;
 
     try {
-      console.log("[Tournament Reg] Step 0: Refreshing auth token...");
+      debugLog("[Tournament Reg] Step 0: Refreshing auth token...");
       token = await getFreshToken();
-      console.log("[Tournament Reg] Token refreshed:", token ? "yes" : "NO TOKEN");
+      debugLog("[Tournament Reg] Token refreshed:", token ? "yes" : "NO TOKEN");
 
       // Paid tournaments: order → Cashfree checkout → server-side
       // verification. Free tournaments (entry_fee = 0) skip payment — the
       // backend accepts registrations without a payment order for them.
       if (selectedTournament.entry_fee > 0) {
         // ── Step 1: Create a Cashfree order for the entry fee ──
-        console.log("[Tournament Reg] Step 1: Creating Cashfree order via payments:createTournamentOrder...");
+        debugLog("[Tournament Reg] Step 1: Creating Cashfree order via payments:createTournamentOrder...");
         const order = await convexClient.action<{
           success: boolean;
           cf_order_id: string;
@@ -362,20 +373,20 @@ export default function TournamentsPage() {
           },
           token
         );
-        console.log("[Tournament Reg] Step 1 result:", order);
+        debugLog("[Tournament Reg] Step 1 result:", order);
         if (!order.success || !order.payment_session_id) {
           throw new Error(order.error || "Failed to initialize payment session.");
         }
 
         // ── Step 2: Open the Cashfree checkout modal ──
-        console.log("[Tournament Reg] Step 2: Opening Cashfree checkout modal...");
+        debugLog("[Tournament Reg] Step 2: Opening Cashfree checkout modal...");
         await openCashfreeCheckout({
           paymentSessionId: order.payment_session_id,
         });
-        console.log("[Tournament Reg] Step 2 complete: Cashfree checkout done.");
+        debugLog("[Tournament Reg] Step 2 complete: Cashfree checkout done.");
 
         // ── Step 3: Verify the payment server-side (single source of truth) ──
-        console.log("[Tournament Reg] Step 3: Verifying payment via payments:verifyTournamentCashfreePayment...");
+        debugLog("[Tournament Reg] Step 3: Verifying payment via payments:verifyTournamentCashfreePayment...");
         const verify = await convexClient.action<{
           success: boolean;
           payment_verified: boolean;
@@ -388,7 +399,7 @@ export default function TournamentsPage() {
           },
           token
         );
-        console.log("[Tournament Reg] Step 3 result:", verify);
+        debugLog("[Tournament Reg] Step 3 result:", verify);
         if (!verify.success || !verify.payment_verified) {
           throw new Error(verify.error || "Payment verification failed.");
         }
@@ -396,7 +407,7 @@ export default function TournamentsPage() {
       }
 
       // ── Step 4: Register the team with the verified payment order ID ──
-      console.log("[Tournament Reg] Step 4: Registering team via tournaments:register...");
+      debugLog("[Tournament Reg] Step 4: Registering team via tournaments:register...");
       const registration = await convexClient.mutation<{
         registration_code: string;
         team_name: string;
@@ -414,7 +425,7 @@ export default function TournamentsPage() {
         },
         token
       );
-      console.log("[Tournament Reg] Step 4 result:", registration);
+      debugLog("[Tournament Reg] Step 4 result:", registration);
 
       setRegistrationCode(registration.registration_code);
       setTournaments((prev) =>
@@ -444,6 +455,7 @@ export default function TournamentsPage() {
         tournament: selectedTournament.title,
         team: teamName,
       });
+      const { default: QRCode } = await import("qrcode");
       const qrDataUrl = await QRCode.toDataURL(qrPayload, {
         width: 256,
         margin: 1,
@@ -515,7 +527,7 @@ export default function TournamentsPage() {
           >
             <div
               className="absolute inset-0 bg-cover bg-center z-0 opacity-50"
-              style={{ backgroundImage: `url('/stadium_light_bg.png')` }}
+              style={{ backgroundImage: `url('/stadium_light_bg.webp')` }}
             />
             <div
               className="absolute inset-0 z-0"
@@ -834,7 +846,7 @@ export default function TournamentsPage() {
                         {/* Image banner */}
                         <div className="relative w-full h-48 bg-elevated overflow-hidden shrink-0">
                           <Image
-                            src={t.image_url || "/stadium_turf_bg.png"}
+                            src={t.image_url || "/stadium_turf_bg.webp"}
                             alt={t.title}
                             fill
                             className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
@@ -977,7 +989,7 @@ export default function TournamentsPage() {
                 {/* Left Large Photo */}
                 <div className="md:col-span-2 relative h-full w-full overflow-hidden group">
                   <Image
-                    src={selectedTournament.image_url || "/stadium_turf_bg.png"}
+                    src={selectedTournament.image_url || "/stadium_turf_bg.webp"}
                     alt={selectedTournament.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 66vw"
@@ -997,7 +1009,7 @@ export default function TournamentsPage() {
                   </div>
                   <div className="relative flex-1 w-full overflow-hidden group">
                     <Image
-                      src="/stadium_cinematic_bg.png"
+                      src="/stadium_cinematic_bg.webp"
                       alt="Cinematic stadium lighting"
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"

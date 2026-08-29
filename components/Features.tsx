@@ -21,8 +21,8 @@ const FEATURES = [
   },
   {
     num: "03",
-    title: "Zero Hidden Fees",
-    desc: "What you see is what you pay. Transparent booking pricing with absolute zero convenience charges or hidden administrative fees.",
+    title: "Transparent Pricing",
+    desc: "What you see at checkout is what you pay. The single service fee is clearly shown before you pay — nothing hidden, nothing added later.",
     tag: "No Booking Fees",
     icon: CircleDollarSign
   },
@@ -37,7 +37,7 @@ const FEATURES = [
 
 const STATS = [
   { value: "10K+", label: "Bookings completed" },
-  { value: "500+", label: "Verified fields" },
+  { value: "100%", label: "Verified fields" },
   { value: "25K+", label: "Active players" },
   { value: "4.8/5", label: "User satisfaction" }
 ];

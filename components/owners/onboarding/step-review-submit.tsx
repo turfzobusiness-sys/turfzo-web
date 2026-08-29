@@ -45,9 +45,11 @@ interface StepReviewSubmitProps {
   onBack: () => void;
   onSubmit: () => Promise<void>;
   loading: boolean;
+  /** One-time listing fee to pay before submission; null = free. */
+  listingFee?: { amount: number; currency: string } | null;
 }
 
-export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }: StepReviewSubmitProps) {
+export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading, listingFee }: StepReviewSubmitProps) {
   const [agreement, setAgreement] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -249,6 +251,23 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
           Back
         </Button>
 
+        {listingFee && listingFee.amount > 0 && (
+          <div className="rounded-[12px] border border-brand-lime/30 bg-brand-lime/5 p-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="font-sans text-sm font-bold text-text-main">
+                One-time listing fee
+              </p>
+              <p className="font-sans text-xs text-text-muted mt-0.5">
+                Paid once per account — reapplications and resubmissions are
+                always free.
+              </p>
+            </div>
+            <span className="font-sans text-lg font-extrabold text-brand-lime whitespace-nowrap">
+              &#8377;{listingFee.amount.toLocaleString("en-IN")}
+            </span>
+          </div>
+        )}
+
         <Button
           type="submit"
           disabled={loading || !agreement}
@@ -262,7 +281,9 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading }
           ) : (
             <>
               <Sparkles className="h-4 w-4 fill-current text-brand-lime" />
-              Submit Application
+              {listingFee && listingFee.amount > 0
+                ? `Pay \u20B9${listingFee.amount.toLocaleString("en-IN")} & Submit Application`
+                : "Submit Application"}
             </>
           )}
         </Button>

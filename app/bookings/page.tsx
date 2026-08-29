@@ -21,7 +21,6 @@ import { useAuth } from "@/lib/auth-context";
 import { convexClient } from "@/lib/convex";
 import { toast } from "sonner";
 import type { Booking, Turf } from "@/lib/types";
-import QRCode from "qrcode";
 
 export default function BookingsPage() {
   const router = useRouter();
@@ -57,18 +56,15 @@ export default function BookingsPage() {
         setBookings(data);
         const turfIds = Array.from(new Set(data.map((b) => b.turf_id)));
         const turfMap: Record<string, Turf> = {};
-        await Promise.all(
-          turfIds.map(async (id) => {
-            try {
-              const t = await convexClient.query<Turf | null>("turfs:getById", {
-                turfId: id,
-              });
-              if (t) turfMap[id] = t;
-            } catch {
-              // ignore individual failures
-            }
-          }),
-        );
+        try {
+          // One batched call instead of one request per turf (N+1).
+          const turfs = await convexClient.query<Turf[]>("turfs:getMany", {
+            turfIds,
+          });
+          for (const t of turfs) turfMap[t._id] = t;
+        } catch {
+          // batch failure: cards fall back to placeholders
+        }
         if (cancelled) return;
         setTurfs(turfMap);
       } catch (err) {
@@ -96,18 +92,15 @@ export default function BookingsPage() {
       setBookings(data);
       const turfIds = Array.from(new Set(data.map((b) => b.turf_id)));
       const turfMap: Record<string, Turf> = {};
-      await Promise.all(
-        turfIds.map(async (id) => {
-          try {
-            const t = await convexClient.query<Turf | null>("turfs:getById", {
-              turfId: id,
-            });
-            if (t) turfMap[id] = t;
-          } catch {
-            // ignore individual failures
-          }
-        }),
-      );
+      try {
+        // One batched call instead of one request per turf (N+1).
+        const turfs = await convexClient.query<Turf[]>("turfs:getMany", {
+          turfIds,
+        });
+        for (const t of turfs) turfMap[t._id] = t;
+      } catch {
+        // batch failure: cards fall back to placeholders
+      }
       setTurfs(turfMap);
     } catch (err) {
       console.error("Failed to load bookings:", err);
@@ -117,16 +110,58 @@ export default function BookingsPage() {
     }
   };
 
-  const handleCancel = async (bookingId: string) => {
-    if (
-      !confirm(
-        "Are you sure you want to cancel this booking? Refund rules apply.",
-      )
-    )
-      return;
+  /**
+   * Refund disclosure for the cancel confirm — mirrors the mobile app's
+   * dialog. Amounts come from bookings:getRefundPreview, which runs the
+   * SAME math the cancellation itself runs, so this can never disagree
+   * with the actual refund.
+   */
+  const refundMessage = (
+    preview: {
+      refundAmount: number;
+      refundPolicy: string;
+      chargedOnline: boolean;
+      canCancel: boolean;
+    } | null,
+    booking: Booking,
+  ): string => {
+    if (!preview) {
+      return "Are you sure you want to cancel this booking? Refund details are unavailable right now — the policy that applied at booking time will be used.";
+    }
+    if (!preview.canCancel) {
+      return "This booking can no longer be cancelled — the slot has already started or its status has changed.";
+    }
+    const paid = `\u20B9${Math.round(booking.total_price)}`;
+    switch (preview.refundPolicy) {
+      case "not_charged":
+        return "This is a pay-at-venue booking — nothing has been charged, so there is nothing to refund.";
+      case "full":
+        return `You will receive a FULL refund of ${paid} back to your original payment method (may take 5\u20137 days to appear).`;
+      case "partial":
+        return `Cancelling now refunds 50%: \u20B9${Math.round(preview.refundAmount)} of ${paid}. Full refunds only apply 24+ hours before the slot.`;
+      default:
+        return "No refund is available — cancellations within 6 hours of the slot are non-refundable.";
+    }
+  };
+
+  const handleCancel = async (booking: Booking) => {
+    // Fetch the refund preview first so the confirm dialog shows real
+    // numbers. A failed lookup never blocks cancellation.
+    let preview = null;
+    try {
+      preview = await convexClient.query<{
+        refundAmount: number;
+        refundPolicy: string;
+        chargedOnline: boolean;
+        canCancel: boolean;
+      }>("bookings:getRefundPreview", { bookingId: booking._id });
+    } catch {
+      preview = null;
+    }
+    if (!confirm(refundMessage(preview, booking))) return;
     try {
       await convexClient.mutation<Booking>("bookings:cancel", {
-        bookingId,
+        bookingId: booking._id,
         reason: "Cancelled by user",
       });
       await loadBookings();
@@ -150,6 +185,7 @@ export default function BookingsPage() {
         turf: turf?.name ?? "Turf",
         date: booking.start_time,
       });
+      const { default: QRCode } = await import("qrcode");
       const url = await QRCode.toDataURL(payload, { width: 256, margin: 1 });
       setQrUrls((prev) => ({ ...prev, [booking._id]: url }));
       setActiveQR(booking._id);
@@ -365,7 +401,7 @@ export default function BookingsPage() {
                               <Ticket className="w-3.5 h-3.5" /> View QR
                             </button>
                             <button
-                              onClick={() => handleCancel(booking._id)}
+                              onClick={() => handleCancel(booking)}
                               className="bg-elevated hover:bg-error/10 border border-border-subtle hover:border-error/30 text-text-muted hover:text-error font-sans text-xs py-2 px-4 rounded-md transition-colors"
                             >
                               Cancel

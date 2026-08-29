@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,17 +45,21 @@ import {
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
+import {
+  LAUNCH_CITIES,
+  launchCityQueryFor,
+} from "@/lib/launch-cities";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { openCashfreeCheckout } from "@/lib/cashfree";
 import { isViewOnlyMode } from "@/lib/env";
+import { AppError } from "@/lib/errors";
 import type {
   Turf as ConvexTurf,
   Booking,
   FavoriteWithTurf,
 } from "@/lib/types";
 import { FAQPageSchema } from "@/lib/schema";
-import QRCode from "qrcode";
 
 const exploreFaqItems = [
   {
@@ -76,7 +80,7 @@ const exploreFaqItems = [
   {
     question: "How many turfs are available on Turfzo?",
     answer:
-      "Turfzo has 50+ verified turfs across 8 major Indian cities including Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, and Ahmedabad.",
+      "Turfzo has verified turfs across 9 Indian cities including Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, and CSN (Aurangabad). You can filter by city at the top of this page.",
   },
   {
     question: "What sports can I book on Turfzo?",
@@ -122,8 +126,6 @@ interface TurfDisplay {
   hasDrinkingWater?: boolean;
   hasFirstAid?: boolean;
   isIndoor?: boolean;
-  convenience_fee?: number;
-  gst_tax?: number;
 }
 
 function mapTurf(t: ConvexTurf): TurfDisplay {
@@ -138,10 +140,8 @@ function mapTurf(t: ConvexTurf): TurfDisplay {
     sport: t.sport_type ?? "Multipurpose",
     size: t.format ?? "N/A",
     premium: t.tier === "premium",
-    convenience_fee: t.convenience_fee,
-    gst_tax: t.gst_tax,
     facilities: t.amenities ?? [],
-    image: t.image_url || "/stadium_turf_bg.png",
+    image: t.image_url || "/stadium_turf_bg.webp",
     city: t.city,
     hasFloodlights: t.has_floodlights,
     hasFreeParking: t.has_free_parking,
@@ -293,6 +293,14 @@ function CalendarPicker({
     d.setHours(0, 0, 0, 0);
     return d;
   }, []);
+  // Booking window: slots are only bookable up to 7 days out (enforced by
+  // the backend) — the calendar mirrors it so no dead-end dates are shown.
+  const maxRef = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 7);
+    return d;
+  }, []);
   const [viewMonth, setViewMonth] = useState(() => {
     const d = new Date(selected);
     return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -332,18 +340,19 @@ function CalendarPicker({
       result.push({
         date: dt,
         key,
-        disabled: dt < todayRef,
+        disabled: dt < todayRef || dt.getTime() > maxRef.getTime(),
         isToday: dt.getTime() === todayRef.getTime(),
         label: d,
       });
     }
     return result;
-  }, [viewMonth, todayRef]);
+  }, [viewMonth, todayRef, maxRef]);
 
   const canGoPrev =
     viewMonth.getFullYear() > todayRef.getFullYear() ||
     (viewMonth.getFullYear() === todayRef.getFullYear() &&
       viewMonth.getMonth() > todayRef.getMonth());
+  const canGoNext = viewMonth.getTime() < maxRef.getTime();
 
   return (
     <div className="w-[280px]">
@@ -362,12 +371,13 @@ function CalendarPicker({
         </button>
         <span className="text-sm font-bold text-text-main">{monthLabel}</span>
         <button
+          disabled={!canGoNext}
           onClick={() =>
             setViewMonth(
               new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1),
             )
           }
-          className="w-8 h-8 rounded-full border-none bg-elevated hover:bg-border-default flex items-center justify-center cursor-pointer transition-all duration-200"
+          className="w-8 h-8 rounded-full border-none bg-elevated hover:bg-border-default flex items-center justify-center cursor-pointer transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <ChevronLeft className="w-4 h-4 text-text-main rotate-180" />
         </button>
@@ -420,10 +430,29 @@ function CalendarPicker({
   );
 }
 
+// Error codes meaning "we could not get a definitive answer" (transport/
+// server-side) rather than "the payment definitively failed" — mirrors the
+// app's isTransientConvexError. For these the outcome is UNKNOWN: the money
+// may have been collected, so NEVER cancel the booking in response.
+function isTransientPaymentError(err: unknown): boolean {
+  const code = err instanceof AppError ? err.code : "";
+  return [
+    "NETWORK_ERROR",
+    "CONVEX_SERVER_ERROR",
+    "CONVEX_RATE_LIMITED",
+    "CONVEX_INVALID_RESPONSE",
+  ].includes(code);
+}
+
 export default function ExplorePage() {
   const router = useRouter();
   const { status, firebaseUser, convexUser, getFreshToken } = useAuth();
   const viewOnly = isViewOnlyMode();
+
+  // Synchronous double-submit guard: setFlowStep("processing") only shields
+  // the button after a re-render, so two clicks in the same frame would
+  // otherwise create two pending bookings.
+  const payInFlight = useRef(false);
 
   const [flowStep, setFlowStep] = useState<FlowStep>("listing");
   const [viewMode, setViewMode] = useState<"list" | "details">("list");
@@ -440,6 +469,9 @@ export default function ExplorePage() {
   const [downloadQrUrl, setDownloadQrUrl] = useState<string>("");
 
   const [searchLocation, setSearchLocation] = useState("");
+  // Launch-city chip filter ("All" = no city restriction). Labels come
+  // from the shared launch list — same nine cities as the mobile app.
+  const [selectedCity, setSelectedCity] = useState<string>("All");
   const [searchDate, setSearchDate] = useState(() => toDateKey(new Date()));
   const [whenCalendarOpen, setWhenCalendarOpen] = useState(false);
   const [sportDropdownOpen, setSportDropdownOpen] = useState(false);
@@ -631,12 +663,23 @@ export default function ExplorePage() {
         (t) => t.sport.toLowerCase() === selectedSport.toLowerCase(),
       );
     }
+    if (selectedCity !== "All") {
+      // Canonical backend city for the label ("CSN (Aurangabad)" →
+      // "Aurangabad").
+      const cityQuery = launchCityQueryFor(selectedCity);
+      result = result.filter((t) => t.city === cityQuery);
+    }
     if (searchLocation) {
+      // Free-text match is alias-aware too — typing "CSN" or
+      // "Sambhajinagar" still finds Aurangabad turfs.
+      const typedQuery = launchCityQueryFor(searchLocation).toLowerCase();
+      const typedRaw = searchLocation.toLowerCase();
       result = result.filter(
         (t) =>
-          t.location.toLowerCase().includes(searchLocation.toLowerCase()) ||
-          (t.city &&
-            t.city.toLowerCase().includes(searchLocation.toLowerCase())),
+          t.location.toLowerCase().includes(typedRaw) ||
+          (t.city && t.city.toLowerCase().includes(typedRaw)) ||
+          (t.city && t.city.toLowerCase().includes(typedQuery)) ||
+          (t.city && launchCityQueryFor(t.city).toLowerCase().includes(typedQuery)),
       );
     }
     if (filterFormat !== "all") {
@@ -747,6 +790,7 @@ export default function ExplorePage() {
     allTurfs,
     selectedSport,
     searchLocation,
+    selectedCity,
     filterFormat,
     filterMinPrice,
     filterMaxPrice,
@@ -838,6 +882,7 @@ export default function ExplorePage() {
 
   const handlePayNow = async () => {
     if (viewOnly) return;
+    if (payInFlight.current) return;
     if (!selectedTurf || !selectedTimeSlot || !firebaseUser) {
       setBookingError("Missing booking details. Please try again.");
       return;
@@ -846,6 +891,7 @@ export default function ExplorePage() {
       setBookingError("Invalid time slot selected.");
       return;
     }
+    payInFlight.current = true;
     setFlowStep("processing");
     setBookingError(null);
 
@@ -867,7 +913,7 @@ export default function ExplorePage() {
           attendees,
           // MUST be sent: the stale-booking cron only spares bookings whose
           // payment_method is "cash". Omitting it made every pay-at-venue
-          // booking self-destruct after 15 minutes ("Payment timeout"),
+          // booking self-destruct after 7 minutes ("Payment timeout"),
           // even though the user was holding a downloaded ticket.
           payment_method:
             selectedPayment === "pay_at_venue" ? "cash" : selectedPayment,
@@ -886,6 +932,7 @@ export default function ExplorePage() {
           date: selectedDate,
           slot: selectedTimeSlot,
         });
+        const { default: QRCode } = await import("qrcode");
         const qrDataUrl = await QRCode.toDataURL(qrPayload, {
           width: 256,
           margin: 1,
@@ -967,6 +1014,7 @@ export default function ExplorePage() {
         date: selectedDate,
         slot: selectedTimeSlot,
       });
+      const { default: QRCode } = await import("qrcode");
       const qrDataUrl = await QRCode.toDataURL(qrPayload, {
         width: 256,
         margin: 1,
@@ -976,34 +1024,33 @@ export default function ExplorePage() {
       setDownloadQrUrl(qrDataUrl);
       setFlowStep("confirmed");
     } catch (err) {
+      // Transport-level failure (network blip, 5xx, rate limit): the
+      // outcome is UNKNOWN, not failed — the money may have been
+      // collected. Never cancel; if a booking exists it stays payable and
+      // the server-side crons reconcile within the 7-minute window. Same
+      // contract as the app's PaymentOutcomeStatus.unavailable.
+      if (isTransientPaymentError(err)) {
+        setBookingError(
+          "We couldn't confirm your payment. Nothing was double-charged — " +
+            "check your bookings in a few minutes to see the final status.",
+        );
+        setFlowStep("error");
+        return;
+      }
+
       // ── Abandonment cleanup: release the slot if a booking was created ──
       if (pendingBookingId) {
-        // SECURITY (T11): verification can fail transiently even when
-        // Cashfree actually collected the money. Re-check the booking
-        // before cancelling so a paid slot isn't refunded/cancelled.
-        // The recheck gets its OWN try: if it throws (network blip, expired
-        // token), we must still fall through to the cancel, otherwise the
-        // slot stays locked until the 15-minute cron sweeps it.
-        let alreadyPaid = false;
+        // SECURITY (T11): the re-check-then-cancel pair runs ATOMICALLY in
+        // bookings:cancelIfUnpaid — a payment landing between check and
+        // cancel can no longer strand a paid booking (the mutation either
+        // sees paid and refuses, or the late payment hits the cancelled
+        // booking and the backend auto-refunds).
+        let outcome: { cancelled: boolean; reason?: string } | null = null;
         try {
-          const recheck = await convexClient.query<{
-            payment_status?: string;
-          }>("bookings:getById", { bookingId: pendingBookingId });
-          alreadyPaid = recheck?.payment_status === "paid";
-        } catch (recheckErr) {
-          console.error(
-            "Failed to re-check booking payment status:",
-            recheckErr,
-          );
-        }
-
-        if (alreadyPaid) {
-          setFlowStep("confirmed");
-          return;
-        }
-
-        try {
-          await convexClient.mutation("bookings:cancel", {
+          outcome = await convexClient.mutation<{
+            cancelled: boolean;
+            reason?: string;
+          }>("bookings:cancelIfUnpaid", {
             bookingId: pendingBookingId,
             reason: "Payment failed or cancelled by user.",
           });
@@ -1013,10 +1060,51 @@ export default function ExplorePage() {
             cancelErr,
           );
         }
+
+        if (outcome && !outcome.cancelled && outcome.reason === "PAID") {
+          // The payment DID land — show the real ticket instead of a blank
+          // confirmed screen. If hydration itself fails, fall back to an
+          // honest error rather than an empty shell.
+          try {
+            const paid = await convexClient.query<Booking>(
+              "bookings:getById",
+              { bookingId: pendingBookingId },
+            );
+            if (paid) {
+              setConfirmedBooking(paid);
+              const qrPayload = JSON.stringify({
+                code: paid.booking_code,
+                turf: selectedTurf!.name,
+                date: selectedDate,
+                slot: selectedTimeSlot!,
+              });
+              const { default: QRCode } = await import("qrcode");
+              const qrDataUrl = await QRCode.toDataURL(qrPayload, {
+                width: 256,
+                margin: 1,
+                color: { dark: "#000000", light: "#FFFFFF" },
+              });
+              setQrCodeUrl(qrDataUrl);
+              setDownloadQrUrl(qrDataUrl);
+              setFlowStep("confirmed");
+              return;
+            }
+          } catch (hydrateErr) {
+            console.error("Failed to hydrate paid booking:", hydrateErr);
+          }
+          setBookingError(
+            "Your payment went through, but we couldn't load your ticket " +
+              "here. Check My Bookings in a moment — nothing was double-charged.",
+          );
+          setFlowStep("error");
+          return;
+        }
       }
       const { getErrorMessage } = await import("@/lib/errors");
       setBookingError(getErrorMessage(err));
       setFlowStep("error");
+    } finally {
+      payInFlight.current = false;
     }
   };
 
@@ -1051,7 +1139,7 @@ export default function ExplorePage() {
             >
               <div
                 className="absolute inset-0 bg-cover bg-center z-0 opacity-95 dark:opacity-50 brightness-[0.70] dark:brightness-100"
-                style={{ backgroundImage: `url('/stadium_light_bg.png')` }}
+                style={{ backgroundImage: `url('/stadium_light_bg.webp')` }}
               />
               <div className="absolute inset-0 z-0 bg-gradient-to-t from-bg via-bg/40 to-transparent dark:from-black/80 dark:via-black/40 dark:to-transparent" />
               <div className="relative z-10 px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full pb-10 sm:pb-14">
@@ -1181,6 +1269,27 @@ export default function ExplorePage() {
             </motion.section>
 
             <div className="max-w-[1280px] mx-auto px-6 md:px-10 w-full">
+              {/* Launch-city chips — the same nine cities as the mobile
+                  app's selectors ("All" removes the restriction). */}
+              <div className="flex gap-2 overflow-x-auto scrollbar-none py-3 mb-2">
+                {["All", ...LAUNCH_CITIES.map((c) => c.label)].map((city) => {
+                  const isActive = selectedCity === city;
+                  return (
+                    <button
+                      key={city}
+                      onClick={() => setSelectedCity(city)}
+                      className={`px-4 py-1.5 rounded-full border text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                        isActive
+                          ? "bg-text-main text-bg border-text-main"
+                          : "border-border-default text-text-muted hover:border-border-strong hover:text-text-main"
+                      }`}
+                    >
+                      {city === "All" ? "All Cities" : city}
+                    </button>
+                  );
+                })}
+              </div>
+
               {/* Category Strip Row */}
               <div className="border-b border-border-default mt-2 mb-6">
                 <div className="flex gap-10 overflow-x-auto scrollbar-none pb-0 justify-start sm:justify-center items-center">
@@ -1462,7 +1571,7 @@ export default function ExplorePage() {
                 </div>
                 <div className="relative flex-1 w-full overflow-hidden group">
                   <Image
-                    src="/stadium_cinematic_bg.png"
+                    src="/stadium_cinematic_bg.webp"
                     alt="Cinematic stadium lights"
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"

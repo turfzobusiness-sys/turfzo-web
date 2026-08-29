@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { cache } from "react";
 import { MapPin, Star, ChevronRight, CheckCircle2 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
@@ -11,10 +12,16 @@ import type { Turf } from "@/lib/types";
 
 type Props = { params: Promise<{ venueId: string }> };
 
+// React.cache dedupes this per request, so generateMetadata and the page
+// body share one backend call instead of two.
+const getTurf = cache((turfId: string) =>
+  convexClient.query<Turf | null>("turfs:getById", { turfId }),
+);
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { venueId } = await params;
   try {
-    const turf = await convexClient.query<Turf>("turfs:getById", { turfId: venueId });
+    const turf = await getTurf(venueId);
     if (!turf) return { title: "Venue Not Found" };
 
     const sport = turf.sport_type || "Sports";
@@ -38,7 +45,7 @@ export default async function VenuePage({ params }: Props) {
   
   let turf: Turf | null = null;
   try {
-    turf = await convexClient.query<Turf>("turfs:getById", { turfId: venueId });
+    turf = await getTurf(venueId);
   } catch (err) {
     console.error("Failed to fetch venue:", err);
   }
@@ -50,9 +57,6 @@ export default async function VenuePage({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <link rel="canonical" href={`https://turfzo.app/venues/${venueId}`} />
-      </head>
       <BreadcrumbListSchema items={[
         { name: "Home", url: "https://turfzo.app" },
         { name: "Explore", url: "https://turfzo.app/explore" },
@@ -62,10 +66,10 @@ export default async function VenuePage({ params }: Props) {
       <SportsActivityLocationSchema
         name={turf.name}
         description={`Online booking for ${turf.name}. Play ${sport} in ${city}.`}
-        address={{ streetAddress: turf.address || "", addressLocality: city, addressRegion: turf.state || "", postalCode: "560001" }}
+        address={{ streetAddress: turf.address || "", addressLocality: city, addressRegion: turf.state || "", postalCode: turf.zip_code || "" }}
         sportType={sport}
         pricePerHour={turf.price_per_hour || 1000}
-        image={turf.image_url || "/stadium_turf_bg.png"}
+        image={turf.image_url || "/stadium_turf_bg.webp"}
         openingHours="Mo-Su 06:00-23:00"
       />
       <Header />
@@ -73,7 +77,7 @@ export default async function VenuePage({ params }: Props) {
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-5xl mx-auto px-6 md:px-8 w-full">
           <div className="relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow mb-8 min-h-[350px]">
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${turf.image_url || "'/stadium_turf_bg.png'"})` }} />
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${encodeURI(turf.image_url || "/stadium_turf_bg.webp")})` }} />
             <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-8">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-surface/80 backdrop-blur-md border border-border-default text-xs font-bold text-brand-lime mb-4">

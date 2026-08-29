@@ -126,7 +126,7 @@ export default async function TournamentPage({ params }: Props) {
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
-                backgroundImage: `url(${tournament.image_url || "/stadium_turf_bg.png"})`,
+                backgroundImage: `url(${tournament.image_url || "/stadium_turf_bg.webp"})`,
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent" />

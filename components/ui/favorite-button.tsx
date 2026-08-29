@@ -31,6 +31,7 @@ export function FavoriteButton({ turfId, className, label }: FavoriteButtonProps
 
   React.useEffect(() => {
     if (!isAuthed || !convexUser?._id) {
+      setLoading(false);
       return;
     }
     let cancelled = false;

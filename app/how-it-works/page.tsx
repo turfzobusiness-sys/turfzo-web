@@ -28,7 +28,7 @@ const faqItems = [
   { question: "How much does turf booking cost?", answer: "Turf booking prices in India range from ₹500 to ₹2000 per hour depending on the city, sport, and facilities. Football turfs typically cost ₹800-1500/hour in metro cities." },
   { question: "Can I cancel my booking?", answer: "Yes, you can cancel your booking up to 6 hours before the scheduled time for a full refund. Cancellations within 6 hours receive a 50% refund." },
   { question: "How does bill splitting work?", answer: "When you book a turf on Turfzo, you can add your teammates' phone numbers at checkout. Each teammate receives a payment request for their share. Everyone pays their portion online." },
-  { question: "What sports can I book on Turfzo?", answer: "Turfzo supports football, cricket, badminton, tennis, and multipurpose sports venues. We have 50+ turfs across 8 major Indian cities." },
+  { question: "What sports can I book on Turfzo?", answer: "Turfzo supports football, cricket, badminton, tennis, and multipurpose sports venues. We have turfs across 9 Indian cities, from Mumbai to CSN (Aurangabad)." },
   { question: "Is online payment safe on Turfzo?", answer: "Yes, Turfzo uses Cashfree for payment processing, which is PCI DSS compliant. We support UPI, credit cards, debit cards, and net banking." },
   { question: "Do I need to download an app to book?", answer: "No, you can book directly on turfzo.app from any browser. We also have a mobile app for Android and iOS if you prefer." },
   { question: "What happens if it rains on my booking day?", answer: "If the turf is outdoor and weather conditions prevent play, you can reschedule or get a full refund. Indoor turfs are not affected by weather." },

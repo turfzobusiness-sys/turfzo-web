@@ -30,19 +30,19 @@ export default function Hero() {
       <div className="absolute inset-0 z-0 select-none pointer-events-none">
         {/* Dark Mode Background */}
         <Image
-          src="/stadium_cinematic_bg.png"
+          src="/stadium_cinematic_bg.webp"
           alt="Cinematic Night Stadium Backdrop"
           fill
           priority
           className="object-cover object-center dark:block hidden"
         />
 
-        {/* Light Mode Background */}
+        {/* Light Mode Background — no `priority`: only one hero variant may
+            be preloaded, otherwise both are fetched on every visit. */}
         <Image
-          src="/stadium_light_bg.png"
+          src="/stadium_light_bg.webp"
           alt="Cinematic Day Stadium Backdrop"
           fill
-          priority
           className="object-cover object-center dark:hidden block"
         />
 
@@ -198,7 +198,7 @@ export default function Hero() {
             {/* Show the static mockup image directly since it already contains the iPhone frame */}
             <div className="relative w-[300px] sm:w-[330px] aspect-[9/18] select-none">
               <Image
-                src="/Screenshot_20260603-131114.turfzo-portrait.png"
+                src="/Screenshot_20260603-131114.turfzo-portrait.webp"
                 alt="Turfzo App Mockup"
                 width={330}
                 height={660}
