@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | Turfzo",
   },
   description:
-    "Turfzo is India's premium turf booking platform. Book football turfs, cricket grounds, badminton courts, and sports venues instantly across 8+ cities. Real-time availability, secure payments, and instant confirmation.",
+    "Turfzo is India's premium turf booking platform. Book football turfs, cricket grounds, badminton courts, and sports venues instantly across 9 cities. Real-time availability, secure payments, and instant confirmation.",
   keywords: [
     "turf booking",
     "football turf near me",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     siteName: "Turfzo",
     title: "Turfzo | Book Premium Turfs & Sports Venues Instantly",
     description:
-      "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly across 8+ cities.",
+      "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly across 9 cities.",
     images: [
       {
         url: "/turfzo_mascot.svg",
@@ -108,7 +108,7 @@ export default function RootLayout({
           name="Turfzo"
           url={SITE_URL}
           logo={`${SITE_URL}/turfzo_mascot.svg`}
-          description="India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly across 8+ cities."
+          description="India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly across 9 cities."
           sameAs={[
             "https://instagram.com/turfzo",
             "https://twitter.com/turfzo",

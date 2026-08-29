@@ -41,8 +41,6 @@ export interface Turf {
   is_indoor?: boolean;
   ground_count?: number;
   status?: "pending" | "approved" | "rejected" | "active" | "inactive";
-  convenience_fee?: number;
-  gst_tax?: number;
 }
 
 export interface AppUser {

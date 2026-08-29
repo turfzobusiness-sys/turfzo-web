@@ -994,4 +994,87 @@ textarea:focus-visible {
   outline: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   OWNERS PAGE — CLEAN DESIGN UTILITIES
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Custom range slider styling */
+.owners-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-border-default);
+  outline: none;
+  transition: background 0.2s;
+}
+
+.owners-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-brand-lime);
+  cursor: pointer;
+  border: 3px solid var(--color-bg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.owners-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.owners-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-brand-lime);
+  cursor: pointer;
+  border: 3px solid var(--color-bg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.owners-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-border-default);
+}
+
+/* Pain/gain visual indicators */
+.pain-card {
+  background: rgba(224, 90, 71, 0.04);
+  border: 1px solid rgba(224, 90, 71, 0.15);
+}
+
+.light .pain-card {
+  background: rgba(224, 90, 71, 0.03);
+  border: 1px solid rgba(224, 90, 71, 0.12);
+}
+
+.gain-card {
+  background: rgba(109, 182, 49, 0.04);
+  border: 1px solid rgba(109, 182, 49, 0.15);
+}
+
+.light .gain-card {
+  background: rgba(22, 163, 74, 0.03);
+  border: 1px solid rgba(22, 163, 74, 0.12);
+}
+
+/* Sticky mobile CTA bar */
+.sticky-mobile-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  padding: 12px 16px;
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border-default);
+}
+
 /* CACHE BUSTER Sat Jun  6 03:58:17 PM IST 2026 */

@@ -7,7 +7,7 @@ if (!DEPLOYMENT_URL && process.env.NODE_ENV === "production") {
   throw new Error("NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL is not set. Refusing to fallback to dev URL in production.");
 }
 
-const FINAL_DEPLOYMENT_URL = DEPLOYMENT_URL ?? "https://woozy-husky-516.eu-west-1.convex.cloud";
+const FINAL_DEPLOYMENT_URL = DEPLOYMENT_URL ?? "";
 
 // Testing-phase toggle: NEXT_PUBLIC_USE_MOCK=true runs the whole site on
 // fixture data from lib/mock-convex.ts with zero backend calls.
@@ -23,12 +23,10 @@ type ConvexEndpoint = "query" | "mutation" | "action";
 
 interface ConvexClientOptions {
   deploymentUrl?: string;
-  adminKey?: string;
 }
 
 export class ConvexHttpClient {
   private deploymentUrl: string;
-  private adminKey?: string;
 
   authToken?: string | null;
 
@@ -37,7 +35,6 @@ export class ConvexHttpClient {
       /\/+$/,
       ""
     );
-    this.adminKey = opts?.adminKey;
   }
 
   async query<T = unknown>(
@@ -77,9 +74,6 @@ export class ConvexHttpClient {
     };
     if (activeToken) {
       headers["Authorization"] = `Bearer ${activeToken}`;
-    }
-    if (this.adminKey) {
-      headers["Convex-Admin-Auth"] = this.adminKey;
     }
 
     let res: Response;

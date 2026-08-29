@@ -63,18 +63,19 @@ try {
 `;
 
 export function GET() {
-  const body = SW_SOURCE.replace("__API_KEY__", process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "")
-    .replace("__AUTH_DOMAIN__", process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "")
-    .replace("__PROJECT_ID__", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "")
-    .replace("__STORAGE_BUCKET__", process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? "")
-    .replace("__SENDER_ID__", process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "")
-    .replace("__APP_ID__", process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "");
+  const body = SW_SOURCE.replace("__API_KEY__", JSON.stringify(process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "").slice(1, -1))
+    .replace("__AUTH_DOMAIN__", JSON.stringify(process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "").slice(1, -1))
+    .replace("__PROJECT_ID__", JSON.stringify(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "").slice(1, -1))
+    .replace("__STORAGE_BUCKET__", JSON.stringify(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? "").slice(1, -1))
+    .replace("__SENDER_ID__", JSON.stringify(process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "").slice(1, -1))
+    .replace("__APP_ID__", JSON.stringify(process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "").slice(1, -1));
 
   return new Response(body, {
     headers: {
       "Content-Type": "application/javascript; charset=utf-8",
       "Cache-Control": "public, max-age=0, must-revalidate",
       "Service-Worker-Allowed": "/",
+      "Content-Security-Policy": "default-src 'none'; script-src https://www.gstatic.com",
     },
   });
 }

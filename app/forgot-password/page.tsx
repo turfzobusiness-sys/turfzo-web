@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Mail, ArrowLeft, Loader2, Check, AlertCircle } from "lucide-react";
 import { sendPasswordResetEmail, auth } from "@/lib/firebase";
+import { convexClient } from "@/lib/convex";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -19,6 +20,12 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError(null);
     try {
+      // Two account populations exist and each engine can only reset its
+      // own: Convex sendPasswordReset emails a branded /reset-password
+      // link to native-password accounts and silently no-ops for Firebase
+      // accounts; Firebase sends its own link and silently no-ops for
+      // unknown emails. Calling both emails exactly ONE working link.
+      await convexClient.action("auth:sendPasswordReset", { email });
       await sendPasswordResetEmail(auth, email);
       setSent(true);
     } catch (err) {

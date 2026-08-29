@@ -12,6 +12,7 @@ import {
 import {
   auth,
   onAuthStateChanged,
+  onIdTokenChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   firebaseSignOut,
@@ -222,6 +223,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return unsubscribe;
   }, [syncConvexUser]);
+
+  // Firebase ID tokens expire after ~1 hour and are refreshed automatically
+  // by the SDK in the background — but onAuthStateChanged does NOT re-fire on
+  // that rotation. Without this listener, convexClient.authToken goes stale
+  // after an hour and every token-less call (bookings, profile, owner
+  // dashboard, header badge...) sends an expired Bearer token until reload.
+  // onIdTokenChanged fires whenever the SDK mints a fresh token, keeping the
+  // client's snapshot current for all call sites.
+  useEffect(() => {
+    const unsubscribe = onIdTokenChanged(auth, (firebaseUser) => {
+      if (!firebaseUser) return; // sign-out handled by onAuthStateChanged
+      getIdToken(firebaseUser)
+        .then((token) => {
+          convexClient.authToken = token;
+        })
+        .catch(() => {
+          // Keep the previous token; getFreshToken() callers still work.
+        });
+    });
+    return unsubscribe;
+  }, []);
 
   const signUp = async (opts: {
     email: string;
@@ -568,7 +590,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const getFreshToken = useCallback(async (): Promise<string | undefined> => {
     const currentUser = auth.currentUser;
     if (!currentUser) return undefined;
+    const uidAtStart = currentUser.uid;
     const token = await getIdToken(currentUser, /* forceRefresh */ true);
+    // The refresh round-trip is async: the user may have signed out or
+    // switched accounts while it was in flight. Installing this token would
+    // silently run every subsequent token-less call (e.g. bookings:createPending)
+    // as the previous account. Only apply it if the session still matches
+    // the one we fetched it for.
+    if (auth.currentUser?.uid !== uidAtStart) {
+      return undefined;
+    }
     convexClient.authToken = token;
     return token;
   }, []);

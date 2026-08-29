@@ -10,7 +10,6 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "convex:dev": "npx convex dev",
     "seed": "node scripts/seed-real-data.mjs",
     "preflight": "node scripts/preflight.mjs",
     "env:diff": "node scripts/env-diff.mjs",

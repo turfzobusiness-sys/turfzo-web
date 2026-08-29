@@ -82,11 +82,11 @@ async function uploadFile(filePath) {
 async function main() {
   try {
     // 2. Upload the images
-    const footballStorageId = await uploadFile("public/images/football_turf_premium.png");
-    const cricketStorageId = await uploadFile("public/images/cricket_nets_professional.png");
-    const badmintonStorageId = await uploadFile("public/images/badminton_court_wooden.png");
-    const tennisStorageId = await uploadFile("public/images/tennis_court_clay.png");
-    const trophyStorageId = await uploadFile("public/images/tournament_trophy.png");
+    const footballStorageId = await uploadFile("public/images/football_turf_premium.webp");
+    const cricketStorageId = await uploadFile("public/images/cricket_nets_professional.webp");
+    const badmintonStorageId = await uploadFile("public/images/badminton_court_wooden.webp");
+    const tennisStorageId = await uploadFile("public/images/tennis_court_clay.webp");
+    const trophyStorageId = await uploadFile("public/images/tournament_trophy.webp");
 
     console.log("\nAll images uploaded successfully. Running seed database mutation...");
 

@@ -13,11 +13,8 @@ type EnvKey =
   | "NEXT_PUBLIC_FIREBASE_APP_ID"
   | "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID"
   | "NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL"
-  | "CONVEX_DEPLOY_KEY"
   | "NEXT_PUBLIC_CASHFREE_APP_ID"
   | "NEXT_PUBLIC_CASHFREE_ENV"
-  | "CASHFREE_SECRET_KEY"
-  | "CASHFREE_WEBHOOK_SECRET"
   | "NEXT_PUBLIC_SENTRY_DSN"
   | "SENTRY_AUTH_TOKEN"
   | "NEXT_PUBLIC_POSTHOG_KEY"
@@ -40,11 +37,9 @@ const PROD_REQUIRED: EnvKey[] = [
   "NEXT_PUBLIC_FIREBASE_APP_ID",
   "NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL",
   "NEXT_PUBLIC_CASHFREE_APP_ID",
-  "CASHFREE_SECRET_KEY",
 ];
 
 const OPTIONAL_BUT_RECOMMENDED: EnvKey[] = [
-  "CASHFREE_WEBHOOK_SECRET",
   "NEXT_PUBLIC_SENTRY_DSN",
   "NEXT_PUBLIC_POSTHOG_KEY",
   "EMAIL_PROVIDER_API_KEY",
@@ -121,25 +116,27 @@ export function getOptionalEnv(key: EnvKey): string | undefined {
   return readEnv(key);
 }
 
-export function getCashfreeCredentials(): { appId: string; secretKey: string } {
-  return {
-    appId: getEnv("NEXT_PUBLIC_CASHFREE_APP_ID"),
-    secretKey: getEnv("CASHFREE_SECRET_KEY"),
-  };
+export function getCashfreeAppId(): string {
+  return getEnv("NEXT_PUBLIC_CASHFREE_APP_ID");
 }
 
 /**
- * View-only mode: when `NEXT_PUBLIC_VIEW_ONLY_MODE=true` the website hides
- * all booking/payment entry points (turfs & tournaments become view-only and
- * direct users to the mobile app). Toggle without code changes by flipping
- * the env var and redeploying.
+ * View-only mode: turf BOOKING on the website is disabled by default —
+ * players browse turfs and slots, then book in the mobile app. Tournament
+ * entry fees and owner onboarding payments (incl. the listing fee) remain
+ * fully payable on the web. Set NEXT_PUBLIC_VIEW_ONLY_MODE=false to
+ * temporarily restore web booking.
  */
 export function isViewOnlyMode(): boolean {
-  return readEnv("NEXT_PUBLIC_VIEW_ONLY_MODE") === "true";
+  // DEFAULT TRUE — turf bookings are app-only by product strategy. The
+  // website shows slots and pricing, then sends players to the app.
+  // Set NEXT_PUBLIC_VIEW_ONLY_MODE=false ONLY to temporarily restore web
+  // booking during an emergency.
+  return readEnv("NEXT_PUBLIC_VIEW_ONLY_MODE") !== "false";
 }
 
 export function isCashfreeConfigured(): boolean {
-  return Boolean(readEnv("NEXT_PUBLIC_CASHFREE_APP_ID") && readEnv("CASHFREE_SECRET_KEY"));
+  return Boolean(readEnv("NEXT_PUBLIC_CASHFREE_APP_ID"));
 }
 
 export function isCashfreeProdMode(): boolean {
