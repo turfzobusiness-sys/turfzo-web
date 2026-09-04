@@ -30,11 +30,13 @@ export function FavoriteButton({ turfId, className, label }: FavoriteButtonProps
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    if (!isAuthed || !convexUser?._id) {
-      setLoading(false);
-      return;
-    }
     let cancelled = false;
+    if (!isAuthed || !convexUser?._id) {
+      setTimeout(() => {
+        if (!cancelled) setLoading(false);
+      }, 0);
+      return () => { cancelled = true; };
+    }
     (async () => {
       try {
         const token = await getFreshToken();
