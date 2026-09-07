@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Turfzo Website
 
-## Getting Started
+The web frontend for Turfzo, built with **Next.js 16 (App Router)** and **React 19**, running serverless on **Cloudflare Workers** via `@opennextjs/cloudflare`.
 
-First, run the development server:
+> **Thin Client Rule**: The website is strictly a presentation layer. It does not compute prices, manage bookings, or handle raw payment logic—all business operations are delegated to the Convex backend (`turfzo-backend`).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 1. Environment Matrix
+
+| Environment | Cloudflare Worker Target | Hostname / URL | Convex Backend |
+| :--- | :--- | :--- | :--- |
+| **Local (Dev)** | `localhost:3000` | `http://localhost:3000` | `woozy-husky-516` |
+| **Staging** | `turfzo-web-staging` | `https://turfzo-web-staging.turfzobusiness.workers.dev` | `healthy-panther-67` |
+| **Production** | `turfzo-web` | `https://turfzo.app` / `https://www.turfzo.app` | `dependable-donkey-330` |
+
+---
+
+## 2. Release & CI/CD Pipeline
+
+```text
+feature branch ──> Pull Request ──> CI (Lint, Typecheck, Build) ──> Merge to main
+                                                                         │
+                                                                         ▼
+                                                          Deploy Staging Worker (Auto)
+                                                                         │
+                                                                         ▼
+                                                          Manual Approval Gate
+                                                                         │
+                                                                         ▼
+                                                          Deploy Production Worker
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Workflows
+* **PR Checks (`ci.yml`)**: Runs lint, TypeScript checks (`tsc --noEmit`), and tests.
+* **Staging Auto-Deploy (`deploy-staging.yml`)**: Runs on merge to `main`. Builds Next.js + OpenNext with staging public variables and deploys to Cloudflare Worker `turfzo-web-staging`.
+* **Production Deploy (`deploy-production.yml`)**: Manual `workflow_dispatch` requiring explicit input confirmation (`deploy-prod`) and GitHub `production` environment approval. Builds with production variables and deploys to `turfzo-web`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 3. Local Development
 
-## Learn More
+### Prerequisites
+* Node.js 20+
+* Cloudflare Wrangler CLI (`npx wrangler`)
 
-To learn more about Next.js, take a look at the following resources:
+### Setup
+1. Copy the environment configuration:
+   ```bash
+   cp .env.example .env.local
+   ```
+2. Install dependencies:
+   ```bash
+   npm ci
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Verification Commands
+```bash
+# Typecheck TypeScript
+npm run typecheck
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Production Next.js build
+npm run build
 
-## Deploy on Vercel
+# Cloudflare OpenNext bundle build
+npx opennextjs-cloudflare build
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Wrangler deploy dry-run
+npx wrangler deploy --dry-run --env staging
+npx wrangler deploy --dry-run --env production
+```
