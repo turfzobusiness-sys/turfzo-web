@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Preview-first Cloudflare setup. Vercel stays live: vercel.json, DNS, and
+  // turfzo.app are untouched. First deploy target is <name>.workers.dev only.
+  "main": ".open-next/worker.js",
+  "name": "turfzo-web",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": [
+    // Required for Next.js on Workers (Node.js APIs used by the adapter)
+    "nodejs_compat",
+    // Allow fetch() to same-origin / public URLs
+    "global_fetch_strictly_public"
+  ],
+  "account_id": "3f24b8f35b25e0943b29f0035403f694",
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "turfzo-web"
+    }
+  ],
+  "images": {
+    // next/image optimization via Cloudflare Images
+    "binding": "IMAGES"
+  },
+  "routes": [
+    { "pattern": "turfzo.app/*", "zone_name": "turfzo.app" },
+    { "pattern": "www.turfzo.app/*", "zone_name": "turfzo.app" }
+  ]
+}

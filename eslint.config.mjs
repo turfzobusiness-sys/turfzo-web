@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Cloudflare: generated worker types + adapter build output.
+    "cloudflare-env.d.ts",
+    ".open-next/**",
     // Auto-generated Convex stubs (overwritten by `npx convex dev`).
     "convex/_generated/**",
     // Tooling scripts (preflight, env-diff, vercel sync) — run with node, not the app.

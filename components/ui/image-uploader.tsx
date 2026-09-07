@@ -66,7 +66,7 @@ export function ImageUploader({ value = [], onChange, maxFiles = 5, className }:
           body: file,
         });
         
-        const { storageId } = await result.json();
+        const { storageId } = (await result.json()) as { storageId: string };
         newStorageIds.push(storageId);
       }
       
