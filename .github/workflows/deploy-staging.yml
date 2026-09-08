@@ -37,9 +37,9 @@ jobs:
         run: npm run build
       - run: npx opennextjs-cloudflare build
       - name: Setup SOPS
-        uses: getsops/setup-sops@v1
-        with:
-          version: v3.9.0
+        run: |
+          sudo wget -qO /usr/local/bin/sops https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64
+          sudo chmod +x /usr/local/bin/sops
       - name: Decrypt and push secrets
         run: |
           sops decrypt .env.staging.enc > .env.staging
