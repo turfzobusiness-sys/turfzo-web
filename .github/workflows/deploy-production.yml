@@ -23,8 +23,37 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - name: Build with production environment
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'turfzo-prod.firebaseapp.com' }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'turfzo-prod' }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'turfzo-prod.firebasestorage.app' }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1060583963551' }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1060583963551:web:52df50b8a3f6a75b249baa' }}
+          NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL: ${{ secrets.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL || 'https://dependable-donkey-330.eu-west-1.convex.cloud' }}
+          NEXT_PUBLIC_CONVEX_SITE_URL: ${{ secrets.NEXT_PUBLIC_CONVEX_SITE_URL || 'https://dependable-donkey-330.eu-west-1.convex.site' }}
+          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.NEXT_PUBLIC_CONVEX_URL || 'https://dependable-donkey-330.eu-west-1.convex.cloud' }}
+          NEXT_PUBLIC_CASHFREE_APP_ID: ${{ secrets.NEXT_PUBLIC_CASHFREE_APP_ID }}
+          NEXT_PUBLIC_CASHFREE_ENV: ${{ secrets.NEXT_PUBLIC_CASHFREE_ENV || 'production' }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAAA-placeholder' }}
+          NEXT_PUBLIC_VIEW_ONLY_MODE: 'false'
+        run: npm run build
       - run: npx opennextjs-cloudflare build
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'turfzo-prod.firebaseapp.com' }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'turfzo-prod' }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'turfzo-prod.firebasestorage.app' }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1060583963551' }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1060583963551:web:52df50b8a3f6a75b249baa' }}
+          NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL: ${{ secrets.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL || 'https://dependable-donkey-330.eu-west-1.convex.cloud' }}
+          NEXT_PUBLIC_CONVEX_SITE_URL: ${{ secrets.NEXT_PUBLIC_CONVEX_SITE_URL || 'https://dependable-donkey-330.eu-west-1.convex.site' }}
+          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.NEXT_PUBLIC_CONVEX_URL || 'https://dependable-donkey-330.eu-west-1.convex.cloud' }}
+          NEXT_PUBLIC_CASHFREE_APP_ID: ${{ secrets.NEXT_PUBLIC_CASHFREE_APP_ID }}
+          NEXT_PUBLIC_CASHFREE_ENV: ${{ secrets.NEXT_PUBLIC_CASHFREE_ENV || 'production' }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAAA-placeholder' }}
+          NEXT_PUBLIC_VIEW_ONLY_MODE: 'false'
       - name: Setup SOPS
         run: |
           sudo wget -qO /usr/local/bin/sops https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64
