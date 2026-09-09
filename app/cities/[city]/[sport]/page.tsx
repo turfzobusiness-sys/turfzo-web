@@ -4,7 +4,7 @@ import Link from "next/link";
 import { MapPin, ChevronRight } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { FAQPageSchema, BreadcrumbListSchema, SportsActivityLocationSchema } from "@/lib/schema";
+import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
 
 const CITY_DATA: Record<string, { name: string; state: string; venues: string; avgPrice: string; highlights: string[] }> = {
   bangalore: { name: "Bangalore", state: "Karnataka", venues: "20+", avgPrice: "₹1,100/hr", highlights: ["HSR Layout", "Koramangala", "Indiranagar", "Whitefield", "Marathahalli"] },
@@ -15,6 +15,7 @@ const CITY_DATA: Record<string, { name: string; state: string; venues: string; a
   chennai: { name: "Chennai", state: "Tamil Nadu", venues: "8+", avgPrice: "₹950/hr", highlights: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "OMR"] },
   kolkata: { name: "Kolkata", state: "West Bengal", venues: "6+", avgPrice: "₹900/hr", highlights: ["Salt Lake", "Park Street", "Ballygunge", "New Town", "Howrah"] },
   ahmedabad: { name: "Ahmedabad", state: "Gujarat", venues: "5+", avgPrice: "₹850/hr", highlights: ["Satellite", "Bodakdev", "Vastrapur", "SG Highway", "Prahlad Nagar"] },
+  aurangabad: { name: "Aurangabad", state: "Maharashtra", venues: "5+", avgPrice: "₹900/hr", highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"] },
 };
 
 const SPORTS = ["football", "cricket", "badminton", "tennis", "pickleball"];
@@ -60,9 +61,9 @@ export default async function CitySportPage({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <link rel="canonical" href={`https://turfzo.app/cities/${city}/${sport}`} />
-      </head>
+      {/* Canonical comes from generateMetadata (Next metadata API).
+          No invented-venue JSON-LD here: only Breadcrumb + FAQ schemas built
+          from real page data. No hardcoded postal codes. */}
       <BreadcrumbListSchema items={[
         { name: "Home", url: "https://turfzo.app" },
         { name: "Explore", url: "https://turfzo.app/explore" },
@@ -70,15 +71,6 @@ export default async function CitySportPage({ params }: Props) {
         { name: formattedSport, url: `https://turfzo.app/cities/${city}/${sport}` },
       ]} />
       <FAQPageSchema items={faqs} />
-      <SportsActivityLocationSchema
-        name={`Turfzo ${data.name} - ${formattedSport} Turf Booking`}
-        description={`Online booking for ${formattedSport} turfs and grounds across ${data.name}.`}
-        address={{ streetAddress: data.highlights[0], addressLocality: data.name, addressRegion: data.state, postalCode: "560001" }}
-        sportType={formattedSport}
-        pricePerHour={parseInt(data.avgPrice.replace(/[^\d]/g, "")) || 1000}
-        image="/stadium_turf_bg.webp"
-        openingHours="Mo-Su 06:00-23:00"
-      />
       <Header />
 
       <main className="flex-grow pt-24 pb-16">

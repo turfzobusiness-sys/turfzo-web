@@ -48,16 +48,38 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "object-src 'none'",
   "base-uri 'self'",
+  // Matches X-Frame-Options: DENY above (frame-ancestors overrides XFO in
+  // modern browsers — keep both deny so behavior is identical everywhere).
+  "frame-ancestors 'none'",
+  // Workers serve https only — upgrade any stray http subresource.
+  "upgrade-insecure-requests",
+  // FCM service worker is same-origin; blob: covers Next chunk workers.
+  "worker-src 'self' blob:",
   "form-action 'self' https://*.firebaseapp.com https://*.firebaseauth.com https://*.cashfree.com https://api.cashfree.com https://sandbox.cashfree.com",
 ].join("; ");
 
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
+    // Scoped to the two known Convex deployments (PROD dependable-donkey-330,
+    // DEV woozy-husky-516), both API host (.cloud) and storage host (.site —
+    // turf image_url values resolve to storage URLs). No wildcards.
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*.convex.cloud",
+        hostname: "dependable-donkey-330.eu-west-1.convex.cloud",
+      },
+      {
+        protocol: "https",
+        hostname: "dependable-donkey-330.eu-west-1.convex.site",
+      },
+      {
+        protocol: "https",
+        hostname: "woozy-husky-516.eu-west-1.convex.cloud",
+      },
+      {
+        protocol: "https",
+        hostname: "woozy-husky-516.eu-west-1.convex.site",
       },
     ],
   },
