@@ -4,7 +4,7 @@ import Link from "next/link";
 import { MapPin, Star, ChevronRight, Trophy, CheckCircle2 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { FAQPageSchema, BreadcrumbListSchema, SportsActivityLocationSchema } from "@/lib/schema";
+import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
 
 const CITY_DATA: Record<string, { name: string; state: string; venues: string; avgPrice: string; highlights: string[] }> = {
   bangalore: { name: "Bangalore", state: "Karnataka", venues: "20+", avgPrice: "₹1,100/hr", highlights: ["HSR Layout", "Koramangala", "Indiranagar", "Whitefield", "Marathahalli"] },
@@ -15,6 +15,7 @@ const CITY_DATA: Record<string, { name: string; state: string; venues: string; a
   chennai: { name: "Chennai", state: "Tamil Nadu", venues: "8+", avgPrice: "₹950/hr", highlights: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "OMR"] },
   kolkata: { name: "Kolkata", state: "West Bengal", venues: "6+", avgPrice: "₹900/hr", highlights: ["Salt Lake", "Park Street", "Ballygunge", "New Town", "Howrah"] },
   ahmedabad: { name: "Ahmedabad", state: "Gujarat", venues: "5+", avgPrice: "₹850/hr", highlights: ["Satellite", "Bodakdev", "Vastrapur", "SG Highway", "Prahlad Nagar"] },
+  aurangabad: { name: "Aurangabad", state: "Maharashtra", venues: "5+", avgPrice: "₹900/hr", highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"] },
 };
 
 const CITY_FAQS = [
@@ -36,6 +37,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: `Book football turfs, cricket grounds, and sports venues in ${data.name} starting at ${data.avgPrice}. ${data.venues} verified turfs across ${data.highlights.slice(0, 3).join(", ")} and more. Real-time availability, secure payment, instant confirmation.`,
     keywords: [`turf booking ${data.name}`, `football turf ${data.name}`, `cricket ground ${data.name}`, `book turf ${data.name}`, `${data.name} sports venue`],
     alternates: { canonical: `https://turfzo.app/cities/${city}` },
+    openGraph: {
+      title: `Book Turfs in ${data.name} | Turfzo`,
+      description: `${data.venues} verified turfs in ${data.name}. Book instantly with real-time availability.`,
+      url: `https://turfzo.app/cities/${city}`,
+      type: "website",
+    },
   };
 }
 
@@ -55,27 +62,15 @@ export default async function CityPage({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <link rel="canonical" href={`https://turfzo.app/cities/${city}`} />
-        <meta property="og:title" content={`Book Turfs in ${data.name} | Turfzo`} />
-        <meta property="og:description" content={`${data.venues} verified turfs in ${data.name}. Book instantly with real-time availability.`} />
-        <meta property="og:url" content={`https://turfzo.app/cities/${city}`} />
-      </head>
+      {/* Canonical + OG come from generateMetadata above (Next metadata API).
+          No invented-venue JSON-LD here: only Breadcrumb + FAQ schemas built
+          from real page data. No hardcoded postal codes. */}
       <BreadcrumbListSchema items={[
         { name: "Home", url: "https://turfzo.app" },
         { name: "Explore", url: "https://turfzo.app/explore" },
         { name: data.name, url: `https://turfzo.app/cities/${city}` },
       ]} />
       <FAQPageSchema items={faqs} />
-      <SportsActivityLocationSchema
-        name={`Turfzo ${data.name} - Premium Turf Booking`}
-        description={`Online booking for football turfs, cricket grounds, and sports venues across ${data.name}.`}
-        address={{ streetAddress: data.highlights[0], addressLocality: data.name, addressRegion: data.state, postalCode: "560001" }}
-        sportType="Football"
-        pricePerHour={parseInt(data.avgPrice.replace(/[^\d]/g, "")) || 1000}
-        image="/stadium_turf_bg.webp"
-        openingHours="Mo-Su 06:00-23:00"
-      />
       <Header />
 
       <main className="flex-grow pt-24 pb-16">

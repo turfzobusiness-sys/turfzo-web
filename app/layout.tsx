@@ -60,7 +60,10 @@ export const metadata: Metadata = {
       "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly across 9 cities.",
     images: [
       {
-        url: "/turfzo_mascot.svg",
+        // TODO: /og-cover.jpg binary does not exist yet — generate it from
+        // turfzo_mascot.svg artwork at exactly 1200x630 (raster JPG, not SVG:
+        // crawlers reject SVG OG images and require absolute URLs).
+        url: `${SITE_URL}/og-cover.jpg`,
         width: 1200,
         height: 630,
         alt: "Turfzo - Premium Turf Booking",
@@ -72,7 +75,7 @@ export const metadata: Metadata = {
     title: "Turfzo | Book Premium Turfs & Sports Venues Instantly",
     description:
       "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly.",
-    images: ["/turfzo_mascot.svg"],
+    images: [`${SITE_URL}/og-cover.jpg`],
   },
   robots: {
     index: true,

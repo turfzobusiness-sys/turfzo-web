@@ -146,7 +146,7 @@ export interface OwnerProfile {
     price_per_hour?: number;
     sport_type?: string;
     amenities?: string[];
-    operating_hours?: Record<string, { open: string; close: string }>;
+  operating_hours?: { open?: string; close?: string };
     max_players?: number;
     has_floodlights?: boolean;
     has_free_parking?: boolean;

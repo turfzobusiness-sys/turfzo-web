@@ -7,15 +7,20 @@ const SITE_URL = "https://turfzo.app";
 const CITIES = [
   "bangalore", "mumbai", "delhi", "hyderabad",
   "pune", "chennai", "kolkata", "ahmedabad",
+  "aurangabad",
 ];
 
 const SPORTS = ["football", "cricket", "badminton", "tennis", "pickleball"];
 
+// Real blog slugs — must match app/blog/page.tsx + app/blog/[slug]/page.tsx
+// generateStaticParams so every sitemap URL resolves (legacy static routes
+// under app/blog/<slug>/ stay live but are no longer listed here).
 const BLOG_SLUGS = [
-  "how-to-book-turf-online",
-  "turf-vs-ground",
-  "turf-booking-price-india",
-  "best-football-turfs-bangalore",
+  "book-football-turf-instantly",
+  "organize-local-sports-tournaments",
+  "maximize-turf-roi-booking-management",
+  "future-of-amateur-sports-india",
+  "turf-vs-ground-injury-prevention",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -59,17 +64,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
+  // Venue pages come from the backend (thin-client rule: no local pricing/
+  // schema logic, just turfs:getAvailable). When the Convex URL is empty at
+  // build time, an empty base URL would self-fetch the Next server ("/api/query")
+  // and return zero venues — so skip venue URLs with a LOUD warning instead of
+  // silently producing a sitemap that looks complete but is missing venues.
   let venuePages: { url: string; lastModified: Date; changeFrequency: "daily"; priority: number }[] = [];
-  try {
-    const turfs = await convexClient.query<Turf[]>("turfs:getAvailable", {});
-    venuePages = turfs.map((turf) => ({
-      url: `${SITE_URL}/venues/${turf._id}`,
-      lastModified: new Date(),
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    }));
-  } catch (error) {
-    console.error("Failed to fetch turfs for sitemap:", error);
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL ?? "";
+  if (!convexUrl) {
+    console.warn(
+      "[sitemap] NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL is empty at build time — " +
+        "returning static/blog/city routes ONLY. Venue pages are OMITTED " +
+        "(incomplete by design, not silently complete)."
+    );
+  } else {
+    try {
+      const turfs = await convexClient.query<Turf[]>("turfs:getAvailable", {});
+      venuePages = turfs.map((turf) => ({
+        url: `${SITE_URL}/venues/${turf._id}`,
+        lastModified: new Date(),
+        changeFrequency: "daily" as const,
+        priority: 0.8,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch turfs for sitemap:", error);
+    }
   }
 
   return [...staticPages, ...blogPages, ...cityPages, ...citySportPages, ...venuePages];

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, Suspense } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin,
@@ -444,6 +444,45 @@ function isTransientPaymentError(err: unknown): boolean {
   ].includes(code);
 }
 
+// Preselects filters from /cities deep links (/explore?city=<slug>&sport=<slug>).
+// Isolated in its own component so the useSearchParams hook sits under a
+// Suspense boundary (required by Next for prerendered routes) while the rest
+// of the page is untouched. Unknown values are ignored — existing filter
+// behavior is preserved.
+const EXPLORE_SPORT_IDS = ["Football", "Cricket", "Badminton", "Tennis", "Multipurpose"];
+
+function ExploreQuerySync({
+  currentCity,
+  currentSport,
+  onCity,
+  onSport,
+}: {
+  currentCity: string;
+  currentSport: string;
+  onCity: (city: string) => void;
+  onSport: (sport: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  const citySlug = (searchParams.get("city") ?? "").trim().toLowerCase();
+  const sportSlug = (searchParams.get("sport") ?? "").trim().toLowerCase();
+  useEffect(() => {
+    if (citySlug) {
+      // Alias-aware ("bengaluru" → "Bangalore", "sambhajinagar" → "Aurangabad")
+      // then resolved back to the chip label users see.
+      const query = launchCityQueryFor(citySlug);
+      const label =
+        LAUNCH_CITIES.find((c) => c.label.toLowerCase() === citySlug)?.label ??
+        LAUNCH_CITIES.find((c) => c.query.toLowerCase() === query.toLowerCase())?.label;
+      if (label && label !== currentCity) onCity(label);
+    }
+    if (sportSlug) {
+      const match = EXPLORE_SPORT_IDS.find((id) => id.toLowerCase() === sportSlug);
+      if (match && match !== currentSport) onSport(match);
+    }
+  }, [citySlug, sportSlug, currentCity, currentSport, onCity, onSport]);
+  return null;
+}
+
 export default function ExplorePage() {
   const router = useRouter();
   const { status, firebaseUser, convexUser, getFreshToken } = useAuth();
@@ -863,13 +902,13 @@ export default function ExplorePage() {
         totalPaise: 0,
       };
     const subtotal = effectivePricePreview?.subtotal ?? selectedTurf.price;
-    // The real charge is the backend's 5% service fee (total_price +
-    // service_fee) — never fall back to the legacy 1.8%+18% convenience/GST
-    // numbers, or the breakdown won't add up to what Cashfree charges.
-    const serviceFee =
-      effectivePricePreview?.serviceFee ??
-      Math.round(subtotal * 0.05 * 100) / 100;
-    const total = effectivePricePreview?.grandTotal ?? subtotal + serviceFee;
+    // Fail-closed: the backend's 5% service fee (total_price + service_fee)
+    // is the real charge — never synthesize a fee client-side when the
+    // preview hasn't loaded, or the breakdown won't match what the booking
+    // actually charges. Pay is blocked until the preview arrives (see
+    // handlePayNow guard below).
+    const serviceFee = effectivePricePreview?.serviceFee ?? 0;
+    const total = effectivePricePreview?.grandTotal ?? subtotal;
     return {
       subtotal,
       serviceFee,
@@ -889,6 +928,14 @@ export default function ExplorePage() {
     }
     if (!selectedSlot) {
       setBookingError("Invalid time slot selected.");
+      return;
+    }
+    // Fail-closed: never charge from a client-guessed total. The backend
+    // preview (calculatePreview) is the only price authority.
+    if (!effectivePricePreview) {
+      setBookingError(
+        "Price preview is still loading. Please wait a moment and try again.",
+      );
       return;
     }
     payInFlight.current = true;
@@ -1121,6 +1168,14 @@ export default function ExplorePage() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <FAQPageSchema items={exploreFaqItems} />
+      <Suspense fallback={null}>
+        <ExploreQuerySync
+          currentCity={selectedCity}
+          currentSport={selectedSport}
+          onCity={setSelectedCity}
+          onSport={setSelectedSport}
+        />
+      </Suspense>
 
       <Header />
 
