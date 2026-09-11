@@ -260,13 +260,13 @@ export default async function BlogPostPage({ params }: Props) {
             <Image src={post.image} alt={post.title} fill className="object-cover" />
           </div>
 
-          <div className="prose prose-invert prose-brand max-w-none font-sans text-sm sm:text-base leading-relaxed text-text-muted">
+          <div className="prose dark:prose-invert prose-brand max-w-none font-sans text-sm sm:text-base leading-relaxed text-text-muted">
             {post.content}
           </div>
 
           <div className="mt-16 pt-8 border-t border-border-default text-center">
             <h3 className="font-sans font-bold text-xl text-text-main mb-4">Ready to play?</h3>
-            <Link href="/explore" className="inline-flex items-center justify-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-sm py-3 px-8 rounded-md transition-all">
+            <Link href="/explore" className="inline-flex items-center justify-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-3 px-8 rounded-md transition-all">
               Book a Turf Now <ChevronRight className="w-4 h-4 stroke-[2.5]" />
             </Link>
           </div>

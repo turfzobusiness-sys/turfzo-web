@@ -8,10 +8,10 @@
   --font-anton: var(--font-anton), Impact, sans-serif;
   --font-poppins: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
 
-  /* Backgrounds */
-  --color-bg: #000000;
-  --color-surface: #000000;
-  --color-elevated: #0a0a0a;
+  /* Backgrounds — warm obsidian, not pure black */
+  --color-bg: #090C0A;
+  --color-surface: #111613;
+  --color-elevated: #18201B;
 
   /* Brand Accent & Buttons */
   --color-brand-lime: #6DB631;
@@ -21,17 +21,17 @@
   --color-brand-btn-bg-hover: #161C19;
 
   /* Text */
-  --color-text-main: #F4F7F4;
+  --color-text-main: #F3F6F3;
   --color-text-secondary: #C3CBC4;
-  --color-text-muted: #8B9E93;
-  --color-text-hint: #707D73;
+  --color-text-muted: #8A988E;
+  --color-text-hint: #6B786E;
 
-  /* Borders */
-  --color-border-subtle: #2A362F;
-  --color-border-default: #324138;
-  --color-border-strong: #324138;
+  /* Borders — hairline opacity-based */
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-default: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.14);
   --color-border-focused: #6DB631;
-  --color-border-glow: rgba(255, 255, 255, 0.15);
+  --color-border-glow: rgba(255, 255, 255, 0.10);
 
   /* Status */
   --color-error: #E05A47;
@@ -51,60 +51,91 @@
   /* QR code */
   --color-qr-bg: #FFFFFF;
 
-  /* Radii - Aligned with Flutter app */
-  --radius-sm: 8px;
-  --radius-md: 10px;
+  /* Radii - Architectural, not balloon */
+  --radius-sm: 6px;
+  --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 14px;
   --radius-pill: 24px;
 
-  /* Shadows - Flattened */
-  --shadow-card-shadow: 0 12px 20px rgba(0, 0, 0, 0.09);
+  /* Shadows — subtle layered, not heavy black */
+  --shadow-card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 /* ========== LIGHT MODE ========== */
 .light {
-  --color-bg: #FAFAFA;
+  --color-bg: #FBFDFB;
   --color-surface: #FFFFFF;
-  --color-elevated: #F2F2F2;
+  --color-elevated: #F2F6F3;
   --color-brand-lime: #16A34A;
   /* Rich Green Accent for Light Mode */
   --color-brand-lime-hover: #15803D;
+  --color-brand-lime-light: #4ADE80;
   --color-brand-btn-bg: #0f1f0f;
   --color-brand-btn-bg-hover: #162f16;
-  --color-text-main: #111111;
-  --color-text-muted: #4B4B4B;
+  --color-text-main: #090D0A;
+  --color-text-secondary: #2D3748;
+  --color-text-muted: #475569;
+  --color-text-hint: #64748B;
   --color-border-subtle: rgba(0, 0, 0, 0.08);
-  --color-border-default: rgba(0, 0, 0, 0.15);
-  --color-border-strong: rgba(0, 0, 0, 0.25);
-  --color-border-glow: rgba(0, 0, 0, 0.10);
+  --color-border-default: rgba(0, 0, 0, 0.12);
+  --color-border-strong: rgba(0, 0, 0, 0.24);
+  --color-border-focused: #16A34A;
+  --color-border-glow: rgba(0, 0, 0, 0.06);
   --color-overlay: rgba(0, 0, 0, 0.5);
   --color-overlay-heavy: rgba(0, 0, 0, 0.6);
-  --shadow-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* ========== MARKETING (public light marketplace) ========== */
+/* Plan §3: warm off-white pages, white cards, deep-green text. Applied via
+   className="marketing" on public page wrappers; authenticated product keeps
+   .light/.dark untouched. */
+.marketing {
+  --color-bg: #F7F8F5;
+  --color-surface: #FFFFFF;
+  --color-elevated: #EDF0E8;
+  --color-brand-lime: #16A34A;
+  --color-brand-lime-hover: #15803D;
+  --color-brand-lime-light: #4ADE80;
+  --color-brand-btn-bg: #162019;
+  --color-brand-btn-bg-hover: #243428;
+  --color-text-main: #162019;
+  --color-text-secondary: #3A4A3E;
+  --color-text-muted: #5A6B5E;
+  --color-text-hint: #7A8A7E;
+  --color-border-subtle: rgba(22, 32, 25, 0.08);
+  --color-border-default: rgba(22, 32, 25, 0.12);
+  --color-border-strong: rgba(22, 32, 25, 0.22);
+  --color-border-focused: #16A34A;
+  --color-border-glow: rgba(22, 32, 25, 0.08);
+  --color-overlay: rgba(22, 32, 25, 0.5);
+  --color-overlay-heavy: rgba(22, 32, 25, 0.65);
+  --shadow-card-shadow: 0 1px 2px rgba(22, 32, 25, 0.06), 0 8px 24px rgba(22, 32, 25, 0.08);
 }
 
 /* Backward compat aliases */
 .dark {
-  --color-bg: #000000;
-  --color-surface: #000000;
-  --color-elevated: #0a0a0a;
+  --color-bg: #090C0A;
+  --color-surface: #111613;
+  --color-elevated: #18201B;
   --color-brand-lime: #6DB631;
   --color-brand-lime-hover: #5CA426;
   --color-brand-lime-light: #8ED45A;
   --color-brand-btn-bg: #0D0D0D;
   --color-brand-btn-bg-hover: #161C19;
-  --color-text-main: #F4F7F4;
+  --color-text-main: #F3F6F3;
   --color-text-secondary: #C3CBC4;
-  --color-text-muted: #8B9E93;
-  --color-text-hint: #707D73;
-  --color-border-subtle: #2A362F;
-  --color-border-default: #324138;
-  --color-border-strong: #324138;
+  --color-text-muted: #8A988E;
+  --color-text-hint: #6B786E;
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-default: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.14);
   --color-border-focused: #6DB631;
-  --color-border-glow: rgba(255, 255, 255, 0.15);
+  --color-border-glow: rgba(255, 255, 255, 0.10);
   --color-overlay: rgba(0, 0, 0, 0.6);
   --color-overlay-heavy: rgba(0, 0, 0, 0.8);
-  --shadow-card-shadow: 0 12px 20px rgba(0, 0, 0, 0.09);
+  --shadow-card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 /* Base custom resets */
@@ -1044,25 +1075,10 @@ textarea:focus-visible {
   background: var(--color-border-default);
 }
 
-/* Pain/gain visual indicators */
-.pain-card {
-  background: rgba(224, 90, 71, 0.04);
-  border: 1px solid rgba(224, 90, 71, 0.15);
-}
-
-.light .pain-card {
-  background: rgba(224, 90, 71, 0.03);
-  border: 1px solid rgba(224, 90, 71, 0.12);
-}
-
-.gain-card {
-  background: rgba(109, 182, 49, 0.04);
-  border: 1px solid rgba(109, 182, 49, 0.15);
-}
-
-.light .gain-card {
-  background: rgba(22, 163, 74, 0.03);
-  border: 1px solid rgba(22, 163, 74, 0.12);
+/* Tabular numerals for prices, ratings, and timestamps */
+.tabular-nums {
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
 }
 
 /* Sticky mobile CTA bar */

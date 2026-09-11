@@ -144,7 +144,7 @@ function ResetPasswordForm() {
               </p>
               <Link
                 href="/auth/login"
-                className="w-full bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
               >
                 Sign In
               </Link>
@@ -202,7 +202,7 @@ function ResetPasswordForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated disabled:text-text-muted/40 text-black font-sans font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-elevated disabled:text-text-muted/40 text-white dark:text-black font-sans font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -221,7 +221,7 @@ function ResetPasswordForm() {
               </p>
               <Link
                 href="/forgot-password"
-                className="w-full bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
               >
                 Request New Link
               </Link>

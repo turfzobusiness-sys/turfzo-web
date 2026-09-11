@@ -25,7 +25,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Changing Rooms", "Parking", "Water"],
     premium: true,
-    image: "/stadium_turf_bg.webp",
+    image: "/images/marketing/explore/football-card.webp",
   },
   {
     name: "Green Valley Turf",
@@ -36,7 +36,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Parking", "Cafeteria"],
     premium: false,
-    image: "/stadium_turf_bg.webp",
+    image: "/images/marketing/explore/football-card.webp",
   },
   {
     name: "Bangalore Football Arena",
@@ -47,7 +47,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Changing Rooms", "Parking", "Water"],
     premium: true,
-    image: "/stadium_turf_bg.webp",
+    image: "/images/marketing/explore/football-card.webp",
   },
   {
     name: "Whitefield Kickers",
@@ -58,7 +58,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Parking"],
     premium: false,
-    image: "/stadium_turf_bg.webp",
+    image: "/images/marketing/explore/football-card.webp",
   },
   {
     name: "JP Nagar Sports Hub",
@@ -69,7 +69,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Changing Rooms", "Water"],
     premium: false,
-    image: "/stadium_turf_bg.webp",
+    image: "/images/marketing/explore/football-card.webp",
   },
   {
     name: "Electronic City Turf",
@@ -80,7 +80,7 @@ const turfs = [
     sport: "Football",
     facilities: ["Floodlights", "Parking"],
     premium: false,
-    image: "/stadium_turf_bg.webp",
+    image: "/images/marketing/explore/football-card.webp",
   },
 ];
 
@@ -198,7 +198,7 @@ export default function BestFootballTurfsBangalore() {
                 May 2026 · 8 min read
               </span>
             </div>
-            <h1 className="font-sans text-3xl sm:text-4xl font-extrabold text-text-main leading-tight">
+            <h1 className="font-sans text-3xl sm:text-4xl font-extrabold text-text-main leading-tight tracking-tight">
               Best Football Turfs in Bangalore [2026 Guide]
             </h1>
             <p className="mt-4 text-text-muted text-sm font-sans leading-relaxed">
@@ -211,9 +211,9 @@ export default function BestFootballTurfsBangalore() {
           </motion.div>
 
           {/* Featured Image */}
-          <div className="relative rounded-md overflow-hidden mb-12 h-64 sm:h-80">
+          <div className="relative rounded-xl overflow-hidden mb-12 h-64 sm:h-80">
             <Image
-              src="/stadium_turf_bg.webp"
+              src="/images/marketing/explore/football-card.webp"
               alt="Football turf in Bangalore"
               fill
               className="object-cover"
@@ -221,8 +221,8 @@ export default function BestFootballTurfsBangalore() {
           </div>
 
           {/* Direct Answer Block (for AI citation) */}
-          <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
-            <h2 className="font-sans font-bold text-base text-brand-lime mb-2">
+          <div className="bg-surface border border-border-default rounded-xl p-6 mb-12">
+            <h2 className="font-sans font-bold text-base text-text-main tracking-tight mb-2">
               Quick Answer
             </h2>
             <p className="text-sm text-text-main font-sans leading-relaxed">
@@ -231,15 +231,15 @@ export default function BestFootballTurfsBangalore() {
           </div>
 
           {/* Article Content */}
-          <article className="prose prose-invert max-w-none">
-            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
+          <article className="prose dark:prose-invert max-w-none">
+            <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mt-12 mb-4">
               Why is Bangalore the Best City for Football Turfs?
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-6">
               Bangalore has the highest concentration of football turfs in India, with over 50 verified venues across the city. The city&apos;s tech-savvy population, pleasant weather, and strong football culture have driven demand for quality playing surfaces. Most turfs offer floodlights for evening games, making it easy to play after work or on weekends.
             </p>
 
-            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mt-12 mb-4">
               Top Football Turfs in Bangalore by Area
             </h2>
 
@@ -248,7 +248,7 @@ export default function BestFootballTurfsBangalore() {
               {turfs.map((turf) => (
                 <div
                   key={turf.name}
-                  className="bg-surface border border-border-subtle rounded-md p-4 hover:border-brand-lime/10 transition-all"
+                  className="bg-surface border border-border-default rounded-xl p-4 hover:border-border-strong transition-all"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-sans font-bold text-sm text-text-main">
@@ -269,7 +269,7 @@ export default function BestFootballTurfsBangalore() {
                       <Star className="w-3 h-3 text-brand-lime fill-brand-lime" />{" "}
                       {turf.rating} ({turf.reviews} reviews)
                     </span>
-                    <span className="font-bold text-brand-lime">
+                    <span className="font-bold text-text-main tabular-nums">
                       ₹{turf.price}/hr
                     </span>
                   </div>
@@ -288,16 +288,16 @@ export default function BestFootballTurfsBangalore() {
               ))}
             </div>
 
-            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mt-12 mb-4">
               How Much Does Football Turf Cost in Bangalore?
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-4">
               Football turf prices in Bangalore vary by location and amenities:
             </p>
-            <div className="bg-surface border border-border-subtle rounded-md p-5 my-6">
+            <div className="bg-surface border border-border-default rounded-xl p-5 my-6">
               <table className="w-full text-xs font-sans">
                 <thead>
-                  <tr className="border-b border-border-subtle">
+                  <tr className="border-b border-border-default">
                     <th className="text-left py-2 text-text-main font-sans font-bold">
                       Area
                     </th>
@@ -312,34 +312,34 @@ export default function BestFootballTurfsBangalore() {
                 <tbody className="text-text-muted">
                   <tr className="border-b border-border-subtle">
                     <td className="py-2">Electronic City</td>
-                    <td className="py-2">₹700 - ₹900/hr</td>
+                    <td className="py-2 tabular-nums">₹700 - ₹900/hr</td>
                     <td className="py-2">Budget-friendly games</td>
                   </tr>
                   <tr className="border-b border-border-subtle">
                     <td className="py-2">HSR Layout</td>
-                    <td className="py-2">₹1000 - ₹1400/hr</td>
+                    <td className="py-2 tabular-nums">₹1000 - ₹1400/hr</td>
                     <td className="py-2">Best variety & quality</td>
                   </tr>
                   <tr className="border-b border-border-subtle">
                     <td className="py-2">Koramangala</td>
-                    <td className="py-2">₹900 - ₹1200/hr</td>
+                    <td className="py-2 tabular-nums">₹900 - ₹1200/hr</td>
                     <td className="py-2">Central location</td>
                   </tr>
                   <tr className="border-b border-border-subtle">
                     <td className="py-2">Indiranagar</td>
-                    <td className="py-2">₹1200 - ₹1500/hr</td>
+                    <td className="py-2 tabular-nums">₹1200 - ₹1500/hr</td>
                     <td className="py-2">Premium facilities</td>
                   </tr>
                   <tr>
                     <td className="py-2">Whitefield</td>
-                    <td className="py-2">₹700 - ₹1000/hr</td>
+                    <td className="py-2 tabular-nums">₹700 - ₹1000/hr</td>
                     <td className="py-2">East Bangalore</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mt-12 mb-4">
               What Amenities Should You Look For?
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-4">
@@ -364,14 +364,14 @@ export default function BestFootballTurfsBangalore() {
               ))}
             </ul>
 
-            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mt-12 mb-4">
               Best Time to Book a Football Turf in Bangalore
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-6">
               Early morning slots (6-8 AM) and late evening slots (8-10 PM) are the cheapest and most available. Peak hours (5-8 PM) are the most expensive and book up fast, especially on weekends. If you want to save money, book during off-peak hours on weekdays. Turfzo shows real-time availability so you can find open slots instantly.
             </p>
 
-            <h2 className="font-sans font-bold text-xl text-text-main mt-12 mb-4">
+            <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mt-12 mb-4">
               How to Book a Football Turf in Bangalore
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-6">
@@ -379,7 +379,7 @@ export default function BestFootballTurfsBangalore() {
             </p>
 
             {/* CTA */}
-            <div className="bg-brand-lime/10 border border-brand-lime/20 rounded-md p-6 my-8 text-center">
+            <div className="bg-brand-lime/10 border border-brand-lime/20 rounded-xl p-6 my-8 text-center">
               <h3 className="font-sans font-bold text-lg text-text-main mb-2">
                 Ready to Book?
               </h3>
@@ -388,7 +388,7 @@ export default function BestFootballTurfsBangalore() {
               </p>
               <Link
                 href="/explore"
-                className="inline-flex items-center gap-2 bg-brand-lime text-black font-sans font-bold text-sm py-3 px-8 rounded-md hover:bg-brand-lime-hover transition-all"
+                className="inline-flex items-center gap-2 bg-brand-lime text-white dark:text-black font-sans font-bold text-sm py-3 px-8 rounded-md hover:bg-brand-lime-hover transition-all"
               >
                 Explore Turfs <ArrowRight className="w-4 h-4" />
               </Link>
@@ -397,14 +397,14 @@ export default function BestFootballTurfsBangalore() {
 
           {/* FAQ Section */}
           <div className="mt-16 mb-12">
-            <h2 className="font-sans font-bold text-2xl text-text-main mb-8">
+            <h2 className="font-sans font-bold text-2xl text-text-main tracking-tight mb-8">
               Frequently Asked Questions
             </h2>
             <div className="flex flex-col gap-4">
               {faqItems.map((item, idx) => (
                 <details
                   key={idx}
-                  className="bg-surface border border-border-subtle rounded-md p-5 group"
+                  className="bg-surface border border-border-default rounded-xl p-5 group"
                 >
                   <summary className="font-sans font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}

@@ -1,22 +1,73 @@
 "use client";
 
-import { useState } from "react";
-import { motion, Variants } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowRight, Trophy, Users, Calendar } from "lucide-react";
+import {
+  ArrowRight,
+  Trophy,
+  Users,
+  Calendar,
+  MapPin,
+  Search,
+  ChevronDown,
+  Check,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const SPORTS = [
+  { id: "Football", name: "Football", desc: "5v5, 7v7, 11v11 pitches", icon: "⚽" },
+  { id: "Cricket", name: "Box Cricket", desc: "Box cricket, nets & turf pitch", icon: "🏏" },
+  { id: "Badminton", name: "Badminton", desc: "Indoor wooden & synthetic courts", icon: "🏸" },
+  { id: "Tennis", name: "Tennis", desc: "Clay & synthetic courts", icon: "🎾" },
+  { id: "All Sports", name: "All Sports", desc: "Browse all available sports", icon: "🎯" },
+];
+
+const CITIES = [
+  { name: "Bengaluru", areas: "Koramangala, HSR, Indiranagar" },
+  { name: "Mumbai", areas: "Bandra, Andheri, Powai" },
+  { name: "Delhi NCR", areas: "Gurgaon, Noida, South Delhi" },
+  { name: "Hyderabad", areas: "Gachibowli, Madhapur, Jubilee Hills" },
+  { name: "Pune", areas: "Kothrud, Viman Nagar, Baner" },
+  { name: "Chennai", areas: "Anna Nagar, OMR, Guindy" },
+];
+
+const DATES = [
+  { id: "Today", label: "Today", sub: "Evening slots available" },
+  { id: "Tomorrow", label: "Tomorrow", sub: "Prime morning & evening slots" },
+  { id: "Weekend", label: "This Weekend", sub: "Saturday & Sunday bookings" },
+  { id: "Anytime", label: "Any Date", sub: "View complete calendar" },
+];
 
 export default function Hero() {
+  const router = useRouter();
   const [showComingSoon, setShowComingSoon] = useState(false);
-  const containerVariants: Variants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
+
+  // Search capsule state
+  const [selectedSport, setSelectedSport] = useState("Football");
+  const [selectedCity, setSelectedCity] = useState("Bengaluru");
+  const [selectedDate, setSelectedDate] = useState("Today");
+  const [openDropdown, setOpenDropdown] = useState<"sport" | "city" | "date" | null>(null);
+  const capsuleRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (capsuleRef.current && !capsuleRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (selectedSport && selectedSport !== "All Sports") params.set("sport", selectedSport);
+    if (selectedCity && selectedCity !== "All Cities") params.set("city", selectedCity);
+    if (selectedDate === "Today") {
+      params.set("date", new Date().toISOString().split("T")[0]);
+    }
+    router.push(`/explore${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
   return (
@@ -25,81 +76,265 @@ export default function Hero() {
       className="relative min-h-screen pt-28 pb-16 lg:pt-36 lg:pb-20 flex items-center justify-center overflow-hidden bg-bg"
     >
       {/* ======================================================== */}
-      {/*           CINEMATIC AI STADIUM BACKGROUND IMAGE          */}
+      {/*           REALISTIC LOCAL TURF BACKGROUND IMAGE          */}
       {/* ======================================================== */}
       <div className="absolute inset-0 z-0 select-none pointer-events-none">
-        {/* Dark Mode Background */}
+        {/* Single canonical LCP hero image */}
         <Image
-          src="/stadium_cinematic_bg.webp"
-          alt="Cinematic Night Stadium Backdrop"
+          src="/images/marketing/home/hero-turf-evening.webp"
+          alt="Floodlit sports turf pitch in the evening"
           fill
           priority
-          className="object-cover object-center dark:block hidden"
+          sizes="100vw"
+          className="object-cover object-[75%_50%] opacity-20 dark:opacity-35"
         />
 
-        {/* Light Mode Background — no `priority`: only one hero variant may
-            be preloaded, otherwise both are fetched on every visit. */}
-        <Image
-          src="/stadium_light_bg.webp"
-          alt="Cinematic Day Stadium Backdrop"
-          fill
-          className="object-cover object-center dark:hidden block"
-        />
-
-        {/* Dark Mode Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-black/30 dark:block hidden z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/45 dark:block hidden z-10" />
-        <div className="absolute inset-0 bg-black/35 dark:block hidden z-10" />
-
-        {/* Light Mode Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-bg/65 via-bg/15 to-transparent dark:hidden block z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg to-transparent dark:hidden block z-10" />
+        {/* Clean bottom-up gradient overlay — high contrast in light mode, atmospheric in dark */}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/85 to-bg/40 dark:from-bg dark:via-bg/60 dark:to-transparent z-10" />
       </div>
 
       {/* Grid Layout Container */}
       <div className="max-w-7xl mx-auto px-6 md:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center z-20 relative">
 
         {/* Left Column (Hero Content) */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="lg:col-span-7 flex flex-col justify-center text-center lg:text-left"
-        >
-          {/* Heading in Google Anton Font */}
+        <div className="lg:col-span-7 flex flex-col justify-center text-center lg:text-left">
+          {/* Architectural Typography Overline */}
+          <div className="flex items-center gap-2 mb-4 w-fit mx-auto lg:mx-0">
+            <span className="w-1.5 h-1.5 rounded-xs bg-brand-lime" />
+            <span className="text-[11px] sm:text-xs font-mono font-bold text-text-muted tracking-wider uppercase">
+              Verified Sports Venues
+            </span>
+          </div>
 
-          {/* Heading in Google Anton Font */}
-          <h1 className="font-anton italic text-5xl sm:text-7xl lg:text-[5.8rem] font-normal leading-[0.9] tracking-tighter text-text-main dark:text-white uppercase text-left max-w-2xl transition-all duration-200">
-            YOUR GAME<br />
-            STARTS <span className="text-brand-lime">HERE</span>
+          {/* Clean Title Case Heading */}
+          <h1 className="font-sans text-4xl sm:text-5xl lg:text-[4rem] font-extrabold leading-[1.08] tracking-[-0.03em] text-text-main text-left max-w-2xl transition-all duration-200">
+            Book local sports turfs <br className="hidden sm:inline" />
+            <span className="text-text-main">in seconds</span>
           </h1>
 
           {/* Subheading */}
-          <p className="mt-6 text-base sm:text-lg text-text-muted font-sans font-normal max-w-lg mx-auto lg:mx-0 leading-relaxed text-left">
-            Find top-rated turfs near you, pick a time slot, and book instantly. No phone calls required.
+          <p className="mt-4 text-base sm:text-lg text-text-muted font-sans font-normal max-w-lg mx-auto lg:mx-0 leading-relaxed text-left">
+            Real-time hourly slots, upfront pricing, and instant confirmation for verified football, cricket, badminton, and tennis grounds.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-start gap-4 w-full max-w-sm mx-auto lg:mx-0 lg:max-w-none">
-            <a
-              href="#explore"
-              className="group bg-brand-lime hover:bg-brand-lime-hover text-brand-btn-bg font-sans font-semibold px-6 py-3.5 rounded-md transition-all duration-200 flex items-center gap-2 w-full sm:w-auto justify-center shadow-md cursor-pointer text-sm"
-            >
-              Book a Turf
-              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-            </a>
+          {/* ======================================================== */}
+          {/*            MODERN STRUCTURED SEARCH CAPSULE              */}
+          {/* ======================================================== */}
+          <div ref={capsuleRef} className="mt-8 w-full max-w-2xl relative z-30">
+            <div className="bg-surface border border-border-default hover:border-border-strong rounded-xl shadow-xs p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 transition-all">
+              
+              {/* Segment 1: Sport */}
+              <div className="relative flex-1">
+                <button
+                  type="button"
+                  onClick={() => setOpenDropdown(openDropdown === "sport" ? null : "sport")}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-colors text-left cursor-pointer",
+                    openDropdown === "sport" ? "bg-elevated" : "hover:bg-elevated"
+                  )}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-base shrink-0">
+                      {SPORTS.find((s) => s.id === selectedSport)?.icon || "⚽"}
+                    </span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                        Sport
+                      </span>
+                      <span className="text-sm font-semibold text-text-main truncate">
+                        {selectedSport}
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronDown className={cn("w-4 h-4 text-text-muted transition-transform shrink-0", openDropdown === "sport" && "rotate-180")} />
+                </button>
 
-            <a
-              href="#how-it-works"
-              className="group bg-surface border border-border-default text-text-main hover:bg-elevated hover:border-border-strong font-sans font-semibold px-6 py-3.5 rounded-md transition-all duration-200 w-full sm:w-auto justify-center flex items-center gap-2 cursor-pointer text-sm"
+                {openDropdown === "sport" && (
+                  <div className="absolute top-[calc(100%+8px)] left-0 z-50 w-72 bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-muted border-b border-border-subtle mb-1">
+                      Select Sport
+                    </div>
+                    {SPORTS.map((sport) => {
+                      const active = selectedSport === sport.id;
+                      return (
+                        <button
+                          key={sport.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSport(sport.id);
+                            setOpenDropdown("city");
+                          }}
+                          className={cn(
+                            "w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer",
+                            active ? "bg-brand-lime/15 text-text-main" : "hover:bg-elevated text-text-main"
+                          )}
+                        >
+                          <span className="text-lg shrink-0 mt-0.5">{sport.icon}</span>
+                          <div className="flex flex-col">
+                            <span className={cn("text-xs font-semibold", active && "text-brand-lime")}>{sport.name}</span>
+                            <span className="text-[10px] text-text-muted">{sport.desc}</span>
+                          </div>
+                          {active && <Check className="w-3.5 h-3.5 text-brand-lime ml-auto mt-1 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="hidden sm:block w-[1px] h-8 bg-border-default shrink-0" />
+
+              {/* Segment 2: City */}
+              <div className="relative flex-1">
+                <button
+                  type="button"
+                  onClick={() => setOpenDropdown(openDropdown === "city" ? null : "city")}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-colors text-left cursor-pointer",
+                    openDropdown === "city" ? "bg-elevated" : "hover:bg-elevated"
+                  )}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <MapPin className="w-4 h-4 text-brand-lime shrink-0" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                        City
+                      </span>
+                      <span className="text-sm font-semibold text-text-main truncate">
+                        {selectedCity}
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronDown className={cn("w-4 h-4 text-text-muted transition-transform shrink-0", openDropdown === "city" && "rotate-180")} />
+                </button>
+
+                {openDropdown === "city" && (
+                  <div className="absolute top-[calc(100%+8px)] left-0 sm:left-1/2 sm:-translate-x-1/2 z-50 w-72 bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-muted border-b border-border-subtle mb-1">
+                      Choose City
+                    </div>
+                    {CITIES.map((city) => {
+                      const active = selectedCity === city.name;
+                      return (
+                        <button
+                          key={city.name}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCity(city.name);
+                            setOpenDropdown("date");
+                          }}
+                          className={cn(
+                            "w-full flex items-start gap-2.5 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer",
+                            active ? "bg-brand-lime/15 text-text-main" : "hover:bg-elevated text-text-main"
+                          )}
+                        >
+                          <MapPin className={cn("w-3.5 h-3.5 mt-0.5 shrink-0", active ? "text-brand-lime" : "text-text-muted")} />
+                          <div className="flex flex-col">
+                            <span className={cn("text-xs font-semibold", active && "text-brand-lime")}>{city.name}</span>
+                            <span className="text-[10px] text-text-muted line-clamp-1">{city.areas}</span>
+                          </div>
+                          {active && <Check className="w-3.5 h-3.5 text-brand-lime ml-auto mt-1 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="hidden sm:block w-[1px] h-8 bg-border-default shrink-0" />
+
+              {/* Segment 3: Date */}
+              <div className="relative flex-1">
+                <button
+                  type="button"
+                  onClick={() => setOpenDropdown(openDropdown === "date" ? null : "date")}
+                  className={cn(
+                    "w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl transition-colors text-left cursor-pointer",
+                    openDropdown === "date" ? "bg-elevated" : "hover:bg-elevated"
+                  )}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Calendar className="w-4 h-4 text-brand-lime shrink-0" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                        When
+                      </span>
+                      <span className="text-sm font-semibold text-text-main truncate">
+                        {selectedDate}
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronDown className={cn("w-4 h-4 text-text-muted transition-transform shrink-0", openDropdown === "date" && "rotate-180")} />
+                </button>
+
+                {openDropdown === "date" && (
+                  <div className="absolute top-[calc(100%+8px)] right-0 z-50 w-64 bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-muted border-b border-border-subtle mb-1">
+                      Choose Time Window
+                    </div>
+                    {DATES.map((date) => {
+                      const active = selectedDate === date.id;
+                      return (
+                        <button
+                          key={date.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDate(date.id);
+                            setOpenDropdown(null);
+                          }}
+                          className={cn(
+                            "w-full flex items-start gap-2.5 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer",
+                            active ? "bg-brand-lime/15 text-text-main" : "hover:bg-elevated text-text-main"
+                          )}
+                        >
+                          <div className="flex flex-col">
+                            <span className={cn("text-xs font-semibold", active && "text-brand-lime")}>{date.label}</span>
+                            <span className="text-[10px] text-text-muted">{date.sub}</span>
+                          </div>
+                          {active && <Check className="w-3.5 h-3.5 text-brand-lime ml-auto mt-1 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Submit CTA Button */}
+              <button
+                type="button"
+                onClick={handleSearch}
+                className="inline-flex items-center justify-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold px-6 py-3 rounded-xl transition-all shadow-sm text-sm shrink-0 cursor-pointer active:scale-95 mt-1 sm:mt-0"
+              >
+                <Search className="w-4 h-4 stroke-[2.5]" />
+                <span>Search</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Action Links */}
+          <div className="mt-4 flex flex-wrap items-center justify-start gap-2 text-xs text-text-muted">
+            <span className="font-medium">Trending:</span>
+            <button
+              type="button"
+              onClick={() => router.push("/explore?sport=Football&city=Bengaluru")}
+              className="px-2.5 py-1 rounded-full bg-surface border border-border-subtle hover:border-border-strong text-text-main hover:text-brand-lime transition-colors cursor-pointer"
             >
-              How it works
-              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-text-main/5 border border-border-default group-hover:bg-brand-lime/10 group-hover:border-brand-lime/20 transition-all">
-                <svg className="w-1.5 h-1.5 fill-current text-text-main group-hover:text-brand-lime ml-0.5" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </span>
-            </a>
+              ⚽ Bengaluru Football
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/explore?sport=Cricket&city=Mumbai")}
+              className="px-2.5 py-1 rounded-full bg-surface border border-border-subtle hover:border-border-strong text-text-main hover:text-brand-lime transition-colors cursor-pointer"
+            >
+              🏏 Mumbai Box Cricket
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/explore?sport=Badminton&city=Hyderabad")}
+              className="px-2.5 py-1 rounded-full bg-surface border border-border-subtle hover:border-border-strong text-text-main hover:text-brand-lime transition-colors cursor-pointer"
+            >
+              🏸 Hyderabad Badminton
+            </button>
           </div>
 
           {/* ======================================================== */}
@@ -189,7 +424,7 @@ export default function Hero() {
             )}
           </div>
 
-        </motion.div>
+        </div>
 
         {/* Right Column (iPhone Mockup Showcase) */}
         <div className="flex lg:col-span-5 items-center justify-center relative w-full lg:h-auto mt-8 lg:mt-0">
@@ -199,11 +434,10 @@ export default function Hero() {
             <div className="relative w-[300px] sm:w-[330px] aspect-[9/18] select-none">
               <Image
                 src="/Screenshot_20260603-131114.turfzo-portrait.webp"
-                alt="Turfzo App Mockup"
+                alt="Turfzo mobile app interface"
                 width={330}
                 height={660}
-                className="w-full h-auto object-contain"
-                priority
+                className="w-full h-auto object-contain drop-shadow-2xl"
               />
             </div>
 
