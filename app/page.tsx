@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 import { Header } from "@/components/ui/header-2";
 import Hero from "@/components/Hero";
+import PopularTurfs from "@/components/PopularTurfs";
 import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
 import CTABanner from "@/components/CTABanner";
@@ -19,6 +20,7 @@ export default function Home() {
       <Header />
       <main className="flex-grow">
         <Hero />
+        <PopularTurfs />
         <Features />
         <HowItWorks />
         <CTABanner />
@@ -27,4 +29,3 @@ export default function Home() {
     </div>
   );
 }
-

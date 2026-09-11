@@ -81,6 +81,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "woozy-husky-516.eu-west-1.convex.site",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
     ],
   },
   turbopack: {
@@ -88,6 +96,19 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        source: "/:all*(webp|jpg|jpeg|png|svg|ico)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+          {
+            key: "CDN-Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
       {
         source: "/:path*",
         headers: [

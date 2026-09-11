@@ -43,6 +43,7 @@ import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
 import { isViewOnlyMode } from "@/lib/env";
 import { openCashfreeCheckout } from "@/lib/cashfree";
+import { getLocalTournamentImage } from "@/lib/turf-images";
 
 interface Tournament {
   _id: string;
@@ -523,27 +524,34 @@ export default function TournamentsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
-            className="relative -mt-24 overflow-hidden min-h-[320px] sm:min-h-[380px] flex flex-col items-start justify-end mb-6"
+            className="relative -mt-24 overflow-hidden min-h-[340px] sm:min-h-[400px] flex flex-col items-start justify-end mb-6"
           >
-            <div
-              className="absolute inset-0 bg-cover bg-center z-0 opacity-50"
-              style={{ backgroundImage: `url('/stadium_light_bg.webp')` }}
-            />
-            <div
-              className="absolute inset-0 z-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.05) 100%)",
-              }}
-            />
+            {/* Background Image using Next.js Image */}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="/images/marketing/tournaments/tournament-hero.webp"
+                alt=""
+                fill
+                className="object-cover object-center"
+                sizes="100vw"
+                priority={false}
+              />
+              {/* Directional contrast overlay — deep black base ensures white text is vibrant in all modes */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/75 to-black/90" />
+            </div>
+
             <div className="relative z-10 px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full pb-10 sm:pb-14">
-              <h1 className="font-[family-name:var(--font-anton)] text-4xl sm:text-5xl lg:text-6xl text-white uppercase leading-[1.1] tracking-wide mb-2">
-                Leagues &<br />
-                Tournaments
+              <div className="flex items-center gap-2 mb-4">
+                <Trophy className="w-3.5 h-3.5 text-brand-lime" />
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-brand-lime">
+                  Amateur &amp; Community Leagues
+                </span>
+              </div>
+              <h1 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-3">
+                Leagues &amp; Tournaments
               </h1>
-              <p className="text-white/70 text-sm sm:text-base max-w-xl">
-                Register your team, climb the regional leaderboards, and compete
-                for grand cash prizes on the finest turfs.
+              <p className="text-white/80 text-sm sm:text-base max-w-xl leading-relaxed">
+                Register your team, track live tournament brackets, and compete on verified community turfs across your city.
               </p>
             </div>
           </motion.section>
@@ -556,7 +564,7 @@ export default function TournamentsPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="bg-surface border border-border-default rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6"
+              className="bg-surface border border-border-default rounded-xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2.5 mb-3">
@@ -584,7 +592,7 @@ export default function TournamentsPage() {
               </div>
               <button
                 onClick={() => router.push("/tournaments/create")}
-                className="flex items-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-bg font-semibold px-6 py-3 rounded-xl transition-colors text-sm cursor-pointer whitespace-nowrap flex-shrink-0"
+                className="flex items-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-bold px-6 py-3 rounded-xl transition-colors text-sm cursor-pointer whitespace-nowrap flex-shrink-0"
               >
                 Create Tournament <ArrowRight className="w-4 h-4" />
               </button>
@@ -627,7 +635,7 @@ export default function TournamentsPage() {
                           ${
                             isActive
                               ? "border-text-main text-text-main opacity-100 font-semibold"
-                              : "border-transparent text-text-muted opacity-55 hover:opacity-100 hover:text-text-main"
+                              : "border-transparent text-text-secondary hover:text-text-main"
                           }`}
                       >
                         <Icon className="w-7 h-7 shrink-0" />
@@ -709,13 +717,13 @@ export default function TournamentsPage() {
                       return (
                         <div
                           key={reg._id}
-                          className="bg-elevated border border-border-default rounded-2xl p-5"
+                          className="bg-elevated border border-border-default rounded-xl p-5"
                         >
                           <div className="flex items-center justify-between pb-3 border-b border-dashed border-border-strong mb-4">
                             <span className="font-extrabold text-brand-lime text-base tracking-wide">
                               {reg.registration_code ?? "No pass ID"}
                             </span>
-                            <span className="bg-brand-lime text-bg text-[9px] font-black px-2.5 py-1 rounded-md uppercase">
+                            <span className="bg-brand-lime text-white dark:text-black text-[9px] font-black px-2.5 py-1 rounded-md uppercase">
                               {reg.status}
                             </span>
                           </div>
@@ -789,7 +797,7 @@ export default function TournamentsPage() {
                   </p>
                 </div>
               ) : filteredTournaments.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 gap-4 bg-surface border border-border-default rounded-2xl text-center p-8">
+                <div className="flex flex-col items-center justify-center py-24 gap-4 bg-surface border border-border-default rounded-xl text-center p-8">
                   <Trophy
                     className="w-14 h-14 text-text-muted"
                     strokeWidth={1.2}
@@ -830,12 +838,12 @@ export default function TournamentsPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                         onClick={() => openDetails(t)}
-                        className="bg-surface border border-border-default rounded-2xl overflow-hidden hover:shadow-lg hover:border-border-strong transition-all duration-300 cursor-pointer group flex flex-col h-full relative"
+                        className="bg-surface border border-border-default rounded-xl overflow-hidden hover:shadow-sm hover:border-border-strong transition-all duration-300 cursor-pointer group flex flex-col h-full relative"
                       >
                         {/* Wishlist and Share */}
                         <button
                           onClick={(e) => toggleWishlist(t._id, e)}
-                          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-bg/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all"
+                          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all"
                           aria-label="Wishlist"
                         >
                           <Heart
@@ -846,17 +854,14 @@ export default function TournamentsPage() {
                         {/* Image banner */}
                         <div className="relative w-full h-48 bg-elevated overflow-hidden shrink-0">
                           <Image
-                            src={t.image_url || "/stadium_turf_bg.webp"}
+                            src={getLocalTournamentImage(t)}
                             alt={t.title}
                             fill
                             className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
                           />
                           <div className="absolute top-4 left-4 flex gap-2">
-                            <span className="bg-bg/80 dark:bg-surface/80 backdrop-blur-md text-text-main text-[10px] font-bold px-2.5 py-1 rounded-md border border-border-default">
-                              {t.sport}
-                            </span>
-                            <span className="bg-brand-lime text-bg text-[10px] font-extrabold px-2.5 py-1 rounded-md">
-                              {t.format}
+                            <span className="bg-brand-lime text-white dark:text-black text-[10px] font-extrabold px-2.5 py-1 rounded-md">
+                              {t.sport} · {t.format}
                             </span>
                           </div>
                         </div>
@@ -885,7 +890,7 @@ export default function TournamentsPage() {
                                 <span className="text-text-muted">
                                   Teams Registered
                                 </span>
-                                <span className="text-text-main">
+                                <span className="text-text-main tabular-nums">
                                   {t.registered_teams}/{t.max_teams}
                                 </span>
                               </div>
@@ -909,7 +914,7 @@ export default function TournamentsPage() {
                               <span className="block text-[9px] text-text-muted uppercase tracking-wider font-semibold">
                                 Entry Fee
                               </span>
-                              <span className="text-lg font-extrabold text-brand-lime">
+                              <span className="text-lg font-bold text-text-main tabular-nums">
                                 ₹{t.entry_fee.toLocaleString("en-IN")}
                                 <span className="text-xs text-text-muted font-normal ml-0.5">
                                   /team
@@ -985,11 +990,11 @@ export default function TournamentsPage() {
               </div>
 
               {/* Airbnb-style Photo Grid Gallery */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-2xl overflow-hidden bg-elevated relative h-[300px] md:h-[420px]">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-xl overflow-hidden bg-elevated relative h-[300px] md:h-[420px]">
                 {/* Left Large Photo */}
                 <div className="md:col-span-2 relative h-full w-full overflow-hidden group">
                   <Image
-                    src={selectedTournament.image_url || "/stadium_turf_bg.webp"}
+                    src={getLocalTournamentImage(selectedTournament)}
                     alt={selectedTournament.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 66vw"
@@ -1009,8 +1014,8 @@ export default function TournamentsPage() {
                   </div>
                   <div className="relative flex-1 w-full overflow-hidden group">
                     <Image
-                      src="/stadium_cinematic_bg.webp"
-                      alt="Cinematic stadium lighting"
+                      src="/images/marketing/home/cta-floodlit-turf.webp"
+                      alt="Floodlit community turf ground"
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover group-hover:brightness-95 transition-all duration-300"
@@ -1019,7 +1024,7 @@ export default function TournamentsPage() {
                 </div>
 
                 {/* Show all photos floating button */}
-                <button className="absolute bottom-6 right-6 bg-surface border border-border-strong text-text-main hover:bg-elevated transition-colors text-xs font-semibold py-2 px-4 rounded-xl flex items-center gap-1.5 shadow-md">
+                <button className="absolute bottom-6 right-6 bg-surface border border-border-strong text-text-main hover:bg-elevated transition-colors text-xs font-semibold py-2 px-4 rounded-xl flex items-center gap-1.5 shadow-sm">
                   <Info className="w-3.5 h-3.5" /> Show all photos
                 </button>
               </div>
@@ -1199,7 +1204,7 @@ export default function TournamentsPage() {
                     </div>
 
                     {/* Standings & Stats tab interface */}
-                    <div className="bg-surface border border-border-default rounded-2xl p-5 mt-8 shadow-sm">
+                    <div className="bg-surface border border-border-default rounded-xl p-5 mt-8 shadow-sm">
                       <div className="flex border-b border-border-default pb-3 mb-4 gap-4">
                         <button
                           onClick={() => setActiveTab("standings")}
@@ -1243,19 +1248,19 @@ export default function TournamentsPage() {
                                   key={row.rank}
                                   className="border-b border-border-subtle last:border-b-0"
                                 >
-                                  <td className="py-3 font-bold text-text-muted pr-2">
+                                  <td className="py-3 font-bold text-text-muted pr-2 tabular-nums">
                                     {row.rank}
                                   </td>
                                   <td className="py-3 font-semibold text-text-main">
                                     {row.team}
                                   </td>
-                                  <td className="py-3 text-center text-text-muted">
+                                  <td className="py-3 text-center text-text-muted tabular-nums">
                                     {row.played}
                                   </td>
-                                  <td className="py-3 text-center font-semibold text-brand-lime">
+                                  <td className="py-3 text-center font-semibold text-brand-lime tabular-nums">
                                     {row.goalDiff}
                                   </td>
-                                  <td className="py-3 text-right font-extrabold text-brand-lime">
+                                  <td className="py-3 text-right font-extrabold text-brand-lime tabular-nums">
                                     {row.points}
                                   </td>
                                 </tr>
@@ -1300,11 +1305,11 @@ export default function TournamentsPage() {
                 </div>
 
                 {/* RIGHT COLUMN: Sticky Reservation card widget (Airbnb-style) */}
-                <div className="sticky top-28 bg-surface border border-border-default rounded-2xl p-6 shadow-md space-y-4">
+                <div className="sticky top-28 bg-surface border border-border-default rounded-xl p-6 shadow-sm space-y-4">
                   {/* Price info header */}
                   <div className="flex items-baseline justify-between">
                     <div>
-                      <span className="text-2xl font-extrabold text-text-main">
+                      <span className="text-2xl font-extrabold text-text-main tabular-nums">
                         ₹{selectedTournament.entry_fee.toLocaleString("en-IN")}
                       </span>
                       <span className="text-sm text-text-muted font-medium ml-1">
@@ -1320,60 +1325,68 @@ export default function TournamentsPage() {
                     </div>
                   </div>
 
-                  {/* Grid fields box selector */}
-                  <div className="border border-border-strong rounded-xl overflow-hidden text-xs bg-bg">
-                    {/* Top half split */}
-                    <div className="grid grid-cols-2 border-b border-border-strong">
-                      <div className="p-3 border-r border-border-strong">
-                        <label className="block text-[9px] uppercase font-bold text-text-muted">
-                          Sport format
+                  {/* Highlights overview card container */}
+                  <div className="border border-border-strong rounded-xl overflow-hidden text-xs bg-bg divide-y divide-border-strong">
+                    <div className="p-3">
+                      <label className="block text-[8px] uppercase font-bold text-text-muted">
+                        Venue &amp; Location
+                      </label>
+                      <span className="font-semibold text-text-main mt-0.5 block truncate">
+                        {selectedTournament.venue}, {selectedTournament.city}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 divide-x divide-border-strong">
+                      <div className="p-3">
+                        <label className="block text-[8px] uppercase font-bold text-text-muted">
+                          Match Format
                         </label>
-                        <span className="font-semibold text-text-main mt-0.5 block truncate">
+                        <span className="font-semibold text-text-main mt-0.5 block">
                           {selectedTournament.format}
                         </span>
                       </div>
                       <div className="p-3">
-                        <label className="block text-[9px] uppercase font-bold text-text-muted">
-                          Schedule Date
+                        <label className="block text-[8px] uppercase font-bold text-text-muted">
+                          Tournament Sport
                         </label>
-                        <span className="font-semibold text-text-main mt-0.5 block truncate">
-                          {new Date(
-                            selectedTournament.start_date,
-                          ).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}
+                        <span className="font-semibold text-text-main mt-0.5 block">
+                          {selectedTournament.sport}
                         </span>
                       </div>
                     </div>
-                    {/* Bottom half */}
-                    <div className="p-3">
-                      <label className="block text-[9px] uppercase font-bold text-text-muted">
-                        Venue Arena
-                      </label>
-                      <span className="font-semibold text-text-main mt-0.5 block truncate">
-                        {selectedTournament.venue}
+                  </div>
+
+                  {/* Registered squads progress bar */}
+                  <div className="pt-2">
+                    <div className="flex justify-between items-center text-xs font-semibold mb-1.5">
+                      <span className="text-text-muted">Teams Registered</span>
+                      <span className="text-text-main tabular-nums">
+                        {selectedTournament.registered_teams}/
+                        {selectedTournament.max_teams}
                       </span>
+                    </div>
+                    <div className="h-2 w-full bg-border-default rounded-full overflow-hidden relative">
+                      <div
+                        className="h-full bg-brand-lime rounded-full transition-all duration-500"
+                        style={{
+                          width: `${(selectedTournament.registered_teams / selectedTournament.max_teams) * 100}%`,
+                        }}
+                      />
                     </div>
                   </div>
 
                   {/* Action Register Button */}
-                  {selectedTournament.max_teams -
-                    selectedTournament.registered_teams <=
-                  0 ? (
-                    <button
-                      disabled
-                      className="w-full bg-border-default text-text-muted font-bold text-sm py-3.5 rounded-xl cursor-not-allowed text-center"
-                    >
-                      Registration Full
-                    </button>
+                  {selectedTournament.status === "closed" ||
+                  selectedTournament.status === "completed" ? (
+                    <div className="w-full bg-border-default text-text-muted font-bold text-sm py-3.5 rounded-xl cursor-not-allowed text-center">
+                      Registration Closed
+                    </div>
                   ) : viewOnly ? (
                     <div className="flex flex-col gap-2">
                       <a
                         href="https://play.google.com/store/apps/details?id=com.turfzo.app"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
+                        className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
                       >
                         <Smartphone className="w-4 h-4" />
                         Register on the Turfzo App
@@ -1386,7 +1399,7 @@ export default function TournamentsPage() {
                   ) : (
                     <button
                       onClick={() => handleOpenRegistration(selectedTournament)}
-                      className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99]"
+                      className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99]"
                     >
                       Register Team
                     </button>
@@ -1403,17 +1416,17 @@ export default function TournamentsPage() {
                   <div className="space-y-2.5 text-sm text-text-muted">
                     <div className="flex justify-between">
                       <span className="underline">Entry fee</span>
-                      <span className="text-text-main">
+                      <span className="text-text-main tabular-nums">
                         ₹{selectedTournament.entry_fee.toLocaleString("en-IN")}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="underline">Turfzo convenience fee</span>
-                      <span className="text-text-main">₹0</span>
+                      <span className="text-text-main tabular-nums">₹0</span>
                     </div>
                     <div className="flex justify-between font-bold text-text-main border-t border-border-default pt-2.5 text-base">
                       <span>Total</span>
-                      <span>
+                      <span className="tabular-nums">
                         ₹{selectedTournament.entry_fee.toLocaleString("en-IN")}
                       </span>
                     </div>
@@ -1460,7 +1473,7 @@ export default function TournamentsPage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.96, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="relative bg-surface border border-border-default rounded-2xl max-w-md w-full p-6 shadow-2xl z-10 flex flex-col gap-4 text-left"
+                className="relative bg-surface border border-border-default rounded-xl max-w-md w-full p-6 shadow-sm z-10 flex flex-col gap-4 text-left"
               >
                 <div className="flex items-center justify-between pb-3 border-b border-border-default">
                   <h3 className="text-lg font-bold text-text-main">
@@ -1576,14 +1589,14 @@ export default function TournamentsPage() {
                     <span className="text-sm font-semibold text-text-muted">
                       Total Entry Fee
                     </span>
-                    <span className="text-lg font-extrabold text-brand-lime">
+                    <span className="text-lg font-bold text-text-main tabular-nums">
                       ₹{selectedTournament.entry_fee.toLocaleString("en-IN")}
                     </span>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all mt-2 cursor-pointer text-center shadow-sm active:scale-[0.99]"
+                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-xl transition-all mt-2 cursor-pointer text-center shadow-sm active:scale-[0.99]"
                   >
                     Pay & Register Team
                   </button>
@@ -1597,7 +1610,7 @@ export default function TournamentsPage() {
                 initial={{ scale: 0.96, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.96, opacity: 0 }}
-                className="relative bg-surface border border-border-default rounded-2xl max-w-sm w-full p-8 shadow-2xl z-10 flex flex-col items-center justify-center gap-4 text-center"
+                className="relative bg-surface border border-border-default rounded-xl max-w-sm w-full p-8 shadow-sm z-10 flex flex-col items-center justify-center gap-4 text-center"
               >
                 <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
                 <h3 className="text-lg font-bold text-text-main">
@@ -1615,7 +1628,7 @@ export default function TournamentsPage() {
                 initial={{ scale: 0.96, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.96, opacity: 0 }}
-                className="relative bg-surface border border-border-default rounded-2xl max-w-md w-full p-6 shadow-2xl z-10 text-center"
+                className="relative bg-surface border border-border-default rounded-xl max-w-md w-full p-6 shadow-sm z-10 text-center"
               >
                 <div className="w-16 h-16 bg-brand-lime/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-lime/20">
                   <Check className="w-8 h-8 text-brand-lime" strokeWidth={3} />
@@ -1630,7 +1643,7 @@ export default function TournamentsPage() {
                 </p>
 
                 {/* Ticket Receipt Pass */}
-                <div className="bg-bg border border-border-default rounded-2xl p-5 mt-6 text-left relative overflow-hidden">
+                <div className="bg-bg border border-border-default rounded-xl p-5 mt-6 text-left relative overflow-hidden">
                   <div className="flex justify-between items-center pb-3 border-b border-dashed border-border-strong mb-4">
                     <div>
                       <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
@@ -1640,7 +1653,7 @@ export default function TournamentsPage() {
                         {registrationCode}
                       </span>
                     </div>
-                    <span className="bg-brand-lime text-bg text-[9px] font-black px-2.5 py-1 rounded-md uppercase">
+                    <span className="bg-brand-lime text-white dark:text-black text-[9px] font-black px-2.5 py-1 rounded-md uppercase">
                       {selectedTournament.entry_fee > 0 ? "Paid" : "Free"}
                     </span>
                   </div>
@@ -1708,7 +1721,7 @@ export default function TournamentsPage() {
                   </button>
                   <button
                     onClick={() => setRegStep("closed")}
-                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold py-3 rounded-xl text-sm transition-all cursor-pointer"
+                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold py-3 rounded-xl text-sm transition-all cursor-pointer"
                   >
                     Done
                   </button>
@@ -1722,7 +1735,7 @@ export default function TournamentsPage() {
                 initial={{ scale: 0.96, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.96, opacity: 0 }}
-                className="relative bg-surface border border-border-default rounded-2xl max-w-md w-full p-6 shadow-2xl z-10 text-center flex flex-col items-center gap-4"
+                className="relative bg-surface border border-border-default rounded-xl max-w-md w-full p-6 shadow-sm z-10 text-center flex flex-col items-center gap-4"
               >
                 <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 border border-red-500/25">
                   <AlertCircle className="w-6 h-6" />
@@ -1734,7 +1747,7 @@ export default function TournamentsPage() {
                 <div className="flex gap-3 mt-4 w-full justify-center text-xs font-semibold">
                   <button
                     onClick={() => setRegStep("form")}
-                    className="bg-brand-lime hover:bg-brand-lime-hover text-bg font-bold px-6 py-3 rounded-xl transition-all cursor-pointer"
+                    className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-bold px-6 py-3 rounded-xl transition-all cursor-pointer"
                   >
                     Try Again
                   </button>

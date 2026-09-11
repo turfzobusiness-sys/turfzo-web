@@ -32,33 +32,41 @@ function isActive(pathname: string | null, href: string) {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
-function ThemeIcon({ mode }: { mode: "dark" | "light" | "system" }) {
-  if (mode === "dark") return <Moon className="size-5" />;
-  if (mode === "light") return <Sun className="size-5" />;
-  return <Monitor className="size-5" />;
-}
-
-function HeaderThemeButton({ className }: { className?: string }) {
-  const { mode, setMode } = useTheme();
-  const cycle = () => {
-    if (mode === "dark") setMode("light");
-    else if (mode === "light") setMode("system");
-    else setMode("dark");
+function HeaderThemeButton({
+  className,
+  showLabel = true,
+}: {
+  className?: string;
+  showLabel?: boolean;
+}) {
+  const { resolved, setMode } = useTheme();
+  const toggle = () => {
+    setMode(resolved === "dark" ? "light" : "dark");
   };
-  const label =
-    mode === "dark" ? "Dark mode" : mode === "light" ? "Light mode" : "System";
+  const isDark = resolved === "dark";
+
   return (
     <button
       type="button"
-      onClick={cycle}
-      title={label}
-      aria-label={`Switch theme: currently ${label}`}
+      onClick={toggle}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className={cn(
-        "inline-flex h-9 w-9 items-center justify-center rounded-md text-text-muted hover:bg-elevated hover:text-text-main transition-colors",
+        "inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border-default bg-surface px-3 py-1.5 text-xs font-semibold text-text-main shadow-sm transition-all hover:bg-elevated hover:border-border-strong cursor-pointer active:scale-95 select-none",
         className
       )}
     >
-      <ThemeIcon mode={mode} />
+      {isDark ? (
+        <>
+          <Sun className="h-4 w-4 text-amber-400 transition-transform duration-200" />
+          {showLabel && <span className="hidden sm:inline">Light</span>}
+        </>
+      ) : (
+        <>
+          <Moon className="h-4 w-4 text-indigo-500 transition-transform duration-200" />
+          {showLabel && <span className="hidden sm:inline">Dark</span>}
+        </>
+      )}
     </button>
   );
 }
@@ -180,6 +188,7 @@ export function Header() {
   const pathname = usePathname();
   const { status, firebaseUser, convexUser, signOut } = useAuth();
   const { openAuthModal } = useAuthModal();
+  const { resolved, setMode } = useTheme();
   const isAuthed = status === "authenticated";
 
   React.useEffect(() => {
@@ -359,14 +368,14 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2.5 md:hidden">
-          <HeaderThemeButton className="h-12 w-12" />
-          <HeaderPushButton className="h-12 w-12" />
-          <HeaderNotificationsButton className="h-12 w-12" />
+          <HeaderThemeButton className="h-10 w-10 p-0" showLabel={false} />
+          <HeaderPushButton className="h-10 w-10" />
+          <HeaderNotificationsButton className="h-10 w-10" />
           <Button
             size="icon"
             variant="outline"
             onClick={() => setOpen((v) => !v)}
-            className="md:hidden h-12 w-12"
+            className="md:hidden h-10 w-10"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >
@@ -388,7 +397,43 @@ export function Header() {
             "flex h-full w-full flex-col justify-between gap-y-3 p-5"
           )}
         >
-          <div className="grid gap-y-1">
+          <div className="flex flex-col gap-3">
+            {/* Mobile Theme Segmented Toggle */}
+            <div className="flex items-center justify-between p-3 rounded-xl bg-surface border border-border-default">
+              <span className="text-sm font-semibold text-text-main">
+                Theme
+              </span>
+              <div className="inline-flex items-center p-1 rounded-lg bg-elevated border border-border-subtle gap-1">
+                <button
+                  type="button"
+                  onClick={() => setMode("light")}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
+                    resolved === "light"
+                      ? "bg-surface text-text-main shadow-xs font-bold"
+                      : "text-text-muted hover:text-text-main"
+                  )}
+                >
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  Light
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("dark")}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
+                    resolved === "dark"
+                      ? "bg-surface text-text-main shadow-xs font-bold"
+                      : "text-text-muted hover:text-text-main"
+                  )}
+                >
+                  <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                  Dark
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-y-1">
             {NAV_LINKS.map((link) => {
               const active = isActive(pathname, link.href);
               return (
@@ -434,6 +479,7 @@ export function Header() {
               </Link>
             )}
           </div>
+        </div>
           <div className="flex flex-col gap-3">
             {isAuthed ? (
               <>

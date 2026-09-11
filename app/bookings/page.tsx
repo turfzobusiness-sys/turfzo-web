@@ -251,7 +251,7 @@ export default function BookingsPage() {
             </div>
             <Link
               href="/explore"
-              className="bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all w-fit"
+              className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all w-fit"
             >
               Book a new slot <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </Link>
@@ -300,7 +300,7 @@ export default function BookingsPage() {
               </p>
               <Link
                 href="/explore"
-                className="bg-brand-lime text-black font-sans font-bold text-xs py-2.5 px-6 rounded-md mt-2"
+                className="bg-brand-lime text-white dark:text-black font-sans font-bold text-xs py-2.5 px-6 rounded-md mt-2"
               >
                 Explore Turfs
               </Link>
@@ -396,7 +396,7 @@ export default function BookingsPage() {
                           <>
                             <button
                               onClick={() => showQR(booking)}
-                              className="bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-xs py-2 px-4 rounded-md flex items-center gap-1.5 transition-colors"
+                              className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-xs py-2 px-4 rounded-md flex items-center gap-1.5 transition-colors"
                             >
                               <Ticket className="w-3.5 h-3.5" /> View QR
                             </button>
@@ -447,11 +447,11 @@ export default function BookingsPage() {
             <p className="text-xs text-text-muted font-sans mt-4">
               Show this QR at the venue entrance to check in.
             </p>
-            <a
-              href={qrUrls[activeQR]}
-              download={`turfzo-booking-${bookings.find((b) => b._id === activeQR)?.booking_code}.png`}
-              className="mt-4 w-full bg-brand-lime text-black font-sans font-bold text-sm py-2.5 rounded-md flex items-center justify-center gap-1.5"
-            >
+              <a
+                href={qrUrls[activeQR]}
+                download={`turfzo-booking-${bookings.find((b) => b._id === activeQR)?.booking_code}.png`}
+                className="mt-4 w-full bg-brand-lime text-white dark:text-black font-sans font-bold text-sm py-2.5 rounded-md flex items-center justify-center gap-1.5"
+              >
               <Download className="w-4 h-4" /> Download
             </a>
           </div>

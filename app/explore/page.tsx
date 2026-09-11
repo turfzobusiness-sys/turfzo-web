@@ -43,6 +43,7 @@ import {
   GiAmericanFootballBall,
 } from "react-icons/gi";
 import { Header } from "@/components/ui/header-2";
+import { getLocalTurfImage } from "@/lib/turf-images";
 import Footer from "@/components/Footer";
 import { convexClient } from "@/lib/convex";
 import {
@@ -141,7 +142,7 @@ function mapTurf(t: ConvexTurf): TurfDisplay {
     size: t.format ?? "N/A",
     premium: t.tier === "premium",
     facilities: t.amenities ?? [],
-    image: t.image_url || "/stadium_turf_bg.webp",
+    image: getLocalTurfImage(t),
     city: t.city,
     hasFloodlights: t.has_floodlights,
     hasFreeParking: t.has_free_parking,
@@ -256,7 +257,7 @@ function CustomSelect({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full right-0 mt-1.5 min-w-[160px] bg-surface border border-border-default rounded-xl shadow-lg z-50 p-1.5 overflow-hidden"
+            className="absolute top-full right-0 mt-1.5 min-w-[160px] bg-surface border border-border-default rounded-xl shadow-sm z-50 p-1.5 overflow-hidden"
           >
             {options.map((opt) => (
               <button
@@ -1185,33 +1186,49 @@ export default function ExplorePage() {
             ======================================================== */}
         {viewMode === "list" && flowStep === "listing" && (
           <div>
-            {/* Full Bleed Hero Section */}
+            {/* Full Bleed Search Header Section */}
             <motion.section
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="relative -mt-24 overflow-visible min-h-[380px] sm:min-h-[440px] flex flex-col items-start justify-end mb-6"
+              transition={{ duration: 0.5 }}
+              className="relative -mt-24 overflow-visible min-h-[340px] sm:min-h-[380px] flex flex-col items-start justify-end mb-6 border-b border-border-default"
             >
-              <div
-                className="absolute inset-0 bg-cover bg-center z-0 opacity-95 dark:opacity-50 brightness-[0.70] dark:brightness-100"
-                style={{ backgroundImage: `url('/stadium_light_bg.webp')` }}
-              />
-              <div className="absolute inset-0 z-0 bg-gradient-to-t from-bg via-bg/40 to-transparent dark:from-black/80 dark:via-black/40 dark:to-transparent" />
-              <div className="relative z-10 px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full pb-10 sm:pb-14">
-                <h1 className="font-[family-name:var(--font-anton)] text-4xl sm:text-5xl lg:text-6xl text-text-main dark:text-white uppercase leading-[1.1] tracking-wide mb-2">
-                  Find &amp; Book
-                  <br />
-                  The Best Turfs Near You
+              {/* Authentic sports turf background image */}
+              <div className="absolute inset-0 overflow-hidden z-0 select-none pointer-events-none">
+                {/* Light mode: crisp daylight sports turf pitch */}
+                <Image
+                  src="/stadium_light_bg.webp"
+                  alt="Sports turf stadium pitch"
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover object-center opacity-85 dark:hidden"
+                />
+                {/* Dark mode: floodlit evening sports turf pitch */}
+                <Image
+                  src="/stadium_cinematic_bg.webp"
+                  alt="Floodlit sports turf pitch"
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover object-[center_65%] opacity-45 hidden dark:block"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent dark:from-bg dark:via-bg/50 dark:to-transparent z-10" />
+              </div>
+
+              <div className="relative z-10 px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full pt-28 sm:pt-32 pb-10 sm:pb-12">
+                <h1 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-extrabold text-text-main tracking-tight mb-2">
+                  Find &amp; book sports turfs near you
                 </h1>
-                <p className="text-text-muted dark:text-white/70 text-sm sm:text-base max-w-xl mb-6">
+                <p className="text-text-muted text-sm sm:text-base max-w-xl mb-6">
                   Check real-time slots, secure bookings in under 60 seconds,
                   and play on 100% verified fields.
                 </p>
 
-                {/* Airbnb-style Search Pill */}
-                <div className="w-full max-w-3xl bg-surface border border-border-default rounded-full shadow-lg h-[66px] flex items-center focus-within:border-border-strong focus-within:shadow-xl transition-all duration-200 relative z-20">
+                {/* Structured Architectural Search Bar */}
+                <div className="w-full max-w-3xl bg-surface border border-border-default rounded-xl shadow-xs h-[64px] flex items-center focus-within:border-border-strong transition-all duration-200 relative z-20">
                   {/* Segment 1: Where */}
-                  <div className="flex flex-col justify-center px-8 h-full rounded-l-full cursor-pointer hover:bg-elevated/50 transition-colors flex-[1.3] min-w-0">
+                  <div className="flex flex-col justify-center px-6 h-full rounded-l-xl cursor-pointer hover:bg-elevated/50 transition-colors flex-[1.3] min-w-0">
                     <span className="text-[10px] font-bold tracking-wider text-text-muted uppercase">
                       Where
                     </span>
@@ -1227,7 +1244,7 @@ export default function ExplorePage() {
                   {/* Segment 2: When */}
                   <div
                     data-when-calendar
-                    className="flex flex-col justify-center px-8 h-full cursor-pointer hover:bg-elevated/50 border-l border-border-default transition-colors relative flex-[0.9] min-w-0"
+                    className="flex flex-col justify-center px-6 h-full cursor-pointer hover:bg-elevated/50 border-l border-border-default transition-colors relative flex-[0.9] min-w-0"
                     onClick={() => {
                       setWhenCalendarOpen((v) => !v);
                       setSportDropdownOpen(false);
@@ -1249,7 +1266,7 @@ export default function ExplorePage() {
                           exit={{ opacity: 0, y: -8, scale: 0.97 }}
                           transition={{ duration: 0.2 }}
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-2xl shadow-xl p-5 w-[calc(100vw-2rem)] max-w-[320px]"
+                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-xl shadow-sm p-5 w-[calc(100vw-2rem)] max-w-[320px]"
                         >
                           <CalendarPicker
                             selected={searchDate}
@@ -1266,7 +1283,7 @@ export default function ExplorePage() {
                   {/* Segment 3: Sport */}
                   <div
                     data-sport-dropdown
-                    className="flex flex-col justify-center px-8 h-full cursor-pointer hover:bg-elevated/50 border-l border-border-default transition-colors relative flex-[0.8] min-w-0"
+                    className="flex flex-col justify-center px-6 h-full cursor-pointer hover:bg-elevated/50 border-l border-border-default transition-colors relative flex-[0.8] min-w-0"
                     onClick={() => {
                       setSportDropdownOpen((v) => !v);
                       setWhenCalendarOpen(false);
@@ -1288,7 +1305,7 @@ export default function ExplorePage() {
                           exit={{ opacity: 0, y: -8, scale: 0.97 }}
                           transition={{ duration: 0.2 }}
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-2xl shadow-xl p-2 min-w-[200px]"
+                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-xl shadow-sm p-2 min-w-[200px]"
                         >
                           <div className="flex flex-col gap-1">
                             {SPORT_CATEGORIES.map((s) => {
@@ -1315,17 +1332,17 @@ export default function ExplorePage() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Search Orb */}
-                  <button className="w-12 h-12 rounded-full bg-brand-lime hover:bg-brand-lime-hover hover:scale-105 active:scale-95 transition-all flex items-center justify-center mr-2 ml-auto shrink-0 cursor-pointer">
-                    <Search className="w-5 h-5 text-bg" strokeWidth={2.5} />
+                  {/* Search Button */}
+                  <button className="h-10 px-4 rounded-lg bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-bold text-xs flex items-center justify-center gap-1.5 mr-2.5 ml-auto shrink-0 transition-all cursor-pointer">
+                    <Search className="w-4 h-4" strokeWidth={2.5} />
+                    <span className="hidden sm:inline">Search</span>
                   </button>
                 </div>
               </div>
             </motion.section>
 
             <div className="max-w-[1280px] mx-auto px-6 md:px-10 w-full">
-              {/* Launch-city chips — the same nine cities as the mobile
-                  app's selectors ("All" removes the restriction). */}
+              {/* Launch-city chips */}
               <div className="flex gap-2 overflow-x-auto scrollbar-none py-3 mb-2">
                 {["All", ...LAUNCH_CITIES.map((c) => c.label)].map((city) => {
                   const isActive = selectedCity === city;
@@ -1333,7 +1350,7 @@ export default function ExplorePage() {
                     <button
                       key={city}
                       onClick={() => setSelectedCity(city)}
-                      className={`px-4 py-1.5 rounded-full border text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                      className={`px-3.5 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
                         isActive
                           ? "bg-text-main text-bg border-text-main"
                           : "border-border-default text-text-muted hover:border-border-strong hover:text-text-main"
@@ -1359,7 +1376,7 @@ export default function ExplorePage() {
                           ${
                             isActive
                               ? "border-text-main text-text-main opacity-100 font-semibold"
-                              : "border-transparent text-text-muted opacity-55 hover:opacity-100 hover:text-text-main"
+                              : "border-transparent text-text-secondary hover:text-text-main"
                           }`}
                       >
                         <Icon className="w-7 h-7 shrink-0" />
@@ -1409,7 +1426,7 @@ export default function ExplorePage() {
 
               {/* Error warning state */}
               {loadError && (
-                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/25 rounded-2xl flex items-center gap-3 text-red-400 text-sm">
+                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/25 rounded-xl flex items-center gap-3 text-red-400 text-sm">
                   <AlertCircle className="w-5 h-5 shrink-0" />
                   <p>{loadError}</p>
                 </div>
@@ -1417,7 +1434,7 @@ export default function ExplorePage() {
 
               {/* Empty warning state */}
               {!loading && filteredTurfs.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-24 gap-4 bg-surface border border-border-default rounded-2xl text-center p-8">
+                <div className="flex flex-col items-center justify-center py-24 gap-4 bg-surface border border-border-default rounded-xl text-center p-8">
                   <SlidersHorizontal
                     className="w-12 h-12 text-text-muted"
                     strokeWidth={1.2}
@@ -1469,12 +1486,12 @@ export default function ExplorePage() {
                       tabIndex={0}
                       role="button"
                       aria-label={`View slots for ${turf.name}`}
-                      className="bg-surface border border-border-default rounded-2xl overflow-hidden hover:shadow-lg hover:border-border-strong transition-all duration-300 cursor-pointer group flex flex-col h-full relative focus-visible:outline-2 focus-visible:outline-brand-lime focus-visible:outline-offset-2"
+                      className="bg-surface border border-border-default rounded-xl overflow-hidden hover:shadow-sm hover:border-border-strong transition-all duration-300 cursor-pointer group flex flex-col h-full relative focus-visible:outline-2 focus-visible:outline-brand-lime focus-visible:outline-offset-2"
                     >
                       {/* Heart Save button */}
                       <button
                         onClick={(e) => toggleWishlist(turf.id, e)}
-                        className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-bg/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all"
+                        className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all"
                         aria-label="Wishlist"
                       >
                         <Heart
@@ -1492,16 +1509,15 @@ export default function ExplorePage() {
                           className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
                         />
                         <div className="absolute top-4 left-4 flex gap-2">
-                          {turf.rating >= 4.7 && (
-                            <span className="bg-bg/85 dark:bg-surface/85 backdrop-blur-sm text-text-main text-[10px] font-bold px-2.5 py-1 rounded-md border border-border-default">
-                              Guest Favorite
-                            </span>
-                          )}
-                          {turf.premium && (
-                            <span className="bg-brand-lime text-bg text-[10px] font-extrabold px-2.5 py-1 rounded-md">
+                          {turf.premium ? (
+                            <span className="bg-brand-lime text-white dark:text-black text-[10px] font-extrabold px-2.5 py-1 rounded-md">
                               Premium
                             </span>
-                          )}
+                          ) : turf.rating >= 4.7 ? (
+                            <span className="bg-bg text-text-main text-[10px] font-bold px-2.5 py-1 rounded-md border border-border-default">
+                              Guest Favorite
+                            </span>
+                          ) : null}
                         </div>
                       </div>
 
@@ -1527,7 +1543,7 @@ export default function ExplorePage() {
                             <span className="block text-[9px] text-text-muted uppercase tracking-wider font-semibold">
                               Hourly Rate
                             </span>
-                            <span className="text-lg font-extrabold text-brand-lime">
+                            <span className="text-lg font-bold text-text-main tabular-nums">
                               {formatPrice(turf.price)}
                               <span className="text-xs text-text-muted font-normal ml-0.5">
                                 /hr
@@ -1602,7 +1618,7 @@ export default function ExplorePage() {
             </div>
 
             {/* Photos Grid Gallery */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-2xl overflow-hidden bg-elevated relative h-[300px] md:h-[420px]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-xl overflow-hidden bg-elevated relative h-[300px] md:h-[420px]">
               {/* Left Large main photo */}
               <div className="md:col-span-2 relative h-full w-full overflow-hidden group">
                 <Image
@@ -1626,8 +1642,8 @@ export default function ExplorePage() {
                 </div>
                 <div className="relative flex-1 w-full overflow-hidden group">
                   <Image
-                    src="/stadium_cinematic_bg.webp"
-                    alt="Cinematic stadium lights"
+                    src="/images/marketing/explore/football-card.webp"
+                    alt="Verified pitch conditions"
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover group-hover:brightness-95 transition-all duration-300"
@@ -1636,7 +1652,7 @@ export default function ExplorePage() {
               </div>
 
               {/* Show all photos button */}
-              <button className="absolute bottom-6 right-6 bg-surface border border-border-strong text-text-main hover:bg-elevated transition-colors text-xs font-semibold py-2 px-4 rounded-xl flex items-center gap-1.5 shadow-md">
+              <button className="absolute bottom-6 right-6 bg-surface border border-border-strong text-text-main hover:bg-elevated transition-colors text-xs font-semibold py-2 px-4 rounded-xl flex items-center gap-1.5 shadow-sm">
                 <Info className="w-3.5 h-3.5" /> Show all photos
               </button>
             </div>
@@ -1833,10 +1849,10 @@ export default function ExplorePage() {
               </div>
 
               {/* RIGHT COLUMN: Sticky booking selectors (Airbnb-style) */}
-              <div className="sticky top-28 bg-surface border border-border-default rounded-2xl p-6 shadow-md space-y-4">
+              <div className="sticky top-28 bg-surface border border-border-default rounded-xl p-6 shadow-sm space-y-4">
                 <div className="flex items-baseline justify-between">
                   <div>
-                    <span className="text-2xl font-extrabold text-text-main">
+                    <span className="text-2xl font-extrabold text-text-main tabular-nums">
                       {formatPrice(selectedTurf.price)}
                     </span>
                     <span className="text-sm text-text-muted font-medium ml-1">
@@ -1885,7 +1901,7 @@ export default function ExplorePage() {
                           initial={{ opacity: 0, y: -6 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -6 }}
-                          className="absolute top-12 left-2 z-50 bg-surface border border-border-default rounded-2xl shadow-xl p-5"
+                          className="absolute top-12 left-2 z-50 bg-surface border border-border-default rounded-xl shadow-sm p-5"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <CalendarPicker
@@ -1987,7 +2003,7 @@ export default function ExplorePage() {
                       href="https://play.google.com/store/apps/details?id=com.turfzo.app"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
+                      className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
                     >
                       <Smartphone className="w-4 h-4" />
                       Book on the Turfzo App
@@ -2000,7 +2016,7 @@ export default function ExplorePage() {
                   <button
                     disabled={!selectedTimeSlot}
                     onClick={handleProceedToCheckout}
-                    className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-border-default disabled:text-text-muted text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm disabled:cursor-not-allowed active:scale-[0.99]"
+                    className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-border-default disabled:text-text-muted text-white dark:text-black font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm disabled:cursor-not-allowed active:scale-[0.99]"
                   >
                     Book Turf
                   </button>
@@ -2011,19 +2027,19 @@ export default function ExplorePage() {
                   <div className="border-t border-border-default pt-4 space-y-2.5 text-sm text-text-muted">
                     <div className="flex justify-between">
                       <span className="underline">Base fare</span>
-                      <span className="text-text-main">
+                      <span className="text-text-main tabular-nums">
                         {formatPrice(pricing.subtotal)}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="underline">Service fee (5%)</span>
-                      <span className="text-text-main">
+                      <span className="text-text-main tabular-nums">
                         {formatPrice(pricing.serviceFee)}
                       </span>
                     </div>
                     <div className="flex justify-between font-bold text-text-main border-t border-border-default pt-2.5 text-base">
                       <span>Total</span>
-                      <span>{formatPrice(pricing.total)}</span>
+                      <span className="tabular-nums">{formatPrice(pricing.total)}</span>
                     </div>
                   </div>
                 )}
@@ -2057,7 +2073,7 @@ export default function ExplorePage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.96, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="relative bg-surface border border-border-default rounded-2xl max-w-md w-full p-6 shadow-2xl z-10 flex flex-col gap-4 text-left"
+              className="relative bg-surface border border-border-default rounded-xl max-w-md w-full p-6 shadow-sm z-10 flex flex-col gap-4 text-left"
             >
               <div className="flex items-center justify-between pb-3 border-b border-border-default">
                 <h3 className="text-lg font-bold text-text-main">
@@ -2196,19 +2212,19 @@ export default function ExplorePage() {
               <div className="bg-transparent border border-border-default rounded-xl p-4 flex flex-col gap-2 text-xs text-text-muted">
                 <div className="flex justify-between">
                   <span>Base slot price</span>
-                  <span className="text-text-main">
+                  <span className="text-text-main tabular-nums">
                     {formatPrice(pricing.subtotal)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Service fee (5%)</span>
-                  <span className="text-text-main">
+                  <span className="text-text-main tabular-nums">
                     {formatPrice(pricing.serviceFee)}
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-border-strong pt-2.5 font-bold text-text-main text-sm">
                   <span>Grand Total</span>
-                  <span className="text-brand-lime">
+                  <span className="tabular-nums">
                     {formatPrice(pricing.total)}
                   </span>
                 </div>
@@ -2217,7 +2233,7 @@ export default function ExplorePage() {
               <div className="flex flex-col gap-2.5 mt-1">
                 <button
                   onClick={handlePayNow}
-                  className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99]"
+                  className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99]"
                 >
                   {selectedPayment === "pay_at_venue"
                     ? `Book & Pay at Venue · ${formatPrice(pricing.total)}`
@@ -2261,7 +2277,7 @@ export default function ExplorePage() {
               initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.96, opacity: 0 }}
-              className="bg-surface border border-border-default rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center flex flex-col items-center gap-4"
+              className="bg-surface border border-border-default rounded-xl max-w-sm w-full p-6 shadow-sm text-center flex flex-col items-center gap-4"
             >
               <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 border border-red-500/25">
                 <AlertCircle className="w-6 h-6" />
@@ -2276,7 +2292,7 @@ export default function ExplorePage() {
               <div className="flex gap-3 mt-4 w-full justify-center text-xs font-semibold">
                 <button
                   onClick={() => setFlowStep("checkout")}
-                  className="bg-brand-lime hover:bg-brand-lime-hover text-bg font-bold px-6 py-3 rounded-xl transition-all cursor-pointer"
+                  className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-bold px-6 py-3 rounded-xl transition-all cursor-pointer"
                 >
                   Try Again
                 </button>
@@ -2308,7 +2324,7 @@ export default function ExplorePage() {
                 initial={{ scale: 0.96, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.96, opacity: 0 }}
-                className="bg-surface border border-border-default rounded-2xl max-w-md w-full p-6 shadow-2xl z-10 text-center my-8"
+                className="bg-surface border border-border-default rounded-xl max-w-md w-full p-6 shadow-sm z-10 text-center my-8"
               >
                 <div className="w-16 h-16 bg-brand-lime/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-lime/20">
                   <Check className="w-8 h-8 text-brand-lime" strokeWidth={3} />
@@ -2321,9 +2337,9 @@ export default function ExplorePage() {
                 </p>
 
                 {/* Ticket receipt box */}
-                <div className="relative mt-6 rounded-2xl overflow-hidden shadow-xl border border-border-default bg-surface">
+                <div className="relative mt-6 rounded-xl overflow-hidden shadow-sm border border-border-default bg-surface">
                   {/* Top Section */}
-                  <div className="bg-gradient-to-br from-brand-lime to-green-600 p-5 text-bg">
+                  <div className="bg-gradient-to-br from-brand-lime to-green-600 p-5 text-white">
                     <div className="flex justify-between items-center mb-4">
                       <div>
                         <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-0.5">
@@ -2400,7 +2416,7 @@ export default function ExplorePage() {
                         <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">
                           Amount
                         </span>
-                        <span className="font-bold text-brand-lime text-sm">
+                        <span className="font-bold text-text-main text-sm tabular-nums">
                           {formatPrice(confirmedBooking.total_price)}
                         </span>
                       </div>
@@ -2420,7 +2436,7 @@ export default function ExplorePage() {
                         <img
                           src={qrCodeUrl}
                           alt="Booking QR Pass"
-                          className="w-24 h-24 rounded-xl bg-white p-1.5 shadow-md"
+                          className="w-24 h-24 rounded-xl bg-white p-1.5 shadow-sm"
                         />
                       ) : (
                         <div className="w-24 h-24 bg-elevated animate-pulse rounded-xl" />
@@ -2444,7 +2460,7 @@ export default function ExplorePage() {
                       setFlowStep("listing");
                       setViewMode("list");
                     }}
-                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold py-3 rounded-xl text-sm transition-all cursor-pointer"
+                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold py-3 rounded-xl text-sm transition-all cursor-pointer"
                   >
                     Done
                   </button>
@@ -2480,7 +2496,7 @@ export default function ExplorePage() {
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.96, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="relative bg-surface border border-border-default rounded-2xl max-w-xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl z-10"
+                  className="relative bg-surface border border-border-default rounded-xl max-w-xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-sm z-10"
                 >
                   {/* Header */}
                   <div className="flex items-center justify-between px-6 py-4 border-b border-border-default shrink-0">
@@ -2546,7 +2562,7 @@ export default function ExplorePage() {
                                     : [...prev, card.id],
                                 );
                               }}
-                              className={`flex flex-col items-center justify-center p-4 border rounded-2xl cursor-pointer transition-all duration-200 aspect-square select-none
+                              className={`flex flex-col items-center justify-center p-4 border rounded-xl cursor-pointer transition-all duration-200 aspect-square select-none
                               ${
                                 isChecked
                                   ? "border-text-main bg-elevated/40 ring-1 ring-text-main"
@@ -2572,7 +2588,7 @@ export default function ExplorePage() {
                       <h4 className="text-base font-bold text-text-main mb-3">
                         Type of turf
                       </h4>
-                      <div className="flex border border-border-default rounded-full p-1 bg-bg/50 select-none w-full justify-between gap-1">
+                      <div className="flex border border-border-default rounded-xl p-1 bg-elevated/40 select-none w-full justify-between gap-1">
                         {[
                           { id: "all", label: "Any format" },
                           { id: "5v5", label: "5v5 Pitch" },
@@ -2584,11 +2600,11 @@ export default function ExplorePage() {
                             <button
                               key={fmt.id}
                               onClick={() => setFilterFormat(fmt.id)}
-                              className={`flex-1 py-3 text-xs font-extrabold text-center rounded-full transition-all cursor-pointer focus:outline-none
+                              className={`flex-1 py-2.5 text-xs font-bold text-center rounded-lg transition-all cursor-pointer focus:outline-none
                               ${
                                 isActive
-                                  ? "bg-surface border border-text-main text-text-main shadow-sm"
-                                  : "text-text-muted hover:bg-elevated/40 hover:text-text-main"
+                                  ? "bg-surface border border-border-strong text-text-main shadow-xs"
+                                  : "text-text-muted hover:bg-elevated hover:text-text-main"
                               }`}
                             >
                               {fmt.label}
@@ -2673,8 +2689,8 @@ export default function ExplorePage() {
                             }}
                             className={`absolute left-0 right-0 w-full h-1 pointer-events-none appearance-none bg-transparent outline-none focus:outline-none
                             ${isMinOnTop ? "z-40" : "z-30"}
-                            [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-border-strong [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer
-                            [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-surface [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-border-strong [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer`}
+                            [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-border-strong [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:cursor-pointer
+                            [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-surface [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-border-strong [&::-moz-range-thumb]:shadow-sm [&::-moz-range-thumb]:cursor-pointer`}
                           />
 
                           {/* Maximum Range Slider Input */}
@@ -2697,8 +2713,8 @@ export default function ExplorePage() {
                             }}
                             className={`absolute left-0 right-0 w-full h-1 pointer-events-none appearance-none bg-transparent outline-none focus:outline-none
                             ${isMinOnTop ? "z-30" : "z-40"}
-                            [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-border-strong [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer
-                            [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-surface [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-border-strong [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer`}
+                            [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-border-strong [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:cursor-pointer
+                            [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-surface [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-border-strong [&::-moz-range-thumb]:shadow-sm [&::-moz-range-thumb]:cursor-pointer`}
                           />
                         </div>
                       </div>
@@ -2706,7 +2722,7 @@ export default function ExplorePage() {
                       {/* Dual price inputs */}
                       <div className="grid grid-cols-2 gap-4 items-center">
                         {/* Min Price Box */}
-                        <div className="border border-border-default focus-within:border-text-main focus-within:ring-1 focus-within:ring-text-main rounded-full px-6 py-2.5 bg-bg flex flex-col justify-center">
+                        <div className="border border-border-default focus-within:border-text-main focus-within:ring-1 focus-within:ring-text-main rounded-xl px-4 py-2.5 bg-bg flex flex-col justify-center">
                           <label className="text-[9px] font-bold uppercase tracking-wider text-text-muted">
                             Minimum
                           </label>
@@ -2747,7 +2763,7 @@ export default function ExplorePage() {
                         </div>
 
                         {/* Max Price Box */}
-                        <div className="border border-border-default focus-within:border-text-main focus-within:ring-1 focus-within:ring-text-main rounded-full px-6 py-2.5 bg-bg flex flex-col justify-center">
+                        <div className="border border-border-default focus-within:border-text-main focus-within:ring-1 focus-within:ring-text-main rounded-xl px-4 py-2.5 bg-bg flex flex-col justify-center">
                           <label className="text-[9px] font-bold uppercase tracking-wider text-text-muted">
                             Maximum
                           </label>
@@ -2836,11 +2852,11 @@ export default function ExplorePage() {
                                     : [...prev, amenity.id],
                                 );
                               }}
-                              className={`flex items-center gap-2 border px-4 py-2.5 rounded-full text-xs font-bold cursor-pointer transition-all duration-200 select-none
+                              className={`flex items-center gap-2 border px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 select-none
                               ${
                                 isChecked
-                                  ? "border-text-main ring-1 ring-text-main text-text-main bg-surface/30"
-                                  : "border-border-default text-text-main hover:border-border-strong bg-surface/50"
+                                  ? "border-text-main ring-1 ring-text-main text-text-main bg-elevated"
+                                  : "border-border-default text-text-main hover:border-border-strong bg-surface"
                               }`}
                             >
                               <Icon
@@ -2881,11 +2897,11 @@ export default function ExplorePage() {
                                     : [...prev, option.id],
                                 );
                               }}
-                              className={`flex items-center gap-2 border px-4 py-2.5 rounded-full text-xs font-bold cursor-pointer transition-all duration-200 select-none
+                              className={`flex items-center gap-2 border px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 select-none
                               ${
                                 isChecked
-                                  ? "border-text-main ring-1 ring-text-main text-text-main bg-surface/30"
-                                  : "border-border-default text-text-main hover:border-border-strong bg-surface/50"
+                                  ? "border-text-main ring-1 ring-text-main text-text-main bg-elevated"
+                                  : "border-border-default text-text-main hover:border-border-strong bg-surface"
                               }`}
                             >
                               <Icon
@@ -2916,7 +2932,7 @@ export default function ExplorePage() {
                     </button>
                     <button
                       onClick={() => setIsFiltersModalOpen(false)}
-                      className="bg-text-main hover:bg-text-main/90 text-bg font-extrabold text-xs py-3 px-6 rounded-full transition-all cursor-pointer"
+                      className="bg-text-main hover:bg-text-main/90 text-bg font-extrabold text-xs py-3 px-6 rounded-xl transition-all cursor-pointer"
                     >
                       Show {filteredTurfs.length} turf
                       {filteredTurfs.length !== 1 ? "s" : ""}

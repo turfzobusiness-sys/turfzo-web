@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -27,6 +28,7 @@ import {
   Droplets,
   X,
   Zap,
+  CreditCard,
   Quote,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
@@ -55,7 +57,7 @@ function FadeInSection({
       ref={ref}
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.6, ease: "easeOut", delay }}
+      transition={{ duration: 0.3, ease: "easeOut", delay }}
       className={className}
     >
       {children}
@@ -241,34 +243,49 @@ const FEATURE_PILLARS = [
 /* ------------------------------------------------------------------ */
 const COMPARISON_ITEMS = [
   {
-    title: "Slot Booking & Conflicts",
-    manual: "WhatsApp chats & paper notebooks. Constant double-booking mixups.",
-    turfzo: "Real-time app booking with server-enforced atomic locks. Zero double bookings.",
+    category: "Slot Bookings",
     icon: Calendar,
+    manualTitle: "WhatsApp & Paper Double Bookings",
+    manualDesc: "Chasing players over phone calls, sticky notes, and paper registers. Two groups inevitably show up at 8 PM for the same court.",
+    turfzoTitle: "Atomic Concurrency Slot Locks",
+    turfzoDesc: "Server-enforced locks guarantee zero double bookings. When a slot is held, it locks in real-time across both mobile app and web.",
+    badge: "0 Double Bookings",
   },
   {
-    title: "Academy & Maintenance Blocking",
-    manual: "Scattered diary notes. Forgetting to block slots for coaching batches.",
-    turfzo: "One-tap bulk slot blocking for date ranges, recurring days, and academies.",
+    category: "Coaching & Maintenance",
     icon: Clock,
+    manualTitle: "Forgotten Academy Holds",
+    manualDesc: "Scattered diary notes lead to booking walk-in players during private coaching batches or pitch maintenance sessions.",
+    turfzoTitle: "One-Tap Bulk Date & Recurring Blocks",
+    turfzoDesc: "Instantly block entire date ranges, daily recurring coaching hours, or routine turf maintenance in seconds.",
+    badge: "Instant Bulk Hold",
   },
   {
-    title: "Pricing & Peak Hours",
-    manual: "Fixed flat rates all week. Empty morning slots earning zero revenue.",
-    turfzo: "Automated dynamic pricing for peak evenings, morning discounts, plus promo codes.",
+    category: "Pricing & Yield",
     icon: TrendingUp,
+    manualTitle: "Fixed Rates & Empty Mornings",
+    manualDesc: "Flat weekday pricing leaves early mornings completely empty while peak evenings sell out at below-market rates.",
+    turfzoTitle: "Automated Dynamic & Off-Peak Pricing",
+    turfzoDesc: "Fill morning downtime with attractive discounts, auto-surge peak weekend evenings, and distribute targeted promo codes.",
+    badge: "+35% Utilization",
   },
   {
-    title: "Payments & Accounting",
-    manual: "Verifying fake UPI screenshots, manual bookkeeping, split cash chaos.",
-    turfzo: "100% upfront online payments. View exact ledger and request 24h bank payouts.",
+    category: "Payments & Ledger",
     icon: Wallet,
+    manualTitle: "Fake UPI Screenshots & Cash Chaos",
+    manualDesc: "Scrutinizing phone screenshots at the gate, chasing split payments, and spending hours reconciling cash books.",
+    turfzoTitle: "100% Upfront Online & 24h Payouts",
+    turfzoDesc: "Players pay upfront via UPI, Cards, or Netbanking. Track every rupee in a transparent ledger with direct 24-hour settlements.",
+    badge: "24h Bank Settlements",
   },
   {
-    title: "Tournaments & Leagues",
-    manual: "Drawing manual brackets on whiteboards and chasing team entry fees.",
-    turfzo: "Digital bracket builder with online fee collection and captain pass codes.",
+    category: "Tournaments",
     icon: Trophy,
+    manualTitle: "Whiteboard Brackets & Fee Chasing",
+    manualDesc: "Drawing manual tournament fixtures on whiteboards, managing registration via DMs, and tracking entry fees on scratch paper.",
+    turfzoTitle: "Digital Bracket Builder & Online Fees",
+    turfzoDesc: "Generate single-elimination or round-robin brackets instantly. Collect team registration fees upfront with captain verification codes.",
+    badge: "Automated Fixtures",
   },
 ];
 
@@ -390,18 +407,18 @@ export default function OwnersPage() {
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12 lg:gap-16">
             {/* Left Column: Value Proposition */}
             <FadeInSection className="flex-1 max-w-2xl">
-              {/* Eyebrow badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border-default mb-6">
-                <span className="w-2 h-2 rounded-full bg-brand-lime" />
-                <span className="text-[11px] sm:text-xs font-mono font-semibold text-text-muted uppercase tracking-wider">
-                  For Venue Owners & Arena Managers
+              {/* Eyebrow label */}
+              <div className="flex items-center gap-2 mb-6">
+                <span className="w-1.5 h-1.5 rounded-xs bg-brand-lime" />
+                <span className="text-[11px] sm:text-xs font-mono font-bold text-text-muted uppercase tracking-wider">
+                  For Venue Owners &amp; Arena Managers
                 </span>
               </div>
 
               <h1 className="font-sans text-4xl sm:text-5xl lg:text-[3.75rem] xl:text-7xl font-extrabold tracking-tight text-text-main leading-[1.05] mb-5 sm:mb-6">
                 Your Courts.{" "}
                 <br className="hidden sm:block" />
-                <span className="text-brand-lime">Fully Booked.</span>
+                <span className="text-text-main">Fully Booked.</span>
               </h1>
 
               <p className="font-sans text-base sm:text-lg lg:text-xl text-text-muted leading-relaxed mb-8 sm:mb-10 max-w-xl">
@@ -428,19 +445,19 @@ export default function OwnersPage() {
               </div>
 
               {/* Floating Stat Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
                   { value: "95%", label: "Owner Payout", highlight: false },
                   { value: "24h", label: "Settlement SLA", highlight: false },
                   { value: "₹0", label: "Listing Fee", highlight: true },
-                  { value: "0%", label: "Double Bookings", highlight: false },
+                  
                 ].map((stat, i) => (
                   <motion.div
                     key={stat.label}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
-                    className="bg-surface border border-border-default rounded-xl p-3.5 sm:p-4 text-center hover:scale-[1.02] transition-transform duration-200"
+                    transition={{ delay: 0.4 + i * 0.05, duration: 0.5 }}
+                    className="bg-surface border border-border-default rounded-xl p-3.5 sm:p-4 text-center transition-transform duration-200"
                   >
                     <div className={cn(
                       "font-mono text-lg sm:text-xl font-bold",
@@ -456,100 +473,27 @@ export default function OwnersPage() {
               </div>
             </FadeInSection>
 
-            {/* Right Column: Live Partner Console Mockup */}
+            {/* Right Column: Authentic Turf Manager Editorial Image */}
             <FadeInSection delay={0.2} className="w-full lg:w-[480px] shrink-0 min-w-0">
-              <div className="bg-surface border border-border-default rounded-2xl p-4 sm:p-6 relative overflow-hidden shadow-xl">
-                {/* Console Topbar */}
-                <div className="flex items-center justify-between pb-3 sm:pb-4 mb-3 sm:mb-4 border-b border-border-default/50">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-2.5 h-2.5 rounded-full bg-brand-lime" />
-                    <span className="font-mono text-[11px] sm:text-xs font-semibold text-text-main truncate">
-                      APEX SPORTS ARENA · MAIN TURF
+              <div className="relative aspect-[4/5] rounded-xl overflow-hidden border border-border-default shadow-sm bg-surface">
+                <Image
+                  src="/images/marketing/owners/hero-owner-at-turf.webp"
+                  alt="Sports facility owner managing courts and bookings on a tablet"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 480px"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-surface border border-border-default/80">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-brand-lime" />
+                    <span className="text-xs font-semibold text-text-main font-sans">
+                      Partner Portal &amp; Ground Controls
                     </span>
                   </div>
-                  <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md bg-bg/60 text-text-muted border border-border-default/50 shrink-0">
-                    PARTNER PORTAL
-                  </span>
-                </div>
-
-                {/* Simulated Quick Metrics */}
-                <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-3 sm:mb-4">
-                  <div className="bg-bg/50 border border-border-default/50 rounded-xl p-2.5 sm:p-3">
-                    <div className="text-[10px] sm:text-[11px] text-text-muted font-medium">Today&apos;s Gross</div>
-                    <div className="font-mono text-lg sm:text-xl font-bold text-brand-lime mt-0.5">₹18,400</div>
-                    <div className="text-[9px] sm:text-[10px] text-text-hint mt-0.5">Payout: ₹17,480 (95%)</div>
-                  </div>
-                  <div className="bg-bg/50 border border-border-default/50 rounded-xl p-2.5 sm:p-3">
-                    <div className="text-[10px] sm:text-[11px] text-text-muted font-medium">Slot Occupancy</div>
-                    <div className="font-mono text-lg sm:text-xl font-bold text-text-main mt-0.5">88%</div>
-                    <div className="text-[9px] sm:text-[10px] text-text-hint mt-0.5">14 of 16 Slots Booked</div>
-                  </div>
-                </div>
-
-                {/* Dynamic Pricing Status Banner */}
-                <div className="bg-bg/30 border border-border-default/50 rounded-xl p-3 sm:p-3.5 mb-3 sm:mb-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-                      <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-lime shrink-0" />
-                      <span className="text-[11px] sm:text-xs font-semibold text-text-main font-sans truncate">
-                        Dynamic Peak Rule Active
-                      </span>
-                    </div>
-                    <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-brand-lime/10 text-brand-lime border border-brand-lime/20 shrink-0">
-                      1.3× MULTIPLIER
-                    </span>
-                  </div>
-                  <div className="text-[10px] sm:text-[11px] text-text-muted pt-1.5 mt-1 border-t border-border-default/30 flex justify-between">
-                    <span>Evening Slots (06:00 PM – 10:00 PM)</span>
-                    <span className="font-mono text-text-main font-medium">₹1,560 / hr</span>
-                  </div>
-                </div>
-
-                {/* Upcoming Bookings Schedule */}
-                <div className="space-y-2">
-                  <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-text-muted flex justify-between">
-                    <span>Live Booking Schedule</span>
-                    <span className="text-brand-lime font-medium flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-lime animate-pulse" />
-                      Synced
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg bg-bg/40 border border-border-default/50 text-xs gap-2">
-                    <div className="min-w-0">
-                      <span className="font-mono font-semibold text-text-main text-[11px] sm:text-xs block truncate">06:00 PM – 07:00 PM</span>
-                      <div className="text-[9px] sm:text-[10px] text-text-muted truncate">7v7 Football · Online Paid</div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-mono bg-brand-lime/10 text-brand-lime border border-brand-lime/20 font-medium shrink-0">
-                      CONFIRMED
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg bg-bg/20 border border-brand-lime/30 text-xs gap-2">
-                    <div className="min-w-0">
-                      <span className="font-mono font-semibold text-brand-lime text-[11px] sm:text-xs block truncate">07:00 PM – 08:00 PM</span>
-                      <div className="text-[9px] sm:text-[10px] text-text-muted truncate">5v5 Football · Rahul FC</div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-mono bg-brand-lime text-white dark:text-black font-bold shrink-0">
-                      IN PROGRESS
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg bg-bg/40 border border-border-default/50 text-xs gap-2">
-                    <div className="min-w-0">
-                      <span className="font-mono font-semibold text-text-main text-[11px] sm:text-xs block truncate">08:00 PM – 09:00 PM</span>
-                      <div className="text-[9px] sm:text-[10px] text-text-muted truncate">Cricket Nets · Academy Block</div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-mono bg-bg/60 text-text-muted border border-border-default/50 shrink-0">
-                      SLOT BLOCKED
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-border-default/30 text-center">
-                  <span className="text-[10px] sm:text-[11px] text-text-muted font-sans">
-                    Available on Web Partner Dashboard &amp; Mobile App
-                  </span>
+                  <p className="text-[11px] text-text-muted mt-1 leading-relaxed">
+                    Real-time slot locks, instant walk-in entry, and direct 24-hour settlements.
+                  </p>
                 </div>
               </div>
             </FadeInSection>
@@ -590,9 +534,98 @@ export default function OwnersPage() {
         </section>
 
         {/* ========================================================= */}
+        {/* BENEFITS SECTION — Operations & Discovery                 */}
+        {/* ========================================================= */}
+        <section className="py-20 sm:py-28 border-b border-border-default/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
+            <FadeInSection>
+              <div className="mb-10 sm:mb-14 max-w-2xl">
+                <span className="text-[11px] sm:text-xs font-mono uppercase tracking-wider text-text-muted">
+                  Daily Venue Operations
+                </span>
+                <h2 className="font-sans text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-text-main mt-1.5 sm:mt-2">
+                  Built for seamless court management.
+                </h2>
+                <p className="font-sans text-text-muted text-sm sm:text-base mt-2 sm:mt-3 leading-relaxed">
+                  Turfzo equips arena owners and sports facility operators with purpose-built tools to maximize pitch utilization and streamline daily cash flow.
+                </p>
+              </div>
+            </FadeInSection>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* Image Column */}
+              <FadeInSection delay={0.1} className="lg:col-span-6">
+                <div className="relative aspect-[3/2] rounded-xl overflow-hidden border border-border-default shadow-sm bg-surface">
+                  <Image
+                    src="/images/marketing/owners/venue-operations.webp"
+                    alt="Sports turf venue operations and ground staff maintenance during active evening hours"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                </div>
+              </FadeInSection>
+
+              {/* 4 Concise Benefits */}
+              <FadeInSection delay={0.2} className="lg:col-span-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 sm:p-5 rounded-xl bg-surface border border-border-default">
+                    <div className="w-8 h-8 rounded-lg bg-brand-lime/10 text-brand-lime flex items-center justify-center mb-3">
+                      <Calendar className="w-4 h-4 text-brand-lime" />
+                    </div>
+                    <h3 className="font-sans text-sm sm:text-base font-bold text-text-main">
+                      Online Slot Scheduling
+                    </h3>
+                    <p className="font-sans text-xs text-text-muted mt-1 leading-relaxed">
+                      Real-time availability with server-side concurrency locks that prevent double bookings.
+                    </p>
+                  </div>
+
+                  <div className="p-4 sm:p-5 rounded-xl bg-surface border border-border-default">
+                    <div className="w-8 h-8 rounded-lg bg-brand-lime/10 text-brand-lime flex items-center justify-center mb-3">
+                      <Wallet className="w-4 h-4 text-brand-lime" />
+                    </div>
+                    <h3 className="font-sans text-sm sm:text-base font-bold text-text-main">
+                      24h Payout Settlements
+                    </h3>
+                    <p className="font-sans text-xs text-text-muted mt-1 leading-relaxed">
+                      Transparent 95% revenue share paid out directly to your registered UPI or bank account.
+                    </p>
+                  </div>
+
+                  <div className="p-4 sm:p-5 rounded-xl bg-surface border border-border-default">
+                    <div className="w-8 h-8 rounded-lg bg-brand-lime/10 text-brand-lime flex items-center justify-center mb-3">
+                      <Clock className="w-4 h-4 text-brand-lime" />
+                    </div>
+                    <h3 className="font-sans text-sm sm:text-base font-bold text-text-main">
+                      Flexible Slot Blocking
+                    </h3>
+                    <p className="font-sans text-xs text-text-muted mt-1 leading-relaxed">
+                      Quickly hold slots for coaching academies, recurring leagues, offline walk-ins, or turf care.
+                    </p>
+                  </div>
+
+                  <div className="p-4 sm:p-5 rounded-xl bg-surface border border-border-default">
+                    <div className="w-8 h-8 rounded-lg bg-brand-lime/10 text-brand-lime flex items-center justify-center mb-3">
+                      <Users className="w-4 h-4 text-brand-lime" />
+                    </div>
+                    <h3 className="font-sans text-sm sm:text-base font-bold text-text-main">
+                      Player Discovery
+                    </h3>
+                    <p className="font-sans text-xs text-text-muted mt-1 leading-relaxed">
+                      Immediate visibility to local players searching for football, cricket, badminton, and tennis grounds.
+                    </p>
+                  </div>
+                </div>
+              </FadeInSection>
+            </div>
+          </div>
+        </section>
+
+        {/* ========================================================= */}
         {/* INTERACTIVE FEATURE ARCHITECTURE — 4 Verified Pillars    */}
         {/* ========================================================= */}
-        <section id="features" className="py-16 sm:py-24">
+        <section id="features" className="py-20 sm:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
             <FadeInSection>
               <div className="mb-8 sm:mb-12">
@@ -622,7 +655,7 @@ export default function OwnersPage() {
                         "text-left p-3.5 sm:p-5 rounded-xl border transition-all duration-300 cursor-pointer flex flex-col justify-between gap-3 relative overflow-hidden",
                         isActive
                           ? "bg-surface border-brand-lime dark:border-white shadow-sm"
-                          : "bg-surface/30 border-border-default hover:border-border-strong hover:bg-surface/60"
+                          : "bg-elevated border-border-default hover:border-border-strong hover:bg-surface/60"
                       )}
                     >
                       {/* Active indicator line */}
@@ -679,11 +712,11 @@ export default function OwnersPage() {
 
             {/* Active Pillar Deep-Dive Card */}
             <FadeInSection delay={0.2}>
-              <div className="bg-surface border border-border-default rounded-2xl p-5 sm:p-8 lg:p-10 shadow-xl">
+              <div className="bg-surface border border-border-default rounded-xl p-5 sm:p-8 lg:p-10 shadow-sm">
                 <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 sm:gap-10 lg:gap-14 items-center">
                   {/* Left: Explanatory Copy & Points */}
                   <div className="space-y-4 sm:space-y-6">
-                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-bg/50 border border-border-default/50 text-xs font-mono text-brand-lime font-semibold">
+                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-elevated border border-border-default/50 text-xs font-mono text-brand-lime font-semibold">
                       <span>{activePillar.badge}</span>
                     </div>
 
@@ -724,7 +757,7 @@ export default function OwnersPage() {
                   </div>
 
                   {/* Right: Simulated Preview Widget */}
-                  <div className="bg-bg/50 border border-border-default/50 rounded-xl p-4 sm:p-6 min-w-0">
+                  <div className="bg-elevated border border-border-default/50 rounded-xl p-4 sm:p-6 min-w-0">
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={activePillarIdx}
@@ -737,33 +770,34 @@ export default function OwnersPage() {
                           <div className="space-y-3.5 sm:space-y-4">
                             <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b border-border-default/50">
                               <span className="font-mono text-xs font-bold text-text-main">SLOT CALENDAR OVERVIEW</span>
-                              <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md bg-surface/50 text-brand-lime border border-border-default/50 font-semibold">
+                              <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md bg-elevated text-brand-lime border border-border-default/50 font-semibold">
                                 ZERO OVERLAP
                               </span>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                              <div className="p-2.5 sm:p-3 rounded-lg bg-surface/30 border border-border-default/50">
+                              <div className="p-2.5 sm:p-3 rounded-lg bg-elevated border border-border-default/50">
                                 <div className="text-[10px] text-text-muted font-mono">06:00 AM – 07:00 AM</div>
                                 <div className="font-semibold text-text-main mt-0.5 sm:mt-1">Academy Coaching</div>
                                 <span className="text-[9px] sm:text-[10px] text-text-hint">Recurring Slot Block</span>
                               </div>
-                              <div className="p-2.5 sm:p-3 rounded-lg bg-surface/30 border border-border-default/50">
+                              <div className="p-2.5 sm:p-3 rounded-lg bg-elevated border border-border-default/50">
                                 <div className="text-[10px] text-text-muted font-mono">07:00 AM – 08:00 AM</div>
                                 <div className="font-semibold text-text-main mt-0.5 sm:mt-1">Available Online</div>
-                                <span className="text-[9px] sm:text-[10px] text-brand-lime font-medium">₹1,000 / hr</span>
+                                <span className="text-[9px] sm:text-[10px] text-brand-lime font-medium tabular-nums">
+₹1,000 / hr</span>
                               </div>
                               <div className="p-2.5 sm:p-3 rounded-lg bg-brand-lime/5 border border-brand-lime/20">
                                 <div className="text-[10px] text-brand-lime font-mono">08:00 PM – 09:00 PM</div>
                                 <div className="font-semibold text-brand-lime mt-0.5 sm:mt-1">Confirmed · Online</div>
                                 <span className="text-[9px] sm:text-[10px] text-brand-lime font-medium">Verified Escrow</span>
                               </div>
-                              <div className="p-2.5 sm:p-3 rounded-lg bg-surface/30 border border-border-default/50">
+                              <div className="p-2.5 sm:p-3 rounded-lg bg-elevated border border-border-default/50">
                                 <div className="text-[10px] text-text-muted font-mono">09:00 PM – 10:00 PM</div>
                                 <div className="font-semibold text-text-main mt-0.5 sm:mt-1">Turf Grooming</div>
                                 <span className="text-[9px] sm:text-[10px] text-text-hint">Maintenance Block</span>
                               </div>
                             </div>
-                            <div className="text-[10px] sm:text-[11px] text-text-muted bg-surface/30 p-2.5 rounded-lg border border-border-default/30">
+                            <div className="text-[10px] sm:text-[11px] text-text-muted bg-elevated p-2.5 rounded-lg border border-border-default/30">
                               ⚡ Concurrency-safe database transactions reject simultaneous booking attempts on the same slot.
                             </div>
                           </div>
@@ -778,26 +812,26 @@ export default function OwnersPage() {
                               </span>
                             </div>
                             <div className="space-y-2 sm:space-y-2.5">
-                              <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-surface/30 border border-border-default/50 text-xs gap-2">
+                              <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-elevated border border-border-default/50 text-xs gap-2">
                                 <div className="min-w-0">
                                   <div className="font-semibold text-text-main truncate">Prime Weekend Evening</div>
                                   <div className="text-[9px] sm:text-[10px] text-text-muted truncate">Fri, Sat, Sun · 06:00 PM – 10:00 PM</div>
                                 </div>
-                                <span className="font-mono text-[11px] sm:text-xs font-bold text-brand-lime bg-bg/50 px-2 py-0.5 rounded-md border border-border-default/50 shrink-0">
+                                <span className="font-mono text-[11px] sm:text-xs font-bold text-brand-lime bg-elevated px-2 py-0.5 rounded-md border border-border-default/50 shrink-0">
                                   +25% (1.25×)
                                 </span>
                               </div>
-                              <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-surface/30 border border-border-default/50 text-xs gap-2">
+                              <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-elevated border border-border-default/50 text-xs gap-2">
                                 <div className="min-w-0">
                                   <div className="font-semibold text-text-main truncate">Early Bird Promo Code</div>
                                   <div className="text-[9px] sm:text-[10px] text-text-muted truncate">Code: MORNING100 · ₹100 Flat Off</div>
                                 </div>
-                                <span className="font-mono text-[10px] sm:text-xs font-bold text-text-main bg-bg/50 px-2 py-0.5 rounded-md border border-border-default/50 shrink-0">
+                                <span className="font-mono text-[10px] sm:text-xs font-bold text-text-main bg-elevated px-2 py-0.5 rounded-md border border-border-default/50 shrink-0">
                                   Max 50 Uses
                                 </span>
                               </div>
                             </div>
-                            <div className="text-[10px] sm:text-[11px] text-text-muted bg-surface/30 p-2.5 rounded-lg border border-border-default/30">
+                            <div className="text-[10px] sm:text-[11px] text-text-muted bg-elevated p-2.5 rounded-lg border border-border-default/30">
                               📈 Automatically applies the highest priority rule during user checkout.
                             </div>
                           </div>
@@ -807,25 +841,27 @@ export default function OwnersPage() {
                           <div className="space-y-3.5 sm:space-y-4">
                             <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b border-border-default/50">
                               <span className="font-mono text-xs font-bold text-text-main">EARNINGS &amp; PAYOUTS</span>
-                              <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md bg-surface/50 text-brand-lime border border-border-default/50 font-semibold">
+                              <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md bg-elevated text-brand-lime border border-border-default/50 font-semibold">
                                 95% REVENUE SHARE
                               </span>
                             </div>
                             <div className="space-y-2 text-xs">
-                              <div className="flex justify-between p-2 sm:p-2.5 bg-surface/30 rounded-lg border border-border-default/50">
+                              <div className="flex justify-between p-2 sm:p-2.5 bg-elevated rounded-lg border border-border-default/50">
                                 <span className="text-text-muted">Gross Slot Value</span>
-                                <span className="font-mono font-semibold text-text-main">₹1,500.00</span>
+                                <span className="font-mono font-semibold text-text-main tabular-nums">
+₹1,500.00</span>
                               </div>
-                              <div className="flex justify-between p-2 sm:p-2.5 bg-surface/30 rounded-lg border border-border-default/50">
+                              <div className="flex justify-between p-2 sm:p-2.5 bg-elevated rounded-lg border border-border-default/50">
                                 <span className="text-text-muted">Platform Fee (Flat 5%)</span>
                                 <span className="font-mono text-text-muted">- ₹75.00</span>
                               </div>
                               <div className="flex justify-between p-2 sm:p-2.5 bg-brand-lime/5 rounded-lg border border-brand-lime/20 font-bold text-brand-lime">
                                 <span>Net Owner Payout Balance</span>
-                                <span className="font-mono text-xs sm:text-sm">₹1,425.00</span>
+                                <span className="font-mono text-xs sm:text-sm tabular-nums">
+₹1,425.00</span>
                               </div>
                             </div>
-                            <div className="text-[10px] sm:text-[11px] text-text-muted bg-surface/30 p-2.5 rounded-lg border border-border-default/30">
+                            <div className="text-[10px] sm:text-[11px] text-text-muted bg-elevated p-2.5 rounded-lg border border-border-default/30">
                               🏦 Request one-tap payouts to UPI or Bank (Account Number + IFSC) settled in 24 hours.
                             </div>
                           </div>
@@ -835,21 +871,21 @@ export default function OwnersPage() {
                           <div className="space-y-3.5 sm:space-y-4">
                             <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b border-border-default/50">
                               <span className="font-mono text-xs font-bold text-text-main">TOURNAMENTS &amp; CRM</span>
-                              <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md bg-surface/50 text-text-main border border-border-default/50 font-semibold">
+                              <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md bg-elevated text-text-main border border-border-default/50 font-semibold">
                                 SINGLE ELIMINATION
                               </span>
                             </div>
                             <div className="space-y-2 text-xs font-mono">
-                              <div className="p-2 sm:p-2.5 bg-surface/30 rounded-lg border border-border-default/50 flex justify-between items-center gap-2">
+                              <div className="p-2 sm:p-2.5 bg-elevated rounded-lg border border-border-default/50 flex justify-between items-center gap-2">
                                 <span className="text-text-muted text-[11px] shrink-0">Quarter-Final 1</span>
                                 <span className="text-brand-lime font-bold truncate text-right">Bangalore FC vs Apex United</span>
                               </div>
-                              <div className="p-2 sm:p-2.5 bg-surface/30 rounded-lg border border-border-default/50 flex justify-between items-center gap-2">
+                              <div className="p-2 sm:p-2.5 bg-elevated rounded-lg border border-border-default/50 flex justify-between items-center gap-2">
                                 <span className="text-text-muted text-[11px] shrink-0">Captain Pass Code</span>
                                 <span className="text-text-main font-semibold">REG-K9W42J</span>
                               </div>
                             </div>
-                            <div className="text-[10px] sm:text-[11px] text-text-muted bg-surface/30 p-2.5 rounded-lg border border-border-default/30">
+                            <div className="text-[10px] sm:text-[11px] text-text-muted bg-elevated p-2.5 rounded-lg border border-border-default/30">
                               🏆 Manage fixtures, collect team entry fees, and identify VIP repeat players automatically.
                             </div>
                           </div>
@@ -864,67 +900,210 @@ export default function OwnersPage() {
         </section>
 
         {/* ========================================================= */}
-        {/* THE TURFZO DIFFERENCE — Before/After Cards                */}
+        {/* VENUE OPERATIONS — On-Ground Check-in & Desk Management   */}
         {/* ========================================================= */}
-        <section className="py-16 sm:py-24">
+        <section className="py-20 sm:py-28 bg-elevated border-y border-border-default/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
             <FadeInSection>
-              <div className="mb-10 sm:mb-14 text-center max-w-2xl mx-auto">
+              <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
                 <span className="text-[11px] sm:text-xs font-mono uppercase tracking-wider text-text-muted">
-                  Operational Upgrade
+                  On-Ground Operations
                 </span>
                 <h2 className="font-sans text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-text-main mt-1.5 sm:mt-2">
-                  Stop managing chaos. Start managing a business.
+                  Seamless check-ins from the front desk to the pitch.
                 </h2>
-                <p className="font-sans text-text-muted text-sm sm:text-base mt-2 sm:mt-3">
-                  See how Turfzo replaces every manual process holding your venue back.
+                <p className="font-sans text-text-muted text-sm sm:text-base mt-2 sm:mt-3 leading-relaxed">
+                  Manage walk-in arrivals, verify player slots instantly via QR, and eliminate manual register errors. Your front desk staff and ground operators stay in perfect sync with real-time slot telemetry.
                 </p>
               </div>
             </FadeInSection>
 
-            <div className="space-y-4 sm:space-y-5 max-w-4xl mx-auto">
-              {COMPARISON_ITEMS.map((item, idx) => {
-                const Icon = item.icon;
-                return (
-                  <FadeInSection key={idx} delay={idx * 0.08}>
-                    <div className="bg-surface border border-border-default rounded-2xl p-4 sm:p-6 hover:scale-[1.01] transition-transform duration-200">
-                      {/* Title row */}
-                      <div className="flex items-center gap-2.5 mb-4">
-                        <div className="w-8 h-8 rounded-lg bg-brand-lime/10 border border-brand-lime/20 flex items-center justify-center shrink-0">
-                          <Icon className="w-4 h-4 text-brand-lime" />
-                        </div>
-                        <h3 className="font-sans text-sm sm:text-base font-bold text-text-main">
-                          {item.title}
+            <FadeInSection delay={0.1}>
+              <div className="max-w-4xl mx-auto rounded-xl overflow-hidden border border-border-default bg-surface shadow-sm">
+                <div className="relative aspect-[3/2] sm:aspect-[16/10] w-full overflow-hidden bg-bg group">
+                  <Image
+                    src="/images/marketing/owners/venue-reception.webp"
+                    alt="Turf arena front desk reception with manager verifying walk-in check-in and booking schedule"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 1024px) 100vw, 896px"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  
+                  {/* Bottom overlay highlight pill badges */}
+                  <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 border border-white/10 text-white text-xs font-mono">
+                      <span className="w-2 h-2 rounded-full bg-brand-lime" />
+                      Instant QR Check-in
+                    </div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 border border-white/10 text-white text-xs font-mono">
+                      <CreditCard className="w-3.5 h-3.5 text-brand-lime" />
+                      Walk-in POS & UPI
+                    </div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 border border-white/10 text-white text-xs font-mono">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-brand-lime" />
+                      Real-time Slot Locks
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </FadeInSection>
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* THE TURFZO DIFFERENCE — Two-Column "Chaos vs. System"     */}
+        {/* ========================================================= */}
+        <section className="py-20 sm:py-28 bg-slate-50 dark:bg-zinc-950 border-y border-slate-200 dark:border-zinc-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
+            <FadeInSection>
+              <div className="mb-12 sm:mb-16 text-center max-w-2xl mx-auto">
+                <span className="text-[11px] sm:text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold">
+                  Operational Comparison
+                </span>
+                <h2 className="font-sans text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-100 mt-1.5 sm:mt-2">
+                  Stop managing chaos. Start managing a business.
+                </h2>
+                <p className="font-sans text-slate-600 dark:text-zinc-400 text-sm sm:text-base mt-2 sm:mt-3 leading-relaxed">
+                  Compare traditional manual facility management with Turfzo&apos;s real-time operational operating system.
+                </p>
+              </div>
+            </FadeInSection>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch max-w-6xl mx-auto">
+              {/* LEFT BOARD: The Traditional Setup (Manual & Fragmented) */}
+              <FadeInSection delay={0.1} className="h-full">
+                <div className="h-full rounded-xl p-6 sm:p-8 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between">
+                  <div>
+                    {/* Header */}
+                    <div className="flex items-center gap-3.5 pb-6 border-b border-slate-100 dark:border-zinc-800">
+                      <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shrink-0">
+                        <X className="w-5 h-5 text-slate-500 dark:text-zinc-400" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                          The Traditional Setup
+                        </span>
+                        <h3 className="font-sans text-lg sm:text-xl font-bold text-slate-900 dark:text-zinc-100">
+                          Manual Chaos &amp; Revenue Leaks
                         </h3>
                       </div>
+                    </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        {/* Pain card (Without) */}
-                        <div className="pain-card rounded-xl p-3.5 sm:p-4 flex items-start gap-2.5">
-                          <div className="w-5 h-5 rounded-full bg-error/10 flex items-center justify-center shrink-0 mt-0.5">
-                            <X className="w-3 h-3 text-error" />
+                    {/* 5 Friction Points */}
+                    <div className="divide-y divide-slate-100 dark:divide-zinc-800 mt-2">
+                      {COMPARISON_ITEMS.map((item, idx) => {
+                        const Icon = item.icon;
+                        return (
+                          <div key={idx} className="py-4 sm:py-5 first:pt-4 last:pb-2">
+                            <div className="flex items-start gap-3">
+                              <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shrink-0 mt-0.5">
+                                <X className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Icon className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500" />
+                                  <span className="text-xs font-mono text-slate-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">
+                                    {item.category}
+                                  </span>
+                                </div>
+                                <h4 className="font-sans text-sm sm:text-base font-bold text-slate-900 dark:text-zinc-100">
+                                  {item.manualTitle}
+                                </h4>
+                                <p className="font-sans text-xs sm:text-sm text-slate-600 dark:text-zinc-400 mt-1 leading-relaxed">
+                                  {item.manualDesc}
+                                </p>
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <div className="text-[10px] font-mono uppercase tracking-wider text-text-hint mb-1">Without Turfzo</div>
-                            <p className="text-xs sm:text-sm text-text-muted leading-relaxed">{item.manual}</p>
-                          </div>
-                        </div>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-                        {/* Gain card (With) */}
-                        <div className="gain-card rounded-xl p-3.5 sm:p-4 flex items-start gap-2.5">
-                          <div className="w-5 h-5 rounded-full bg-brand-lime/10 flex items-center justify-center shrink-0 mt-0.5">
-                            <Check className="w-3 h-3 text-brand-lime" />
-                          </div>
-                          <div>
-                            <div className="text-[10px] font-mono uppercase tracking-wider text-brand-lime/70 mb-1">With Turfzo</div>
-                            <p className="text-xs sm:text-sm text-text-main font-medium leading-relaxed">{item.turfzo}</p>
-                          </div>
+                  {/* Negative Outcome Footer Banner */}
+                  <div className="mt-6 pt-5 border-t border-slate-100 dark:border-zinc-800">
+                    <div className="p-4 rounded-xl bg-slate-100/80 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700/70 flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-slate-400 dark:bg-zinc-500 shrink-0" />
+                      <p className="font-sans text-xs text-slate-600 dark:text-zinc-400 leading-snug">
+                        <strong className="text-slate-900 dark:text-zinc-200 font-semibold">Typical venue loss:</strong> 15–20% monthly revenue leaked to double bookings, uncollected cash, and idle morning courts.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </FadeInSection>
+
+              {/* RIGHT BOARD: The Turfzo Operating System (Control & Scale) */}
+              <FadeInSection delay={0.2} className="h-full">
+                <div className="h-full rounded-xl p-6 sm:p-8 bg-white dark:bg-zinc-900 border-2 border-slate-900 dark:border-zinc-100 shadow-md flex flex-col justify-between">
+                  <div>
+                    {/* Header */}
+                    <div className="flex items-center gap-3.5 pb-6 border-b border-slate-100 dark:border-zinc-800">
+                      <div className="w-10 h-10 rounded-lg bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shrink-0">
+                        <Check className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-slate-900 dark:text-zinc-100">
+                            The Turfzo Platform
+                          </span>
+                          <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
+                            AUTOMATED OS
+                          </span>
                         </div>
+                        <h3 className="font-sans text-lg sm:text-xl font-bold text-slate-900 dark:text-zinc-100">
+                          Automated, Confirmed &amp; Paid
+                        </h3>
                       </div>
                     </div>
-                  </FadeInSection>
-                );
-              })}
+
+                    {/* 5 Solution Items */}
+                    <div className="divide-y divide-slate-100 dark:divide-zinc-800 mt-2">
+                      {COMPARISON_ITEMS.map((item, idx) => {
+                        const Icon = item.icon;
+                        return (
+                          <div key={idx} className="py-4 sm:py-5 first:pt-4 last:pb-2">
+                            <div className="flex items-start gap-3">
+                              <div className="w-6 h-6 rounded-full bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shrink-0 mt-0.5">
+                                <Check className="w-3.5 h-3.5" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2 mb-1">
+                                  <div className="flex items-center gap-2">
+                                    <Icon className="w-3.5 h-3.5 text-slate-700 dark:text-zinc-300" />
+                                    <span className="text-xs font-mono text-slate-700 dark:text-zinc-300 font-semibold uppercase tracking-wider">
+                                      {item.category}
+                                    </span>
+                                  </div>
+                                  <span className="text-[10px] sm:text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-800 border border-slate-200 dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 shrink-0">
+                                    {item.badge}
+                                  </span>
+                                </div>
+                                <h4 className="font-sans text-sm sm:text-base font-bold text-slate-900 dark:text-zinc-100">
+                                  {item.turfzoTitle}
+                                </h4>
+                                <p className="font-sans text-xs sm:text-sm text-slate-600 dark:text-zinc-400 mt-1 leading-relaxed">
+                                  {item.turfzoDesc}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Positive Outcome Footer Banner */}
+                  <div className="mt-6 pt-5 border-t border-slate-100 dark:border-zinc-800">
+                    <div className="p-4 rounded-xl bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-950 flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-emerald-600 shrink-0" />
+                      <p className="font-sans text-xs text-slate-200 dark:text-zinc-800 leading-snug">
+                        <strong className="text-white dark:text-zinc-950 font-bold">Turfzo partner result:</strong> 100% upfront booking collection, zero schedule conflicts, and direct 24h bank payouts at a flat 5% fee.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </FadeInSection>
             </div>
           </div>
         </section>
@@ -932,7 +1111,7 @@ export default function OwnersPage() {
         {/* ========================================================= */}
         {/* REVENUE CALCULATOR — Premium Glassmorphism                */}
         {/* ========================================================= */}
-        <section id="calculator" className="py-16 sm:py-24">
+        <section id="calculator" className="py-20 sm:py-28">
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-20 relative z-10">
             <FadeInSection>
@@ -950,7 +1129,7 @@ export default function OwnersPage() {
             </FadeInSection>
 
             <FadeInSection delay={0.1}>
-              <div className="bg-surface border border-border-default rounded-2xl p-5 sm:p-8 lg:p-12 max-w-4xl mx-auto shadow-xl">
+              <div className="bg-surface border border-border-default rounded-xl p-5 sm:p-8 lg:p-12 max-w-4xl mx-auto shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 items-center">
                   {/* Sliders Control Panel */}
                   <div className="space-y-6 sm:space-y-8">
@@ -960,7 +1139,7 @@ export default function OwnersPage() {
                         <label className="font-sans text-xs sm:text-sm font-semibold text-text-main">
                           Number of Courts / Pitches
                         </label>
-                        <span className="font-mono text-sm sm:text-base font-bold text-brand-lime px-3 py-1 bg-bg/50 rounded-lg border border-border-default/50">
+                        <span className="font-mono text-sm sm:text-base font-bold text-brand-lime px-3 py-1 bg-elevated rounded-lg border border-border-default/50 tabular-nums">
                           {courtCount} {courtCount === 1 ? "Court" : "Courts"}
                         </span>
                       </div>
@@ -985,8 +1164,8 @@ export default function OwnersPage() {
                         <label className="font-sans text-xs sm:text-sm font-semibold text-text-main">
                           Average Hourly Rate
                         </label>
-                        <span className="font-mono text-sm sm:text-base font-bold text-brand-lime px-3 py-1 bg-bg/50 rounded-lg border border-border-default/50">
-                          ₹{hourlyPrice.toLocaleString()} / hr
+                        <span className="font-mono text-sm sm:text-base font-bold text-brand-lime px-3 py-1 bg-elevated rounded-lg border border-border-default/50 tabular-nums">
+₹{hourlyPrice.toLocaleString()} / hr
                         </span>
                       </div>
                       <input
@@ -1010,7 +1189,7 @@ export default function OwnersPage() {
                         <label className="font-sans text-xs sm:text-sm font-semibold text-text-main">
                           Average Booked Hours / Day
                         </label>
-                        <span className="font-mono text-sm sm:text-base font-bold text-brand-lime px-3 py-1 bg-bg/50 rounded-lg border border-border-default/50">
+                        <span className="font-mono text-sm sm:text-base font-bold text-brand-lime px-3 py-1 bg-elevated rounded-lg border border-border-default/50 tabular-nums">
                           {hoursPerDay} Hrs / Day
                         </span>
                       </div>
@@ -1031,15 +1210,15 @@ export default function OwnersPage() {
                   </div>
 
                   {/* Live Output Card */}
-                  <div className="bg-bg/50 border border-border-default/50 rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-5 sm:space-y-6">
+                  <div className="bg-elevated border border-border-default/50 rounded-xl p-5 sm:p-6 flex flex-col justify-between space-y-5 sm:space-y-6">
                     <div>
                       <div className="text-[10px] sm:text-xs font-mono text-text-muted uppercase tracking-wider">
                         Projected Monthly Payout (95% Net)
                       </div>
-                      <div className="font-mono text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brand-lime mt-2">
+                      <div className="font-mono text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brand-lime mt-2 tabular-nums">
                         <AnimatedCounter value={netOwnerEarnings} prefix="₹" />
                       </div>
-                      <div className="text-[11px] sm:text-xs text-text-muted mt-1.5">
+                      <div className="text-[11px] sm:text-xs text-text-muted mt-1.5 tabular-nums">
                         Gross Turnover: ₹{grossMonthlyRevenue.toLocaleString("en-IN")} / mo
                       </div>
                       {/* Yearly projection */}
@@ -1047,8 +1226,8 @@ export default function OwnersPage() {
                         <div className="text-[10px] sm:text-xs font-mono text-text-hint uppercase tracking-wider">
                           Projected Annual Earnings
                         </div>
-                        <div className="font-mono text-lg sm:text-xl font-bold text-text-main mt-1">
-                          ₹{(netOwnerEarnings * 12).toLocaleString("en-IN")} / year
+                        <div className="font-mono text-lg sm:text-xl font-bold text-text-main mt-1 tabular-nums">
+₹{(netOwnerEarnings * 12).toLocaleString("en-IN")} / year
                         </div>
                       </div>
                     </div>
@@ -1056,12 +1235,12 @@ export default function OwnersPage() {
                     <div className="pt-3 sm:pt-4 border-t border-border-default/50 space-y-2 text-xs">
                       <div className="flex justify-between text-text-muted">
                         <span>Estimated Monthly Slots:</span>
-                        <span className="font-mono font-semibold text-text-main">{estimatedBookings} Bookings</span>
+                        <span className="font-mono font-semibold text-text-main tabular-nums">{estimatedBookings} Bookings</span>
                       </div>
                       <div className="flex justify-between text-text-muted">
                         <span>Platform Fee (Flat 5%):</span>
-                        <span className="font-mono font-semibold text-text-muted">
-                          ₹{(grossMonthlyRevenue - netOwnerEarnings).toLocaleString("en-IN")}
+                        <span className="font-mono font-semibold text-text-muted tabular-nums">
+₹{(grossMonthlyRevenue - netOwnerEarnings).toLocaleString("en-IN")}
                         </span>
                       </div>
                       <div className="flex justify-between text-text-muted">
@@ -1086,7 +1265,7 @@ export default function OwnersPage() {
         {/* ========================================================= */}
         {/* OWNER TESTIMONIALS                                        */}
         {/* ========================================================= */}
-        <section className="py-16 sm:py-24">
+        <section className="py-20 sm:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
             <FadeInSection>
               <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
@@ -1105,7 +1284,7 @@ export default function OwnersPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
               {OWNER_TESTIMONIALS.map((testimonial, idx) => (
                 <FadeInSection key={idx} delay={idx * 0.1}>
-                  <div className="bg-surface border border-border-default rounded-2xl p-5 sm:p-6 flex flex-col justify-between h-full hover:scale-[1.02] transition-transform duration-300">
+                  <div className="bg-surface border border-border-default rounded-xl p-5 sm:p-6 flex flex-col justify-between h-full transition-transform duration-300">
                     {/* Quote */}
                     <div>
                       <Quote className="w-6 h-6 text-brand-lime/30 mb-3" />
@@ -1140,7 +1319,7 @@ export default function OwnersPage() {
         {/* ========================================================= */}
         {/* 3-STEP ANIMATED ONBOARDING CAROUSEL                       */}
         {/* ========================================================= */}
-        <section className="py-16 sm:py-24">
+        <section className="py-20 sm:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
             <FadeInSection>
               <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
@@ -1160,7 +1339,7 @@ export default function OwnersPage() {
               <div
                 onMouseEnter={() => setIsStepPaused(true)}
                 onMouseLeave={() => setIsStepPaused(false)}
-                className="bg-surface border border-border-default rounded-2xl p-4 sm:p-8 lg:p-10 shadow-xl"
+                className="bg-surface border border-border-default rounded-xl p-4 sm:p-8 lg:p-10 shadow-sm"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.15fr] gap-6 sm:gap-8 lg:gap-12 items-center">
                   {/* Left: Interactive 3-Step Clickable Stack with Live Progress Lines */}
@@ -1176,7 +1355,7 @@ export default function OwnersPage() {
                             "w-full text-left p-3.5 sm:p-5 rounded-xl border transition-all duration-300 cursor-pointer relative overflow-hidden flex flex-col gap-1.5 sm:gap-2",
                             isActive
                               ? "bg-surface border-brand-lime dark:border-white shadow-sm"
-                              : "bg-bg/30 border-border-default hover:border-border-strong hover:bg-surface/40"
+                              : "bg-bg border-border-default hover:border-border-strong hover:bg-elevated"
                           )}
                         >
                           {/* Live animated progress bar for active card */}
@@ -1197,7 +1376,7 @@ export default function OwnersPage() {
                                   "font-mono text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded-md",
                                   isActive
                                     ? "bg-brand-lime text-white dark:text-black"
-                                    : "bg-surface/50 text-text-hint border border-border-default/50"
+                                    : "bg-elevated text-text-hint border border-border-default/50"
                                 )}
                               >
                                 STEP {step.step}
@@ -1208,7 +1387,7 @@ export default function OwnersPage() {
                             </div>
                             {isActive && (
                               <span className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-mono text-brand-lime font-bold">
-                                <span className="w-1.5 h-1.5 rounded-full bg-brand-lime animate-ping" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-brand-lime" />
                                 LIVE
                               </span>
                             )}
@@ -1254,7 +1433,7 @@ export default function OwnersPage() {
                             )
                           }
                           aria-label="Previous step"
-                          className="w-8 h-8 rounded-lg bg-bg/50 border border-border-default/50 hover:border-border-strong text-text-muted hover:text-text-main flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-8 h-8 rounded-lg bg-elevated border border-border-default/50 hover:border-border-strong text-text-muted hover:text-text-main flex items-center justify-center transition-colors cursor-pointer"
                         >
                           <ChevronLeft className="w-4 h-4" />
                         </button>
@@ -1263,7 +1442,7 @@ export default function OwnersPage() {
                             setActiveStepIdx((prev) => (prev + 1) % ONBOARDING_STEPS.length)
                           }
                           aria-label="Next step"
-                          className="w-8 h-8 rounded-lg bg-bg/50 border border-border-default/50 hover:border-border-strong text-text-muted hover:text-text-main flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-8 h-8 rounded-lg bg-elevated border border-border-default/50 hover:border-border-strong text-text-muted hover:text-text-main flex items-center justify-center transition-colors cursor-pointer"
                         >
                           <ChevronRight className="w-4 h-4" />
                         </button>
@@ -1271,160 +1450,47 @@ export default function OwnersPage() {
                     </div>
                   </div>
 
-                  {/* Right: Dynamic Animated Live Simulator Preview */}
-                  <div className="relative min-h-[300px] sm:min-h-[360px] bg-bg/50 border border-border-default/50 rounded-xl p-4 sm:p-6 overflow-hidden flex flex-col justify-between min-w-0">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={activeStep.step}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -12 }}
-                        transition={{ duration: 0.35, ease: "easeInOut" }}
-                        className="space-y-3 sm:space-y-4"
-                      >
-                        {/* Widget Header */}
-                        <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b border-border-default/50 gap-2">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <activeStep.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-lime shrink-0" />
-                            <span className="font-mono text-[11px] sm:text-xs font-bold text-text-main uppercase truncate">
-                              {activeStep.previewTitle}
-                            </span>
-                          </div>
-                          <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md bg-surface/50 text-brand-lime border border-border-default/50 font-semibold shrink-0">
-                            STEP {activeStep.step} / 03
-                          </span>
-                        </div>
+                  {/* Right: Authentic Venue Exterior Image */}
+                  <div className="relative aspect-[4/5] rounded-xl overflow-hidden border border-border-default bg-surface shadow-sm min-w-0">
+                    <Image
+                      src="/images/marketing/owners/onboarding-venue-exterior.webp"
+                      alt="Verified sports turf venue exterior ready for player bookings"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 540px"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-                        {/* Step 1 Simulation: Interactive Form Preview */}
-                        {activeStepIdx === 0 && (
-                          <div className="space-y-2.5 sm:space-y-3">
-                            <div className="p-3 sm:p-3.5 bg-surface/30 rounded-lg border border-border-default/50 text-xs space-y-2 sm:space-y-2.5">
-                              <div className="flex justify-between items-center gap-2">
-                                <span className="text-text-muted text-[11px] sm:text-xs">Facility Name:</span>
-                                <span className="font-semibold text-text-main truncate text-right">
-                                  {activeStep.previewData.name}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center gap-2">
-                                <span className="text-text-muted text-[11px] sm:text-xs">Location:</span>
-                                <span className="font-mono text-text-main truncate text-right">
-                                  {activeStep.previewData.location}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center gap-2">
-                                <span className="text-text-muted text-[11px] sm:text-xs">Hourly Base Rate:</span>
-                                <span className="font-mono font-bold text-brand-lime">
-                                  {activeStep.previewData.hourlyRate}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="space-y-1.5 text-xs">
-                              <div className="text-[9px] sm:text-[10px] font-mono text-text-muted uppercase tracking-wider">
-                                Configured Sports &amp; Amenities
-                              </div>
-                              <div className="flex flex-wrap gap-1 sm:gap-1.5">
-                                {activeStep.previewData.formats?.map((fmt: string, i: number) => (
-                                  <span
-                                    key={i}
-                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface/30 border border-border-default/50 text-[10px] sm:text-[11px] font-mono text-text-main"
-                                  >
-                                    <Check className="w-3 h-3 text-brand-lime shrink-0" />
-                                    <span>{fmt}</span>
-                                  </span>
-                                ))}
-                                {activeStep.previewData.amenities?.map((am: string, i: number) => {
-                                  const isLight = am.toLowerCase().includes("light");
-                                  const isParking = am.toLowerCase().includes("parking");
-                                  const isWater = am.toLowerCase().includes("water");
-                                  return (
-                                    <span
-                                      key={i}
-                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-lime/5 border border-brand-lime/20 text-[10px] sm:text-[11px] font-mono text-brand-lime font-medium"
-                                    >
-                                      {isLight && <Lightbulb className="w-3 h-3 text-brand-lime shrink-0" />}
-                                      {isParking && <Car className="w-3 h-3 text-brand-lime shrink-0" />}
-                                      {isWater && <Droplets className="w-3 h-3 text-brand-lime shrink-0" />}
-                                      {!isLight && !isParking && !isWater && <Users className="w-3 h-3 text-brand-lime shrink-0" />}
-                                      <span>+{am}</span>
-                                    </span>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Step 2 Simulation: Operations Audit Checklist */}
-                        {activeStepIdx === 1 && (
-                          <div className="space-y-2 sm:space-y-2.5">
-                            {activeStep.previewData.checklist?.map((item: { label: string; status: string }, i: number) => (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.1, duration: 0.3 }}
-                                className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-surface/30 border border-border-default/50 text-xs gap-2"
-                              >
-                                <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-                                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-lime shrink-0" />
-                                  <span className="font-medium text-text-main truncate text-[11px] sm:text-xs">{item.label}</span>
-                                </div>
-                                <span className="font-mono text-[9px] sm:text-[10px] font-bold text-brand-lime shrink-0">
-                                  {item.status}
-                                </span>
-                              </motion.div>
-                            ))}
-                            <div className="p-2 sm:p-2.5 bg-brand-lime/5 border border-brand-lime/20 rounded-lg text-center">
-                              <span className="font-mono text-[11px] sm:text-xs font-bold text-brand-lime">
-                                STATUS: {activeStep.previewData.badge}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Step 3 Simulation: Live Booking & Payout Feed */}
-                        {activeStepIdx === 2 && (
-                          <div className="space-y-2 sm:space-y-2.5">
-                            {activeStep.previewData.activity?.map((act: { title: string; desc: string; amt: string; time: string }, i: number) => (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: i * 0.1, duration: 0.3 }}
-                                className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-surface/30 border border-border-default/50 text-xs gap-2"
-                              >
-                                <div className="min-w-0">
-                                  <div className="font-semibold text-text-main text-[11px] sm:text-xs truncate">{act.title}</div>
-                                  <div className="text-[9px] sm:text-[10px] text-text-muted truncate">{act.desc}</div>
-                                </div>
-                                <div className="text-right shrink-0">
-                                  <div className="font-mono font-bold text-brand-lime text-xs sm:text-sm">{act.amt}</div>
-                                  <div className="text-[9px] sm:text-[10px] text-text-hint">{act.time}</div>
-                                </div>
-                              </motion.div>
-                            ))}
-                            <div className="p-2 sm:p-2.5 bg-surface/30 border border-brand-lime/30 rounded-lg text-center flex items-center justify-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-brand-lime animate-pulse" />
-                              <span className="font-mono text-[11px] sm:text-xs font-bold text-text-main">
-                                {activeStep.previewData.badge}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </motion.div>
-                    </AnimatePresence>
-
-                    <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-border-default/30 flex items-center justify-between text-xs">
-                      <span className="text-[10px] sm:text-[11px] text-text-muted font-sans">
-                        Automated onboarding pipeline
+                    <div className="absolute top-4 right-4 z-10">
+                      <span className="font-mono text-[10px] font-bold px-2.5 py-1 rounded-full bg-brand-lime text-white dark:text-black shadow-sm">
+                        STEP {activeStep.step} OF 03
                       </span>
-                      <button
-                        onClick={() => router.push("/owners/register")}
-                        className="group font-mono text-[11px] sm:text-xs font-bold text-brand-lime hover:underline flex items-center gap-1 cursor-pointer"
-                      >
-                        Register now <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
-                      </button>
+                    </div>
+
+                    <div className="absolute bottom-4 left-4 right-4 p-4 sm:p-5 rounded-xl bg-surface border border-border-default/80">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="w-2 h-2 rounded-full bg-brand-lime" />
+                        <span className="text-xs font-mono uppercase tracking-wider text-brand-lime font-semibold">
+                          {activeStep.tag}
+                        </span>
+                      </div>
+                      <h4 className="font-sans text-sm sm:text-base font-bold text-text-main">
+                        {activeStep.title}
+                      </h4>
+                      <p className="text-xs text-text-muted mt-1 leading-relaxed">
+                        {activeStep.desc}
+                      </p>
+                      <div className="mt-3 pt-3 border-t border-border-default/40 flex items-center justify-between">
+                        <span className="text-[11px] text-text-muted">
+                          Approved in under 24 hours
+                        </span>
+                        <button
+                          onClick={() => router.push("/owners/register")}
+                          className="font-sans text-xs font-bold text-brand-lime hover:underline inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          Register ground <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1436,7 +1502,7 @@ export default function OwnersPage() {
         {/* ========================================================= */}
         {/* FAQ SECTION                                               */}
         {/* ========================================================= */}
-        <section className="py-16 sm:py-24">
+        <section className="py-20 sm:py-28">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12">
             <FadeInSection>
               <div className="text-center mb-8 sm:mb-12">
@@ -1456,29 +1522,42 @@ export default function OwnersPage() {
         </section>
 
         {/* ========================================================= */}
-        {/* CLOSING CTA — Full-width Gradient Banner                  */}
+        {/* CLOSING CTA — Floodlit Arena Background Card              */}
         {/* ========================================================= */}
-        <section className="py-16 sm:py-24">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12">
+        <section className="py-20 sm:py-28">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-12">
             <FadeInSection>
-              <div className="bg-surface border border-border-default rounded-3xl p-8 sm:p-12 lg:p-16 text-center shadow-2xl">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-bg border border-border-default mb-6">
+              <div className="relative rounded-xl overflow-hidden border border-border-default shadow-sm min-h-[420px] sm:min-h-[460px] flex items-center justify-center">
+                {/* Authentic Floodlit Sports Arena Background */}
+                <Image
+                  src="/images/marketing/owners/cta-arena-aerial.webp"
+                  alt="Overhead view of an active floodlit box cricket and football turf with community players at night"
+                  fill
+                  sizes="(max-width: 1280px) 100vw, 1024px"
+                  className="object-cover object-center"
+                />
+
+                {/* Balanced atmospheric contrast overlay — preserves vibrant turf while guaranteeing WCAG AAA legibility */}
+                <div className="absolute inset-0 bg-black/50 z-10" />
+
+                {/* Card Content Container */}
+                <div className="relative z-20 w-full max-w-2xl mx-auto p-8 sm:p-12 lg:p-16 text-center flex flex-col items-center justify-center">
+                  <div className="flex items-center gap-2 mb-6">
                     <Zap className="w-3.5 h-3.5 text-brand-lime" />
-                    <span className="text-[11px] sm:text-xs font-mono font-semibold text-text-muted uppercase tracking-wider">
+                    <span className="text-[11px] sm:text-xs font-mono font-bold text-white/90 uppercase tracking-wider">
                       100% Free to Start
                     </span>
                   </div>
 
-                  <h2 className="font-sans text-2xl sm:text-3xl lg:text-5xl font-extrabold text-text-main tracking-tight mb-4 sm:mb-5 leading-tight">
+                  <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4 sm:mb-5 leading-tight">
                     Ready to fill every slot<br className="hidden sm:block" /> on your arena?
                   </h2>
 
-                  <p className="font-sans text-sm sm:text-base lg:text-lg text-text-muted max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+                  <p className="font-sans text-sm sm:text-base lg:text-lg text-white/90 max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed">
                     Join verified venue owners across India. Start accepting online bookings, eliminate double scheduling, and receive direct 24h payouts.
                   </p>
 
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
                     <button
                       onClick={() => router.push("/owners/register")}
                       className="group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold px-8 sm:px-10 py-4 sm:py-4.5 rounded-xl transition-all duration-200 text-sm sm:text-base shadow-sm cursor-pointer"
@@ -1488,21 +1567,21 @@ export default function OwnersPage() {
                     </button>
                     <button
                       onClick={() => router.push("/owners/dashboard")}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent hover:bg-surface/50 text-text-main font-sans font-semibold px-6 sm:px-8 py-4 sm:py-4.5 rounded-xl border border-border-default hover:border-border-strong transition-all duration-200 text-sm sm:text-base cursor-pointer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-sans font-semibold px-6 sm:px-8 py-4 sm:py-4.5 rounded-xl border border-white/25 transition-all duration-200 text-sm sm:text-base cursor-pointer shadow-md"
                     >
                       Partner Sign In
                     </button>
                   </div>
 
-                  <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] sm:text-[11px] font-mono text-text-hint">
+                  <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[11px] sm:text-xs font-mono text-white/80">
                     <span className="flex items-center gap-1.5">
-                      <Check className="w-3 h-3 text-brand-lime" /> Free Listing
+                      <Check className="w-3.5 h-3.5 text-brand-lime" /> Free Listing
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Check className="w-3 h-3 text-brand-lime" /> Flat 5% Fee
+                      <Check className="w-3.5 h-3.5 text-brand-lime" /> Flat 5% Fee
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Check className="w-3 h-3 text-brand-lime" /> 24h Settlements
+                      <Check className="w-3.5 h-3.5 text-brand-lime" /> 24h Settlements
                     </span>
                   </div>
                 </div>
