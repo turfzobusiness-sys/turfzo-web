@@ -19,8 +19,6 @@ jobs:
       - run: npm ci
       - name: Build with staging environment
         env:
-          NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL || 'https://healthy-panther-67.eu-west-1.convex.cloud' }}
-
           # Staging env (mirrors .env.staging.example) — baked at build time;
           # overridable via GitHub repo secrets when env-diff hygiene requires it.
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_API_KEY }}
