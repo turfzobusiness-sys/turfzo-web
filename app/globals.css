@@ -75,16 +75,16 @@
   --color-brand-btn-bg-hover: #162f16;
   --color-text-main: #090D0A;
   --color-text-secondary: #2D3748;
-  --color-text-muted: #475569;
-  --color-text-hint: #64748B;
-  --color-border-subtle: rgba(0, 0, 0, 0.08);
-  --color-border-default: rgba(0, 0, 0, 0.12);
-  --color-border-strong: rgba(0, 0, 0, 0.24);
+  --color-text-muted: #334155;
+  --color-text-hint: #475569;
+  --color-border-subtle: rgba(0, 0, 0, 0.09);
+  --color-border-default: rgba(0, 0, 0, 0.15);
+  --color-border-strong: rgba(0, 0, 0, 0.28);
   --color-border-focused: #16A34A;
-  --color-border-glow: rgba(0, 0, 0, 0.06);
+  --color-border-glow: rgba(0, 0, 0, 0.08);
   --color-overlay: rgba(0, 0, 0, 0.5);
   --color-overlay-heavy: rgba(0, 0, 0, 0.6);
-  --shadow-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 /* ========== MARKETING (public light marketplace) ========== */
@@ -101,14 +101,14 @@
   --color-brand-btn-bg: #162019;
   --color-brand-btn-bg-hover: #243428;
   --color-text-main: #162019;
-  --color-text-secondary: #3A4A3E;
-  --color-text-muted: #5A6B5E;
-  --color-text-hint: #7A8A7E;
-  --color-border-subtle: rgba(22, 32, 25, 0.08);
-  --color-border-default: rgba(22, 32, 25, 0.12);
-  --color-border-strong: rgba(22, 32, 25, 0.22);
+  --color-text-secondary: #27372B;
+  --color-text-muted: #3D4F42;
+  --color-text-hint: #526658;
+  --color-border-subtle: rgba(22, 32, 25, 0.09);
+  --color-border-default: rgba(22, 32, 25, 0.15);
+  --color-border-strong: rgba(22, 32, 25, 0.26);
   --color-border-focused: #16A34A;
-  --color-border-glow: rgba(22, 32, 25, 0.08);
+  --color-border-glow: rgba(22, 32, 25, 0.09);
   --color-overlay: rgba(22, 32, 25, 0.5);
   --color-overlay-heavy: rgba(22, 32, 25, 0.65);
   --shadow-card-shadow: 0 1px 2px rgba(22, 32, 25, 0.06), 0 8px 24px rgba(22, 32, 25, 0.08);

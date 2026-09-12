@@ -143,6 +143,8 @@ export interface OwnerProfile {
     city?: string;
     state?: string;
     zip_code?: string;
+    latitude?: number;
+    longitude?: number;
     price_per_hour?: number;
     sport_type?: string;
     amenities?: string[];

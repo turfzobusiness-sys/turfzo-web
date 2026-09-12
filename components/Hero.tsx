@@ -86,11 +86,15 @@ export default function Hero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[75%_50%] opacity-20 dark:opacity-35"
+          className="object-cover object-[75%_50%] opacity-45 sm:opacity-55 dark:opacity-35"
         />
 
-        {/* Clean bottom-up gradient overlay — high contrast in light mode, atmospheric in dark */}
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/85 to-bg/40 dark:from-bg dark:via-bg/60 dark:to-transparent z-10" />
+        {/* Ambient Turf Warmth in light mode to eliminate sterile stark whiteness */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_65%_at_50%_15%,rgba(22,163,74,0.07),transparent_75%)] dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_10%,rgba(109,182,49,0.05),transparent_70%)] z-5" />
+
+        {/* Clean bottom-up & horizontal gradient overlays — preserves legibility without washing out color */}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-bg/10 dark:from-bg dark:via-bg/60 dark:to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-bg/90 via-bg/40 to-transparent lg:w-3/4 z-10" />
       </div>
 
       {/* Grid Layout Container */}
@@ -99,8 +103,8 @@ export default function Hero() {
         {/* Left Column (Hero Content) */}
         <div className="lg:col-span-7 flex flex-col justify-center text-center lg:text-left">
           {/* Architectural Typography Overline */}
-          <div className="flex items-center gap-2 mb-4 w-fit mx-auto lg:mx-0">
-            <span className="w-1.5 h-1.5 rounded-xs bg-brand-lime" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface/90 border border-border-default shadow-2xs mb-4 w-fit mx-auto lg:mx-0">
+            <span className="w-2 h-2 rounded-full bg-brand-lime animate-pulse" />
             <span className="text-[11px] sm:text-xs font-mono font-bold text-text-muted tracking-wider uppercase">
               Verified Sports Venues
             </span>
@@ -113,7 +117,7 @@ export default function Hero() {
           </h1>
 
           {/* Subheading */}
-          <p className="mt-4 text-base sm:text-lg text-text-muted font-sans font-normal max-w-lg mx-auto lg:mx-0 leading-relaxed text-left">
+          <p className="mt-4 text-base sm:text-lg text-text-secondary font-sans font-normal max-w-lg mx-auto lg:mx-0 leading-relaxed text-left">
             Real-time hourly slots, upfront pricing, and instant confirmation for verified football, cricket, badminton, and tennis grounds.
           </p>
 
@@ -121,7 +125,7 @@ export default function Hero() {
           {/*            MODERN STRUCTURED SEARCH CAPSULE              */}
           {/* ======================================================== */}
           <div ref={capsuleRef} className="mt-8 w-full max-w-2xl relative z-30">
-            <div className="bg-surface border border-border-default hover:border-border-strong rounded-xl shadow-xs p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 transition-all">
+            <div className="bg-surface/95 dark:bg-surface/90 backdrop-blur-md border border-border-strong/50 dark:border-border-default rounded-2xl shadow-xl shadow-black/8 dark:shadow-black/35 p-2 sm:p-2.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 transition-all">
               
               {/* Segment 1: Sport */}
               <div className="relative flex-1">
@@ -303,7 +307,7 @@ export default function Hero() {
               <button
                 type="button"
                 onClick={handleSearch}
-                className="inline-flex items-center justify-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold px-6 py-3 rounded-xl transition-all shadow-sm text-sm shrink-0 cursor-pointer active:scale-95 mt-1 sm:mt-0"
+                className="inline-flex items-center justify-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold px-7 py-3 rounded-xl transition-all shadow-md shadow-brand-lime/20 text-sm shrink-0 cursor-pointer active:scale-95 mt-1 sm:mt-0"
               >
                 <Search className="w-4 h-4 stroke-[2.5]" />
                 <span>Search</span>
@@ -312,26 +316,26 @@ export default function Hero() {
           </div>
 
           {/* Quick Action Links */}
-          <div className="mt-4 flex flex-wrap items-center justify-start gap-2 text-xs text-text-muted">
-            <span className="font-medium">Trending:</span>
+          <div className="mt-4 flex flex-wrap items-center justify-start gap-2 text-xs text-text-secondary">
+            <span className="font-semibold text-text-muted">Trending:</span>
             <button
               type="button"
               onClick={() => router.push("/explore?sport=Football&city=Bengaluru")}
-              className="px-2.5 py-1 rounded-full bg-surface border border-border-subtle hover:border-border-strong text-text-main hover:text-brand-lime transition-colors cursor-pointer"
+              className="px-3 py-1 rounded-full bg-surface/90 border border-border-default hover:border-brand-lime text-text-main font-medium shadow-2xs hover:text-brand-lime transition-all cursor-pointer"
             >
               ⚽ Bengaluru Football
             </button>
             <button
               type="button"
               onClick={() => router.push("/explore?sport=Cricket&city=Mumbai")}
-              className="px-2.5 py-1 rounded-full bg-surface border border-border-subtle hover:border-border-strong text-text-main hover:text-brand-lime transition-colors cursor-pointer"
+              className="px-3 py-1 rounded-full bg-surface/90 border border-border-default hover:border-brand-lime text-text-main font-medium shadow-2xs hover:text-brand-lime transition-all cursor-pointer"
             >
               🏏 Mumbai Box Cricket
             </button>
             <button
               type="button"
               onClick={() => router.push("/explore?sport=Badminton&city=Hyderabad")}
-              className="px-2.5 py-1 rounded-full bg-surface border border-border-subtle hover:border-border-strong text-text-main hover:text-brand-lime transition-colors cursor-pointer"
+              className="px-3 py-1 rounded-full bg-surface/90 border border-border-default hover:border-brand-lime text-text-main font-medium shadow-2xs hover:text-brand-lime transition-all cursor-pointer"
             >
               🏸 Hyderabad Badminton
             </button>
@@ -340,37 +344,37 @@ export default function Hero() {
           {/* ======================================================== */}
           {/*                   FLAT TYPOGRAPHIC STATS                 */}
           {/* ======================================================== */}
-          <div className="mt-16 pt-8 border-t border-border-default/50 grid grid-cols-3 gap-6 text-left max-w-xl">
+          <div className="mt-14 pt-8 border-t border-border-default grid grid-cols-3 gap-6 text-left max-w-xl">
             {/* Stat 1 */}
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl border border-brand-lime/30 flex items-center justify-center shrink-0">
+              <div className="w-11 h-11 rounded-xl bg-surface/90 border border-border-default shadow-2xs flex items-center justify-center shrink-0">
                 <Calendar className="w-5 h-5 text-brand-lime" />
               </div>
               <div className="flex flex-col">
-                <span className="font-sans text-xl font-bold text-text-main dark:text-white leading-none">500+</span>
-                <span className="text-xs font-sans text-text-muted mt-1">Turfs</span>
+                <span className="font-sans text-xl font-bold text-text-main leading-none">500+</span>
+                <span className="text-xs font-sans text-text-muted font-medium mt-1">Turfs</span>
               </div>
             </div>
 
             {/* Stat 2 */}
             <div className="flex items-center gap-3.5 pl-2">
-              <div className="w-11 h-11 rounded-xl border border-brand-lime/30 flex items-center justify-center shrink-0">
+              <div className="w-11 h-11 rounded-xl bg-surface/90 border border-border-default shadow-2xs flex items-center justify-center shrink-0">
                 <Users className="w-5 h-5 text-brand-lime" />
               </div>
               <div className="flex flex-col">
-                <span className="font-sans text-xl font-bold text-text-main dark:text-white leading-none">50K+</span>
-                <span className="text-xs font-sans text-text-muted mt-1">Happy Players</span>
+                <span className="font-sans text-xl font-bold text-text-main leading-none">50K+</span>
+                <span className="text-xs font-sans text-text-muted font-medium mt-1">Happy Players</span>
               </div>
             </div>
 
             {/* Stat 3 */}
             <div className="flex items-center gap-3.5 pl-2">
-              <div className="w-11 h-11 rounded-xl border border-brand-lime/30 flex items-center justify-center shrink-0">
+              <div className="w-11 h-11 rounded-xl bg-surface/90 border border-border-default shadow-2xs flex items-center justify-center shrink-0">
                 <Trophy className="w-5 h-5 text-brand-lime" />
               </div>
               <div className="flex flex-col">
-                <span className="font-sans text-xl font-bold text-text-main dark:text-white leading-none">1000+</span>
-                <span className="text-xs font-sans text-text-muted mt-1">Tournaments</span>
+                <span className="font-sans text-xl font-bold text-text-main leading-none">1000+</span>
+                <span className="text-xs font-sans text-text-muted font-medium mt-1">Tournaments</span>
               </div>
             </div>
           </div>

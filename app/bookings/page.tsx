@@ -386,7 +386,7 @@ export default function BookingsPage() {
                           <span className="font-bold text-brand-lime">
                             ₹{booking.total_price.toLocaleString("en-IN")}
                           </span>
-                          <span className="text-text-muted/70">
+                          <span className="text-text-muted font-mono">
                             #{booking.booking_code}
                           </span>
                         </div>
