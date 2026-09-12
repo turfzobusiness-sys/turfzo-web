@@ -133,8 +133,8 @@ export default function Features() {
                 >
                   <div className="flex gap-4 sm:gap-5 items-start">
                     {/* Icon Container */}
-                    <div className="mt-1 shrink-0 text-text-muted transition-colors duration-200 group-hover:text-text-main">
-                      <Icon className="w-5 h-5 stroke-[1.5]" />
+                    <div className="mt-1 shrink-0 text-text-secondary transition-colors duration-200 group-hover:text-text-main">
+                      <Icon className="w-5 h-5 stroke-[2]" />
                     </div>
 
                     {/* Content */}
@@ -143,7 +143,7 @@ export default function Features() {
                         <h3 className="font-sans text-base sm:text-lg font-semibold text-text-main tracking-tight transition-colors duration-200 group-hover:text-text-main">
                           {feature.title}
                         </h3>
-                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-elevated text-text-muted border border-border-default">
+                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-elevated text-text-secondary font-semibold border border-border-default">
                           {feature.tag}
                         </span>
                       </div>
@@ -158,7 +158,7 @@ export default function Features() {
                       "self-start pt-1.5 opacity-0 transition-all duration-200",
                       isHovered && "opacity-100 text-text-muted"
                     )}>
-                      <ArrowUpRight className="w-4 h-4 stroke-[1.5]" />
+                      <ArrowUpRight className="w-4 h-4 stroke-[2]" />
                     </div>
                   </div>
                 </div>

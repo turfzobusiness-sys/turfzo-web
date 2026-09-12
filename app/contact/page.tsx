@@ -209,8 +209,8 @@ export default function ContactPage() {
                       <div className="flex flex-col gap-1.5">
                         <label htmlFor="contact-name" className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Full Name</label>
                         <div className="relative">
-                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted/40">
-                            <User className="w-4 h-4 stroke-[1.5]" />
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted">
+                            <User className="w-4 h-4 stroke-[2]" />
                           </span>
                           <input 
                             id="contact-name"
@@ -219,7 +219,7 @@ export default function ContactPage() {
                             placeholder="Your name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full bg-elevated/40 border border-border-subtle focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded pl-10 pr-4 py-3.5 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-all duration-200"
+                            className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded pl-10 pr-4 py-3.5 text-sm text-text-main placeholder:text-text-muted focus:outline-none transition-all duration-200"
                           />
                         </div>
                       </div>
@@ -228,8 +228,8 @@ export default function ContactPage() {
                       <div className="flex flex-col gap-1.5">
                         <label htmlFor="contact-email" className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Email Address</label>
                         <div className="relative">
-                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted/40">
-                            <Mail className="w-4 h-4 stroke-[1.5]" />
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted">
+                            <Mail className="w-4 h-4 stroke-[2]" />
                           </span>
                           <input 
                             id="contact-email"
@@ -238,7 +238,7 @@ export default function ContactPage() {
                             placeholder="Your email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-elevated/40 border border-border-subtle focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded pl-10 pr-4 py-3.5 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-all duration-200"
+                            className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded pl-10 pr-4 py-3.5 text-sm text-text-main placeholder:text-text-muted focus:outline-none transition-all duration-200"
                           />
                         </div>
                       </div>
@@ -248,21 +248,21 @@ export default function ContactPage() {
                     <div className="flex flex-col gap-1.5">
                       <label htmlFor="contact-subject" className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Subject Category</label>
                       <div className="relative">
-                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted/40 pointer-events-none">
-                          <MessageSquare className="w-4 h-4 stroke-[1.5]" />
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
+                          <MessageSquare className="w-4 h-4 stroke-[2]" />
                         </span>
                         <select
                           id="contact-subject"
                           value={subject}
                           onChange={(e) => setSubject(e.target.value)}
-                          className="w-full bg-elevated/40 border border-border-subtle focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 text-sm text-text-main pl-10 pr-10 py-3.5 rounded font-semibold focus:outline-none appearance-none cursor-pointer transition-all duration-200"
+                          className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 text-sm text-text-main pl-10 pr-10 py-3.5 rounded font-semibold focus:outline-none appearance-none cursor-pointer transition-all duration-200"
                         >
                           <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">General Inquiry</option>
                           <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">Booking Issue</option>
                           <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">List a Venue (Turf Owner)</option>
                           <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">Tournament Inquiry</option>
                         </select>
-                        <ChevronDown className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted/60" />
+                        <ChevronDown className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted" />
                       </div>
                     </div>
 
@@ -276,7 +276,7 @@ export default function ContactPage() {
                         placeholder="Write details of your inquiry here..."
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        className="w-full bg-elevated/40 border border-border-subtle focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded px-4 py-3.5 text-sm text-text-main placeholder-text-muted/30 focus:outline-none resize-none leading-relaxed transition-all duration-200"
+                        className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded px-4 py-3.5 text-sm text-text-main placeholder:text-text-muted focus:outline-none resize-none leading-relaxed transition-all duration-200"
                       />
                     </div>
 

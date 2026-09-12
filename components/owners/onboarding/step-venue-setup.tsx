@@ -141,7 +141,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
         <h2 className="font-sans text-xl font-bold text-text-main tracking-wide">Venue Setup</h2>
-        <p className="font-sans text-sm text-text-muted/70">
+        <p className="font-sans text-sm text-text-muted">
           Create details for your first turf venue. You can always add more venues later.
         </p>
       </div>
@@ -164,7 +164,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Turfzo Arena - HSR Layout"
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
             {errors.name && (
               <span className="font-sans text-xs text-error-light">{errors.name}</span>
@@ -182,7 +182,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Tell players about your turf quality, specific rules (e.g. studs allowed), and parking info..."
               rows={3}
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200 resize-none"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200 resize-none"
             />
           </div>
 
@@ -192,14 +192,14 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
               Full Venue Address <span className="text-brand-lime">*</span>
             </label>
             <div className="relative">
-              <MapPin className="pointer-events-none absolute left-3.5 top-3 h-4.5 w-4.5 text-text-muted/70" />
+              <MapPin className="pointer-events-none absolute left-3.5 top-3 h-4.5 w-4.5 text-text-muted" />
               <textarea
                 id="venue_address"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="e.g., Survey No. 42, HSR Layout Sector 3, Opposite Star Bazar"
                 rows={2}
-                className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200 resize-none"
+                className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200 resize-none"
               />
             </div>
             {errors.address && (
@@ -219,7 +219,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Bangalore"
-                className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+                className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
               />
               {errors.city && (
                 <span className="font-sans text-xs text-error-light">{errors.city}</span>
@@ -235,7 +235,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
                 value={state}
                 onChange={(e) => setState(e.target.value)}
                 placeholder="Karnataka"
-                className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+                className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
               />
             </div>
           </div>
@@ -254,14 +254,14 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
                 Hourly Price <span className="text-brand-lime">*</span>
               </label>
               <div className="relative">
-                <IndianRupee className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted/70" />
+                <IndianRupee className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
                 <input
                   id="price"
                   type="text"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   placeholder="e.g., 1200"
-                  className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-9 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+                  className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-9 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
                 />
               </div>
               {errors.price && (
@@ -274,7 +274,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
                 Court / Pitches Count
               </label>
               <div className="relative">
-                <Layers className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted/70" />
+                <Layers className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
                 <select
                   id="court_count"
                   value={groundCount}
@@ -333,9 +333,9 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
               </button>
             </div>
             
-            <div className="flex items-center justify-between col-span-2 text-xs font-sans text-text-muted/80">
+            <div className="flex items-center justify-between col-span-2 text-xs font-sans text-text-muted">
               <div className="flex items-center gap-1">
-                <Info className="h-3.5 w-3.5 text-brand-lime/75" />
+                <Info className="h-3.5 w-3.5 text-brand-lime" />
                 <span>Operating hours defaulted to 6 AM - 11 PM</span>
               </div>
             </div>

@@ -86,7 +86,7 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
         <h2 className="font-sans text-xl font-bold text-text-main tracking-wide">Business Profile</h2>
-        <p className="font-sans text-sm text-text-muted/70">
+        <p className="font-sans text-sm text-text-muted">
           Provide your basic business details. GST and PAN registration details are optional.
         </p>
       </div>
@@ -98,14 +98,14 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
             Registered Business Name <span className="text-brand-lime">*</span>
           </label>
           <div className="relative">
-            <Building2 className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted/70" />
+            <Building2 className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="business_name"
               type="text"
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
               placeholder="e.g., Turfzo Sports Arena Pvt Ltd"
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
           {errors.businessName && (
@@ -119,14 +119,14 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
             Business Phone <span className="text-brand-lime">*</span>
           </label>
           <div className="relative">
-            <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted/70" />
+            <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="business_phone"
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="e.g., 9876543210"
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
           {errors.phone && (
@@ -140,14 +140,14 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
             ZIP / Postal Code
           </label>
           <div className="relative">
-            <Globe className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted/70" />
+            <Globe className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="zip_code"
               type="text"
               value={zipCode}
               onChange={(e) => setZipCode(e.target.value)}
               placeholder="e.g., 560001"
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
         </div>
@@ -158,14 +158,14 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
             Business Address <span className="text-brand-lime">*</span>
           </label>
           <div className="relative">
-            <MapPin className="pointer-events-none absolute left-3.5 top-3 h-4.5 w-4.5 text-text-muted/70" />
+            <MapPin className="pointer-events-none absolute left-3.5 top-3 h-4.5 w-4.5 text-text-muted" />
             <textarea
               id="address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="e.g., 1st Floor, Building A, Outer Ring Road"
               rows={2}
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200 resize-none"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200 resize-none"
             />
           </div>
           {errors.address && (
@@ -184,7 +184,7 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="e.g., Bangalore"
-            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
           />
           {errors.city && (
             <span className="font-sans text-xs text-error-light">{errors.city}</span>
@@ -202,7 +202,7 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
             value={state}
             onChange={(e) => setState(e.target.value)}
             placeholder="e.g., Karnataka"
-            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
           />
           {errors.state && (
             <span className="font-sans text-xs text-error-light">{errors.state}</span>
@@ -211,7 +211,7 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
 
         {/* Divider with Note */}
         <div className="md:col-span-2 border-t border-border-default pt-4 my-2">
-          <p className="font-sans text-xs text-text-muted/60">
+          <p className="font-sans text-xs text-text-muted">
             GST and PAN are optional registration fields. You can proceed without them and supply them later to claim tax benefits.
           </p>
         </div>
@@ -222,10 +222,10 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
             <label htmlFor="gst_number" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
               GST Number
             </label>
-            <span className="font-sans text-[10px] text-text-muted/50 uppercase">Optional</span>
+            <span className="font-sans text-[10px] text-text-muted font-medium uppercase">Optional</span>
           </div>
           <div className="relative">
-            <FileText className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted/70" />
+            <FileText className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="gst_number"
               type="text"
@@ -233,7 +233,7 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
               onChange={(e) => setGst(e.target.value.toUpperCase())}
               placeholder="e.g., 29AAAAA1111A1Z1"
               maxLength={15}
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
           {errors.gst && (
@@ -247,10 +247,10 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
             <label htmlFor="pan_number" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
               Business PAN
             </label>
-            <span className="font-sans text-[10px] text-text-muted/50 uppercase">Optional</span>
+            <span className="font-sans text-[10px] text-text-muted font-medium uppercase">Optional</span>
           </div>
           <div className="relative">
-            <FileText className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted/70" />
+            <FileText className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="pan_number"
               type="text"
@@ -258,7 +258,7 @@ export function StepBusinessProfile({ initialData, onNext, loading }: StepBusine
               onChange={(e) => setPan(e.target.value.toUpperCase())}
               placeholder="e.g., ABCDE1234F"
               maxLength={10}
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
           {errors.pan && (

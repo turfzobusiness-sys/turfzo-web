@@ -507,7 +507,7 @@ export default function OwnersPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
             <FadeInSection>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 lg:gap-12">
-                <span className="text-[11px] sm:text-xs font-mono uppercase tracking-wider text-text-hint">
+                <span className="text-[11px] sm:text-xs font-mono uppercase tracking-wider text-text-secondary font-semibold">
                   Trusted by venue owners
                 </span>
                 <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
@@ -686,7 +686,7 @@ export default function OwnersPage() {
                         <span
                           className={cn(
                             "text-[10px] font-mono uppercase tracking-wider font-semibold",
-                            isActive ? "text-brand-lime font-bold" : "text-text-hint"
+                            isActive ? "text-brand-lime font-bold" : "text-text-muted"
                           )}
                         >
                           [0{idx + 1}]
@@ -702,7 +702,7 @@ export default function OwnersPage() {
                         >
                           {pillar.label}
                         </div>
-                        <div className="text-[10px] text-text-hint mt-0.5">{pillar.badge}</div>
+                        <div className="text-[10px] text-text-muted font-medium mt-0.5">{pillar.badge}</div>
                       </div>
                     </button>
                   );
@@ -778,7 +778,7 @@ export default function OwnersPage() {
                               <div className="p-2.5 sm:p-3 rounded-lg bg-elevated border border-border-default/50">
                                 <div className="text-[10px] text-text-muted font-mono">06:00 AM – 07:00 AM</div>
                                 <div className="font-semibold text-text-main mt-0.5 sm:mt-1">Academy Coaching</div>
-                                <span className="text-[9px] sm:text-[10px] text-text-hint">Recurring Slot Block</span>
+                                <span className="text-[9px] sm:text-[10px] text-text-muted font-medium">Recurring Slot Block</span>
                               </div>
                               <div className="p-2.5 sm:p-3 rounded-lg bg-elevated border border-border-default/50">
                                 <div className="text-[10px] text-text-muted font-mono">07:00 AM – 08:00 AM</div>
@@ -794,7 +794,7 @@ export default function OwnersPage() {
                               <div className="p-2.5 sm:p-3 rounded-lg bg-elevated border border-border-default/50">
                                 <div className="text-[10px] text-text-muted font-mono">09:00 PM – 10:00 PM</div>
                                 <div className="font-semibold text-text-main mt-0.5 sm:mt-1">Turf Grooming</div>
-                                <span className="text-[9px] sm:text-[10px] text-text-hint">Maintenance Block</span>
+                                <span className="text-[9px] sm:text-[10px] text-text-muted font-medium">Maintenance Block</span>
                               </div>
                             </div>
                             <div className="text-[10px] sm:text-[11px] text-text-muted bg-elevated p-2.5 rounded-lg border border-border-default/30">
@@ -958,13 +958,13 @@ export default function OwnersPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
             <FadeInSection>
               <div className="mb-12 sm:mb-16 text-center max-w-2xl mx-auto">
-                <span className="text-[11px] sm:text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-zinc-400 font-semibold">
+                <span className="text-[11px] sm:text-xs font-mono uppercase tracking-wider text-text-secondary font-semibold">
                   Operational Comparison
                 </span>
-                <h2 className="font-sans text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-100 mt-1.5 sm:mt-2">
+                <h2 className="font-sans text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-text-main mt-1.5 sm:mt-2">
                   Stop managing chaos. Start managing a business.
                 </h2>
-                <p className="font-sans text-slate-600 dark:text-zinc-400 text-sm sm:text-base mt-2 sm:mt-3 leading-relaxed">
+                <p className="font-sans text-text-muted text-sm sm:text-base mt-2 sm:mt-3 leading-relaxed">
                   Compare traditional manual facility management with Turfzo&apos;s real-time operational operating system.
                 </p>
               </div>
@@ -973,44 +973,44 @@ export default function OwnersPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch max-w-6xl mx-auto">
               {/* LEFT BOARD: The Traditional Setup (Manual & Fragmented) */}
               <FadeInSection delay={0.1} className="h-full">
-                <div className="h-full rounded-xl p-6 sm:p-8 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between">
+                <div className="h-full rounded-xl p-6 sm:p-8 bg-surface border border-border-default shadow-sm flex flex-col justify-between">
                   <div>
                     {/* Header */}
-                    <div className="flex items-center gap-3.5 pb-6 border-b border-slate-100 dark:border-zinc-800">
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shrink-0">
-                        <X className="w-5 h-5 text-slate-500 dark:text-zinc-400" />
+                    <div className="flex items-center gap-3.5 pb-6 border-b border-border-default">
+                      <div className="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                        <X className="w-5 h-5 text-rose-500" />
                       </div>
                       <div>
-                        <span className="text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                        <span className="text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-wider text-text-muted">
                           The Traditional Setup
                         </span>
-                        <h3 className="font-sans text-lg sm:text-xl font-bold text-slate-900 dark:text-zinc-100">
+                        <h3 className="font-sans text-lg sm:text-xl font-bold text-text-main">
                           Manual Chaos &amp; Revenue Leaks
                         </h3>
                       </div>
                     </div>
 
                     {/* 5 Friction Points */}
-                    <div className="divide-y divide-slate-100 dark:divide-zinc-800 mt-2">
+                    <div className="divide-y divide-border-default mt-2">
                       {COMPARISON_ITEMS.map((item, idx) => {
                         const Icon = item.icon;
                         return (
                           <div key={idx} className="py-4 sm:py-5 first:pt-4 last:pb-2">
                             <div className="flex items-start gap-3">
-                              <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shrink-0 mt-0.5">
-                                <X className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500" />
+                              <div className="w-6 h-6 rounded-full bg-rose-500/10 border border-rose-500/25 flex items-center justify-center shrink-0 mt-0.5">
+                                <X className="w-3.5 h-3.5 text-rose-500" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <Icon className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500" />
-                                  <span className="text-xs font-mono text-slate-400 dark:text-zinc-500 uppercase tracking-wider font-semibold">
+                                  <Icon className="w-3.5 h-3.5 text-text-muted" />
+                                  <span className="text-xs font-mono text-text-secondary uppercase tracking-wider font-semibold">
                                     {item.category}
                                   </span>
                                 </div>
-                                <h4 className="font-sans text-sm sm:text-base font-bold text-slate-900 dark:text-zinc-100">
+                                <h4 className="font-sans text-sm sm:text-base font-bold text-text-main">
                                   {item.manualTitle}
                                 </h4>
-                                <p className="font-sans text-xs sm:text-sm text-slate-600 dark:text-zinc-400 mt-1 leading-relaxed">
+                                <p className="font-sans text-xs sm:text-sm text-text-muted mt-1 leading-relaxed">
                                   {item.manualDesc}
                                 </p>
                               </div>
@@ -1022,11 +1022,11 @@ export default function OwnersPage() {
                   </div>
 
                   {/* Negative Outcome Footer Banner */}
-                  <div className="mt-6 pt-5 border-t border-slate-100 dark:border-zinc-800">
-                    <div className="p-4 rounded-xl bg-slate-100/80 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700/70 flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-slate-400 dark:bg-zinc-500 shrink-0" />
-                      <p className="font-sans text-xs text-slate-600 dark:text-zinc-400 leading-snug">
-                        <strong className="text-slate-900 dark:text-zinc-200 font-semibold">Typical venue loss:</strong> 15–20% monthly revenue leaked to double bookings, uncollected cash, and idle morning courts.
+                  <div className="mt-6 pt-5 border-t border-border-default">
+                    <div className="p-4 rounded-xl bg-elevated border border-border-default flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                      <p className="font-sans text-xs text-text-muted leading-snug">
+                        <strong className="text-text-main font-semibold">Typical venue loss:</strong> 15–20% monthly revenue leaked to double bookings, uncollected cash, and idle morning courts.
                       </p>
                     </div>
                   </div>
@@ -1035,54 +1035,54 @@ export default function OwnersPage() {
 
               {/* RIGHT BOARD: The Turfzo Operating System (Control & Scale) */}
               <FadeInSection delay={0.2} className="h-full">
-                <div className="h-full rounded-xl p-6 sm:p-8 bg-white dark:bg-zinc-900 border-2 border-slate-900 dark:border-zinc-100 shadow-md flex flex-col justify-between">
+                <div className="h-full rounded-xl p-6 sm:p-8 bg-surface border-2 border-brand-lime shadow-sm flex flex-col justify-between">
                   <div>
                     {/* Header */}
-                    <div className="flex items-center gap-3.5 pb-6 border-b border-slate-100 dark:border-zinc-800">
-                      <div className="w-10 h-10 rounded-lg bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shrink-0">
+                    <div className="flex items-center gap-3.5 pb-6 border-b border-border-default">
+                      <div className="w-10 h-10 rounded-lg bg-brand-lime text-white dark:text-black flex items-center justify-center shrink-0">
                         <Check className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-slate-900 dark:text-zinc-100">
+                          <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-text-main">
                             The Turfzo Platform
                           </span>
-                          <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
+                          <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-md bg-brand-lime/15 border border-brand-lime/30 text-brand-lime">
                             AUTOMATED OS
                           </span>
                         </div>
-                        <h3 className="font-sans text-lg sm:text-xl font-bold text-slate-900 dark:text-zinc-100">
+                        <h3 className="font-sans text-lg sm:text-xl font-bold text-text-main">
                           Automated, Confirmed &amp; Paid
                         </h3>
                       </div>
                     </div>
 
                     {/* 5 Solution Items */}
-                    <div className="divide-y divide-slate-100 dark:divide-zinc-800 mt-2">
+                    <div className="divide-y divide-border-default mt-2">
                       {COMPARISON_ITEMS.map((item, idx) => {
                         const Icon = item.icon;
                         return (
                           <div key={idx} className="py-4 sm:py-5 first:pt-4 last:pb-2">
                             <div className="flex items-start gap-3">
-                              <div className="w-6 h-6 rounded-full bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shrink-0 mt-0.5">
-                                <Check className="w-3.5 h-3.5" />
+                              <div className="w-6 h-6 rounded-full bg-brand-lime text-white dark:text-black flex items-center justify-center shrink-0 mt-0.5">
+                                <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2 mb-1">
                                   <div className="flex items-center gap-2">
-                                    <Icon className="w-3.5 h-3.5 text-slate-700 dark:text-zinc-300" />
-                                    <span className="text-xs font-mono text-slate-700 dark:text-zinc-300 font-semibold uppercase tracking-wider">
+                                    <Icon className="w-3.5 h-3.5 text-brand-lime" />
+                                    <span className="text-xs font-mono text-text-secondary font-semibold uppercase tracking-wider">
                                       {item.category}
                                     </span>
                                   </div>
-                                  <span className="text-[10px] sm:text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-800 border border-slate-200 dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 shrink-0">
+                                  <span className="text-[10px] sm:text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-md bg-elevated text-text-main border border-border-default shrink-0">
                                     {item.badge}
                                   </span>
                                 </div>
-                                <h4 className="font-sans text-sm sm:text-base font-bold text-slate-900 dark:text-zinc-100">
+                                <h4 className="font-sans text-sm sm:text-base font-bold text-text-main">
                                   {item.turfzoTitle}
                                 </h4>
-                                <p className="font-sans text-xs sm:text-sm text-slate-600 dark:text-zinc-400 mt-1 leading-relaxed">
+                                <p className="font-sans text-xs sm:text-sm text-text-muted mt-1 leading-relaxed">
                                   {item.turfzoDesc}
                                 </p>
                               </div>
@@ -1094,11 +1094,11 @@ export default function OwnersPage() {
                   </div>
 
                   {/* Positive Outcome Footer Banner */}
-                  <div className="mt-6 pt-5 border-t border-slate-100 dark:border-zinc-800">
-                    <div className="p-4 rounded-xl bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-950 flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-emerald-600 shrink-0" />
-                      <p className="font-sans text-xs text-slate-200 dark:text-zinc-800 leading-snug">
-                        <strong className="text-white dark:text-zinc-950 font-bold">Turfzo partner result:</strong> 100% upfront booking collection, zero schedule conflicts, and direct 24h bank payouts at a flat 5% fee.
+                  <div className="mt-6 pt-5 border-t border-border-default">
+                    <div className="p-4 rounded-xl bg-elevated border border-border-default flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-brand-lime shrink-0" />
+                      <p className="font-sans text-xs text-text-muted leading-snug">
+                        <strong className="text-text-main font-bold">Turfzo partner result:</strong> 100% upfront booking collection, zero schedule conflicts, and direct 24h bank payouts at a flat 5% fee.
                       </p>
                     </div>
                   </div>
@@ -1152,7 +1152,7 @@ export default function OwnersPage() {
                         onChange={(e) => setCourtCount(Number(e.target.value))}
                         className="owners-slider"
                       />
-                      <div className="flex justify-between text-[10px] text-text-hint font-mono mt-1.5">
+                      <div className="flex justify-between text-[10px] text-text-muted font-medium font-mono mt-1.5">
                         <span>1</span>
                         <span>6</span>
                       </div>
@@ -1177,7 +1177,7 @@ export default function OwnersPage() {
                         onChange={(e) => setHourlyPrice(Number(e.target.value))}
                         className="owners-slider"
                       />
-                      <div className="flex justify-between text-[10px] text-text-hint font-mono mt-1.5">
+                      <div className="flex justify-between text-[10px] text-text-muted font-medium font-mono mt-1.5">
                         <span>₹600</span>
                         <span>₹3,000</span>
                       </div>
@@ -1202,7 +1202,7 @@ export default function OwnersPage() {
                         onChange={(e) => setHoursPerDay(Number(e.target.value))}
                         className="owners-slider"
                       />
-                      <div className="flex justify-between text-[10px] text-text-hint font-mono mt-1.5">
+                      <div className="flex justify-between text-[10px] text-text-muted font-medium font-mono mt-1.5">
                         <span>3 hrs</span>
                         <span>14 hrs</span>
                       </div>
@@ -1223,7 +1223,7 @@ export default function OwnersPage() {
                       </div>
                       {/* Yearly projection */}
                       <div className="mt-3 pt-3 border-t border-border-default/30">
-                        <div className="text-[10px] sm:text-xs font-mono text-text-hint uppercase tracking-wider">
+                        <div className="text-[10px] sm:text-xs font-mono text-text-muted font-medium uppercase tracking-wider">
                           Projected Annual Earnings
                         </div>
                         <div className="font-mono text-lg sm:text-xl font-bold text-text-main mt-1 tabular-nums">
@@ -1376,12 +1376,12 @@ export default function OwnersPage() {
                                   "font-mono text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded-md",
                                   isActive
                                     ? "bg-brand-lime text-white dark:text-black"
-                                    : "bg-elevated text-text-hint border border-border-default/50"
+                                    : "bg-elevated text-text-muted border border-border-default font-medium"
                                 )}
                               >
                                 STEP {step.step}
                               </span>
-                              <span className="text-[10px] font-mono text-text-hint uppercase tracking-wider">
+                              <span className="text-[10px] font-mono text-text-muted uppercase tracking-wider font-semibold">
                                 {step.tag}
                               </span>
                             </div>

@@ -571,7 +571,7 @@ export default function TournamentsPage() {
                   <div className="w-9 h-9 rounded-xl bg-brand-lime/15 flex items-center justify-center">
                     <Trophy className="w-4.5 h-4.5 text-brand-lime" />
                   </div>
-                  <h3 className="text-base font-bold text-white">
+                  <h3 className="text-base font-bold text-text-main">
                     Organize Your Tournament
                   </h3>
                 </div>

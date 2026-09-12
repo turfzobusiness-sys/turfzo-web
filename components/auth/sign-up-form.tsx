@@ -135,7 +135,7 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
     if (loading) return;
     setLoading(true);
     try {
-      await signInWithGoogle();
+      await signInWithGoogle(role);
       onSuccess?.();
       toast.success("Account created successfully!");
       finish();

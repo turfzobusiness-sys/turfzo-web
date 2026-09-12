@@ -54,7 +54,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
       newErrors.bankName = "Bank name is required";
     }
 
-    if (upi.trim() && !/^[\w.-]+@[\w.-]+$/.test(upi.trim())) {
+    if (upi.trim() && !/^[\w.\-]{2,}@[a-zA-Z0-9.\-]{2,}$/.test(upi.trim())) {
       newErrors.upi = "Please enter a valid UPI ID (e.g., name@okaxis)";
     }
 
@@ -80,14 +80,14 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-1">
         <h2 className="font-sans text-xl font-bold text-text-main tracking-wide">Payout Setup</h2>
-        <p className="font-sans text-sm text-text-muted/70">
+        <p className="font-sans text-sm text-text-muted">
           Enter the bank account details where you wish to receive bookings settlements.
         </p>
       </div>
 
       <div className="bg-brand-btn-bg/40 border border-brand-lime/10 p-3.5 rounded-[12px] flex items-start gap-3">
         <Landmark className="h-5 w-5 text-brand-lime mt-0.5 shrink-0" />
-        <div className="text-xs font-sans text-text-muted/80 leading-normal">
+        <div className="text-xs font-sans text-text-muted leading-normal">
           <p className="font-semibold text-text-main">Automatic Daily Settlements</p>
           <p className="mt-1">
             Settlements are processed automatically within 24 hours of booking completions. All payments are securely handled in compliance with RBI guidelines.
@@ -102,14 +102,14 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             Account Holder Name <span className="text-brand-lime">*</span>
           </label>
           <div className="relative">
-            <Landmark className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted/70" />
+            <Landmark className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="holder_name"
               type="text"
               value={holderName}
               onChange={(e) => setHolderName(e.target.value)}
               placeholder="e.g., John Doe"
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
           {errors.holderName && (
@@ -123,14 +123,14 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             Bank Account Number <span className="text-brand-lime">*</span>
           </label>
           <div className="relative">
-            <CreditCard className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted/70" />
+            <CreditCard className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="account_num"
               type="password"
               value={accountNumber}
               onChange={(e) => setAccountNumber(e.target.value)}
               placeholder="Enter account number"
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
           {errors.accountNumber && (
@@ -144,14 +144,14 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             Confirm Account Number <span className="text-brand-lime">*</span>
           </label>
           <div className="relative">
-            <CreditCard className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted/70" />
+            <CreditCard className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="confirm_account"
               type="text"
               value={confirmAccount}
               onChange={(e) => setConfirmAccount(e.target.value)}
               placeholder="Re-enter account number"
-              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
           {errors.confirmAccount && (
@@ -171,7 +171,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             onChange={(e) => setIfsc(e.target.value.toUpperCase())}
             placeholder="e.g., HDFC0001234"
             maxLength={11}
-            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
           />
           {errors.ifsc && (
             <span className="font-sans text-xs text-error-light">{errors.ifsc}</span>
@@ -189,7 +189,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             value={bankName}
             onChange={(e) => setBankName(e.target.value)}
             placeholder="e.g., HDFC Bank"
-            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
           />
           {errors.bankName && (
             <span className="font-sans text-xs text-error-light">{errors.bankName}</span>
@@ -202,7 +202,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             <label htmlFor="branch" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
               Branch Name
             </label>
-            <span className="font-sans text-[10px] text-text-muted/50 uppercase">Optional</span>
+            <span className="font-sans text-[10px] text-text-muted font-medium uppercase">Optional</span>
           </div>
           <input
             id="branch"
@@ -210,7 +210,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
             placeholder="e.g., HSR Layout"
-            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
           />
         </div>
 
@@ -220,7 +220,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             <label htmlFor="upi" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
               Settlement UPI ID
             </label>
-            <span className="font-sans text-[10px] text-text-muted/50 uppercase">Optional</span>
+            <span className="font-sans text-[10px] text-text-muted font-medium uppercase">Optional</span>
           </div>
           <input
             id="upi"
@@ -228,7 +228,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             value={upi}
             onChange={(e) => setUpi(e.target.value.toLowerCase())}
             placeholder="e.g., turfzo@okaxis"
-            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted/40 hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
           />
           {errors.upi && (
             <span className="font-sans text-xs text-error-light">{errors.upi}</span>
@@ -236,7 +236,7 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-[11px] font-sans text-text-muted/60 bg-surface border border-border-default p-2 rounded-[8px]">
+      <div className="flex items-center gap-2 text-[11px] font-sans text-text-muted bg-surface border border-border-default p-2 rounded-[8px]">
         <CheckCircle2 className="h-4 w-4 text-brand-lime shrink-0" />
         <span>Your bank details are stored securely. You can modify them later from your billing preferences.</span>
       </div>

@@ -70,7 +70,7 @@ export function StepIndicator({ currentStep, completedSteps, onStepClick }: Step
                       ? "bg-brand-lime/10 border-brand-lime text-brand-lime"
                       : isActive
                       ? "bg-elevated border-brand-lime text-brand-lime ring-4 ring-brand-lime/15 shadow-sm"
-                      : "bg-surface border-border-default text-text-muted/60"
+                      : "bg-surface border-border-default text-text-muted"
                   )}
                 >
                   {isCompleted ? <Check className="h-4.5 w-4.5 stroke-[3]" /> : <Icon className="h-4 w-4" />}
@@ -149,7 +149,7 @@ export function StepIndicator({ currentStep, completedSteps, onStepClick }: Step
                 >
                   {step.title}
                 </span>
-                <span className="font-sans text-xs text-text-muted/70 mt-0.5 leading-snug">
+                <span className="font-sans text-xs text-text-muted mt-0.5 leading-snug">
                   {step.subtitle}
                 </span>
               </div>

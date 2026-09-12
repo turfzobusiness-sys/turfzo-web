@@ -136,9 +136,9 @@ export default function PopularTurfs() {
                   </h3>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between">
+                <div className="mt-4 pt-3 border-t border-border-default flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs text-text-muted">
-                    <Clock className="w-3.5 h-3.5 text-text-hint" />
+                    <Clock className="w-3.5 h-3.5 text-text-muted stroke-[2]" />
                     <span>{venue.nextSlot}</span>
                   </div>
                   <div className="text-right">

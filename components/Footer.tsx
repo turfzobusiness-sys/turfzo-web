@@ -68,11 +68,11 @@ export default function Footer() {
   return (
 
 
-    <footer id="contact" className="relative bg-bg border-t border-border-subtle pt-20 pb-8 overflow-hidden">
+    <footer id="contact" className="relative bg-bg border-t border-border-default pt-20 pb-8 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10">
         
         {/* Main Columns Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-border-subtle">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-border-default">
           
           {/* Brand Info & Newsletter (Lg: 4 columns) */}
           <div className="lg:col-span-4 flex flex-col gap-6">
@@ -104,14 +104,14 @@ export default function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSubscribe()}
-                  className="w-full max-w-sm bg-bg border border-border-default focus:border-border-strong focus:ring-1 focus:ring-border-strong rounded-md py-2.5 pl-3 pr-10 text-sm text-text-main placeholder-text-muted focus:outline-none transition-colors"
+                  className="w-full max-w-sm bg-bg border border-border-default focus:border-border-strong focus:ring-1 focus:ring-border-strong rounded-md py-2.5 pl-3 pr-10 text-sm text-text-main placeholder:text-text-muted focus:outline-none transition-colors"
                 />
                 <button 
                   onClick={handleSubscribe}
                   className="absolute right-1 p-1.5 text-text-muted hover:text-text-main transition-colors focus:outline-none"
                   aria-label="Subscribe"
                 >
-                  {showComingSoon ? <Check className="w-4 h-4 text-brand-lime stroke-[2]" /> : <ArrowRight className="w-4 h-4 stroke-[1.5]" />}
+                  {showComingSoon ? <Check className="w-4 h-4 text-brand-lime stroke-[2]" /> : <ArrowRight className="w-4 h-4 stroke-[2]" />}
                 </button>
               </div>
               {showComingSoon && (
