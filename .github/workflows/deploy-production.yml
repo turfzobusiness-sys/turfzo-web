@@ -54,26 +54,13 @@ jobs:
           NEXT_PUBLIC_CASHFREE_ENV: ${{ secrets.NEXT_PUBLIC_CASHFREE_ENV || 'production' }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAAA-placeholder' }}
           NEXT_PUBLIC_VIEW_ONLY_MODE: 'false'
-      - name: Setup SOPS
-        if: ${{ secrets.SOPS_AGE_KEY != '' }}
-        run: |
-          sudo wget -qO /usr/local/bin/sops https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64
-          sudo chmod +x /usr/local/bin/sops
-      - name: Decrypt and push secrets
-        if: ${{ secrets.SOPS_AGE_KEY != '' }}
-        run: |
-          sops decrypt .env.prod.enc > .env.prod
-          npx wrangler secret bulk .env.prod
-        env:
-          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: 3f24b8f35b25e0943b29f0035403f694
       - name: Deploy production worker
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
-        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: 3f24b8f35b25e0943b29f0035403f694
-      - name: Skip deploy notice
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN == '' }}
-        run: echo "::notice::Skipping wrangler deploy because CLOUDFLARE_API_TOKEN is not configured in repository secrets."
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            npx wrangler deploy
+          else
+            echo "Skipping wrangler deploy: CLOUDFLARE_API_TOKEN is not configured in repository secrets."
+          fi
