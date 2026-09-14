@@ -41,6 +41,7 @@ export default function ContactPage() {
   const [subject, setSubject] = useState("General Inquiry");
   const [message, setMessage] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string>("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const turnstileEnforced = isTurnstileConfigured();
 
@@ -65,6 +66,8 @@ export default function ContactPage() {
       setTurnstileToken("");
       setFormStep('submitted');
     } catch (err) {
+      setTurnstileToken("");
+      setTurnstileResetKey((k) => k + 1);
       setErrorMsg(getErrorMessage(err, "Failed to send message. Please try again."));
       setFormStep('error');
     }
@@ -75,6 +78,8 @@ export default function ContactPage() {
     setEmail("");
     setSubject("General Inquiry");
     setMessage("");
+    setTurnstileToken("");
+    setTurnstileResetKey((k) => k + 1);
     setFormStep('form');
   };
 
@@ -291,7 +296,12 @@ export default function ContactPage() {
                         className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded px-4 py-3.5 text-sm text-text-main placeholder:text-text-muted focus:outline-none resize-none leading-relaxed transition-all duration-200"
                       />
                     </div>
-                    <TurnstileWidget action="contact" onToken={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+                    <TurnstileWidget
+                      action="contact"
+                      onToken={setTurnstileToken}
+                      onExpire={() => setTurnstileToken("")}
+                      resetKey={turnstileResetKey}
+                    />
 
                     {/* Submit Button */}
                     <button

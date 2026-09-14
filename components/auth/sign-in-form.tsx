@@ -22,6 +22,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const [rememberMe, setRememberMe] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [turnstileToken, setTurnstileToken] = React.useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = React.useState(0);
   const turnstileEnforced = isTurnstileConfigured();
 
   const handlePostAuth = () => {
@@ -50,6 +51,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
         const verified = await verifyTurnstileToken(turnstileToken, "login");
         if (!verified.ok) {
           setTurnstileToken("");
+          setTurnstileResetKey((k) => k + 1);
           toast.error(verified.error ?? "Bot verification failed.");
           return;
         }
@@ -65,6 +67,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
       handlePostAuth();
     } catch {
       setTurnstileToken("");
+      setTurnstileResetKey((k) => k + 1);
       // error set in auth context
     } finally {
       setLoading(false);
@@ -162,7 +165,12 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
         </button>
       </div>
       {turnstileEnforced && (
-        <TurnstileWidget action="login" onToken={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+        <TurnstileWidget
+          action="login"
+          onToken={setTurnstileToken}
+          onExpire={() => setTurnstileToken("")}
+          resetKey={turnstileResetKey}
+        />
       )}
 
       {/* Submit */}
