@@ -124,7 +124,6 @@ export function Header() {
   const pathname = usePathname();
   const { status, firebaseUser, convexUser, signOut } = useAuth();
   const { openAuthModal } = useAuthModal();
-  const { resolved, setMode } = useTheme();
   const isAuthed = status === "authenticated";
 
   React.useEffect(() => {
@@ -160,209 +159,211 @@ export function Header() {
   }, [openAuthModal]);
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300 ease-out",
-        scrolled && !open
-          ? "pt-3 sm:pt-4 px-3 sm:px-6 lg:px-8 pointer-events-none bg-transparent border-transparent"
-          : "pt-0 px-0 pointer-events-auto bg-bg/85 backdrop-blur-md border-b border-border-default/50"
-      )}
-    >
-      <nav
+    <>
+      <header
         className={cn(
-          "w-full transition-all duration-300 ease-out flex items-center justify-between gap-2 flex-nowrap pointer-events-auto",
+          "sticky top-0 z-50 w-full transition-all duration-300 ease-out",
           scrolled && !open
-            ? "max-w-6xl mx-auto h-16 px-4 lg:px-5 rounded-full bg-surface/90 dark:bg-surface/85 backdrop-blur-xl backdrop-saturate-150 border border-border-strong/60 dark:border-border-default ring-1 ring-black/5 dark:ring-white/10 shadow-xl shadow-black/10 dark:shadow-black/40"
-            : "max-w-7xl mx-auto h-16 lg:h-20 px-5 lg:px-8 rounded-none border-0 bg-transparent shadow-none",
-          open && "bg-bg border-b border-border-default rounded-none"
+            ? "pt-3 sm:pt-4 px-3 sm:px-6 lg:px-8 pointer-events-none bg-transparent border-transparent"
+            : "pt-0 px-0 pointer-events-auto bg-bg/85 backdrop-blur-md border-b border-border-default/50"
         )}
       >
-        <Link
-          href="/"
-          className="flex shrink-0 items-center gap-2.5 lg:gap-3 select-none"
-          aria-label="Turfzo home"
+        <nav
+          className={cn(
+            "w-full transition-all duration-300 ease-out flex items-center justify-between gap-2 flex-nowrap pointer-events-auto",
+            scrolled && !open
+              ? "max-w-6xl mx-auto h-16 px-4 lg:px-5 rounded-full bg-surface/90 dark:bg-surface/85 backdrop-blur-xl backdrop-saturate-150 border border-border-strong/60 dark:border-border-default ring-1 ring-black/5 dark:ring-white/10 shadow-xl shadow-black/10 dark:shadow-black/40"
+              : "max-w-7xl mx-auto h-16 lg:h-20 px-5 lg:px-8 rounded-none border-0 bg-transparent shadow-none",
+            open && "bg-bg border-b border-border-default rounded-none"
+          )}
         >
-          <Image
-            src="/turfzo_mascot.svg"
-            alt="Turfzo Logo"
-            width={44}
-            height={44}
-            className={cn(
-              "transition-all duration-300",
-              scrolled && !open ? "h-8 w-8 lg:h-9 lg:w-9" : "h-10 w-10 lg:h-11 lg:w-11"
-            )}
-            priority
-          />
-          <span
-            className={cn(
-              "font-sans font-bold text-text-main tracking-tight leading-none whitespace-nowrap transition-all duration-300",
-              scrolled && !open ? "text-lg lg:text-xl" : "text-xl lg:text-2xl"
-            )}
+          <Link
+            href="/"
+            className="flex shrink-0 items-center gap-2.5 lg:gap-3 select-none"
+            aria-label="Turfzo home"
           >
-            turf<span className="text-brand-lime">zo</span>
-          </span>
-        </Link>
+            <Image
+              src="/turfzo_mascot.svg"
+              alt="Turfzo Logo"
+              width={44}
+              height={44}
+              className={cn(
+                "transition-all duration-300",
+                scrolled && !open ? "h-8 w-8 lg:h-9 lg:w-9" : "h-10 w-10 lg:h-11 lg:w-11"
+              )}
+              priority
+            />
+            <span
+              className={cn(
+                "font-sans font-bold text-text-main tracking-tight leading-none whitespace-nowrap transition-all duration-300",
+                scrolled && !open ? "text-lg lg:text-xl" : "text-xl lg:text-2xl"
+              )}
+            >
+              turf<span className="text-brand-lime">zo</span>
+            </span>
+          </Link>
 
-        {/* Desktop Nav Links */}
-        <div className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex flex-nowrap overflow-hidden">
-          {NAV_LINKS.map((link) => {
-            const active = isActive(pathname, link.href);
-            return (
+          {/* Desktop Nav Links */}
+          <div className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex flex-nowrap overflow-hidden">
+            {NAV_LINKS.map((link) => {
+              const active = isActive(pathname, link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative flex shrink-0 items-center justify-center whitespace-nowrap font-sans font-medium rounded-full transition-all duration-200",
+                    scrolled && !open
+                      ? "h-8 px-3 text-[13px]"
+                      : "h-11 px-4 text-sm",
+                    active
+                      ? "text-text-main bg-elevated font-semibold shadow-2xs"
+                      : "text-text-muted hover:text-text-main hover:bg-elevated/60"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            {isAuthed && (
               <Link
-                key={link.href}
-                href={link.href}
-                aria-current={active ? "page" : undefined}
+                href="/tournaments/manage"
+                aria-current={isActive(pathname, "/tournaments/manage") ? "page" : undefined}
                 className={cn(
                   "relative flex shrink-0 items-center justify-center whitespace-nowrap font-sans font-medium rounded-full transition-all duration-200",
                   scrolled && !open
                     ? "h-8 px-3 text-[13px]"
                     : "h-11 px-4 text-sm",
-                  active
+                  isActive(pathname, "/tournaments/manage")
                     ? "text-text-main bg-elevated font-semibold shadow-2xs"
                     : "text-text-muted hover:text-text-main hover:bg-elevated/60"
                 )}
               >
-                {link.label}
+                My Tournaments
               </Link>
-            );
-          })}
-          {isAuthed && (
-            <Link
-              href="/tournaments/manage"
-              aria-current={isActive(pathname, "/tournaments/manage") ? "page" : undefined}
+            )}
+          </div>
+
+          {/* Desktop Actions */}
+          <div className="hidden shrink-0 items-center gap-1.5 lg:flex">
+            <HeaderThemeButton
+              showLabel={!scrolled}
               className={cn(
-                "relative flex shrink-0 items-center justify-center whitespace-nowrap font-sans font-medium rounded-full transition-all duration-200",
-                scrolled && !open
-                  ? "h-8 px-3 text-[13px]"
-                  : "h-11 px-4 text-sm",
-                isActive(pathname, "/tournaments/manage")
-                  ? "text-text-main bg-elevated font-semibold shadow-2xs"
-                  : "text-text-muted hover:text-text-main hover:bg-elevated/60"
+                "rounded-full transition-all duration-200",
+                scrolled && !open ? "h-8 w-8 p-0" : "h-11 px-3.5 text-xs"
               )}
+            />
+            {isAuthed ? (
+              <>
+                <HeaderNotificationsButton
+                  className={cn(
+                    "rounded-full transition-all duration-200",
+                    scrolled && !open ? "h-8 w-8" : "h-11 w-11"
+                  )}
+                />
+                <Link
+                  href="/profile"
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "rounded-full transition-all duration-200 gap-2 shrink-0 whitespace-nowrap",
+                    scrolled && !open
+                      ? "h-8 px-3 text-[13px]"
+                      : "h-11 px-5 text-sm"
+                  )}
+                >
+                  <UserIcon className={cn(scrolled && !open ? "size-3.5" : "size-4.5")} />
+                  <span className="max-w-[120px] truncate">
+                    {((convexUser?.display_name && convexUser.display_name.trim() !== "")
+                      ? convexUser.display_name
+                      : (convexUser?.full_name && convexUser.full_name.trim() !== "")
+                        ? convexUser.full_name
+                        : firebaseUser?.displayName
+                          ? firebaseUser.displayName
+                          : (convexUser?.email ?? firebaseUser?.email)?.split("@")[0]) ?? "Profile"}
+                  </span>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleSignOut}
+                  aria-label="Sign out"
+                  title="Sign out"
+                  className={cn(
+                    "rounded-full transition-all duration-200 shrink-0",
+                    scrolled && !open ? "h-8 w-8" : "h-11 w-11"
+                  )}
+                >
+                  <LogOut className={cn(scrolled && !open ? "size-3.5" : "size-4.5")} />
+                </Button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleSignInClick}
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "rounded-full transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap",
+                    scrolled && !open
+                      ? "h-8 px-3.5 text-[13px]"
+                      : "h-11 px-5 text-sm"
+                  )}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSignUpClick}
+                  className={cn(
+                    buttonVariants({ variant: "default" }),
+                    "rounded-full transition-all duration-200 cursor-pointer font-semibold shrink-0 whitespace-nowrap",
+                    scrolled && !open
+                      ? "h-8 px-3.5 text-[13px]"
+                      : "h-11 px-6 text-sm"
+                  )}
+                >
+                  Get Started
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Actions */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <HeaderThemeButton
+              className={cn(
+                "rounded-full transition-all duration-200",
+                scrolled && !open ? "h-9 w-9 p-0" : "h-10 w-10 p-0"
+              )}
+              showLabel={false}
+            />
+            <HeaderNotificationsButton
+              className={cn(
+                "rounded-full transition-all duration-200",
+                scrolled && !open ? "h-9 w-9" : "h-10 w-10"
+              )}
+            />
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => setOpen((v) => !v)}
+              className={cn(
+                "rounded-full transition-all duration-200",
+              )}
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
             >
-              My Tournaments
-            </Link>
-          )}
-        </div>
-
-        {/* Desktop Actions */}
-        <div className="hidden shrink-0 items-center gap-1.5 lg:flex">
-          <HeaderThemeButton
-            showLabel={!scrolled}
-            className={cn(
-              "rounded-full transition-all duration-200",
-              scrolled && !open ? "h-8 w-8 p-0" : "h-11 px-3.5 text-xs"
-            )}
-          />
-          {isAuthed ? (
-            <>
-              <HeaderNotificationsButton
-                className={cn(
-                  "rounded-full transition-all duration-200",
-                  scrolled && !open ? "h-8 w-8" : "h-11 w-11"
-                )}
-              />
-              <Link
-                href="/profile"
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "rounded-full transition-all duration-200 gap-2 shrink-0 whitespace-nowrap",
-                  scrolled && !open
-                    ? "h-8 px-3 text-[13px]"
-                    : "h-11 px-5 text-sm"
-                )}
-              >
-                <UserIcon className={cn(scrolled && !open ? "size-3.5" : "size-4.5")} />
-                <span className="max-w-[120px] truncate">
-                  {((convexUser?.display_name && convexUser.display_name.trim() !== "")
-                    ? convexUser.display_name
-                    : (convexUser?.full_name && convexUser.full_name.trim() !== "")
-                      ? convexUser.full_name
-                      : firebaseUser?.displayName
-                        ? firebaseUser.displayName
-                        : (convexUser?.email ?? firebaseUser?.email)?.split("@")[0]) ?? "Profile"}
-                </span>
-              </Link>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleSignOut}
-                aria-label="Sign out"
-                title="Sign out"
-                className={cn(
-                  "rounded-full transition-all duration-200 shrink-0",
-                  scrolled && !open ? "h-8 w-8" : "h-11 w-11"
-                )}
-              >
-                <LogOut className={cn(scrolled && !open ? "size-3.5" : "size-4.5")} />
-              </Button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={handleSignInClick}
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "rounded-full transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap",
-                  scrolled && !open
-                    ? "h-8 px-3.5 text-[13px]"
-                    : "h-11 px-5 text-sm"
-                )}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={handleSignUpClick}
-                className={cn(
-                  buttonVariants({ variant: "default" }),
-                  "rounded-full transition-all duration-200 cursor-pointer font-semibold shrink-0 whitespace-nowrap",
-                  scrolled && !open
-                    ? "h-8 px-3.5 text-[13px]"
-                    : "h-11 px-6 text-sm"
-                )}
-              >
-                Get Started
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Mobile Actions */}
-        <div className="flex items-center gap-2 lg:hidden">
-          <HeaderThemeButton
-            className={cn(
-              "rounded-full transition-all duration-200",
-              scrolled && !open ? "h-9 w-9 p-0" : "h-10 w-10 p-0"
-            )}
-            showLabel={false}
-          />
-          <HeaderNotificationsButton
-            className={cn(
-              "rounded-full transition-all duration-200",
-              scrolled && !open ? "h-9 w-9" : "h-10 w-10"
-            )}
-          />
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => setOpen((v) => !v)}
-            className={cn(
-              "rounded-full transition-all duration-200",
-            )}
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-          >
-            <MenuToggleIcon open={open} className={cn(scrolled && !open ? "size-5" : "size-6")} duration={300} />
-          </Button>
-        </div>
-      </nav>
+              <MenuToggleIcon open={open} className={cn(scrolled && !open ? "size-5" : "size-6")} duration={300} />
+            </Button>
+          </div>
+        </nav>
+      </header>
 
       <div
         className={cn(
-          "bg-bg/98 fixed inset-x-0 top-16 bottom-0 z-50 flex flex-col overflow-hidden border-y border-border-default lg:hidden",
-          open ? "block" : "hidden"
+          "bg-bg/98 fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col overflow-y-auto border-y border-border-default lg:hidden",
+          open ? "flex" : "hidden"
         )}
       >
         <div
@@ -373,41 +374,6 @@ export function Header() {
           )}
         >
           <div className="flex flex-col gap-3">
-            {/* Mobile Theme Segmented Toggle */}
-            <div className="flex items-center justify-between p-3 rounded-xl bg-surface border border-border-default">
-              <span className="text-sm font-semibold text-text-main">
-                Theme
-              </span>
-              <div className="inline-flex items-center p-1 rounded-lg bg-elevated border border-border-subtle gap-1">
-                <button
-                  type="button"
-                  onClick={() => setMode("light")}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
-                    resolved === "light"
-                      ? "bg-surface text-text-main shadow-xs font-bold"
-                      : "text-text-muted hover:text-text-main"
-                  )}
-                >
-                  <Sun className="w-3.5 h-3.5 text-amber-400" />
-                  Light
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode("dark")}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
-                    resolved === "dark"
-                      ? "bg-surface text-text-main shadow-xs font-bold"
-                      : "text-text-muted hover:text-text-main"
-                  )}
-                >
-                  <Moon className="w-3.5 h-3.5 text-indigo-400" />
-                  Dark
-                </button>
-              </div>
-            </div>
-
             <div className="grid gap-y-1">
             {NAV_LINKS.map((link) => {
               const active = isActive(pathname, link.href);
@@ -511,6 +477,6 @@ export function Header() {
           </div>
         </div>
       </div>
-    </header>
+    </>
   );
 }

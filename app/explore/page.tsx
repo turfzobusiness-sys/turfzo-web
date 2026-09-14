@@ -2143,7 +2143,7 @@ export default function ExplorePage() {
                             Math.max(2, Math.min(22, Number(e.target.value))),
                           )
                         }
-                        className="w-full bg-black border border-border-strong rounded-lg pl-3 pr-2 py-1.5 text-text-main text-xs font-semibold focus:outline-none focus:border-brand-lime transition-all"
+                        className="w-full bg-elevated border border-border-strong rounded-lg pl-3 pr-2 py-1.5 text-text-main text-xs font-semibold focus:outline-none focus:border-brand-lime transition-all"
                       />
                     </div>
                   </div>
