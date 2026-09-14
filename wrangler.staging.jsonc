@@ -26,12 +26,6 @@
       "service": "turfzo-web-staging"
     }
   ],
-  "r2_buckets": [
-    {
-      "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "turfzo-web-staging-cache"
-    }
-  ],
   "images": {
     "binding": "IMAGES"
   }
