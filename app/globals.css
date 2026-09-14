@@ -218,6 +218,42 @@ body {
   --tzo-exit-scale: 0.95;
 }
 
+/* Branded page-loader keyframes (see components/ui/page-loader.tsx) */
+@keyframes tzo-loader-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes tzo-loader-bar {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(320%); }
+}
+
+@keyframes tzo-loader-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+@utility animate-loader-float {
+  animation: tzo-loader-float 2.2s ease-in-out infinite;
+}
+
+@utility animate-loader-bar {
+  animation: tzo-loader-bar 1.4s ease-in-out infinite;
+}
+
+@utility animate-loader-dot {
+  animation: tzo-loader-dot 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-loader-float,
+  .animate-loader-bar,
+  .animate-loader-dot {
+    animation: none;
+  }
+}
+
 /* ================================================================
    AIRBNB-INSPIRED THEME — Scoped to .airbnb-explore-theme
    Supports light and dark mode via .dark / .light class on <html>

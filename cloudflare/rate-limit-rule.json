@@ -1,0 +1,16 @@
+{
+  "$schema": "https://developers.cloudflare.com/waf/rate-limiting-rules/",
+  "zone": "turfzo.app",
+  "phase": "http_ratelimit",
+  "notes": "Free plan: max 1 rate-limit rule. Throttles Turnstile verify abuse (OTP/signup/login bot burst). Contact form POSTs go to Convex directly, so Convex rate_limits remain the second layer.",
+  "rule": {
+    "ref": "turfzo-throttle-verify",
+    "description": "Throttle POST /api/turnstile/verify: 10/min/IP, block 60s",
+    "expression": "(http.request.uri.path eq \"/api/turnstile/verify\") and (http.request.method eq \"POST\")",
+    "characteristics": ["ip.src"],
+    "period": 60,
+    "requests_per_period": 10,
+    "mitigation_timeout": 60,
+    "action": "block"
+  }
+}
