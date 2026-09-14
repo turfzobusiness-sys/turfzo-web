@@ -34,6 +34,7 @@ const scriptSrc = [
   "https://*.cashfree.com",
   "https://*.convex.cloud",
   "https://apis.google.com",
+  "https://challenges.cloudflare.com",
 ]
   .filter(Boolean)
   .join(" ");
@@ -41,8 +42,8 @@ const scriptSrc = [
 const csp = [
   "default-src 'self'",
   `script-src ${scriptSrc}`,
-  "frame-src 'self' https://api.cashfree.com https://sandbox.cashfree.com https://*.cashfree.com https://*.firebaseapp.com https://*.firebaseauth.com",
-  "connect-src 'self' https://*.cashfree.com https://api.cashfree.com https://sandbox.cashfree.com https://*.convex.cloud https://*.convex.site wss://*.convex.cloud https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.firebaseauth.com https://*.datadoghq.com https://browser-intake-us5-datadoghq.com",
+  "frame-src 'self' https://challenges.cloudflare.com https://api.cashfree.com https://sandbox.cashfree.com https://*.cashfree.com https://*.firebaseapp.com https://*.firebaseauth.com",
+  "connect-src 'self' https://challenges.cloudflare.com https://*.cashfree.com https://api.cashfree.com https://sandbox.cashfree.com https://*.convex.cloud https://*.convex.site wss://*.convex.cloud https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.firebaseauth.com https://*.datadoghq.com https://browser-intake-us5-datadoghq.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
