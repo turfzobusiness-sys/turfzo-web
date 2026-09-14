@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { getTurnstileSiteKey, isTurnstileConfigured } from "@/lib/turnstile";
 
 type TurnstileWidgetId = string;
@@ -16,7 +16,7 @@ type TurnstileApi = {
       "error-callback"?: () => void;
     },
   ) => TurnstileWidgetId;
-  reset: (widgetId: TurnstileWidgetId) => void;
+  reset: (widgetId?: TurnstileWidgetId) => void;
   remove: (widgetId: TurnstileWidgetId) => void;
 };
 
@@ -29,16 +29,18 @@ declare global {
 /**
  * Reusable Turnstile widget (explicit render).
  * - Renders only when NEXT_PUBLIC_TURNSTILE_SITE_KEY is set; otherwise renders nothing (dev fail-open).
- * - Caller holds the token and must reset after each submission attempt (tokens are single-use).
+ * - Caller holds the token and can trigger a reset via `resetKey` after submission attempts (tokens are single-use).
  */
 export function TurnstileWidget({
   action,
   onToken,
   onExpire,
+  resetKey,
 }: {
   action: string;
   onToken: (token: string) => void;
   onExpire?: () => void;
+  resetKey?: number | string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<TurnstileWidgetId | null>(null);
@@ -50,9 +52,7 @@ export function TurnstileWidget({
     onExpireRef.current = onExpire;
   }, [onToken, onExpire]);
 
-  if (!isTurnstileConfigured()) return null;
-
-  const render = () => {
+  const render = useCallback(() => {
     if (!containerRef.current || widgetIdRef.current !== null) return;
     if (!window.turnstile) return;
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
@@ -62,7 +62,37 @@ export function TurnstileWidget({
       "expired-callback": () => onExpireRef.current?.(),
       "error-callback": () => onExpireRef.current?.(),
     });
-  };
+  }, [action]);
+
+  // Mount/remount: if turnstile is already on window, render immediately
+  useEffect(() => {
+    if (window.turnstile && containerRef.current && widgetIdRef.current === null) {
+      render();
+    }
+    return () => {
+      if (widgetIdRef.current !== null && window.turnstile) {
+        try {
+          window.turnstile.remove(widgetIdRef.current);
+        } catch {
+          // ignore
+        }
+        widgetIdRef.current = null;
+      }
+    };
+  }, [render]);
+
+  // When resetKey changes, reset the active widget
+  useEffect(() => {
+    if (resetKey !== undefined && widgetIdRef.current !== null && window.turnstile) {
+      try {
+        window.turnstile.reset(widgetIdRef.current);
+      } catch {
+        // ignore
+      }
+    }
+  }, [resetKey]);
+
+  if (!isTurnstileConfigured()) return null;
 
   return (
     <>
@@ -77,9 +107,16 @@ export function TurnstileWidget({
 }
 
 /** Reset helper for forms that keep their own widget via TurnstileWidget. */
-export function resetTurnstile(): void {
-  // Explicit-render widget IDs are scoped inside TurnstileWidget; a full
-  // reset is done by re-render. Forms clear their token state and the widget
-  // auto-issues a fresh challenge on expiry. This is a no-op placeholder for
-  // API symmetry — token state reset lives in the form.
+export function resetTurnstile(widgetId?: TurnstileWidgetId): void {
+  if (window.turnstile) {
+    try {
+      if (widgetId) {
+        window.turnstile.reset(widgetId);
+      } else {
+        window.turnstile.reset();
+      }
+    } catch {
+      // ignore
+    }
+  }
 }

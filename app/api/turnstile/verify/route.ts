@@ -8,7 +8,7 @@ const ALLOWED_ACTIONS: Record<string, true> = { signup: true, login: true, conta
 function expectedHostnames(): Set<string> {
   const raw =
     process.env.TURNSTILE_HOSTNAMES ??
-    "turfzo.app,www.turfzo.app,turfzo-web.turfzobusiness.workers.dev";
+    "turfzo.app,www.turfzo.app,turfzo-web.turfzobusiness.workers.dev,turfzo-web-staging.turfzobusiness.workers.dev";
   return new Set(
     raw
       .split(",")

@@ -24,6 +24,7 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
   const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [turnstileToken, setTurnstileToken] = React.useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = React.useState(0);
   const turnstileEnforced = isTurnstileConfigured();
 
   // Phone sign up
@@ -61,6 +62,7 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
         const verified = await verifyTurnstileToken(turnstileToken, "signup");
         if (!verified.ok) {
           setTurnstileToken("");
+          setTurnstileResetKey((k) => k + 1);
           toast.error(verified.error ?? "Bot verification failed.");
           return;
         }
@@ -77,6 +79,7 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
       finish();
     } catch {
       setTurnstileToken("");
+      setTurnstileResetKey((k) => k + 1);
       // error set in auth context
     } finally {
       setLoading(false);
@@ -339,7 +342,12 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
             </>
           )}
           {method === "email" && turnstileEnforced && (
-            <TurnstileWidget action="signup" onToken={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+            <TurnstileWidget
+              action="signup"
+              onToken={setTurnstileToken}
+              onExpire={() => setTurnstileToken("")}
+              resetKey={turnstileResetKey}
+            />
           )}
 
           {/* Submit */}
