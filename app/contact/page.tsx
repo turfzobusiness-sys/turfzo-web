@@ -19,6 +19,9 @@ import { FaqAccordion } from "@/components/ui/faq-accordion";
 import { FAQPageSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
+import { getErrorMessage } from "@/lib/errors";
+import { TurnstileWidget } from "@/components/ui/turnstile-widget";
+import { isTurnstileConfigured } from "@/lib/turnstile";
 
 const contactFaqItems = [
   { question: "How do I contact Turfzo support?", answer: "You can reach us via email at support@turfzo.com, call us at +91 (80) 4567-8900, or use the contact form on this page. We respond within 24 hours." },
@@ -37,22 +40,31 @@ export default function ContactPage() {
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("General Inquiry");
   const [message, setMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const turnstileEnforced = isTurnstileConfigured();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
+    if (turnstileEnforced && !turnstileToken) {
+      setErrorMsg("Please complete the bot verification.");
+      setFormStep('error');
+      return;
+    }
     setFormStep('submitting');
     setErrorMsg(null);
     try {
       await convexClient.action(
         "contact:submitContact",
-        { name, email, subject, message },
+        turnstileToken
+          ? { name, email, subject, message, turnstileToken }
+          : { name, email, subject, message },
         firebaseUser ? await firebaseUser.getIdToken() : undefined
       );
+      setTurnstileToken("");
       setFormStep('submitted');
     } catch (err) {
-      const { getErrorMessage } = await import("@/lib/errors");
       setErrorMsg(getErrorMessage(err, "Failed to send message. Please try again."));
       setFormStep('error');
     }
@@ -279,6 +291,7 @@ export default function ContactPage() {
                         className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded px-4 py-3.5 text-sm text-text-main placeholder:text-text-muted focus:outline-none resize-none leading-relaxed transition-all duration-200"
                       />
                     </div>
+                    <TurnstileWidget action="contact" onToken={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
 
                     {/* Submit Button */}
                     <button

@@ -165,22 +165,22 @@ export function Header() {
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300 ease-out",
         scrolled && !open
-          ? "pt-3 sm:pt-4 px-3 sm:px-6 md:px-8 pointer-events-none bg-transparent border-transparent"
+          ? "pt-3 sm:pt-4 px-3 sm:px-6 lg:px-8 pointer-events-none bg-transparent border-transparent"
           : "pt-0 px-0 pointer-events-auto bg-bg/85 backdrop-blur-md border-b border-border-default/50"
       )}
     >
       <nav
         className={cn(
-          "w-full transition-all duration-300 ease-out flex items-center justify-between pointer-events-auto",
+          "w-full transition-all duration-300 ease-out flex items-center justify-between gap-2 flex-nowrap pointer-events-auto",
           scrolled && !open
-            ? "max-w-5xl mx-auto h-14 md:h-16 px-4 md:px-6 rounded-full bg-surface/85 dark:bg-surface/80 backdrop-blur-xl border border-border-strong/50 dark:border-border-default/80 shadow-lg shadow-black/8 dark:shadow-black/35"
-            : "max-w-7xl mx-auto h-16 md:h-20 px-5 md:px-8 rounded-none border-0 bg-transparent shadow-none",
+            ? "max-w-6xl mx-auto h-16 px-4 lg:px-5 rounded-full bg-surface/90 dark:bg-surface/85 backdrop-blur-xl backdrop-saturate-150 border border-border-strong/60 dark:border-border-default ring-1 ring-black/5 dark:ring-white/10 shadow-xl shadow-black/10 dark:shadow-black/40"
+            : "max-w-7xl mx-auto h-16 lg:h-20 px-5 lg:px-8 rounded-none border-0 bg-transparent shadow-none",
           open && "bg-bg border-b border-border-default rounded-none"
         )}
       >
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2.5 md:gap-3 select-none"
+          className="flex shrink-0 items-center gap-2.5 lg:gap-3 select-none"
           aria-label="Turfzo home"
         >
           <Image
@@ -190,14 +190,14 @@ export function Header() {
             height={44}
             className={cn(
               "transition-all duration-300",
-              scrolled && !open ? "h-8 w-8 md:h-9 md:w-9" : "h-10 w-10 md:h-11 md:w-11"
+              scrolled && !open ? "h-8 w-8 lg:h-9 lg:w-9" : "h-10 w-10 lg:h-11 lg:w-11"
             )}
             priority
           />
           <span
             className={cn(
               "font-sans font-bold text-text-main tracking-tight leading-none whitespace-nowrap transition-all duration-300",
-              scrolled && !open ? "text-lg md:text-xl" : "text-xl md:text-2xl"
+              scrolled && !open ? "text-lg lg:text-xl" : "text-xl lg:text-2xl"
             )}
           >
             turf<span className="text-brand-lime">zo</span>
@@ -205,7 +205,7 @@ export function Header() {
         </Link>
 
         {/* Desktop Nav Links */}
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex flex-nowrap overflow-hidden">
           {NAV_LINKS.map((link) => {
             const active = isActive(pathname, link.href);
             return (
@@ -214,9 +214,9 @@ export function Header() {
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex items-center justify-center font-sans font-medium rounded-full transition-all duration-200",
+                  "relative flex shrink-0 items-center justify-center whitespace-nowrap font-sans font-medium rounded-full transition-all duration-200",
                   scrolled && !open
-                    ? "h-9 px-3.5 text-xs lg:text-sm"
+                    ? "h-8 px-3 text-[13px]"
                     : "h-11 px-4 text-sm",
                   active
                     ? "text-text-main bg-elevated font-semibold shadow-2xs"
@@ -232,9 +232,9 @@ export function Header() {
               href="/tournaments/manage"
               aria-current={isActive(pathname, "/tournaments/manage") ? "page" : undefined}
               className={cn(
-                "relative flex items-center justify-center font-sans font-medium rounded-full transition-all duration-200",
+                "relative flex shrink-0 items-center justify-center whitespace-nowrap font-sans font-medium rounded-full transition-all duration-200",
                 scrolled && !open
-                  ? "h-9 px-3.5 text-xs lg:text-sm"
+                  ? "h-8 px-3 text-[13px]"
                   : "h-11 px-4 text-sm",
                 isActive(pathname, "/tournaments/manage")
                   ? "text-text-main bg-elevated font-semibold shadow-2xs"
@@ -247,11 +247,12 @@ export function Header() {
         </div>
 
         {/* Desktop Actions */}
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden shrink-0 items-center gap-1.5 lg:flex">
           <HeaderThemeButton
+            showLabel={!scrolled}
             className={cn(
               "rounded-full transition-all duration-200",
-              scrolled && !open ? "h-9 px-3 text-xs" : "h-11 px-3.5 text-xs"
+              scrolled && !open ? "h-8 w-8 p-0" : "h-11 px-3.5 text-xs"
             )}
           />
           {isAuthed ? (
@@ -259,20 +260,20 @@ export function Header() {
               <HeaderNotificationsButton
                 className={cn(
                   "rounded-full transition-all duration-200",
-                  scrolled && !open ? "h-9 w-9" : "h-11 w-11"
+                  scrolled && !open ? "h-8 w-8" : "h-11 w-11"
                 )}
               />
               <Link
                 href="/profile"
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "rounded-full transition-all duration-200 gap-2",
+                  "rounded-full transition-all duration-200 gap-2 shrink-0 whitespace-nowrap",
                   scrolled && !open
-                    ? "h-9 px-3.5 text-xs md:text-sm"
+                    ? "h-8 px-3 text-[13px]"
                     : "h-11 px-5 text-sm"
                 )}
               >
-                <UserIcon className={cn(scrolled && !open ? "size-4" : "size-4.5")} />
+                <UserIcon className={cn(scrolled && !open ? "size-3.5" : "size-4.5")} />
                 <span className="max-w-[120px] truncate">
                   {((convexUser?.display_name && convexUser.display_name.trim() !== "")
                     ? convexUser.display_name
@@ -290,11 +291,11 @@ export function Header() {
                 aria-label="Sign out"
                 title="Sign out"
                 className={cn(
-                  "rounded-full transition-all duration-200",
-                  scrolled && !open ? "h-9 w-9" : "h-11 w-11"
+                  "rounded-full transition-all duration-200 shrink-0",
+                  scrolled && !open ? "h-8 w-8" : "h-11 w-11"
                 )}
               >
-                <LogOut className={cn(scrolled && !open ? "size-4" : "size-4.5")} />
+                <LogOut className={cn(scrolled && !open ? "size-3.5" : "size-4.5")} />
               </Button>
             </>
           ) : (
@@ -304,9 +305,9 @@ export function Header() {
                 onClick={handleSignInClick}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "rounded-full transition-all duration-200 cursor-pointer",
+                  "rounded-full transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap",
                   scrolled && !open
-                    ? "h-9 px-4 text-xs md:text-sm"
+                    ? "h-8 px-3.5 text-[13px]"
                     : "h-11 px-5 text-sm"
                 )}
               >
@@ -317,9 +318,9 @@ export function Header() {
                 onClick={handleSignUpClick}
                 className={cn(
                   buttonVariants({ variant: "default" }),
-                  "rounded-full transition-all duration-200 cursor-pointer font-semibold",
+                  "rounded-full transition-all duration-200 cursor-pointer font-semibold shrink-0 whitespace-nowrap",
                   scrolled && !open
-                    ? "h-9 px-4 md:px-5 text-xs md:text-sm"
+                    ? "h-8 px-3.5 text-[13px]"
                     : "h-11 px-6 text-sm"
                 )}
               >
@@ -330,7 +331,7 @@ export function Header() {
         </div>
 
         {/* Mobile Actions */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <HeaderThemeButton
             className={cn(
               "rounded-full transition-all duration-200",
@@ -349,8 +350,7 @@ export function Header() {
             variant="outline"
             onClick={() => setOpen((v) => !v)}
             className={cn(
-              "md:hidden rounded-full transition-all duration-200",
-              scrolled && !open ? "h-9 w-9" : "h-10 w-10"
+              "rounded-full transition-all duration-200",
             )}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
@@ -362,7 +362,7 @@ export function Header() {
 
       <div
         className={cn(
-          "bg-bg/98 fixed inset-x-0 top-16 bottom-0 z-50 flex flex-col overflow-hidden border-y border-border-default md:hidden",
+          "bg-bg/98 fixed inset-x-0 top-16 bottom-0 z-50 flex flex-col overflow-hidden border-y border-border-default lg:hidden",
           open ? "block" : "hidden"
         )}
       >

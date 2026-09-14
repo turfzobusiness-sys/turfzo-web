@@ -8,7 +8,8 @@ import { useAuthModal } from "@/lib/auth-modal-context";
 import { safeRedirectTarget } from "@/lib/redirect";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
+import { TurnstileWidget } from "@/components/ui/turnstile-widget";
+import { isTurnstileConfigured, verifyTurnstileToken } from "@/lib/turnstile";
 type SignUpMethod = "email" | "phone";
 
 export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?: string }) {
@@ -22,6 +23,8 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [turnstileToken, setTurnstileToken] = React.useState("");
+  const turnstileEnforced = isTurnstileConfigured();
 
   // Phone sign up
   const [step, setStep] = React.useState<"phone" | "otp">("phone");
@@ -48,14 +51,26 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
       );
       return;
     }
+    if (turnstileEnforced && !turnstileToken) {
+      toast.error("Please complete the bot verification.");
+      return;
+    }
     setLoading(true);
     try {
+      if (turnstileEnforced) {
+        const verified = await verifyTurnstileToken(turnstileToken, "signup");
+        if (!verified.ok) {
+          toast.error(verified.error ?? "Bot verification failed.");
+          return;
+        }
+      }
       await signUp({
         email,
         password,
         role: role ?? "player",
         displayName: name,
       });
+      setTurnstileToken("");
       onSuccess?.();
       toast.success("Account created successfully!");
       finish();
@@ -320,6 +335,9 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
                 </button>
               </div>
             </>
+          )}
+          {method === "email" && turnstileEnforced && (
+            <TurnstileWidget action="signup" onToken={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
           )}
 
           {/* Submit */}

@@ -9,7 +9,8 @@ import { auth, setPersistence, browserLocalPersistence, browserSessionPersistenc
 import { safeRedirectTarget } from "@/lib/redirect";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
+import { TurnstileWidget } from "@/components/ui/turnstile-widget";
+import { isTurnstileConfigured, verifyTurnstileToken } from "@/lib/turnstile";
 export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const { signIn, signInWithGoogle, error } = useAuth();
   const { closeAuthModal, returnTo } = useAuthModal();
@@ -20,6 +21,8 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const [showPassword, setShowPassword] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [turnstileToken, setTurnstileToken] = React.useState("");
+  const turnstileEnforced = isTurnstileConfigured();
 
   const handlePostAuth = () => {
     onSuccess?.();
@@ -37,8 +40,19 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
+    if (turnstileEnforced && !turnstileToken) {
+      toast.error("Please complete the bot verification.");
+      return;
+    }
     setLoading(true);
     try {
+      if (turnstileEnforced) {
+        const verified = await verifyTurnstileToken(turnstileToken, "login");
+        if (!verified.ok) {
+          toast.error(verified.error ?? "Bot verification failed.");
+          return;
+        }
+      }
       // W10: "Remember me" now actually controls Firebase persistence —
       // unchecked means the session dies with the browser tab.
       await setPersistence(
@@ -46,6 +60,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
         rememberMe ? browserLocalPersistence : browserSessionPersistence,
       );
       await signIn(email, password);
+      setTurnstileToken("");
       handlePostAuth();
     } catch {
       // error set in auth context
@@ -144,6 +159,9 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
           Forgot password?
         </button>
       </div>
+      {turnstileEnforced && (
+        <TurnstileWidget action="login" onToken={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
+      )}
 
       {/* Submit */}
       <button

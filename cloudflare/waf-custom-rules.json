@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developers.cloudflare.com/waf/custom-rules/",
+  "zone": "turfzo.app",
+  "phase": "http_request_firewall_custom",
+  "notes": "Free plan: max 5 custom rules. No regex. Managed Challenge preferred over Block for false-positive safety, except probing/scanners.",
+  "rules": [
+    {
+      "ref": "turfzo-challenge-bots-auth-contact",
+      "description": "Challenge likely bots on signup/login/contact/owner-register",
+      "expression": "(http.request.uri.path in {\"/contact\" \"/auth/login\" \"/auth/signup\" \"/owners/register\" \"/auth/verify-phone\"}) and (cf.bot_management.score lt 30)",
+      "action": "managed_challenge"
+    },
+    {
+      "ref": "turfzo-challenge-admin",
+      "description": "Challenge all /admin traffic (admin UI is Convex-authenticated, edge challenge is defense in depth)",
+      "expression": "starts_with(http.request.uri.path, \"/admin\")",
+      "action": "managed_challenge"
+    },
+    {
+      "ref": "turfzo-block-probing",
+      "description": "Block config/scanner probing",
+      "expression": "(http.request.uri.path contains \".env\") or (http.request.uri.path contains \".git\") or (http.request.uri.path contains \"wp-admin\") or (http.request.uri.path contains \"phpmyadmin\") or (http.request.uri.path contains \".php\")",
+      "action": "block"
+    },
+    {
+      "ref": "turfzo-block-bad-ua",
+      "description": "Block known scanner user-agents",
+      "expression": "(http.user_agent contains \"sqlmap\") or (http.user_agent contains \"nikto\") or (http.user_agent contains \"masscan\") or (http.user_agent contains \"nmap\") or (http.user_agent contains \"acunetix\")",
+      "action": "block"
+    },
+    {
+      "ref": "turfzo-challenge-api-abuse",
+      "description": "Challenge high-threat requests to Next API routes (Turnstile verify, future server routes)",
+      "expression": "(starts_with(http.request.uri.path, \"/api/\")) and (cf.threat_score gt 30)",
+      "action": "managed_challenge"
+    }
+  ]
+}
