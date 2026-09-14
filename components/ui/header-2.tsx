@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { LogOut, User as UserIcon, Sun, Moon, Bell } from "lucide-react";
-import { toast } from "sonner";
 import { convexClient } from "@/lib/convex";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { MenuToggleIcon } from "@/components/ui/menu-toggle-icon";

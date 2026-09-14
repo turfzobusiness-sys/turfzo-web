@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { getTurnstileSiteKey, isTurnstileConfigured } from "@/lib/turnstile";
 
 type TurnstileWidgetId = string;
@@ -43,9 +43,12 @@ export function TurnstileWidget({
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<TurnstileWidgetId | null>(null);
   const onTokenRef = useRef(onToken);
-  onTokenRef.current = onToken;
   const onExpireRef = useRef(onExpire);
-  onExpireRef.current = onExpire;
+
+  useEffect(() => {
+    onTokenRef.current = onToken;
+    onExpireRef.current = onExpire;
+  }, [onToken, onExpire]);
 
   if (!isTurnstileConfigured()) return null;
 
