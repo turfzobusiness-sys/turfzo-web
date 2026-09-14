@@ -22,7 +22,7 @@ wrangler turnstile widget create "turfzo-web" \
 
 ```bash
 # Local (website)
-printf 'NEXT_PUBLIC_TURNSTILE_SITE_KEY=<sitekey>\nTURNSTILE_SECRET_KEY=<secret>\nTURNSTILE_HOSTNAMES=turfzo.app,www.turfzo.app,turfzo-web.turfzobusiness.workers.dev\n' >> turfzo_website/turfzo/.env.local
+printf 'NEXT_PUBLIC_TURNSTILE_SITE_KEY=<sitekey>\nTURNSTILE_SECRET_KEY=<secret>\nTURNSTILE_HOSTNAMES=localhost,127.0.0.1,turfzo.app,www.turfzo.app,turfzo-web.turfzobusiness.workers.dev\n' >> turfzo_website/turfzo/.env.local
 
 # Convex backend (enforces contact:submitContact when set, fail-open in dev)
 npx convex env set TURNSTILE_SECRET_KEY '<secret>'   # run in turfzo-backend/
@@ -41,7 +41,7 @@ GitHub Actions secrets: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (+ staging variant). Wo
 - `/contact` without solving → "Please complete the bot verification."
 - `/contact` with token → Convex `contact:submitContact` succeeds (fails closed in prod when secret set).
 - Signup/login email flows call `POST /api/turnstile/verify` with `action=signup|login` before Firebase. Replay of a token → 403.
-- Staging hostnames: add `turfzo-web-staging.workers.dev` to widget domains + `TURNSTILE_HOSTNAMES` if staging verify 403s on hostname.
+- Staging hostnames: add `turfzo-web-staging.turfzobusiness.workers.dev` to widget domains + `TURNSTILE_HOSTNAMES` if staging verify 403s on hostname.
 
 ## Notes
 

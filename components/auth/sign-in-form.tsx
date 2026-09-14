@@ -49,6 +49,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
       if (turnstileEnforced) {
         const verified = await verifyTurnstileToken(turnstileToken, "login");
         if (!verified.ok) {
+          setTurnstileToken("");
           toast.error(verified.error ?? "Bot verification failed.");
           return;
         }
@@ -63,6 +64,7 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
       setTurnstileToken("");
       handlePostAuth();
     } catch {
+      setTurnstileToken("");
       // error set in auth context
     } finally {
       setLoading(false);

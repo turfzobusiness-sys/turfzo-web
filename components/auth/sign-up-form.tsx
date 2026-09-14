@@ -60,6 +60,7 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
       if (turnstileEnforced) {
         const verified = await verifyTurnstileToken(turnstileToken, "signup");
         if (!verified.ok) {
+          setTurnstileToken("");
           toast.error(verified.error ?? "Bot verification failed.");
           return;
         }
@@ -75,6 +76,7 @@ export function SignUpForm({ onSuccess, role }: { onSuccess?: () => void; role?:
       toast.success("Account created successfully!");
       finish();
     } catch {
+      setTurnstileToken("");
       // error set in auth context
     } finally {
       setLoading(false);
