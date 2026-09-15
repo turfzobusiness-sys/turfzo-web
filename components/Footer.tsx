@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { Mail, Phone, MapPin, ArrowRight, Check } from "lucide-react";
 
@@ -60,9 +61,8 @@ export default function Footer() {
 
   const supportLinks = [
     { name: "List Your Turf", href: "/owners" },
-    { name: "Help Center", href: "/contact" },
+    { name: "Contact", href: "/contact" },
     { name: "Refund Policy", href: "/refund-policy" },
-    { name: "Contact Support", href: "/contact" },
   ];
 
   return (
@@ -76,7 +76,7 @@ export default function Footer() {
           
           {/* Brand Info & Newsletter (Lg: 4 columns) */}
           <div className="lg:col-span-4 flex flex-col gap-6">
-            <a href="#home" className="flex items-center gap-2 w-fit group">
+            <Link href="/" className="flex items-center gap-2 w-fit group" aria-label="Turfzo home">
               <Image
                 src="/turfzo_mascot.svg"
                 alt="Turfzo Logo"
@@ -87,7 +87,7 @@ export default function Footer() {
               <span className="font-sans font-semibold text-xl text-text-main tracking-tight">
                 turf<span className="text-brand-lime">zo</span>
               </span>
-            </a>
+            </Link>
             <p className="text-text-muted text-sm font-sans leading-relaxed max-w-sm">
               Book football turfs, cricket grounds, and badminton courts instantly.
             </p>

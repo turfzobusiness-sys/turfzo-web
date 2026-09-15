@@ -274,10 +274,10 @@ export default function ContactPage() {
                           onChange={(e) => setSubject(e.target.value)}
                           className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 text-sm text-text-main pl-10 pr-10 py-3.5 rounded font-semibold focus:outline-none appearance-none cursor-pointer transition-all duration-200"
                         >
-                          <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">General Inquiry</option>
-                          <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">Booking Issue</option>
-                          <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">List a Venue (Turf Owner)</option>
-                          <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">Tournament Inquiry</option>
+                          <option className="bg-surface text-text-main">General Inquiry</option>
+                          <option className="bg-surface text-text-main">Booking Issue</option>
+                          <option className="bg-surface text-text-main">List a Venue (Turf Owner)</option>
+                          <option className="bg-surface text-text-main">Tournament Inquiry</option>
                         </select>
                         <ChevronDown className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted" />
                       </div>

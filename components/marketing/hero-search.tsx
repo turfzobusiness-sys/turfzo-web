@@ -70,7 +70,7 @@ export default function HeroSearch() {
         </button>
 
         {openDropdown === "city" && (
-          <div className="absolute top-[calc(100%+6px)] left-0 z-50 w-full min-w-[200px] bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
+          <div className="absolute top-[calc(100%+6px)] left-0 z-30 w-full min-w-[200px] bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
             <button
               type="button"
               onClick={() => {
@@ -144,7 +144,7 @@ export default function HeroSearch() {
         </button>
 
         {openDropdown === "sport" && (
-          <div className="absolute top-[calc(100%+6px)] left-0 z-50 w-full min-w-[180px] bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
+          <div className="absolute top-[calc(100%+6px)] left-0 z-30 w-full min-w-[180px] bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
             <button
               type="button"
               onClick={() => {

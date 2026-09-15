@@ -154,7 +154,7 @@ export default function Hero() {
                 </button>
 
                 {openDropdown === "sport" && (
-                  <div className="absolute top-[calc(100%+8px)] left-0 z-50 w-72 bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
+                  <div className="absolute top-[calc(100%+8px)] left-0 z-30 w-72 bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
                     <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-muted border-b border-border-subtle mb-1">
                       Select Sport
                     </div>
@@ -213,7 +213,7 @@ export default function Hero() {
                 </button>
 
                 {openDropdown === "city" && (
-                  <div className="absolute top-[calc(100%+8px)] left-0 sm:left-1/2 sm:-translate-x-1/2 z-50 w-72 bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
+                  <div className="absolute top-[calc(100%+8px)] left-0 sm:left-1/2 sm:-translate-x-1/2 z-30 w-72 bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
                     <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-muted border-b border-border-subtle mb-1">
                       Choose City
                     </div>
@@ -272,7 +272,7 @@ export default function Hero() {
                 </button>
 
                 {openDropdown === "date" && (
-                  <div className="absolute top-[calc(100%+8px)] right-0 z-50 w-64 bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
+                  <div className="absolute top-[calc(100%+8px)] right-0 z-30 w-64 bg-surface border border-border-default rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95">
                     <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-text-muted border-b border-border-subtle mb-1">
                       Choose Time Window
                     </div>
