@@ -20,11 +20,13 @@ import {
   Heart,
   CreditCard,
   Bell,
+  BellRing,
   Shield,
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/lib/auth-context";
+import { enableWebPush, isWebPushSupported, wasWebPushEnabled } from "@/lib/push";
 import { convexClient } from "@/lib/convex";
 import { toast } from "sonner";
 import type {
@@ -90,6 +92,40 @@ export default function ProfilePage() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
   const [accountActionLoading, setAccountActionLoading] = useState(false);
+  const [pushSupported, setPushSupported] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const supported = await isWebPushSupported();
+      if (!cancelled) {
+        setPushSupported(supported);
+        setPushEnabled(wasWebPushEnabled());
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleEnablePush = async () => {
+    setPushBusy(true);
+    try {
+      await enableWebPush();
+      setPushEnabled(true);
+      toast.success("Push notifications enabled", {
+        description: "You'll get booking reminders and match updates on this device.",
+      });
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Couldn't enable push notifications.",
+      );
+    } finally {
+      setPushBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -539,7 +575,7 @@ export default function ProfilePage() {
                         value={f.value}
                         onChange={(e) => f.setter(e.target.value)}
                         placeholder={f.placeholder}
-                        className="w-full bg-elevated border-none rounded-lg px-4 py-3 text-sm text-text-main placeholder:text-text-muted/40 focus:outline-none focus:ring-1 focus:ring-border-strong transition-all"
+                        className="w-full bg-elevated border-none rounded-lg px-4 py-3 text-sm text-text-main placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-border-strong transition-all"
                       />
                     </div>
                   ))}
@@ -634,7 +670,7 @@ export default function ProfilePage() {
                     ) : bookings.length === 0 ? (
                       <div className="py-16 flex flex-col items-center text-center">
                         <div className="w-16 h-16 rounded-full bg-elevated flex items-center justify-center mb-5">
-                          <Ticket className="w-8 h-8 text-text-muted/40" />
+                          <Ticket className="w-8 h-8 text-text-secondary stroke-[1.75]" />
                         </div>
                         <h3 className="font-bold text-text-main text-lg mb-2">
                           No bookings yet
@@ -806,7 +842,7 @@ export default function ProfilePage() {
                   ) : reviews.length === 0 ? (
                     <div className="bg-surface/50 border border-border-default rounded-lg p-8 sm:p-12 text-center flex flex-col items-center">
                       <div className="w-16 h-16 rounded-full bg-elevated flex items-center justify-center mb-6">
-                        <MessageSquare className="w-8 h-8 text-text-muted/40" />
+                        <MessageSquare className="w-8 h-8 text-text-secondary stroke-[1.75]" />
                       </div>
                       <h3 className="font-bold text-text-main text-lg mb-2">
                         No reviews written yet
@@ -889,7 +925,7 @@ export default function ProfilePage() {
                   ) : favorites.length === 0 ? (
                     <div className="bg-surface/50 border border-border-default rounded-lg p-8 sm:p-12 text-center flex flex-col items-center">
                       <div className="w-16 h-16 rounded-full bg-elevated flex items-center justify-center mb-6">
-                        <Heart className="w-8 h-8 text-text-muted/40" />
+                        <Heart className="w-8 h-8 text-text-secondary stroke-[1.75]" />
                       </div>
                       <h3 className="font-bold text-text-main text-lg mb-2">
                         Your Favourites list is empty
@@ -928,7 +964,7 @@ export default function ProfilePage() {
                                 />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
-                                  <Heart className="w-8 h-8 text-text-muted/30" />
+                                  <Heart className="w-8 h-8 text-text-secondary stroke-[1.75]" />
                                 </div>
                               )}
                             </Link>
@@ -995,7 +1031,7 @@ export default function ProfilePage() {
                   ) : payments.length === 0 ? (
                     <div className="bg-surface/50 border border-border-default rounded-lg p-8 sm:p-12 text-center flex flex-col items-center">
                       <div className="w-16 h-16 rounded-full bg-elevated flex items-center justify-center mb-6">
-                        <CreditCard className="w-8 h-8 text-text-muted/40" />
+                        <CreditCard className="w-8 h-8 text-text-secondary stroke-[1.75]" />
                       </div>
                       <h3 className="font-bold text-text-main text-lg mb-2">
                         No payments yet
@@ -1053,7 +1089,7 @@ export default function ProfilePage() {
                                     minute: "2-digit",
                                   })}
                                 </p>
-                                <p className="text-[10px] text-text-muted/70 mt-0.5">
+                                <p className="text-xs text-text-muted mt-0.5">
                                   Order #{p.receipt}
                                 </p>
                               </div>
@@ -1119,6 +1155,33 @@ export default function ProfilePage() {
                       </button>
                     )}
                   </div>
+
+                  {pushSupported && !pushEnabled && (
+                    <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-border-default bg-surface">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-elevated border border-border-subtle flex items-center justify-center shrink-0">
+                          <BellRing className="w-5 h-5 text-brand-lime" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-text-main">
+                            Enable Browser Notifications
+                          </h4>
+                          <p className="text-xs text-text-muted">
+                            Get real-time booking reminders and slot updates on this device.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleEnablePush}
+                        disabled={pushBusy}
+                        className="shrink-0 px-4 py-2 rounded-lg bg-brand-lime text-black font-semibold text-xs hover:bg-brand-lime/90 transition-all disabled:opacity-50 cursor-pointer"
+                      >
+                        {pushBusy ? "Enabling…" : "Turn On"}
+                      </button>
+                    </div>
+                  )}
+
                   {loadingNotifications ? (
                     <div className="py-12 flex flex-col items-center gap-4">
                       <Loader2 className="w-6 h-6 text-text-muted animate-spin" />
@@ -1127,7 +1190,7 @@ export default function ProfilePage() {
                   ) : notifications.length === 0 ? (
                     <div className="bg-surface/50 border border-border-default rounded-lg p-8 sm:p-12 text-center flex flex-col items-center">
                       <div className="w-16 h-16 rounded-full bg-elevated flex items-center justify-center mb-6">
-                        <Bell className="w-8 h-8 text-text-muted/40" />
+                        <Bell className="w-8 h-8 text-text-secondary stroke-[1.75]" />
                       </div>
                       <h3 className="font-bold text-text-main text-lg mb-2">
                         You&apos;re all caught up
@@ -1150,7 +1213,7 @@ export default function ProfilePage() {
                         >
                           <div
                             className={`mt-1 w-2 h-2 rounded-full shrink-0 ${
-                              n.is_read ? "bg-text-muted/30" : "bg-brand-lime"
+                              n.is_read ? "bg-text-muted/50" : "bg-brand-lime"
                             }`}
                           />
                           <div className="flex-grow min-w-0">
@@ -1171,7 +1234,7 @@ export default function ProfilePage() {
                               {n.body}
                             </p>
                             {n.created_at && (
-                              <p className="text-[10px] text-text-muted/70 mt-2">
+                              <p className="text-xs text-text-muted mt-2">
                                 {new Date(n.created_at).toLocaleString("en-IN", {
                                   day: "numeric",
                                   month: "short",

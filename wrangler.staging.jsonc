@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Staging mirror of wrangler.jsonc — separate worker name (turfzo-web-staging)
+  // so main pushes auto-deploying staging never touch the production routes
+  // (turfzo.app/*, www.turfzo.app/*) which live only in wrangler.jsonc
+  // used by deploy-production.yml.
+  "main": ".open-next/worker.js",
+  "name": "turfzo-web-staging",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": [
+    // Required for Next.js on Workers (Node.js APIs used by the adapter)
+    "nodejs_compat",
+    // Allow fetch() to same-origin / public URLs
+    "global_fetch_strictly_public"
+  ],
+  "account_id": "3f24b8f35b25e0943b29f0035403f694",
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "turfzo-web-staging"
+    }
+  ],
+  "images": {
+    "binding": "IMAGES"
+  }
+}

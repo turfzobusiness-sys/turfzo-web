@@ -143,7 +143,7 @@ export default function PhoneMockup() {
               <div className="relative mx-3 h-[170px] rounded-[14px] overflow-hidden">
                 <div
                   className="absolute inset-0 bg-cover bg-center scale-[1.05]"
-                  style={{ backgroundImage: `url('/stadium_turf_bg.webp')` }}
+                  style={{ backgroundImage: `url('/images/marketing/explore/football-card.webp')` }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10" />
 

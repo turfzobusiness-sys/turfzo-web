@@ -1,40 +1,46 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export default function CTABanner() {
   return (
-    <section id="tournaments" className="relative py-20 px-6 md:px-8 bg-bg overflow-hidden">
-      {/* Outer container to hold the content */}
-      <div className="max-w-7xl mx-auto relative rounded-xl overflow-hidden border border-border-default bg-surface min-h-[380px] flex items-center justify-center">
-        
+    <section className="relative py-20 px-6 md:px-8 bg-bg overflow-hidden border-t border-border-default">
+      <div className="max-w-7xl mx-auto relative rounded-xl overflow-hidden border border-border-default min-h-[360px] sm:min-h-[420px] flex items-center justify-center">
+        {/* 21:9 Floodlit Turf Background Image */}
+        <Image
+          src="/images/marketing/home/cta-floodlit-turf.webp"
+          alt="Wide floodlit sports turf at twilight"
+          fill
+          sizes="(max-width: 1280px) 100vw, 1280px"
+          className="object-cover object-bottom"
+        />
+
+        {/* Balanced Atmospheric Contrast Overlay — preserves the luminous green pitch, floodlights, and active players */}
+        <div className="absolute inset-0 bg-black/50 z-10" />
+
         {/* Content Centered Container */}
-        <div className="relative z-10 w-full max-w-3xl mx-auto text-center flex flex-col items-center justify-center p-8 sm:p-12">
-          <span className="text-xs sm:text-sm font-sans font-medium tracking-wide uppercase mb-4 text-brand-lime">
+        <div className="relative z-20 w-full max-w-2xl mx-auto text-center flex flex-col items-center justify-center p-8 sm:p-12">
+          <span className="text-xs font-semibold tracking-wider uppercase mb-3 text-white/80">
             Ready to play?
           </span>
-          <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main leading-tight tracking-tight">
+          <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight">
             Your next game is one tap away
           </h2>
-          <p className="mt-4 text-sm sm:text-base text-text-muted max-w-md font-sans leading-relaxed">
-            Pick a turf, pick a time. We&apos;ll handle the rest.
+          <p className="mt-4 text-sm sm:text-base text-white/90 max-w-lg font-sans leading-relaxed">
+            Pick a turf, choose your time slot, and lock in your booking with zero hassle.
           </p>
 
-          {/* CTAs */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
-            <a 
-              href="#explore"
-              className="bg-brand-btn-bg border border-brand-lime/30 text-white hover:bg-brand-btn-bg-hover hover:border-brand-lime/60 font-sans font-medium px-6 py-3 rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 shadow-sm"
+          {/* Single Focused CTA */}
+          <div className="mt-8 flex justify-center w-full">
+            <Link
+              href="/explore"
+              className="inline-flex items-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold px-8 py-3.5 rounded-xl transition-all duration-200 text-sm sm:text-base shadow-md cursor-pointer"
             >
-              Book Now
-              <ArrowUpRight className="w-4 h-4 stroke-[1.5]" />
-            </a>
-            <a 
-              href="#explore"
-              className="bg-bg border border-border-default text-text-main hover:bg-elevated hover:border-border-strong font-sans font-medium px-6 py-3 rounded-md transition-all duration-200 flex items-center justify-center"
-            >
-              Explore Turfs
-            </a>
+              Find a Turf
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </div>

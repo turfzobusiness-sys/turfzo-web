@@ -1,12 +1,12 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 
+// Server component: metadata (incl. canonical) comes from app/blog/layout.tsx
+// via the Next metadata API. Slugs here must stay in sync with
+// app/blog/[slug]/page.tsx generateStaticParams and app/sitemap.ts.
 const blogPosts = [
   {
     slug: "book-football-turf-instantly",
@@ -63,14 +63,6 @@ const blogPosts = [
 export default function BlogIndex() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>Turfzo Blog | Turf Booking Tips, Guides & City Guides</title>
-        <meta
-          name="description"
-          content="Expert guides on turf booking, football turf prices, city guides, and sports venue comparisons. Learn how to book the best turfs in India."
-        />
-        <link rel="canonical" href="https://turfzo.app/blog" />
-      </head>
       <Header />
 
       <main className="flex-grow pt-24 pb-16">
@@ -87,13 +79,8 @@ export default function BlogIndex() {
 
           {/* Blog Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {blogPosts.map((post, idx) => (
-              <motion.div
-                key={post.slug}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-              >
+            {blogPosts.map((post) => (
+              <div key={post.slug}>
                 <Link
                   href={`/blog/${post.slug}`}
                   className="group block bg-surface border border-border-default hover:border-brand-lime/10 rounded-md overflow-hidden transition-all duration-300 hover:shadow-card-shadow"
@@ -131,7 +118,7 @@ export default function BlogIndex() {
                     </div>
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

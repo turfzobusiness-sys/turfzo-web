@@ -230,7 +230,7 @@ export default function TurfBookingPriceIndia() {
           <div className="bg-brand-lime/10 border border-brand-lime/20 rounded-md p-6 mb-12 text-center">
             <h3 className="font-sans font-bold text-lg text-text-main mb-2">Compare Prices & Book</h3>
             <p className="text-xs text-text-muted font-sans mb-4">Browse real-time pricing for turfs in your city</p>
-            <Link href="/explore" className="inline-flex items-center gap-2 bg-brand-lime text-black font-sans font-bold text-sm py-3 px-8 rounded-md hover:bg-brand-lime-hover transition-all">
+            <Link href="/explore" className="inline-flex items-center gap-2 bg-brand-lime text-white dark:text-black font-sans font-bold text-sm py-3 px-8 rounded-md hover:bg-brand-lime-hover transition-all">
               Explore Turfs <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

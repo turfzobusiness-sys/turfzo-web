@@ -20,10 +20,12 @@ export function initDatadog() {
       site: site,
       service: service,
       env: env,
-      sessionSampleRate: 100, // capture 100% of sessions
-      // Full replay on every session costs continuous MutationObserver CPU
-      // on user devices and Datadog quota. 15% is plenty for debugging.
-      sessionReplaySampleRate: 15,
+      // Prod sampling: 20% of sessions keeps trend/error visibility while
+      // cutting RUM event + session-replay quota/CPU vs 100%.
+      sessionSampleRate: 20,
+      // Replay is the expensive part (continuous MutationObserver on user
+      // devices + quota). 5% of sampled sessions is plenty for debugging.
+      sessionReplaySampleRate: 5,
       trackResources: true, // Enable Resource tracking
       trackUserInteractions: true, // Enable Action tracking
       trackLongTasks: true, // Enable Long Tasks tracking

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { MapPin, Star, ChevronRight, Trophy, CheckCircle2 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { FAQPageSchema, BreadcrumbListSchema, SportsActivityLocationSchema } from "@/lib/schema";
+import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
 
 const CITY_DATA: Record<string, { name: string; state: string; venues: string; avgPrice: string; highlights: string[] }> = {
   bangalore: { name: "Bangalore", state: "Karnataka", venues: "20+", avgPrice: "₹1,100/hr", highlights: ["HSR Layout", "Koramangala", "Indiranagar", "Whitefield", "Marathahalli"] },
@@ -15,6 +15,7 @@ const CITY_DATA: Record<string, { name: string; state: string; venues: string; a
   chennai: { name: "Chennai", state: "Tamil Nadu", venues: "8+", avgPrice: "₹950/hr", highlights: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "OMR"] },
   kolkata: { name: "Kolkata", state: "West Bengal", venues: "6+", avgPrice: "₹900/hr", highlights: ["Salt Lake", "Park Street", "Ballygunge", "New Town", "Howrah"] },
   ahmedabad: { name: "Ahmedabad", state: "Gujarat", venues: "5+", avgPrice: "₹850/hr", highlights: ["Satellite", "Bodakdev", "Vastrapur", "SG Highway", "Prahlad Nagar"] },
+  aurangabad: { name: "Aurangabad", state: "Maharashtra", venues: "5+", avgPrice: "₹900/hr", highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"] },
 };
 
 const CITY_FAQS = [
@@ -36,6 +37,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: `Book football turfs, cricket grounds, and sports venues in ${data.name} starting at ${data.avgPrice}. ${data.venues} verified turfs across ${data.highlights.slice(0, 3).join(", ")} and more. Real-time availability, secure payment, instant confirmation.`,
     keywords: [`turf booking ${data.name}`, `football turf ${data.name}`, `cricket ground ${data.name}`, `book turf ${data.name}`, `${data.name} sports venue`],
     alternates: { canonical: `https://turfzo.app/cities/${city}` },
+    openGraph: {
+      title: `Book Turfs in ${data.name} | Turfzo`,
+      description: `${data.venues} verified turfs in ${data.name}. Book instantly with real-time availability.`,
+      url: `https://turfzo.app/cities/${city}`,
+      type: "website",
+    },
   };
 }
 
@@ -55,52 +62,39 @@ export default async function CityPage({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <link rel="canonical" href={`https://turfzo.app/cities/${city}`} />
-        <meta property="og:title" content={`Book Turfs in ${data.name} | Turfzo`} />
-        <meta property="og:description" content={`${data.venues} verified turfs in ${data.name}. Book instantly with real-time availability.`} />
-        <meta property="og:url" content={`https://turfzo.app/cities/${city}`} />
-      </head>
+      {/* Canonical + OG come from generateMetadata above (Next metadata API).
+          No invented-venue JSON-LD here: only Breadcrumb + FAQ schemas built
+          from real page data. No hardcoded postal codes. */}
       <BreadcrumbListSchema items={[
         { name: "Home", url: "https://turfzo.app" },
         { name: "Explore", url: "https://turfzo.app/explore" },
         { name: data.name, url: `https://turfzo.app/cities/${city}` },
       ]} />
       <FAQPageSchema items={faqs} />
-      <SportsActivityLocationSchema
-        name={`Turfzo ${data.name} - Premium Turf Booking`}
-        description={`Online booking for football turfs, cricket grounds, and sports venues across ${data.name}.`}
-        address={{ streetAddress: data.highlights[0], addressLocality: data.name, addressRegion: data.state, postalCode: "560001" }}
-        sportType="Football"
-        pricePerHour={parseInt(data.avgPrice.replace(/[^\d]/g, "")) || 1000}
-        image="/stadium_turf_bg.webp"
-        openingHours="Mo-Su 06:00-23:00"
-      />
       <Header />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8 w-full">
-          <div className="relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow p-8 sm:p-12 mb-12 min-h-[280px] flex flex-col justify-end">
-            <div className="absolute inset-0 bg-cover bg-center z-0 opacity-40" style={{ backgroundImage: `url('/stadium_turf_bg.webp')` }} />
-            
-            
+          <div className="relative rounded-xl overflow-hidden border border-border-default shadow-sm p-8 sm:p-12 mb-12 min-h-[280px] flex flex-col justify-end">
+            <div className="absolute inset-0 bg-cover bg-center z-0 opacity-20 dark:opacity-40" style={{ backgroundImage: `url('/images/marketing/home/hero-turf-evening.webp')` }} />
+            <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/95 to-bg/70 z-[1]" />
 
             <div className="relative z-10 text-left">
               <nav className="flex items-center gap-1.5 text-xs text-text-muted font-sans mb-4">
-                <Link href="/" className="hover:text-brand-lime">Home</Link>
+                <Link href="/" className="hover:text-text-main">Home</Link>
                 <ChevronRight className="w-3 h-3" />
-                <Link href="/explore" className="hover:text-brand-lime">Explore</Link>
+                <Link href="/explore" className="hover:text-text-main">Explore</Link>
                 <ChevronRight className="w-3 h-3" />
-                <span className="text-brand-lime">{data.name}</span>
+                <span className="text-text-main font-semibold">{data.name}</span>
               </nav>
               <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main leading-tight tracking-tight">
-                Book Turfs in <span className="text-brand-lime">{data.name}</span>
+                Book Turfs in {data.name}
               </h1>
               <p className="mt-3 text-text-muted text-sm sm:text-base font-sans max-w-2xl leading-relaxed">
                 Book football turfs, cricket grounds, and sports venues across {data.name} starting at {data.avgPrice}. {data.venues} verified turfs in {data.highlights.slice(0, 3).join(", ")} and more. Real-time availability, secure payment, instant confirmation.
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-3">
-                <Link href={`/explore?city=${city}`} className="bg-brand-lime hover:bg-brand-lime-hover text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
+                <Link href={`/explore?city=${city}`} className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
                   Browse {data.name} Turfs <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                 </Link>
                 <Link href="/tournaments" className="bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-sans font-semibold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
@@ -112,11 +106,11 @@ export default async function CityPage({ params }: Props) {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 flex flex-col gap-6">
-              <h2 className="font-sans font-bold text-2xl text-text-main text-left">Popular areas in {data.name}</h2>
+              <h2 className="font-sans font-bold text-2xl text-text-main tracking-tight text-left">Popular areas in {data.name}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {data.highlights.map((area) => (
                   <Link key={area} href={`/explore?city=${city}`}
-                    className="bg-surface border border-border-default hover:border-brand-lime/20 rounded-md p-5 flex items-center justify-between transition-all">
+                    className="bg-surface border border-border-default hover:border-border-strong rounded-xl p-5 flex items-center justify-between transition-all">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime">
                         <MapPin className="w-5 h-5" />
@@ -131,8 +125,8 @@ export default async function CityPage({ params }: Props) {
                 ))}
               </div>
 
-              <div className="bg-surface border border-border-default rounded-md p-6 shadow-card-shadow mt-6 text-left">
-                <h2 className="font-sans font-bold text-xl text-text-main mb-4">
+              <div className="bg-surface border border-border-default rounded-xl p-6 shadow-sm mt-6 text-left">
+                <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mb-4">
                   Why book turfs in {data.name} on Turfzo?
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -154,20 +148,20 @@ export default async function CityPage({ params }: Props) {
             </div>
 
             <div className="lg:col-span-4 flex flex-col gap-6">
-              <div className="bg-surface border border-border-default rounded-md p-6 text-left shadow-card-shadow">
-                <h3 className="font-sans font-bold text-base text-text-main pb-3 border-b border-border-subtle mb-4">
+              <div className="bg-surface border border-border-default rounded-xl p-6 text-left shadow-sm">
+                <h3 className="font-sans font-bold text-base text-text-main tracking-tight pb-3 border-b border-border-subtle mb-4">
                   Quick facts
                 </h3>
                 <div className="flex flex-col gap-3 text-xs font-sans">
-                  <div className="flex justify-between"><span className="text-text-muted">Venues</span><span className="text-text-main font-bold">{data.venues}</span></div>
-                  <div className="flex justify-between"><span className="text-text-muted">Average price</span><span className="text-brand-lime font-bold">{data.avgPrice}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">Venues</span><span className="text-text-main font-bold tabular-nums">{data.venues}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">Average price</span><span className="text-text-main font-bold tabular-nums">{data.avgPrice}</span></div>
                   <div className="flex justify-between"><span className="text-text-muted">Sports available</span><span className="text-text-main font-bold">Football, Cricket, Multi</span></div>
                   <div className="flex justify-between"><span className="text-text-muted">Booking time</span><span className="text-text-main font-bold">2 minutes</span></div>
                 </div>
               </div>
 
-              <div className="bg-surface border border-border-default rounded-md p-6 text-left shadow-card-shadow">
-                <h3 className="font-sans font-bold text-base text-text-main pb-3 border-b border-border-subtle mb-4">
+              <div className="bg-surface border border-border-default rounded-xl p-6 text-left shadow-sm">
+                <h3 className="font-sans font-bold text-base text-text-main tracking-tight pb-3 border-b border-border-subtle mb-4">
                   Popular turfs in {data.name}
                 </h3>
                 <div className="flex flex-col gap-3">
@@ -183,7 +177,7 @@ export default async function CityPage({ params }: Props) {
                           <Star className="w-3 h-3 fill-brand-lime text-brand-lime" /> {t.rating}
                         </span>
                       </div>
-                      <span className="font-sans font-extrabold text-brand-lime">₹{t.price}/hr</span>
+                      <span className="font-sans font-extrabold text-text-main tabular-nums">₹{t.price}/hr</span>
                     </div>
                   ))}
                 </div>
@@ -192,12 +186,12 @@ export default async function CityPage({ params }: Props) {
           </div>
 
           <div className="max-w-3xl mx-auto mt-16">
-            <h2 className="font-sans font-bold text-2xl text-text-main mb-8 text-center">
+            <h2 className="font-sans font-bold text-2xl text-text-main tracking-tight mb-8 text-center">
               Frequently Asked Questions
             </h2>
             <div className="flex flex-col gap-4">
               {faqs.map((item, idx) => (
-                <details key={idx} className="bg-surface border border-border-default rounded-md p-5 group">
+                <details key={idx} className="bg-surface border border-border-default rounded-xl p-5 group">
                   <summary className="font-sans font-semibold text-sm text-text-main cursor-pointer list-none flex items-center justify-between">
                     {item.question}
                     <ChevronRight className="w-4 h-4 text-text-muted group-open:rotate-90 transition-transform" />

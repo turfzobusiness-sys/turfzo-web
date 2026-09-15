@@ -16,6 +16,7 @@ import Footer from "@/components/Footer";
 import { BreadcrumbListSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
 import { isViewOnlyMode } from "@/lib/env";
+import { getLocalTournamentImage } from "@/lib/turf-images";
 
 type Props = { params: Promise<{ tournamentId: string }> };
 
@@ -94,6 +95,11 @@ export default async function TournamentPage({ params }: Props) {
   const viewOnly = isViewOnlyMode();
   const isOpen =
     tournament.status === "open" || tournament.status === "registration_open";
+  const tournamentImage = getLocalTournamentImage({
+    title: tournament.name,
+    sport: tournament.sport_type,
+    image_url: tournament.image_url,
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
@@ -122,19 +128,19 @@ export default async function TournamentPage({ params }: Props) {
             All tournaments
           </Link>
 
-          <div className="relative rounded-lg overflow-hidden border border-border-default shadow-card-shadow mb-8 min-h-[300px]">
+          <div className="relative rounded-xl overflow-hidden border border-border-default shadow-sm mb-8 min-h-[300px]">
             <div
-              className="absolute inset-0 bg-cover bg-center"
+              className="absolute inset-0 bg-cover bg-center opacity-25 dark:opacity-40"
               style={{
-                backgroundImage: `url(${tournament.image_url || "/stadium_turf_bg.webp"})`,
+                backgroundImage: `url(${encodeURI(tournamentImage)})`,
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/85 to-bg/40 dark:from-bg dark:via-bg/60 dark:to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-8">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-surface/80 backdrop-blur-md border border-border-default text-xs font-bold text-brand-lime mb-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-surface border border-border-default text-xs font-bold text-brand-lime mb-4">
                 <Trophy className="w-3.5 h-3.5" /> {tournament.sport_type}
               </span>
-              <h1 className="font-sans text-4xl font-extrabold text-text-main mb-2">
+              <h1 className="font-sans text-4xl font-extrabold text-text-main tracking-tight mb-2">
                 {tournament.name}
               </h1>
               <p className="text-text-muted text-sm max-w-2xl">
@@ -146,15 +152,15 @@ export default async function TournamentPage({ params }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-8">
               <section>
-                <h2 className="font-sans text-xl font-bold mb-3">
+                <h2 className="font-sans text-xl font-bold tracking-tight mb-3">
                   About this tournament
                 </h2>
                 <p className="text-text-muted text-sm leading-relaxed">
                   {tournament.description || "No description provided."}
                 </p>
                 {tournament.rules && (
-                  <div className="mt-4 rounded-lg border border-border-default bg-surface p-4">
-                    <h3 className="font-sans text-sm font-bold mb-2">Rules</h3>
+                  <div className="mt-4 rounded-xl border border-border-default bg-surface p-4 shadow-sm">
+                    <h3 className="font-sans text-sm font-bold tracking-tight mb-2">Rules</h3>
                     <p className="text-text-muted text-sm whitespace-pre-line">
                       {tournament.rules}
                     </p>
@@ -163,11 +169,11 @@ export default async function TournamentPage({ params }: Props) {
               </section>
 
               <section>
-                <h2 className="font-sans text-xl font-bold mb-3">
+                <h2 className="font-sans text-xl font-bold tracking-tight mb-3">
                   Tournament details
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="flex items-center gap-3 rounded-lg border border-border-default bg-surface p-3.5">
+                  <div className="flex items-center gap-3 rounded-xl border border-border-default bg-surface p-3.5 shadow-sm">
                     <CalendarDays className="w-4 h-4 text-brand-lime shrink-0" />
                     <div>
                       <p className="text-xs text-text-muted">Starts</p>
@@ -176,7 +182,7 @@ export default async function TournamentPage({ params }: Props) {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 rounded-lg border border-border-default bg-surface p-3.5">
+                  <div className="flex items-center gap-3 rounded-xl border border-border-default bg-surface p-3.5 shadow-sm">
                     <Timer className="w-4 h-4 text-brand-lime shrink-0" />
                     <div>
                       <p className="text-xs text-text-muted">Registration closes</p>
@@ -185,7 +191,7 @@ export default async function TournamentPage({ params }: Props) {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 rounded-lg border border-border-default bg-surface p-3.5">
+                  <div className="flex items-center gap-3 rounded-xl border border-border-default bg-surface p-3.5 shadow-sm">
                     <Users className="w-4 h-4 text-brand-lime shrink-0" />
                     <div>
                       <p className="text-xs text-text-muted">Team size</p>
@@ -196,11 +202,11 @@ export default async function TournamentPage({ params }: Props) {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 rounded-lg border border-border-default bg-surface p-3.5">
+                  <div className="flex items-center gap-3 rounded-xl border border-border-default bg-surface p-3.5 shadow-sm">
                     <IndianRupee className="w-4 h-4 text-brand-lime shrink-0" />
                     <div>
                       <p className="text-xs text-text-muted">Prize pool</p>
-                      <p className="text-sm font-semibold">
+                      <p className="text-sm font-semibold tabular-nums">
                         {tournament.prize_pool
                           ? `₹${tournament.prize_pool.toLocaleString()}`
                           : "Trophy"}
@@ -212,9 +218,9 @@ export default async function TournamentPage({ params }: Props) {
             </div>
 
             <div className="md:col-span-1">
-              <div className="rounded-lg border border-border-default bg-surface shadow-card-shadow p-5 sticky top-24">
+              <div className="rounded-xl border border-border-default bg-surface shadow-sm p-5 sticky top-24">
                 <p className="text-xs text-text-muted mb-1">Entry fee</p>
-                <p className="font-sans text-3xl font-extrabold text-text-main mb-4">
+                <p className="font-sans text-3xl font-extrabold text-text-main tabular-nums mb-4">
                   ₹{tournament.entry_fee}
                   <span className="text-sm font-medium text-text-muted">
                     {" "}
@@ -223,12 +229,12 @@ export default async function TournamentPage({ params }: Props) {
                 </p>
                 <div className="flex items-center gap-1.5 text-sm text-text-muted mb-5">
                   <Users className="w-4 h-4" />
-                  Max {tournament.max_participants}{" "}
+                  <span className="tabular-nums">Max {tournament.max_participants}</span>{" "}
                   {tournament.max_team_size ? "teams" : "players"}
                 </div>
 
                 {!isOpen ? (
-                  <div className="w-full bg-border-default text-text-muted font-bold text-sm py-3.5 rounded-xl cursor-not-allowed text-center">
+                  <div className="w-full bg-border-default text-text-muted font-bold text-sm py-3.5 rounded-md cursor-not-allowed text-center">
                     Registration Closed
                   </div>
                 ) : viewOnly ? (
@@ -237,7 +243,7 @@ export default async function TournamentPage({ params }: Props) {
                       href="https://play.google.com/store/apps/details?id=com.turfzo.app"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
+                      className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-md transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
                     >
                       <Smartphone className="w-4 h-4" />
                       Register on the Turfzo App
@@ -250,7 +256,7 @@ export default async function TournamentPage({ params }: Props) {
                 ) : (
                   <Link
                     href={`/tournaments?id=${tournamentId}`}
-                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-bg font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
+                    className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-md transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
                   >
                     Register Team
                   </Link>

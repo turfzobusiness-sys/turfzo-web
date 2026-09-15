@@ -19,13 +19,16 @@ import { FaqAccordion } from "@/components/ui/faq-accordion";
 import { FAQPageSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
+import { getErrorMessage } from "@/lib/errors";
+import { TurnstileWidget } from "@/components/ui/turnstile-widget";
+import { isTurnstileConfigured } from "@/lib/turnstile";
 
 const contactFaqItems = [
   { question: "How do I contact Turfzo support?", answer: "You can reach us via email at support@turfzo.com, call us at +91 (80) 4567-8900, or use the contact form on this page. We respond within 24 hours." },
   { question: "How do I cancel a booking?", answer: "You can cancel a booking from your booking history in the app or website. Cancellations up to 6 hours before the slot get a full refund." },
   { question: "I have a partnership inquiry. Who do I contact?", answer: "For turf owner partnerships, venue listings, or business inquiries, email us at partnerships@turfzo.com or use the contact form with subject 'Partnership Inquiry'." },
   { question: "How do I list my turf on Turfzo?", answer: "Turf owners can list their venue by contacting us at owners@turfzo.com. We'll guide you through the onboarding process which takes about 24 hours." },
-  { question: "What cities does Turfzo operate in?", answer: "Turfzo currently operates in Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, and Ahmedabad. We're expanding to more cities soon." },
+  { question: "What cities does Turfzo operate in?", answer: "Turfzo currently operates in Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, and CSN (Aurangabad). We're expanding to more cities soon." },
 ];
 
 
@@ -37,22 +40,34 @@ export default function ContactPage() {
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("General Inquiry");
   const [message, setMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const turnstileEnforced = isTurnstileConfigured();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
+    if (turnstileEnforced && !turnstileToken) {
+      setErrorMsg("Please complete the bot verification.");
+      setFormStep('error');
+      return;
+    }
     setFormStep('submitting');
     setErrorMsg(null);
     try {
       await convexClient.action(
         "contact:submitContact",
-        { name, email, subject, message },
+        turnstileToken
+          ? { name, email, subject, message, turnstileToken }
+          : { name, email, subject, message },
         firebaseUser ? await firebaseUser.getIdToken() : undefined
       );
+      setTurnstileToken("");
       setFormStep('submitted');
     } catch (err) {
-      const { getErrorMessage } = await import("@/lib/errors");
+      setTurnstileToken("");
+      setTurnstileResetKey((k) => k + 1);
       setErrorMsg(getErrorMessage(err, "Failed to send message. Please try again."));
       setFormStep('error');
     }
@@ -63,6 +78,8 @@ export default function ContactPage() {
     setEmail("");
     setSubject("General Inquiry");
     setMessage("");
+    setTurnstileToken("");
+    setTurnstileResetKey((k) => k + 1);
     setFormStep('form');
   };
 
@@ -209,8 +226,8 @@ export default function ContactPage() {
                       <div className="flex flex-col gap-1.5">
                         <label htmlFor="contact-name" className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Full Name</label>
                         <div className="relative">
-                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted/40">
-                            <User className="w-4 h-4 stroke-[1.5]" />
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted">
+                            <User className="w-4 h-4 stroke-[2]" />
                           </span>
                           <input 
                             id="contact-name"
@@ -219,7 +236,7 @@ export default function ContactPage() {
                             placeholder="Your name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full bg-elevated/40 border border-border-subtle focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded pl-10 pr-4 py-3.5 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-all duration-200"
+                            className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded pl-10 pr-4 py-3.5 text-sm text-text-main placeholder:text-text-muted focus:outline-none transition-all duration-200"
                           />
                         </div>
                       </div>
@@ -228,8 +245,8 @@ export default function ContactPage() {
                       <div className="flex flex-col gap-1.5">
                         <label htmlFor="contact-email" className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Email Address</label>
                         <div className="relative">
-                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted/40">
-                            <Mail className="w-4 h-4 stroke-[1.5]" />
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted">
+                            <Mail className="w-4 h-4 stroke-[2]" />
                           </span>
                           <input 
                             id="contact-email"
@@ -238,7 +255,7 @@ export default function ContactPage() {
                             placeholder="Your email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-elevated/40 border border-border-subtle focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded pl-10 pr-4 py-3.5 text-sm text-text-main placeholder-text-muted/30 focus:outline-none transition-all duration-200"
+                            className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded pl-10 pr-4 py-3.5 text-sm text-text-main placeholder:text-text-muted focus:outline-none transition-all duration-200"
                           />
                         </div>
                       </div>
@@ -248,21 +265,21 @@ export default function ContactPage() {
                     <div className="flex flex-col gap-1.5">
                       <label htmlFor="contact-subject" className="text-text-muted font-semibold uppercase tracking-wider text-[10px]">Subject Category</label>
                       <div className="relative">
-                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted/40 pointer-events-none">
-                          <MessageSquare className="w-4 h-4 stroke-[1.5]" />
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
+                          <MessageSquare className="w-4 h-4 stroke-[2]" />
                         </span>
                         <select
                           id="contact-subject"
                           value={subject}
                           onChange={(e) => setSubject(e.target.value)}
-                          className="w-full bg-elevated/40 border border-border-subtle focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 text-sm text-text-main pl-10 pr-10 py-3.5 rounded font-semibold focus:outline-none appearance-none cursor-pointer transition-all duration-200"
+                          className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 text-sm text-text-main pl-10 pr-10 py-3.5 rounded font-semibold focus:outline-none appearance-none cursor-pointer transition-all duration-200"
                         >
-                          <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">General Inquiry</option>
-                          <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">Booking Issue</option>
-                          <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">List a Venue (Turf Owner)</option>
-                          <option className="bg-white text-black dark:bg-[#111111] dark:text-[#ededed]">Tournament Inquiry</option>
+                          <option className="bg-surface text-text-main">General Inquiry</option>
+                          <option className="bg-surface text-text-main">Booking Issue</option>
+                          <option className="bg-surface text-text-main">List a Venue (Turf Owner)</option>
+                          <option className="bg-surface text-text-main">Tournament Inquiry</option>
                         </select>
-                        <ChevronDown className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted/60" />
+                        <ChevronDown className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted" />
                       </div>
                     </div>
 
@@ -276,9 +293,15 @@ export default function ContactPage() {
                         placeholder="Write details of your inquiry here..."
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        className="w-full bg-elevated/40 border border-border-subtle focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded px-4 py-3.5 text-sm text-text-main placeholder-text-muted/30 focus:outline-none resize-none leading-relaxed transition-all duration-200"
+                        className="w-full bg-elevated border border-border-default focus:border-brand-lime/40 focus:ring-1 focus:ring-brand-lime/25 rounded px-4 py-3.5 text-sm text-text-main placeholder:text-text-muted focus:outline-none resize-none leading-relaxed transition-all duration-200"
                       />
                     </div>
+                    <TurnstileWidget
+                      action="contact"
+                      onToken={setTurnstileToken}
+                      onExpire={() => setTurnstileToken("")}
+                      resetKey={turnstileResetKey}
+                    />
 
                     {/* Submit Button */}
                     <button

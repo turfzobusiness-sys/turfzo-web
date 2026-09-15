@@ -14,13 +14,14 @@ function calculateRefundStatus(startTimeIso: string, now: number = Date.now()): 
   return "pending";
 }
 
-// Mirror of pricing logic in app/explore/page.tsx
-function calculatePricing(price: number) {
-  const subtotal = price;
-  const convenience = Math.round(price * 0.018);
-  const gst = Math.round(price * 0.18);
-  const total = subtotal + convenience + gst;
-  return { subtotal, convenience, gst, total, totalPaise: total * 100 };
+// Mirror of pricing logic: the backend (convex/pricing.ts
+// PLATFORM_SERVICE_FEE_RATE) is the only authority — a 5% service fee on the
+// slot subtotal. The client must never revive the deleted 1.8% convenience +
+// 18% GST numbers or the breakdown won't match what checkout charges.
+function calculatePricing(subtotal: number) {
+  const serviceFee = Math.round(subtotal * 0.05 * 100) / 100;
+  const total = subtotal + serviceFee;
+  return { subtotal, serviceFee, total, totalPaise: Math.round(total * 100) };
 }
 
 // Mirror of slot generation in convex/turfs.ts
@@ -85,13 +86,12 @@ describe("calculateRefundStatus", () => {
 });
 
 describe("calculatePricing", () => {
-  it("computes subtotal, convenience (1.8%), GST (18%), and total", () => {
+  it("computes subtotal, 5% service fee, and total", () => {
     const result = calculatePricing(1000);
     expect(result.subtotal).toBe(1000);
-    expect(result.convenience).toBe(18);
-    expect(result.gst).toBe(180);
-    expect(result.total).toBe(1198);
-    expect(result.totalPaise).toBe(119800);
+    expect(result.serviceFee).toBe(50);
+    expect(result.total).toBe(1050);
+    expect(result.totalPaise).toBe(105000);
   });
 
   it("handles zero price", () => {
@@ -100,12 +100,11 @@ describe("calculatePricing", () => {
     expect(result.totalPaise).toBe(0);
   });
 
-  it("rounds convenience and GST correctly", () => {
+  it("rounds the 5% service fee correctly", () => {
     const result = calculatePricing(555);
     expect(result.subtotal).toBe(555);
-    expect(result.convenience).toBe(10); // 555 * 0.018 = 9.99 -> 10
-    expect(result.gst).toBe(100); // 555 * 0.18 = 99.9 -> 100
-    expect(result.total).toBe(665);
+    expect(result.serviceFee).toBe(27.75); // 555 * 0.05
+    expect(result.total).toBe(582.75);
   });
 });
 

@@ -127,7 +127,7 @@ export default function OwnerRegisterPage() {
             {isLogin ? (
               <SignInForm onSuccess={() => router.push("/owners/dashboard")} />
             ) : (
-              <SignUpForm role="owner" onSuccess={() => router.push("/owners/dashboard")} />
+              <SignUpForm role="owner" onSuccess={() => router.push("/owners/onboarding")} />
             )}
           </div>
 

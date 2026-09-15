@@ -250,7 +250,7 @@ export default function OwnerDashboardPage() {
                     style={{ width: step.active ? "100%" : "0%" }}
                   />
                 </div>
-                <span className={`text-[10px] font-sans font-semibold uppercase tracking-wider ${step.active ? "text-text-main" : "text-text-muted/50"}`}>
+                <span className={`text-[10px] font-sans font-semibold uppercase tracking-wider ${step.active ? "text-text-main" : "text-text-muted"}`}>
                   {step.label}
                 </span>
               </div>
@@ -388,30 +388,30 @@ export default function OwnerDashboardPage() {
             <h3 className="font-sans text-sm font-bold text-text-main tracking-wide">
               Venue Analytics
             </h3>
-            <span className="ml-auto text-[10px] uppercase tracking-wider text-text-muted/50 font-semibold">
+            <span className="ml-auto text-[10px] uppercase tracking-wider text-text-secondary font-semibold">
               {summary ? `${summary.turfCount} turf${summary.turfCount === 1 ? "" : "s"}` : "—"}
             </span>
           </div>
 
           {summary ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="rounded-[12px] border border-border-default bg-bg/40 p-4">
-                <span className="text-[10px] uppercase tracking-wider text-text-muted/60 font-semibold">Total Earnings</span>
+              <div className="rounded-[12px] border border-border-default bg-elevated p-4">
+                <span className="text-[10px] uppercase tracking-wider text-text-secondary font-semibold">Total Earnings</span>
                 <span className="block text-xl font-extrabold text-brand-lime mt-1">{formatINR(summary.totalEarnings)}</span>
               </div>
-              <div className="rounded-[12px] border border-border-default bg-bg/40 p-4">
-                <span className="text-[10px] uppercase tracking-wider text-text-muted/60 font-semibold">Available Balance</span>
+              <div className="rounded-[12px] border border-border-default bg-elevated p-4">
+                <span className="text-[10px] uppercase tracking-wider text-text-secondary font-semibold">Available Balance</span>
                 <span className="block text-xl font-extrabold text-text-main mt-1">{formatINR(summary.availableBalance)}</span>
               </div>
-              <div className="rounded-[12px] border border-border-default bg-bg/40 p-4">
-                <span className="text-[10px] uppercase tracking-wider text-text-muted/60 font-semibold">Total Bookings</span>
+              <div className="rounded-[12px] border border-border-default bg-elevated p-4">
+                <span className="text-[10px] uppercase tracking-wider text-text-secondary font-semibold">Total Bookings</span>
                 <span className="block text-xl font-extrabold text-text-main mt-1">{summary.totalBookings}</span>
               </div>
-              <div className="rounded-[12px] border border-border-default bg-bg/40 p-4">
-                <span className="text-[10px] uppercase tracking-wider text-text-muted/60 font-semibold">Completion Rate</span>
+              <div className="rounded-[12px] border border-border-default bg-elevated p-4">
+                <span className="text-[10px] uppercase tracking-wider text-text-secondary font-semibold">Completion Rate</span>
                 <span className="block text-xl font-extrabold text-text-main mt-1">{summary.completionRate}%</span>
               </div>
-              <div className="col-span-2 md:col-span-4 border-t border-border-default pt-3 flex flex-wrap gap-x-6 gap-y-2 text-xs font-sans text-text-muted/80">
+              <div className="col-span-2 md:col-span-4 border-t border-border-default pt-3 flex flex-wrap gap-x-6 gap-y-2 text-xs font-sans text-text-muted">
                 <span className="inline-flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-brand-lime" />
                   {summary.completedBookings} completed
@@ -421,7 +421,7 @@ export default function OwnerDashboardPage() {
                   {summary.pendingBookings} upcoming
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <X className="h-3.5 w-3.5 text-text-muted/60" />
+                  <X className="h-3.5 w-3.5 text-rose-500" />
                   {summary.cancelledBookings} cancelled
                 </span>
               </div>
@@ -446,27 +446,27 @@ export default function OwnerDashboardPage() {
               <div className="space-y-3 font-sans text-xs">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-text-muted/60 uppercase font-semibold tracking-wider">Venue Name</span>
+                    <span className="text-text-secondary uppercase font-semibold tracking-wider">Venue Name</span>
                     <span className="text-text-main font-medium mt-0.5 block">{primaryVenue.name}</span>
                   </div>
                   <div>
-                    <span className="text-text-muted/60 uppercase font-semibold tracking-wider">Hourly Rate</span>
+                    <span className="text-text-secondary uppercase font-semibold tracking-wider">Hourly Rate</span>
                     <span className="text-brand-lime font-bold mt-0.5 block">₹{primaryVenue.price_per_hour}/hr</span>
                   </div>
                 </div>
                 <div>
-                  <span className="text-text-muted/60 uppercase font-semibold tracking-wider">Address</span>
+                  <span className="text-text-secondary uppercase font-semibold tracking-wider">Address</span>
                   <span className="text-text-main font-medium mt-0.5 block">
                     {primaryVenue.address}, {primaryVenue.city}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-text-muted/60 uppercase font-semibold tracking-wider">Pitches Count</span>
+                    <span className="text-text-secondary uppercase font-semibold tracking-wider">Pitches Count</span>
                     <span className="text-text-main font-medium mt-0.5 block">{primaryVenue.ground_count || 1} court(s)</span>
                   </div>
                   <div>
-                    <span className="text-text-muted/60 uppercase font-semibold tracking-wider">Sport Type</span>
+                    <span className="text-text-secondary uppercase font-semibold tracking-wider">Sport Type</span>
                     <span className="text-text-main font-medium mt-0.5 block capitalize">{primaryVenue.sport_type}</span>
                   </div>
                 </div>
@@ -487,27 +487,27 @@ export default function OwnerDashboardPage() {
               <div className="space-y-3 font-sans text-xs">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-text-muted/60 uppercase font-semibold tracking-wider">Holder Name</span>
+                    <span className="text-text-secondary uppercase font-semibold tracking-wider">Holder Name</span>
                     <span className="text-text-main font-medium mt-0.5 block">{ownerData.payout.bank_account_holder_name}</span>
                   </div>
                   <div>
-                    <span className="text-text-muted/60 uppercase font-semibold tracking-wider">Bank Name</span>
+                    <span className="text-text-secondary uppercase font-semibold tracking-wider">Bank Name</span>
                     <span className="text-text-main font-medium mt-0.5 block">{ownerData.payout.bank_name}</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-text-muted/60 uppercase font-semibold tracking-wider">Account Number</span>
+                    <span className="text-text-secondary uppercase font-semibold tracking-wider">Account Number</span>
                     <span className="text-text-main font-mono mt-0.5 block">{obscureAccount(ownerData.payout.bank_account_number)}</span>
                   </div>
                   <div>
-                    <span className="text-text-muted/60 uppercase font-semibold tracking-wider">IFSC Code</span>
+                    <span className="text-text-secondary uppercase font-semibold tracking-wider">IFSC Code</span>
                     <span className="text-text-main font-mono mt-0.5 block">{ownerData.payout.bank_ifsc_code}</span>
                   </div>
                 </div>
                 {ownerData.payout.upi_id && (
                   <div>
-                    <span className="text-text-muted/60 uppercase font-semibold tracking-wider">UPI ID</span>
+                    <span className="text-text-secondary uppercase font-semibold tracking-wider">UPI ID</span>
                     <span className="text-text-main font-mono mt-0.5 block">{ownerData.payout.upi_id}</span>
                   </div>
                 )}
@@ -526,13 +526,13 @@ export default function OwnerDashboardPage() {
             </div>
             <div className="space-y-0.5">
               <h3 className="font-sans text-sm font-bold text-text-main tracking-wide">Manage everything in the Turfzo app</h3>
-              <p className="font-sans text-xs text-text-muted/80 leading-relaxed">
+              <p className="font-sans text-xs text-text-muted leading-relaxed">
                 Slots &amp; calendar, dynamic pricing, promotions, customer insights, payouts, and
                 tournament tools all live in the app. This page is your read-only analytics snapshot.
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs font-sans text-text-muted/70 shrink-0">
+          <div className="flex items-center gap-2 text-xs font-sans text-text-muted shrink-0">
             <ShieldCheck className="h-4 w-4 text-brand-lime" />
             <span>Data refreshes live from your bookings</span>
           </div>
@@ -541,7 +541,7 @@ export default function OwnerDashboardPage() {
         {/* Need Help / Support Section */}
         <div className="bg-surface border border-border-default rounded-[14px] p-5 space-y-3">
           <h3 className="font-sans text-sm font-bold text-text-main tracking-wide">Need Assistance?</h3>
-          <p className="font-sans text-xs text-text-muted/80 leading-relaxed">
+          <p className="font-sans text-xs text-text-muted leading-relaxed">
             Have questions about payouts, fee structures, or hardware integration (IoT lighting/gate
             controller setups)? Reach out to our partner success desk.
           </p>

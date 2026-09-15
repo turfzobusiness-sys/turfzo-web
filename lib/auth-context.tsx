@@ -52,7 +52,7 @@ interface AuthContextValue extends AuthState {
     city?: string;
   }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: (role?: string) => Promise<void>;
   /**
    * Sends an SMS OTP to LINK a phone number to the CURRENTLY signed-in
    * account (email/Google users). Does not change auth state.
@@ -157,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error: null,
   });
 
-  const syncConvexUser = useCallback(async (firebaseUser: FirebaseUser) => {
+  const syncConvexUser = useCallback(async (firebaseUser: FirebaseUser, role?: string) => {
     try {
       const token = await getIdToken(firebaseUser);
       const response = await convexClient.action<{
@@ -170,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           displayName: firebaseUser.displayName || undefined,
           avatarUrl: firebaseUser.photoURL || undefined,
           phoneNumber: firebaseUser.phoneNumber || undefined,
+          role: role || undefined,
         },
         token,
       );
@@ -322,12 +323,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (role?: string) => {
     setState((prev) => ({ ...prev, status: "loading", error: null }));
     try {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
-      const convexUser = await syncConvexUser(cred.user);
+      const convexUser = await syncConvexUser(cred.user, role);
       setState({
         status: "authenticated",
         firebaseUser: cred.user,

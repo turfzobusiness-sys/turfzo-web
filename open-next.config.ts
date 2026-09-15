@@ -1,5 +1,5 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
-// Minimal preview-first config: default caching (no R2 bucket yet).
-// Add R2 incremental cache later if ISR/SSG caching needs it.
+// Default caching (R2 incremental cache omitted until R2 is enabled on Cloudflare account).
 export default defineCloudflareConfig();
+

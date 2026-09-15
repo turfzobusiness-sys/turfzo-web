@@ -1,12 +1,9 @@
-import { Loader2 } from "lucide-react";
+import { PageLoader } from "@/components/ui/page-loader";
 
 export default function Loading() {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center bg-bg text-text-main gap-4">
-      <Loader2 className="w-8 h-8 text-brand-lime animate-spin" />
-      <p className="font-sans text-sm text-text-muted animate-pulse">
-        Loading your profile...
-      </p>
+      <PageLoader label="Loading your profile" />
     </div>
   );
 }

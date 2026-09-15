@@ -51,3 +51,4 @@ AGENTS.md
 DEPLOYMENT.md
 SETUP.md
 .claude/
+!*.enc
