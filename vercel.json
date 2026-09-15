@@ -7,12 +7,12 @@
   "outputDirectory": ".next",
   "regions": ["bom1"],
   "github": {
-    "silent": false,
-    "autoAlias": true
+    "silent": true,
+    "autoAlias": false
   },
   "git": {
     "deploymentEnabled": {
-      "main": true,
+      "main": false,
       "develop": false
     }
   },
