@@ -40,6 +40,7 @@ const PROD_REQUIRED: EnvKey[] = [
   "NEXT_PUBLIC_FIREBASE_APP_ID",
   "NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL",
   "NEXT_PUBLIC_CASHFREE_APP_ID",
+  "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
 ];
 
 const OPTIONAL_BUT_RECOMMENDED: EnvKey[] = [
@@ -71,7 +72,12 @@ export function validateEnv(): { ok: true } | { ok: false; missing: EnvKey[] } {
   const required = isProd ? PROD_REQUIRED : [];
 
   for (const key of required) {
-    if (!readEnv(key)) missing.push(key);
+    const v = readEnv(key);
+    // Placeholder site keys explicitly disable verification — treat as
+    // missing in production so misconfigured builds fail fast at runtime.
+    if (!v || (key === "NEXT_PUBLIC_TURNSTILE_SITE_KEY" && v.includes("placeholder"))) {
+      missing.push(key);
+    }
   }
 
   if (missing.length > 0 && isProd) {
