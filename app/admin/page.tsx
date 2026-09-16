@@ -593,7 +593,7 @@ function MessagesList({ messages }: { messages: ContactMessage[] }) {
             {msg.message}
           </p>
           <a
-            href={`mailto:${msg.email}?subject=Re: ${msg.subject || "Your message to Turfzo"}`}
+            href={`mailto:${encodeURIComponent(msg.email)}?subject=${encodeURIComponent(`Re: ${msg.subject || "Your message to Turfzo"}`)}`}
             className="inline-flex items-center gap-1.5 mt-3 text-xs text-brand-lime hover:underline"
           >
             <Mail className="w-3.5 h-3.5" />
