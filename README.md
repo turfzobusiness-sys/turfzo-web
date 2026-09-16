@@ -71,6 +71,6 @@ npm run build
 npx opennextjs-cloudflare build
 
 # Wrangler deploy dry-run
-npx wrangler deploy --dry-run --env staging
-npx wrangler deploy --dry-run --env production
+npx wrangler deploy --dry-run --config wrangler.staging.jsonc
+npx wrangler deploy --dry-run --config wrangler.jsonc
 ```
