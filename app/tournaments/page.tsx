@@ -225,23 +225,44 @@ export default function TournamentsPage() {
   const [searchSport, setSearchSport] = useState("all");
   const [searchCity, setSearchCity] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchFormat, setSearchFormat] = useState("all");
+  const [searchFormat] = useState("all");
 
   useEffect(() => {
     if (!targetTournamentId) return;
     if (tournaments.length > 0) {
       const match = tournaments.find((t) => t._id === targetTournamentId);
       if (match) {
-        setSelectedTournament(match);
-        setViewMode("details");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setTargetTournamentId(null);
-        return;
+        const timer = setTimeout(() => {
+          setSelectedTournament(match);
+          setViewMode("details");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          setTargetTournamentId(null);
+        }, 0);
+        return () => clearTimeout(timer);
       }
     }
     let cancelled = false;
+    type RawTournamentDoc = {
+      _id: string;
+      _creationTime?: number;
+      name: string;
+      sport_type: string;
+      tournament_type: string;
+      description: string;
+      start_date: string;
+      end_date: string;
+      venue?: string;
+      city?: string;
+      entry_fee: number;
+      prize_pool?: number;
+      max_participants: number;
+      current_participants?: number;
+      status: "upcoming" | "ongoing" | "completed" | "cancelled";
+      image_url?: string;
+      created_at?: string;
+    };
     convexClient
-      .query<any>("tournaments:getTournamentById", { tournamentId: targetTournamentId })
+      .query<RawTournamentDoc | null>("tournaments:getTournamentById", { tournamentId: targetTournamentId })
       .then((t) => {
         if (!cancelled && t) {
           const mapped: Tournament = {
@@ -259,7 +280,14 @@ export default function TournamentsPage() {
             prize_pool: t.prize_pool ? `₹${t.prize_pool.toLocaleString()}` : "Trophy",
             max_teams: t.max_participants,
             registered_teams: t.current_participants ?? 0,
-            status: t.status,
+            status:
+              t.status === "ongoing"
+                ? "live"
+                : t.status === "cancelled"
+                  ? "closed"
+                  : t.status === "completed"
+                    ? "completed"
+                    : "upcoming",
             image_url: t.image_url,
             created_at: t.created_at ?? new Date().toISOString(),
           };

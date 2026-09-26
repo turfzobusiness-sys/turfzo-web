@@ -57,14 +57,15 @@ export default async function VenuePage({ params }: Props) {
   const city = turf.city || "India";
   const venueImage = getLocalTurfImage(turf);
 
-  const openTime =
-    (turf.operating_hours as any)?.open ??
-    (turf.operating_hours as any)?.monday?.open ??
-    "06:00";
-  const closeTime =
-    (turf.operating_hours as any)?.close ??
-    (turf.operating_hours as any)?.monday?.close ??
-    "23:00";
+  type OperatingHoursMap = {
+    open?: string;
+    close?: string;
+    [day: string]: { open?: string; close?: string } | string | undefined;
+  };
+  const opHours = turf.operating_hours as OperatingHoursMap | undefined;
+  const monday = typeof opHours?.monday === "object" ? opHours.monday : undefined;
+  const openTime = opHours?.open ?? monday?.open ?? "06:00";
+  const closeTime = opHours?.close ?? monday?.close ?? "23:00";
   const venueOpeningHours = `Mo-Su ${openTime}-${closeTime}`;
 
   return (

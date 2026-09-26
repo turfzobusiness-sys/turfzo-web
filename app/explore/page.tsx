@@ -563,7 +563,7 @@ export default function ExplorePage() {
   const [pricePreview, setPricePreview] = useState<BookingPricePreview | null>(
     null,
   );
-  const [promoCode, setPromoCode] = useState("");
+  const [promoCode] = useState("");
   const [holdSeconds, setHoldSeconds] = useState<number | null>(null);
 
   const groupedSlots = useMemo(() => {    const groups: { title: string; icon: LucideIcon; slots: SlotInfo[] }[] = [
@@ -930,9 +930,11 @@ export default function ExplorePage() {
     if (allTurfs.length > 0) {
       const found = allTurfs.find((t) => t.id === targetTurfId);
       if (found) {
-        handleOpenSlots(found);
-        setTargetTurfId(null);
-        return;
+        const timer = setTimeout(() => {
+          handleOpenSlots(found);
+          setTargetTurfId(null);
+        }, 0);
+        return () => clearTimeout(timer);
       }
     }
     let cancelled = false;
