@@ -24,7 +24,7 @@ import type { Booking, Turf } from "@/lib/types";
 
 export default function BookingsPage() {
   const router = useRouter();
-  const { status } = useAuth();
+  const { status, getFreshToken } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [turfs, setTurfs] = useState<Record<string, Turf>>({});
   const [loading, setLoading] = useState(true);
@@ -43,12 +43,31 @@ export default function BookingsPage() {
 
   // Load bookings on mount when authenticated. setState calls happen inside
   // async callbacks (after the await), which is the correct pattern.
+  // Authenticated reads pass a fresh Firebase ID token explicitly; on a
+  // 401 (token raced expiry) retry once with a new token before failing.
+  const queryWithAuthRetry = async <T,>(
+    path: string,
+    args: Record<string, unknown>,
+  ): Promise<T> => {
+    const token = await getFreshToken().catch(() => undefined);
+    try {
+      return await convexClient.query<T>(path, args, token);
+    } catch (err) {
+      const code = (err as { code?: string })?.code;
+      if (code === "CONVEX_UNAUTHORIZED") {
+        const retryToken = await getFreshToken().catch(() => undefined);
+        return await convexClient.query<T>(path, args, retryToken);
+      }
+      throw err;
+    }
+  };
+
   useEffect(() => {
     if (status !== "authenticated") return;
     let cancelled = false;
     (async () => {
       try {
-        const data = await convexClient.query<Booking[]>(
+        const data = await queryWithAuthRetry<Booking[]>(
           "bookings:getMyBookings",
           {},
         );
@@ -85,7 +104,7 @@ export default function BookingsPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await convexClient.query<Booking[]>(
+      const data = await queryWithAuthRetry<Booking[]>(
         "bookings:getMyBookings",
         {},
       );
@@ -353,6 +372,15 @@ export default function BookingsPage() {
                           >
                             {booking.status}
                           </span>
+                          {(booking.payment_status === "refunded" ||
+                            (booking.refunded_amount ?? 0) > 0) && (
+                            <span className="text-[10px] font-sans font-bold uppercase px-2.5 py-0.5 rounded-md border bg-info/10 text-info border-info/20">
+                              refunded
+                              {(booking.refunded_amount ?? 0) > 0
+                                ? ` ₹${booking.refunded_amount}`
+                                : ""}
+                            </span>
+                          )}
                         </div>
                         {turf && (
                           <p className="text-xs text-text-muted font-sans flex items-center gap-1 mt-1">

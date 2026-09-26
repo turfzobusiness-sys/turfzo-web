@@ -25,7 +25,7 @@ import { isTurnstileConfigured } from "@/lib/turnstile";
 
 const contactFaqItems = [
   { question: "How do I contact Turfzo support?", answer: "You can reach us via email at support@turfzo.com, call us at +91 (80) 4567-8900, or use the contact form on this page. We respond within 24 hours." },
-  { question: "How do I cancel a booking?", answer: "You can cancel a booking from your booking history in the app or website. Cancellations up to 6 hours before the slot get a full refund." },
+  { question: "How do I cancel a booking?", answer: "You can cancel a booking from your booking history in the app or website. Cancellations more than 24 hours before the slot receive a 100% refund, between 6 and 24 hours receive a 50% refund, and cancellations under 6 hours are non-refundable." },
   { question: "I have a partnership inquiry. Who do I contact?", answer: "For turf owner partnerships, venue listings, or business inquiries, email us at partnerships@turfzo.com or use the contact form with subject 'Partnership Inquiry'." },
   { question: "How do I list my turf on Turfzo?", answer: "Turf owners can list their venue by contacting us at owners@turfzo.com. We'll guide you through the onboarding process which takes about 24 hours." },
   { question: "What cities does Turfzo operate in?", answer: "Turfzo currently operates in Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, and CSN (Aurangabad). We're expanding to more cities soon." },

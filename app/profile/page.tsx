@@ -154,12 +154,31 @@ export default function ProfilePage() {
 
   // Load bookings on mount when authenticated. setState calls happen inside
   // async callbacks (after the await), which is the correct pattern.
+  // Authenticated reads pass a fresh Firebase ID token explicitly; on a
+  // 401 (token raced expiry) retry once with a new token before failing.
+  const queryWithAuthRetry = async <T,>(
+    path: string,
+    args: Record<string, unknown>,
+  ): Promise<T> => {
+    const token = await getFreshToken().catch(() => undefined);
+    try {
+      return await convexClient.query<T>(path, args, token);
+    } catch (err) {
+      const code = (err as { code?: string })?.code;
+      if (code === "CONVEX_UNAUTHORIZED") {
+        const retryToken = await getFreshToken().catch(() => undefined);
+        return await convexClient.query<T>(path, args, retryToken);
+      }
+      throw err;
+    }
+  };
+
   useEffect(() => {
     if (status !== "authenticated") return;
     let cancelled = false;
     (async () => {
       try {
-        const data = await convexClient.query<Booking[]>(
+        const data = await queryWithAuthRetry<Booking[]>(
           "bookings:getMyBookings",
           {},
         );

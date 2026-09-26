@@ -18,6 +18,14 @@ function resolveCashfreeMode(): "production" | "sandbox" {
   if (explicit === "production" || explicit === "sandbox") {
     return explicit;
   }
+  // Fail-closed visibility: without an explicit env var, a live-looking
+  // app id silently flipping us into production charges real money.
+  // Keep the sandbox default but warn loudly in production builds.
+  if (process.env.NODE_ENV === "production") {
+    console.warn(
+      "[cashfree] NEXT_PUBLIC_CASHFREE_ENV is unset in production — defaulting to sandbox. Set it explicitly to \"production\" for live charges."
+    );
+  }
   const appId = process.env.NEXT_PUBLIC_CASHFREE_APP_ID;
   if (appId && !appId.toLowerCase().includes("test")) {
     return "production";
@@ -51,11 +59,17 @@ export interface OpenCheckoutArgs {
  * a guarantee that funds were captured.
  */
 export async function openCashfreeCheckout(
-  args: OpenCheckoutArgs,
+  args: OpenCheckoutArgs & { timeoutMs?: number },
 ): Promise<void> {
   const cashfree = await initializeCashfree();
+  // 6-min client timeout nests inside the 7-min PAYMENT_LOCK_WINDOW_MS so an
+  // abandoned tab self-cancels via cancelIfUnpaid before server crons fire.
+  const timeoutMs = args.timeoutMs ?? 6 * 60 * 1000;
 
   return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error("Payment timed out. Please try again."));
+    }, timeoutMs);
     cashfree
       .checkout({
         paymentSessionId: args.paymentSessionId,
@@ -67,6 +81,7 @@ export async function openCashfreeCheckout(
           redirect?: boolean;
           paymentDetails?: unknown;
         }) => {
+          clearTimeout(timer);
           if (result.error) {
             reject(
               new Error(result.error.message || "Payment failed or cancelled"),
@@ -82,6 +97,7 @@ export async function openCashfreeCheckout(
         },
       )
       .catch((err: unknown) => {
+        clearTimeout(timer);
         reject(err instanceof Error ? err : new Error("Checkout error."));
       });
   });

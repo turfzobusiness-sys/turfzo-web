@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy,
@@ -179,6 +179,21 @@ function formatDate(iso: string) {
   });
 }
 
+function TournamentsQuerySync({
+  onTournamentId,
+}: {
+  onTournamentId: (id: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id") ?? searchParams.get("tournamentId");
+  useEffect(() => {
+    if (id) {
+      onTournamentId(id.trim());
+    }
+  }, [id, onTournamentId]);
+  return null;
+}
+
 export default function TournamentsPage() {
   const router = useRouter();
   const { status, firebaseUser, convexUser, getFreshToken } = useAuth();
@@ -186,6 +201,7 @@ export default function TournamentsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedTournament, setSelectedTournament] =
     useState<Tournament | null>(null);
+  const [targetTournamentId, setTargetTournamentId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "details">("list");
   const [regStep, setRegStep] = useState<RegStep>("closed");
   const [regError, setRegError] = useState<string | null>(null);
@@ -209,13 +225,90 @@ export default function TournamentsPage() {
   const [searchSport, setSearchSport] = useState("all");
   const [searchCity, setSearchCity] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchFormat] = useState("all");
+
+  useEffect(() => {
+    if (!targetTournamentId) return;
+    if (tournaments.length > 0) {
+      const match = tournaments.find((t) => t._id === targetTournamentId);
+      if (match) {
+        const timer = setTimeout(() => {
+          setSelectedTournament(match);
+          setViewMode("details");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          setTargetTournamentId(null);
+        }, 0);
+        return () => clearTimeout(timer);
+      }
+    }
+    let cancelled = false;
+    type RawTournamentDoc = {
+      _id: string;
+      _creationTime?: number;
+      name: string;
+      sport_type: string;
+      tournament_type: string;
+      description: string;
+      start_date: string;
+      end_date: string;
+      venue?: string;
+      city?: string;
+      entry_fee: number;
+      prize_pool?: number;
+      max_participants: number;
+      current_participants?: number;
+      status: "upcoming" | "ongoing" | "completed" | "cancelled";
+      image_url?: string;
+      created_at?: string;
+    };
+    convexClient
+      .query<RawTournamentDoc | null>("tournaments:getTournamentById", { tournamentId: targetTournamentId })
+      .then((t) => {
+        if (!cancelled && t) {
+          const mapped: Tournament = {
+            _id: t._id,
+            _creationTime: t._creationTime ?? Date.now(),
+            title: t.name,
+            sport: t.sport_type,
+            format: t.tournament_type,
+            description: t.description,
+            start_date: t.start_date,
+            end_date: t.end_date,
+            venue: t.venue ?? "Venue",
+            city: t.city ?? "India",
+            entry_fee: t.entry_fee,
+            prize_pool: t.prize_pool ? `₹${t.prize_pool.toLocaleString()}` : "Trophy",
+            max_teams: t.max_participants,
+            registered_teams: t.current_participants ?? 0,
+            status:
+              t.status === "ongoing"
+                ? "live"
+                : t.status === "cancelled"
+                  ? "closed"
+                  : t.status === "completed"
+                    ? "completed"
+                    : "upcoming",
+            image_url: t.image_url,
+            created_at: t.created_at ?? new Date().toISOString(),
+          };
+          setSelectedTournament(mapped);
+          setViewMode("details");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          setTargetTournamentId(null);
+        }
+      })
+      .catch((err) => console.error("Could not fetch target tournament:", err));
+    return () => {
+      cancelled = true;
+    };
+  }, [targetTournamentId, tournaments]);
 
   useEffect(() => {
     async function fetchTournaments() {
       try {
         const data = await convexClient.query<Tournament[]>(
           "tournaments:getOpen",
-          {},
+          searchFormat !== "all" ? { format: searchFormat } : {},
         );
         // NOTE: no mock fallback — mock mode is served by the mock
         // client (lib/mock-convex.ts); an empty live result means no
@@ -296,6 +389,7 @@ export default function TournamentsPage() {
   };
 
   const viewOnly = isViewOnlyMode();
+  const regInFlight = useRef(false);
 
   const handleOpenRegistration = (t: Tournament) => {
     if (viewOnly) return;
@@ -327,14 +421,20 @@ export default function TournamentsPage() {
   const handleSubmitRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
     if (viewOnly) return;
+    if (regInFlight.current) return;
+    const isTeamTourney = /team/i.test(selectedTournament?.format ?? "");
     if (
       !selectedTournament ||
-      !teamName ||
+      (isTeamTourney && !teamName) ||
       !captainName ||
       !captainEmail ||
       !captainPhone
     ) {
-      setRegError("Please fill in all fields.");
+      setRegError(
+        isTeamTourney
+          ? "Please fill in all fields."
+          : "Please fill in name, email and phone.",
+      );
       return;
     }
     if (!/^\d{10}$/.test(captainPhone)) {
@@ -343,6 +443,7 @@ export default function TournamentsPage() {
     }
     setRegStep("processing");
     setRegError(null);
+    regInFlight.current = true;
 
     let paymentOrderId: string | undefined;
     let token: string | undefined;
@@ -407,28 +508,49 @@ export default function TournamentsPage() {
         paymentOrderId = order.cf_order_id;
       }
 
-      // ── Step 4: Register the team with the verified payment order ID ──
-      debugLog("[Tournament Reg] Step 4: Registering team via tournaments:register...");
-      const registration = await convexClient.mutation<{
-        registration_code: string;
-        team_name: string;
-        _id: string;
-      }>(
-        "tournaments:register",
-        {
-          tournament_id: selectedTournament._id,
-          team_name: teamName,
-          captain_name: captainName,
-          captain_email: captainEmail,
-          captain_phone: captainPhone,
-          entry_fee_paid: selectedTournament.entry_fee,
-          ...(paymentOrderId ? { payment_order_id: paymentOrderId } : {}),
-        },
-        token
-      );
-      debugLog("[Tournament Reg] Step 4 result:", registration);
+      // ── Step 4: Register with the verified payment order ID ──
+      // Team tournaments use tournaments:register, solo events use
+      // tournaments:registerParticipant (backend enforces one path each).
+      debugLog("[Tournament Reg] Step 4: Registering...");
+      let registrationCode: string;
+      if (isTeamTourney) {
+        const registration = await convexClient.mutation<{
+          registration_code: string;
+          team_name: string;
+          _id: string;
+        }>(
+          "tournaments:register",
+          {
+            tournament_id: selectedTournament._id,
+            team_name: teamName,
+            captain_name: captainName,
+            captain_email: captainEmail,
+            captain_phone: captainPhone,
+            entry_fee_paid: selectedTournament.entry_fee,
+            ...(paymentOrderId ? { payment_order_id: paymentOrderId } : {}),
+          },
+          token
+        );
+        debugLog("[Tournament Reg] Step 4 result:", registration);
 
-      setRegistrationCode(registration.registration_code);
+        registrationCode = registration.registration_code;
+        setRegistrationCode(registrationCode);
+      } else {
+        const registration = await convexClient.mutation<{
+          registration_code: string;
+        }>(
+          "tournaments:registerParticipant",
+          {
+            tournamentId: selectedTournament._id,
+            registrationType: "individual",
+            ...(paymentOrderId ? { paymentOrderId } : {}),
+          },
+          token
+        );
+        debugLog("[Tournament Reg] Step 4 result:", registration);
+        registrationCode = registration.registration_code;
+        setRegistrationCode(registrationCode);
+      }
       setTournaments((prev) =>
         prev.map((t) =>
           t._id === selectedTournament._id
@@ -452,9 +574,9 @@ export default function TournamentsPage() {
       );
 
       const qrPayload = JSON.stringify({
-        code: registration.registration_code,
+        code: registrationCode,
         tournament: selectedTournament.title,
-        team: teamName,
+        team: isTeamTourney ? teamName : captainName,
       });
       const { default: QRCode } = await import("qrcode");
       const qrDataUrl = await QRCode.toDataURL(qrPayload, {
@@ -496,6 +618,8 @@ export default function TournamentsPage() {
         getErrorMessage(err, "Registration failed. Please try again."),
       );
       setRegStep("error");
+    } finally {
+      regInFlight.current = false;
     }
   };
 
@@ -516,6 +640,9 @@ export default function TournamentsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
+      <Suspense fallback={null}>
+        <TournamentsQuerySync onTournamentId={setTargetTournamentId} />
+      </Suspense>
       <Header />
 
       <main className="flex-grow pt-24 pb-16">

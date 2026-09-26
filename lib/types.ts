@@ -41,6 +41,8 @@ export interface Turf {
   is_indoor?: boolean;
   ground_count?: number;
   status?: "pending" | "approved" | "rejected" | "active" | "inactive";
+  /** Minutes east of UTC for the turf's local day (backend default 330). */
+  timezone_offset_minutes?: number;
 }
 
 export interface AppUser {
@@ -83,6 +85,7 @@ export interface Booking {
   attendees?: number;
   notes?: string;
   cancellation_reason?: string;
+  refunded_amount?: number;
   pg_order_id?: string;
   pg_payment_id?: string;
   pg_signature?: string;

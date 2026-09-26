@@ -114,6 +114,12 @@ function AnimatedCounter({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Platform take — single web source of truth. Backend authority is
+    owner_dashboard PLATFORM_FEE_RATE (5%); owner keeps 95%.           */
+/* ------------------------------------------------------------------ */
+const PLATFORM_OWNER_RATE = 0.95;
+
+/* ------------------------------------------------------------------ */
 /*  Interactive Onboarding Steps Data                                 */
 /* ------------------------------------------------------------------ */
 const ONBOARDING_STEPS = [
@@ -389,7 +395,9 @@ export default function OwnersPage() {
   const daysPerMonth = 30;
   const monthlyHours = courtCount * hoursPerDay * daysPerMonth;
   const grossMonthlyRevenue = monthlyHours * hourlyPrice;
-  const netOwnerEarnings = Math.round(grossMonthlyRevenue * 0.95);
+  const netOwnerEarnings = Math.round(
+    grossMonthlyRevenue * PLATFORM_OWNER_RATE,
+  );
   const estimatedBookings = Math.round(monthlyHours);
 
   const activePillar = FEATURE_PILLARS[activePillarIdx];

@@ -16,13 +16,8 @@ export interface VenueDraftData {
   sport_type?: string;
   amenities?: string[];
   operating_hours?: {
-    monday?: { open: string; close: string };
-    tuesday?: { open: string; close: string };
-    wednesday?: { open: string; close: string };
-    thursday?: { open: string; close: string };
-    friday?: { open: string; close: string };
-    saturday?: { open: string; close: string };
-    sunday?: { open: string; close: string };
+    open?: string;
+    close?: string;
   };
   max_players?: number;
   has_floodlights?: boolean;
@@ -103,16 +98,7 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
     if (hasFirstAid) amenities.push("first_aid");
 
     // Standard default operating hours
-    const defaultHours = { open: "06:00", close: "23:00" };
-    const operatingHours = {
-      monday: defaultHours,
-      tuesday: defaultHours,
-      wednesday: defaultHours,
-      thursday: defaultHours,
-      friday: defaultHours,
-      saturday: defaultHours,
-      sunday: defaultHours,
-    };
+    const operatingHours = { open: "06:00", close: "23:00" };
 
     onNext({
       name: name.trim(),
