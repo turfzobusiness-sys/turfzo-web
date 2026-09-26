@@ -149,6 +149,10 @@ function mapOtpErrorCode(code: string | undefined): string {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// Single-flight for token refreshes: concurrent getFreshToken() callers
+// share one Firebase refresh instead of stampeding it. Cleared on settle.
+let freshTokenPromise: Promise<string | undefined> | null = null;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({
     status: "initial",
@@ -540,6 +544,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     pendingLinkedPhoneRef.current = null;
     pendingPhoneSignupRef.current = null;
+    // Unregister this device so pushes for this account stop after handoff.
+    try {
+      const { disableWebPush } = await import("./push");
+      await disableWebPush();
+    } catch {
+      // Best-effort: sign-out must succeed even when push cleanup fails.
+    }
     await firebaseSignOut(auth);
     convexClient.authToken = null;
     setState({
@@ -589,20 +600,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * when the user has been on the page for over 1 hour.
    */
   const getFreshToken = useCallback(async (): Promise<string | undefined> => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) return undefined;
-    const uidAtStart = currentUser.uid;
-    const token = await getIdToken(currentUser, /* forceRefresh */ true);
-    // The refresh round-trip is async: the user may have signed out or
-    // switched accounts while it was in flight. Installing this token would
-    // silently run every subsequent token-less call (e.g. bookings:createPending)
-    // as the previous account. Only apply it if the session still matches
-    // the one we fetched it for.
-    if (auth.currentUser?.uid !== uidAtStart) {
-      return undefined;
+    if (freshTokenPromise) return freshTokenPromise;
+    freshTokenPromise = (async () => {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return undefined;
+      const uidAtStart = currentUser.uid;
+      const token = await getIdToken(currentUser, /* forceRefresh */ true);
+      // The refresh round-trip is async: the user may have signed out or
+      // switched accounts while it was in flight. Installing this token would
+      // silently run every subsequent token-less call (e.g. bookings:createPending)
+      // as the previous account. Only apply it if the session still matches
+      // the one we fetched it for.
+      if (auth.currentUser?.uid !== uidAtStart) {
+        return undefined;
+      }
+      convexClient.authToken = token;
+      return token;
+    })();
+    try {
+      return await freshTokenPromise;
+    } finally {
+      freshTokenPromise = null;
     }
-    convexClient.authToken = token;
-    return token;
   }, []);
 
   return (

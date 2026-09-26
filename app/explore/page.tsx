@@ -121,6 +121,8 @@ interface TurfDisplay {
   facilities: string[];
   image: string;
   city?: string;
+  /** Turf-local UTC offset (min); backend default 330 when absent. */
+  timezoneOffsetMinutes?: number;
   hasFloodlights?: boolean;
   hasFreeParking?: boolean;
   hasChangingRoom?: boolean;
@@ -144,6 +146,7 @@ function mapTurf(t: ConvexTurf): TurfDisplay {
     facilities: t.amenities ?? [],
     image: getLocalTurfImage(t),
     city: t.city,
+    timezoneOffsetMinutes: t.timezone_offset_minutes,
     hasFloodlights: t.has_floodlights,
     hasFreeParking: t.has_free_parking,
     hasChangingRoom: t.has_changing_room,
@@ -171,8 +174,12 @@ interface BookingPricePreview {
   grandTotal: number;
 }
 
-function toDateKey(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+function toDateKey(d: Date, offsetMinutes?: number) {
+  // Turf-local day, not browser-local: backend maps the day via
+  // turf.timezone_offset_minutes, so build the key in that zone.
+  const offset = offsetMinutes ?? 330;
+  const shifted = new Date(d.getTime() + offset * 60_000);
+  return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, "0")}-${String(shifted.getUTCDate()).padStart(2, "0")}`;
 }
 
 function formatPrice(amount: number) {
@@ -284,22 +291,26 @@ function CalendarPicker({
   selected,
   onSelect,
   onClose,
+  offsetMinutes,
 }: {
   selected: string;
   onSelect: (v: string) => void;
   onClose?: () => void;
+  /** Turf-local UTC offset for day keys; defaults to IST (330). */
+  offsetMinutes?: number;
 }) {
   const todayRef = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d;
   }, []);
-  // Booking window: slots are only bookable up to 7 days out (enforced by
-  // the backend) — the calendar mirrors it so no dead-end dates are shown.
+  // Booking window: slots are only bookable 7 days out (today..today+6,
+  // enforced by the backend) — the calendar mirrors it so no dead-end
+  // dates are shown.
   const maxRef = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() + 7);
+    d.setDate(d.getDate() + 6);
     return d;
   }, []);
   const [viewMonth, setViewMonth] = useState(() => {
@@ -337,7 +348,7 @@ function CalendarPicker({
     for (let d = 1; d <= daysInMonth; d++) {
       const dt = new Date(year, month, d);
       dt.setHours(0, 0, 0, 0);
-      const key = toDateKey(dt);
+      const key = toDateKey(dt, offsetMinutes);
       result.push({
         date: dt,
         key,
@@ -347,7 +358,7 @@ function CalendarPicker({
       });
     }
     return result;
-  }, [viewMonth, todayRef, maxRef]);
+  }, [viewMonth, todayRef, maxRef, offsetMinutes]);
 
   const canGoPrev =
     viewMonth.getFullYear() > todayRef.getFullYear() ||
@@ -457,15 +468,18 @@ function ExploreQuerySync({
   currentSport,
   onCity,
   onSport,
+  onTurfId,
 }: {
   currentCity: string;
   currentSport: string;
   onCity: (city: string) => void;
   onSport: (sport: string) => void;
+  onTurfId: (turfId: string) => void;
 }) {
   const searchParams = useSearchParams();
   const citySlug = (searchParams.get("city") ?? "").trim().toLowerCase();
   const sportSlug = (searchParams.get("sport") ?? "").trim().toLowerCase();
+  const turfIdParam = (searchParams.get("turfId") ?? searchParams.get("id") ?? "").trim();
   useEffect(() => {
     if (citySlug) {
       // Alias-aware ("bengaluru" → "Bangalore", "sambhajinagar" → "Aurangabad")
@@ -480,7 +494,10 @@ function ExploreQuerySync({
       const match = EXPLORE_SPORT_IDS.find((id) => id.toLowerCase() === sportSlug);
       if (match && match !== currentSport) onSport(match);
     }
-  }, [citySlug, sportSlug, currentCity, currentSport, onCity, onSport]);
+    if (turfIdParam) {
+      onTurfId(turfIdParam);
+    }
+  }, [citySlug, sportSlug, turfIdParam, currentCity, currentSport, onCity, onSport, onTurfId]);
   return null;
 }
 
@@ -497,6 +514,7 @@ export default function ExplorePage() {
   const [flowStep, setFlowStep] = useState<FlowStep>("listing");
   const [viewMode, setViewMode] = useState<"list" | "details">("list");
   const [selectedTurf, setSelectedTurf] = useState<TurfDisplay | null>(null);
+  const [targetTurfId, setTargetTurfId] = useState<string | null>(null);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [allTurfs, setAllTurfs] = useState<TurfDisplay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -545,6 +563,8 @@ export default function ExplorePage() {
   const [pricePreview, setPricePreview] = useState<BookingPricePreview | null>(
     null,
   );
+  const [promoCode, setPromoCode] = useState("");
+  const [holdSeconds, setHoldSeconds] = useState<number | null>(null);
 
   const groupedSlots = useMemo(() => {    const groups: { title: string; icon: LucideIcon; slots: SlotInfo[] }[] = [
       { title: "Morning", icon: Sunrise, slots: [] },
@@ -665,6 +685,9 @@ export default function ExplorePage() {
             turf_id: selectedTurf.id,
             start_time: selectedSlot.start_time,
             end_time: selectedSlot.end_time,
+            ...(promoCode.trim()
+              ? { promo_code: promoCode.trim().toUpperCase() }
+              : {}),
           },
         );
         if (!cancelled) {
@@ -680,7 +703,15 @@ export default function ExplorePage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedTurf, selectedSlot]);
+  }, [selectedTurf, selectedSlot, promoCode]);
+
+  // 7-min hold countdown once checkout starts.
+  useEffect(() => {
+    if (holdSeconds === null) return;
+    if (holdSeconds <= 0) return;
+    const t = setTimeout(() => setHoldSeconds((s) => (s ?? 1) - 1), 1000);
+    return () => clearTimeout(t);
+  }, [holdSeconds]);
 
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
@@ -848,11 +879,31 @@ export default function ExplorePage() {
     setWishlist((prev) =>
       isFavorited ? prev.filter((x) => x !== id) : [...prev, id],
     );
+    // Favorites are authenticated writes: send a fresh token and retry once
+    // on 401 (token raced expiry), mirroring the dashboard's withAuthRetry.
+    const withFavAuthRetry = async (
+      path: string,
+      args: Record<string, unknown>,
+      token: string | undefined,
+    ): Promise<void> => {
+      try {
+        await convexClient.mutation(path, args, token);
+      } catch (err) {
+        const code = (err as { code?: string })?.code;
+        if (code === "CONVEX_UNAUTHORIZED") {
+          const retryToken = await getFreshToken().catch(() => undefined);
+          await convexClient.mutation(path, args, retryToken);
+          return;
+        }
+        throw err;
+      }
+    };
     try {
+      const token = await getFreshToken().catch(() => undefined);
       if (isFavorited) {
-        await convexClient.mutation("favorites:remove", { turf_id: id });
+        await withFavAuthRetry("favorites:remove", { turf_id: id }, token);
       } else {
-        await convexClient.mutation("favorites:add", { turf_id: id });
+        await withFavAuthRetry("favorites:add", { turf_id: id }, token);
       }
     } catch (err) {
       console.error("Failed to update favorite:", err);
@@ -864,7 +915,7 @@ export default function ExplorePage() {
     }
   };
 
-  const handleOpenSlots = (turf: TurfDisplay) => {
+  const handleOpenSlots = useCallback((turf: TurfDisplay) => {
     setSelectedTurf(turf);
     setSelectedPitch(
       turf.premium ? "Pitch 1 (Premium Turf)" : "Pitch 1 (Standard Turf)",
@@ -872,7 +923,32 @@ export default function ExplorePage() {
     setSelectedDate(searchDate);
     setViewMode("details");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, [searchDate]);
+
+  useEffect(() => {
+    if (!targetTurfId) return;
+    if (allTurfs.length > 0) {
+      const found = allTurfs.find((t) => t.id === targetTurfId);
+      if (found) {
+        handleOpenSlots(found);
+        setTargetTurfId(null);
+        return;
+      }
+    }
+    let cancelled = false;
+    convexClient
+      .query<ConvexTurf | null>("turfs:getById", { turfId: targetTurfId })
+      .then((t) => {
+        if (!cancelled && t) {
+          handleOpenSlots(mapTurf(t));
+          setTargetTurfId(null);
+        }
+      })
+      .catch((e) => console.error("Could not load direct turf link:", e));
+    return () => {
+      cancelled = true;
+    };
+  }, [targetTurfId, allTurfs, handleOpenSlots]);
 
   const handleProceedToCheckout = () => {
     if (viewOnly) return;
@@ -942,6 +1018,7 @@ export default function ExplorePage() {
     payInFlight.current = true;
     setFlowStep("processing");
     setBookingError(null);
+    setHoldSeconds(6 * 60);
 
     // Track the pending booking ID so we can cancel it on failure / abort,
     // freeing the slot for other users (abandonment cleanup).
@@ -950,6 +1027,21 @@ export default function ExplorePage() {
     try {
       // Force-refresh the auth token before any payment calls
       const token = await getFreshToken();
+
+      // Revalidate the slot right before reserving — the grid may be stale
+      // after sitting on checkout. Fail early instead of after Cashfree.
+      const fresh = await convexClient.query<boolean>(
+        "bookings:isSlotAvailable",
+        {
+          turfId: selectedTurf.id,
+          startTime: selectedSlot.start_time,
+          endTime: selectedSlot.end_time,
+        },
+        token,
+      );
+      if (!fresh) {
+        throw new Error("That slot was just taken. Please pick another time.");
+      }
 
       // ── Step 1: Create a pending booking (reserves the slot) ──
       const pendingBooking = await convexClient.mutation<Booking>(
@@ -965,9 +1057,14 @@ export default function ExplorePage() {
           // even though the user was holding a downloaded ticket.
           payment_method:
             selectedPayment === "pay_at_venue" ? "cash" : selectedPayment,
+          ...(promoCode.trim()
+            ? { promo_code: promoCode.trim().toUpperCase() }
+            : {}),
         },
+        token,
       );
       pendingBookingId = pendingBooking._id;
+      setHoldSeconds(null);
 
       // ── Pay-at-venue: no online payment, the venue collects on arrival ──
       if (selectedPayment === "pay_at_venue") {
@@ -1095,13 +1192,18 @@ export default function ExplorePage() {
         // booking and the backend auto-refunds).
         let outcome: { cancelled: boolean; reason?: string } | null = null;
         try {
+          const cleanupToken = await getFreshToken().catch(() => undefined);
           outcome = await convexClient.mutation<{
             cancelled: boolean;
             reason?: string;
-          }>("bookings:cancelIfUnpaid", {
-            bookingId: pendingBookingId,
-            reason: "Payment failed or cancelled by user.",
-          });
+          }>(
+            "bookings:cancelIfUnpaid",
+            {
+              bookingId: pendingBookingId,
+              reason: "Payment failed or cancelled by user.",
+            },
+            cleanupToken,
+          );
         } catch (cancelErr) {
           console.error(
             "Failed to cancel pending booking after payment failure:",
@@ -1114,9 +1216,11 @@ export default function ExplorePage() {
           // confirmed screen. If hydration itself fails, fall back to an
           // honest error rather than an empty shell.
           try {
+            const hydrateToken = await getFreshToken().catch(() => undefined);
             const paid = await convexClient.query<Booking>(
               "bookings:getById",
               { bookingId: pendingBookingId },
+              hydrateToken,
             );
             if (paid) {
               setConfirmedBooking(paid);
@@ -1175,6 +1279,7 @@ export default function ExplorePage() {
           currentSport={selectedSport}
           onCity={setSelectedCity}
           onSport={setSelectedSport}
+          onTurfId={setTargetTurfId}
         />
       </Suspense>
 
@@ -1906,6 +2011,9 @@ export default function ExplorePage() {
                         >
                           <CalendarPicker
                             selected={selectedDate}
+                            offsetMinutes={
+                              selectedTurf?.timezoneOffsetMinutes ?? 330
+                            }
                             onSelect={(v) => {
                               setSelectedDate(v);
                               setShowCalendarBooking(false);

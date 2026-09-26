@@ -483,7 +483,8 @@ const routes: Record<string, MockHandler> = {
     const pricePerHour = turf?.price_per_hour ?? 1000;
     const start = new Date(String(args.start_time));
     const end = new Date(String(args.end_time));
-    const hours = Math.max(1, (end.getTime() - start.getTime()) / 3_600_000);
+    // Whole-hour billing (1–4h), same as backend: round to nearest hour, min 1.
+    const hours = Math.max(1, Math.round((end.getTime() - start.getTime()) / 3_600_000));
     const subtotal = Math.round(pricePerHour * hours * 100) / 100;
     const serviceFee = Math.round(subtotal * 0.05 * 100) / 100;
     return {
@@ -495,6 +496,13 @@ const routes: Record<string, MockHandler> = {
   "bookings:createPending": (args) => {
     const turfId = String(args.turf_id ?? "");
     const turf = findTurf(turfId);
+    const start = new Date(String(args.start_time ?? new Date().toISOString()));
+    const end = new Date(String(args.end_time ?? new Date().toISOString()));
+    const hours = Math.max(
+      1,
+      Math.round((end.getTime() - start.getTime()) / 3_600_000),
+    );
+    const price = turf?.price_per_hour ?? 1000;
     const newBooking = {
       _id: `booking_mock_new_${Date.now()}`,
       id: `booking_mock_new_${Date.now()}`,
@@ -503,8 +511,8 @@ const routes: Record<string, MockHandler> = {
       turf_id: turfId,
       start_time: String(args.start_time ?? new Date().toISOString()),
       end_time: String(args.end_time ?? new Date().toISOString()),
-      total_price: (turf?.price_per_hour ?? 1000) * 1,
-      service_fee: Math.round((turf?.price_per_hour ?? 1000) * 0.05),
+      total_price: price * hours,
+      service_fee: Math.round(price * hours * 0.05),
       status: "pending",
       payment_status: "pending",
       payment_method: "online",
@@ -521,6 +529,21 @@ const routes: Record<string, MockHandler> = {
     mockBookings.unshift(newBooking);
     return newBooking;
   },
+  "bookings:isSlotAvailable": () => true,
+  "bookings:cancelIfUnpaid": () => ({
+    cancelled: true,
+    status: "cancelled",
+    reason: "UNPAID",
+  }),
+  "bookings:getRefundPreview": () => ({
+    refundAmount: 0,
+    refundPolicy: "full",
+    chargedOnline: false,
+    hoursUntilStart: 24,
+    canCancel: true,
+    paymentMethod: "online",
+    paymentStatus: "pending",
+  }),
   "bookings:cancel": ({ bookingId }) => {
     const b = mockBookings.find(
       (x) => x._id === bookingId || x.id === bookingId
@@ -634,6 +657,9 @@ const routes: Record<string, MockHandler> = {
   "notifications:markAllAsRead": () => ({ updated: 1 }),
 
   // ── Tournaments ────────────────────────────────────────────────────
+  // NOTE: the backend exposes "tournaments:getTournamentById" (canonical).
+  // "tournaments:getById" is kept as a local alias pointing at the same
+  // fixture so older call sites keep working.
   "tournaments:getOpen": () => mockTournaments,
   "tournaments:getMyRegistrations": () => [],
   "tournaments:getById": ({ tournamentId }) =>
@@ -696,6 +722,9 @@ const routes: Record<string, MockHandler> = {
   "tournaments:register": (args) => ({
     _id: "reg_mock_1",
     team_name: (args as { team_name?: string }).team_name ?? "Mock Team",
+    registration_code: "REG-MOCK123",
+  }),
+  "tournaments:registerParticipant": () => ({
     registration_code: "REG-MOCK123",
   }),
 

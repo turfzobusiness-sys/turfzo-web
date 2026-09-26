@@ -159,6 +159,17 @@ export default function ManageTournamentPage() {
     initialLoad();
   }, [status, router, load]);
 
+  const getParticipantLabel = (id?: string) => {
+    if (!id) return "TBD";
+    const team = teams.find((t) => t.id === id || t._id === id);
+    if (team) return team.name;
+    const participant = participants.find(
+      (p) => p.id === id || p._id === id || p.user_id === id,
+    );
+    if (participant) return participant.user_name;
+    return id;
+  };
+
   const run = async (fn: () => Promise<unknown>, successMsg: string) => {
     setBusy(true);
     try {
@@ -454,8 +465,8 @@ export default function ManageTournamentPage() {
                         {m.status}
                       </p>
                       <p className="font-sans text-sm font-semibold text-text-main mt-1">
-                        {m.participant1_id || "TBD"} vs{" "}
-                        {m.participant2_id || "TBD"}
+                        {getParticipantLabel(m.participant1_id)} vs{" "}
+                        {getParticipantLabel(m.participant2_id)}
                       </p>
                       {m.score1 != null && (
                         <p className="text-xs text-text-muted mt-0.5">
@@ -463,27 +474,50 @@ export default function ManageTournamentPage() {
                         </p>
                       )}
                     </div>
-                    {m.status !== "completed" && (
-                      <button
-                        disabled={busy}
-                        onClick={() => {
-                          const winnerId = window.prompt(
-                            `Who won match ${m.match_number}? Enter participant id (${m.participant1_id} or ${m.participant2_id})`,
-                          );
-                          if (!winnerId) return;
-                          run(
-                            () =>
-                              convexClient.mutation(
-                                "tournaments:updateMatchResult",
-                                { matchId: m.id, winnerId },
-                              ),
-                            "Match result saved",
-                          );
-                        }}
-                        className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-3 py-1.5 bg-elevated hover:bg-elevated/80 text-text-main disabled:opacity-50"
-                      >
-                        Set winner
-                      </button>
+                    {m.status !== "completed" ? (
+                      m.participant1_id && m.participant2_id ? (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs text-text-muted mr-1">Winner:</span>
+                          <button
+                            disabled={busy}
+                            onClick={() =>
+                              run(
+                                () =>
+                                  convexClient.mutation(
+                                    "tournaments:updateMatchResult",
+                                    { matchId: m.id, winnerId: m.participant1_id! },
+                                  ),
+                                `Winner: ${getParticipantLabel(m.participant1_id)}`,
+                              )
+                            }
+                            className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-2.5 py-1.5 bg-brand-lime/15 text-brand-lime hover:bg-brand-lime/25 disabled:opacity-50"
+                          >
+                            {getParticipantLabel(m.participant1_id)}
+                          </button>
+                          <button
+                            disabled={busy}
+                            onClick={() =>
+                              run(
+                                () =>
+                                  convexClient.mutation(
+                                    "tournaments:updateMatchResult",
+                                    { matchId: m.id, winnerId: m.participant2_id! },
+                                  ),
+                                `Winner: ${getParticipantLabel(m.participant2_id)}`,
+                              )
+                            }
+                            className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-2.5 py-1.5 bg-brand-lime/15 text-brand-lime hover:bg-brand-lime/25 disabled:opacity-50"
+                          >
+                            {getParticipantLabel(m.participant2_id)}
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-text-muted italic">Waiting for contestants</span>
+                      )
+                    ) : (
+                      <span className="text-xs font-semibold text-brand-lime flex items-center gap-1">
+                        <Check className="w-3.5 h-3.5" /> Won by {getParticipantLabel(m.winner_id)}
+                      </span>
                     )}
                   </div>
                 ))

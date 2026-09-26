@@ -20,6 +20,12 @@ function expectedHostnames(): Set<string> {
 export async function POST(req: Request) {
   const secret = (process.env.TURNSTILE_SECRET_KEY ?? "").trim();
   if (!secret) {
+    // Fail-closed in production: never skip bot verification live.
+    // Dev-only bypass so local development works without secrets.
+    if (process.env.NODE_ENV === "production") {
+      console.error("[turnstile] TURNSTILE_SECRET_KEY not set — rejecting (fail-closed).");
+      return NextResponse.json({ error: "Bot verification unavailable." }, { status: 403 });
+    }
     console.warn("[turnstile] TURNSTILE_SECRET_KEY not set — skipping verification (dev only).");
     return NextResponse.json({ ok: true, skipped: true });
   }

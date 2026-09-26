@@ -57,6 +57,16 @@ export default async function VenuePage({ params }: Props) {
   const city = turf.city || "India";
   const venueImage = getLocalTurfImage(turf);
 
+  const openTime =
+    (turf.operating_hours as any)?.open ??
+    (turf.operating_hours as any)?.monday?.open ??
+    "06:00";
+  const closeTime =
+    (turf.operating_hours as any)?.close ??
+    (turf.operating_hours as any)?.monday?.close ??
+    "23:00";
+  const venueOpeningHours = `Mo-Su ${openTime}-${closeTime}`;
+
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <BreadcrumbListSchema items={[
@@ -72,7 +82,7 @@ export default async function VenuePage({ params }: Props) {
         sportType={sport}
         pricePerHour={turf.price_per_hour || 1000}
         image={venueImage}
-        openingHours="Mo-Su 06:00-23:00"
+        openingHours={venueOpeningHours}
       />
       <Header />
 
@@ -128,12 +138,12 @@ export default async function VenuePage({ params }: Props) {
                     </span>
                   ))}
                   {turf.has_floodlights && (
-                    <span className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">
+                    <span key="floodlights" className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">
                       <CheckCircle2 className="w-3 h-3 text-brand-lime" /> Floodlights
                     </span>
                   )}
                   {turf.has_free_parking && (
-                    <span className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">
+                    <span key="parking" className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">
                       <CheckCircle2 className="w-3 h-3 text-brand-lime" /> Free Parking
                     </span>
                   )}
@@ -147,7 +157,7 @@ export default async function VenuePage({ params }: Props) {
                   <span className="text-3xl font-extrabold text-text-main tabular-nums">₹{turf.price_per_hour}</span>
                   <span className="text-text-muted text-sm"> / hour</span>
                 </div>
-                <Link href={`/explore`} className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-4 px-6 rounded-md flex justify-center items-center gap-2 transition-all">
+                <Link href={`/explore?turfId=${venueId}`} className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-4 px-6 rounded-md flex justify-center items-center gap-2 transition-all">
                   Check Availability & Book
                   <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                 </Link>
@@ -156,7 +166,7 @@ export default async function VenuePage({ params }: Props) {
                   className="w-full py-3 px-6 mt-3"
                 />
                 <p className="text-center text-xs text-text-muted mt-4">
-                  Free cancellation up to 24 hours in advance.
+                  Full refund up to 24 hrs, 50% refund up to 6 hrs before slot.
                 </p>
               </div>
             </div>

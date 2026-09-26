@@ -14,14 +14,12 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
   },
-  ...(isProd
-    ? [
-        {
-          key: "Strict-Transport-Security",
-          value: "max-age=31536000; includeSubDomains",
-        },
-      ]
-    : []),
+  // Served over https only (Workers) — HSTS in every env so staging
+  // previews get the same transport guarantee as production.
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=31536000; includeSubDomains",
+  },
 ];
 
 // Strict CSP: no 'unsafe-eval' — SDK lazy-loaders (PostHog, Sentry) use
@@ -44,7 +42,10 @@ const csp = [
   `script-src ${scriptSrc}`,
   "frame-src 'self' https://challenges.cloudflare.com https://api.cashfree.com https://sandbox.cashfree.com https://*.cashfree.com https://*.firebaseapp.com https://*.firebaseauth.com",
   "connect-src 'self' https://challenges.cloudflare.com https://*.cashfree.com https://api.cashfree.com https://sandbox.cashfree.com https://*.convex.cloud https://*.convex.site wss://*.convex.cloud https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.firebaseauth.com https://*.datadoghq.com https://browser-intake-us5-datadoghq.com",
-  "img-src 'self' data: blob: https:",
+  // Scoped to self + the two known Convex deployments' storage/API
+  // hosts plus the marketing image CDNs in remotePatterns above — no
+  // blanket https: (that would let any third-party host track pixels).
+  "img-src 'self' data: blob: https://dependable-donkey-330.eu-west-1.convex.cloud https://dependable-donkey-330.eu-west-1.convex.site https://woozy-husky-516.eu-west-1.convex.cloud https://woozy-husky-516.eu-west-1.convex.site https://images.unsplash.com https://images.pexels.com",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   "object-src 'none'",

@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function OwnerDashboardPage() {
-  const { status, convexUser } = useAuth();
+  const { status, convexUser, getFreshToken } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [ownerData, setOwnerData] = useState<OnboardingState | null>(null);
@@ -61,8 +61,29 @@ export default function OwnerDashboardPage() {
       }
 
       try {
+        // Authenticated reads pass a fresh Firebase ID token explicitly;
+        // on a 401 (token raced expiry) retry the whole sequence once
+        // with a new token before surfacing the error.
+        const withAuthRetry = async <T,>(
+          path: string,
+          args: Record<string, unknown>,
+          token: string | undefined,
+        ): Promise<T> => {
+          try {
+            return await convexClient.query<T>(path, args, token);
+          } catch (err) {
+            const code = (err as { code?: string })?.code;
+            if (code === "CONVEX_UNAUTHORIZED") {
+              const retryToken = await getFreshToken().catch(() => undefined);
+              return await convexClient.query<T>(path, args, retryToken);
+            }
+            throw err;
+          }
+        };
+
+        const token = await getFreshToken().catch(() => undefined);
         const profileState =
-          await convexClient.query<OnboardingState | null>("auth:getOwnerProfile");
+          await withAuthRetry<OnboardingState | null>("auth:getOwnerProfile", {}, token);
 
         if (profileState && !profileState.profile?.onboarding_completed) {
           router.push("/owners/onboarding");
@@ -71,7 +92,7 @@ export default function OwnerDashboardPage() {
 
         setOwnerData(profileState);
 
-        const ownerTurfs = await convexClient.query<Turf[]>("auth:getOwnerTurfs");
+        const ownerTurfs = await withAuthRetry<Turf[]>("auth:getOwnerTurfs", {}, token);
 
         // Detect approval transition so we can celebrate it once.
         const approvedNow = Boolean(profileState?.user?.is_approved);
@@ -89,9 +110,10 @@ export default function OwnerDashboardPage() {
         // Approved owners get a read-only analytics snapshot. Management
         // lives in the Turfzo app — this page only ever displays data.
         if (approvedNow && profileState?.user?._id) {
-          const s = await convexClient.query<OwnerDashboardSummary>(
+          const s = await withAuthRetry<OwnerDashboardSummary>(
             "owner_dashboard:getSummary",
             { ownerId: profileState.user._id },
+            token,
           );
           setSummary(s);
         } else {
@@ -106,7 +128,7 @@ export default function OwnerDashboardPage() {
         setLoading(false);
       }
     }
-  }, [status, convexUser, router]);
+  }, [status, convexUser, router, getFreshToken]);
 
   const [reapplyLoading, setReapplyLoading] = useState(false);
 
@@ -114,7 +136,24 @@ export default function OwnerDashboardPage() {
     if (reapplyLoading) return;
     setReapplyLoading(true);
     try {
-      await convexClient.mutation("auth:reapplyAsOwner", {});
+      // Authenticated write: fresh token up front, one retry on 401
+      // (token raced expiry) before surfacing the error.
+      const token = await getFreshToken().catch(() => undefined);
+      try {
+        await convexClient.mutation("auth:reapplyAsOwner", {}, token);
+      } catch (err) {
+        const code = (err as { code?: string })?.code;
+        if (code === "CONVEX_UNAUTHORIZED") {
+          const retryToken = await getFreshToken().catch(() => undefined);
+          await convexClient.mutation(
+            "auth:reapplyAsOwner",
+            {},
+            retryToken,
+          );
+        } else {
+          throw err;
+        }
+      }
       toast.success("Application reset. Edit your details and submit again.");
       setTimeout(() => router.push("/owners/onboarding"), 1200);
     } catch (err) {
@@ -134,13 +173,21 @@ export default function OwnerDashboardPage() {
     }
   }, [status, loadData]);
 
-  // Poll for approval while the application is under review
+  // Poll for approval while the application is under review, with backoff
+  // and tab-visibility guard so background tabs do not hammer Convex.
   useEffect(() => {
     if (!isApproved && ownerData && !isRejected) {
-      const interval = setInterval(() => {
-        void loadData();
-      }, 10000);
-      return () => clearInterval(interval);
+      let delay = 10000;
+      let timer: ReturnType<typeof setTimeout>;
+      const tick = () => {
+        if (document.visibilityState === "visible") {
+          void loadData();
+        }
+        delay = Math.min(delay * 1.5, 60000);
+        timer = setTimeout(tick, delay);
+      };
+      timer = setTimeout(tick, delay);
+      return () => clearTimeout(timer);
     }
   }, [isApproved, isRejected, ownerData, loadData]);
 
@@ -201,7 +248,7 @@ export default function OwnerDashboardPage() {
       iconClass: "text-amber-400",
       bgClass: "bg-amber-400/5 border-amber-400/10",
       title: "Application Under Review",
-      desc: "Our onboarding team is reviewing your business details, bank credentials, and venue specifications. This typically takes up to 2-4 hours.",
+      desc: "Our onboarding team is reviewing your business details, bank credentials, and venue specifications. This typically takes up to 24 hours.",
       badgeText: "Pending Review",
       badgeClass: "bg-amber-400/10 border-amber-400/20 text-amber-400",
     };

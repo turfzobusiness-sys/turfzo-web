@@ -28,17 +28,14 @@ const SPORTS = [
 ];
 
 const TOURNAMENT_TYPES = [
-  "Knockout",
-  "League",
-  "Round Robin",
-  "Group Stage",
+  { value: "team", label: "Team / Squad" },
+  { value: "individual", label: "Individual / Solo" },
 ];
 
 const BRACKET_TYPES = [
-  "Single Elimination",
-  "Double Elimination",
-  "League",
-  "Groups + Knockout",
+  { value: "single_elimination", label: "Single Elimination (Knockout)" },
+  { value: "double_elimination", label: "Double Elimination" },
+  { value: "round_robin", label: "Round Robin (League)" },
 ];
 
 const inputCls =
@@ -52,8 +49,8 @@ export default function CreateTournamentPage() {
 
   const [name, setName] = useState("");
   const [sportType, setSportType] = useState(SPORTS[0]);
-  const [tournamentType, setTournamentType] = useState(TOURNAMENT_TYPES[0]);
-  const [bracketType, setBracketType] = useState(BRACKET_TYPES[0]);
+  const [tournamentType, setTournamentType] = useState(TOURNAMENT_TYPES[0].value);
+  const [bracketType, setBracketType] = useState(BRACKET_TYPES[0].value);
   const [entryFee, setEntryFee] = useState("0");
   const [prizePool, setPrizePool] = useState("");
   const [maxParticipants, setMaxParticipants] = useState("8");
@@ -237,8 +234,8 @@ export default function CreateTournamentPage() {
                   className={inputCls}
                 >
                   {TOURNAMENT_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
+                    <option key={t.value} value={t.value}>
+                      {t.label}
                     </option>
                   ))}
                 </select>
@@ -251,8 +248,8 @@ export default function CreateTournamentPage() {
                   className={inputCls}
                 >
                   {BRACKET_TYPES.map((b) => (
-                    <option key={b} value={b}>
-                      {b}
+                    <option key={b.value} value={b.value}>
+                      {b.label}
                     </option>
                   ))}
                 </select>
