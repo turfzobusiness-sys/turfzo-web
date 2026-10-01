@@ -1,7 +1,22 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  // Preview-first Cloudflare setup. Vercel stays live: vercel.json, DNS, and
-  // turfzo.app are untouched. First deploy target is <name>.workers.dev only.
+  // PRODUCTION worker for the Turfzo website.
+  //
+  // This is the only hosting target: the site is a Next.js app bundled by
+  // @opennextjs/cloudflare and served from Cloudflare Workers. Vercel was
+  // retired on 2026-09-06; the `routes` below claim turfzo.app and
+  // www.turfzo.app for this worker, so the apex is served from here.
+  //
+  // (An earlier revision of this comment claimed "Vercel stays live" and that
+  // turfzo.app was untouched. That stopped being true as soon as `routes` were
+  // added. Do not restore that wording.)
+  //
+  // workers_dev/preview_urls stay enabled deliberately: the workers.dev origin
+  // is the documented post-deploy smoke-test target and preview URLs are how a
+  // build gets reviewed before promotion. The cost is that those origins sit
+  // outside the turfzo.app zone, so the zone WAF custom rules and the
+  // http_ratelimit rule under cloudflare/ do not apply to them — see the
+  // SCOPE LIMIT notes in cloudflare/waf-custom-rules.json.
   "main": ".open-next/worker.js",
   "name": "turfzo-web",
   "compatibility_date": "2026-08-01",

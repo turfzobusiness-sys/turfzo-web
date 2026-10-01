@@ -100,6 +100,14 @@ export default function SetupPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-bg text-text-main">
+      {/* Admin bootstrap surface \u2014 must never be indexed. robots.ts
+          disallows /setup and next.config.ts sends X-Robots-Tag; this tag
+          covers crawlers that honour the meta directive over the header. */}
+      <head>
+        <meta name="robots" content="noindex, nofollow" />
+        <title>Initial Admin Setup | Turfzo</title>
+        <link rel="canonical" href="https://turfzo.app/setup" />
+      </head>
       <Header />
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-lg mx-auto px-6">

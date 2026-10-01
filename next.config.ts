@@ -45,7 +45,11 @@ const csp = [
   // Scoped to self + the two known Convex deployments' storage/API
   // hosts plus the marketing image CDNs in remotePatterns above — no
   // blanket https: (that would let any third-party host track pixels).
-  "img-src 'self' data: blob: https://dependable-donkey-330.eu-west-1.convex.cloud https://dependable-donkey-330.eu-west-1.convex.site https://woozy-husky-516.eu-west-1.convex.cloud https://woozy-husky-516.eu-west-1.convex.site https://images.unsplash.com https://images.pexels.com",
+  // Mirrors images.remotePatterns below — keep the two lists identical.
+  // lh3.googleusercontent.com serves Google sign-in avatars (Firebase
+  // photoURL), which were blocked, so every Google account rendered a broken
+  // profile picture.
+  "img-src 'self' data: blob: https://dependable-donkey-330.eu-west-1.convex.cloud https://dependable-donkey-330.eu-west-1.convex.site https://woozy-husky-516.eu-west-1.convex.cloud https://woozy-husky-516.eu-west-1.convex.site https://images.unsplash.com https://images.pexels.com https://lh3.googleusercontent.com",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   "object-src 'none'",
@@ -65,7 +69,16 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     // Scoped to the two known Convex deployments (PROD dependable-donkey-330,
     // DEV woozy-husky-516), both API host (.cloud) and storage host (.site —
-    // turf image_url values resolve to storage URLs). No wildcards.
+    // turf image_url values resolve to storage URLs), the marketing stock
+    // CDNs, and Google's avatar host. No wildcards.
+    //
+    // The backend's assertSafeHttpUrl accepts any http(s) image URL, so an
+    // owner-typed host outside this list would 400 through the optimizer. The
+    // client side agrees with this list on purpose: lib/turf-images.ts
+    // substitutes a local placeholder for any remote URL whose host is not
+    // here, so a new host degrades to a generic venue photo instead of a
+    // broken image — without opening the optimizer (and the CSP) up to
+    // arbitrary third-party hosts.
     remotePatterns: [
       {
         protocol: "https",
@@ -91,6 +104,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.pexels.com",
       },
+      // Google sign-in avatars (Firebase photoURL -> lh3.googleusercontent.com).
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
     ],
   },
   turbopack: {
@@ -109,6 +127,14 @@ const nextConfig: NextConfig = {
             key: "CDN-Cache-Control",
             value: "public, max-age=31536000, immutable",
           },
+        ],
+      },
+      {
+        // /setup is the admin bootstrap page. Defence in depth alongside the
+        // robots.txt disallow and the page's own noindex meta tag.
+        source: "/setup",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],
       },
       {

@@ -31,7 +31,7 @@ const faqItems = [
   { question: "What sports can I book on Turfzo?", answer: "Turfzo supports football, cricket, badminton, tennis, and multipurpose sports venues. We have turfs across 9 Indian cities, from Mumbai to CSN (Aurangabad)." },
   { question: "Is online payment safe on Turfzo?", answer: "Yes, Turfzo uses Cashfree for payment processing, which is PCI DSS compliant. We support UPI, credit cards, debit cards, and net banking." },
   { question: "Do I need to download an app to book?", answer: "No, you can book directly on turfzo.app from any browser. We also have a mobile app for Android and iOS if you prefer." },
-  { question: "What happens if it rains on my booking day?", answer: "If the turf is outdoor and weather conditions prevent play, you can reschedule or get a full refund. Indoor turfs are not affected by weather." },
+  { question: "What happens if it rains on my booking day?", answer: "For outdoor turfs where weather prevents play, the venue may approve a reschedule from My Bookings, or you can cancel under the standard policy: full refund of the play price (service fee is non-refundable) 24+ hours before the slot, 50% up to 6 hours before, and no refund within 6 hours. Indoor turfs are not affected by weather." },
 ];
 
 export default function HowItWorksPage() {

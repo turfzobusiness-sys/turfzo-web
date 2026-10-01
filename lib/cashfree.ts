@@ -48,11 +48,53 @@ export interface OpenCheckoutArgs {
 }
 
 /**
+ * How confident we are about a checkout that did NOT resolve.
+ *
+ *   - "failed"  — we know no money moved (the user dismissed the modal, or
+ *                 the gateway reported an explicit cancellation). Safe to
+ *                 release the pending booking.
+ *   - "unknown" — we could not observe the outcome (client timeout, an
+ *                 unexpected SDK/network error). The charge MAY have landed,
+ *                 so callers must NOT cancel; the server reconciles.
+ *
+ * This mirrors the Flutter client's PaymentOutcomeStatus.paid /
+ * .failed / .unavailable contract (lib/core/payments/payment_coordinator.dart).
+ */
+export type CashfreeFailureOutcome = "failed" | "unknown";
+
+/**
+ * Rejection type of {@link openCashfreeCheckout}. Callers must branch on
+ * `outcome`, never on the message text: a plain `Error` is ambiguous and
+ * previously made the caller cancel bookings whose money may have been
+ * captured.
+ */
+export class CashfreeCheckoutError extends Error {
+  readonly outcome: CashfreeFailureOutcome;
+
+  constructor(outcome: CashfreeFailureOutcome, message: string, cause?: unknown) {
+    super(message);
+    this.name = "CashfreeCheckoutError";
+    this.outcome = outcome;
+    if (cause !== undefined) this.cause = cause;
+  }
+}
+
+/**
+ * True when a gateway error text describes an explicit user cancellation.
+ * Anything else (declines aside, which the gateway reports via
+ * `result.error` and which are definitive) stays "unknown" — we cannot see
+ * the network, so we cannot claim the money never moved.
+ */
+function isCancellationText(text: string): boolean {
+  return /cancel/i.test(text);
+}
+
+/**
  * Opens the Cashfree checkout in a modal popup on the current page.
  *
  * Resolves when the user completes the payment inside the modal.
- * Rejects with a descriptive Error if the payment fails, the user
- * closes the modal, or an unexpected SDK error occurs.
+ * Rejects with a {@link CashfreeCheckoutError} otherwise; its `outcome`
+ * says whether the failure is definitive.
  *
  * NOTE: Even on resolve, the caller MUST verify the payment server-side
  * via `payments:verifyCashfreePayment` — the frontend result is not
@@ -68,7 +110,14 @@ export async function openCashfreeCheckout(
 
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new Error("Payment timed out. Please try again."));
+      // UNKNOWN, not failed: the tab may have lost the callback while the
+      // charge completed. The backend reconciles within the lock window.
+      reject(
+        new CashfreeCheckoutError(
+          "unknown",
+          "The payment window closed before we could confirm the result. Your payment status will be checked — nothing was double-charged.",
+        ),
+      );
     }, timeoutMs);
     cashfree
       .checkout({
@@ -83,8 +132,15 @@ export async function openCashfreeCheckout(
         }) => {
           clearTimeout(timer);
           if (result.error) {
+            const message =
+              result.error.message || "Payment failed or cancelled";
             reject(
-              new Error(result.error.message || "Payment failed or cancelled"),
+              new CashfreeCheckoutError(
+                isCancellationText(message) ? "failed" : "unknown",
+                isCancellationText(message)
+                  ? "Payment was cancelled."
+                  : "Payment could not be completed. Please try again.",
+              ),
             );
             return;
           }
@@ -92,13 +148,24 @@ export async function openCashfreeCheckout(
             resolve();
             return;
           }
-          // Neither error nor paymentDetails — user dismissed the modal
-          reject(new Error("Payment was cancelled."));
+          // Neither error nor paymentDetails — user dismissed the modal.
+          // That is an observable, definitive "no payment".
+          reject(
+            new CashfreeCheckoutError("failed", "Payment was cancelled."),
+          );
         },
       )
       .catch((err: unknown) => {
         clearTimeout(timer);
-        reject(err instanceof Error ? err : new Error("Checkout error."));
+        // A thrown SDK/network error tells us nothing about whether the
+        // charge landed. Classify as unknown and let the server reconcile.
+        reject(
+          new CashfreeCheckoutError(
+            "unknown",
+            "Payment could not be completed. Please try again.",
+            err,
+          ),
+        );
       });
   });
 }

@@ -60,9 +60,17 @@ interface Match {
   id: string;
   round_number: number;
   match_number: number;
+  // Individual fixtures
   participant1_id?: string;
   participant2_id?: string;
   winner_id?: string;
+  // Team fixtures. generateInitialMatches writes team1_id / team2_id and
+  // records the winner in winner_team_id — without these the "Winner"
+  // buttons below never rendered for a team bracket and no winner could be
+  // recorded at all.
+  team1_id?: string;
+  team2_id?: string;
+  winner_team_id?: string;
   score1?: string;
   score2?: string;
   status: string;
@@ -78,16 +86,33 @@ interface Announcement {
 
 type Tab = "participants" | "matches" | "announcements" | "settings";
 
-const STATUS_OPTIONS = [
-  "draft",
-  "registration_open",
-  "open",
-  "registration_closed",
-  "upcoming",
-  "in_progress",
-  "completed",
-  "cancelled",
-];
+/**
+ * Legal status transitions — mirrors the `allowed` adjacency map in
+ * tournaments:updateTournamentStatus. The old flat list offered every
+ * status for every tournament, so most picks were rejected server-side.
+ */
+const STATUS_TRANSITIONS: Record<string, string[]> = {
+  draft: ["upcoming", "registration_open", "cancelled", "deleted"],
+  upcoming: ["registration_open", "registration_closed", "cancelled"],
+  open: ["registration_closed", "in_progress", "cancelled"],
+  registration_open: ["registration_closed", "in_progress", "cancelled"],
+  registration_closed: ["in_progress", "registration_open", "cancelled"],
+  in_progress: ["completed", "cancelled"],
+  completed: [],
+  cancelled: [],
+  deleted: [],
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  draft: "Draft (hidden from players)",
+  upcoming: "Upcoming (registration not yet open)",
+  registration_open: "Registration open",
+  open: "Open (legacy alias of registration open)",
+  registration_closed: "Registration closed",
+  in_progress: "In progress",
+  completed: "Completed",
+  cancelled: "Cancelled (entry fees refunded)",
+};
 
 export default function ManageTournamentPage() {
   const params = useParams<{ tournamentId: string }>();
@@ -170,6 +195,20 @@ export default function ManageTournamentPage() {
     return id;
   };
 
+  /** A fixture is a team match when either slot holds a team id. */
+  const isTeamMatch = (m: Match) =>
+    Boolean(m.team1_id ?? m.team2_id);
+
+  /** The two contestants of a fixture, whatever kind it is. */
+  const matchSides = (m: Match): [string | undefined, string | undefined] =>
+    isTeamMatch(m)
+      ? [m.team1_id, m.team2_id]
+      : [m.participant1_id, m.participant2_id];
+
+  /** The recorded winner of a completed fixture, team or individual. */
+  const matchWinner = (m: Match): string | undefined =>
+    m.winner_team_id ?? m.winner_id;
+
   const run = async (fn: () => Promise<unknown>, successMsg: string) => {
     setBusy(true);
     try {
@@ -249,6 +288,10 @@ export default function ManageTournamentPage() {
       </div>
     );
   }
+
+  // Only transitions the backend actually accepts from the current state.
+  // Computed after the null guard (it is a plain array lookup, not a hook).
+  const allowedStatusOptions = STATUS_TRANSITIONS[tournament.status] ?? [];
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "participants", label: "Participants", icon: <Users className="w-4 h-4" /> },
@@ -454,7 +497,11 @@ export default function ManageTournamentPage() {
                   the bracket.
                 </p>
               ) : (
-                matches.map((m) => (
+                matches.map((m) => {
+                  const [sideA, sideB] = matchSides(m);
+                  const teamFixture = isTeamMatch(m);
+                  const winner = matchWinner(m);
+                  return (
                   <div
                     key={m.id}
                     className="flex items-center justify-between gap-3 bg-surface border border-border-default rounded-md p-4"
@@ -463,10 +510,10 @@ export default function ManageTournamentPage() {
                       <p className="text-xs text-text-muted">
                         Round {m.round_number} · Match {m.match_number} ·{" "}
                         {m.status}
+                        {teamFixture ? " · team fixture" : ""}
                       </p>
                       <p className="font-sans text-sm font-semibold text-text-main mt-1">
-                        {getParticipantLabel(m.participant1_id)} vs{" "}
-                        {getParticipantLabel(m.participant2_id)}
+                        {getParticipantLabel(sideA)} vs {getParticipantLabel(sideB)}
                       </p>
                       {m.score1 != null && (
                         <p className="text-xs text-text-muted mt-0.5">
@@ -475,52 +522,53 @@ export default function ManageTournamentPage() {
                       )}
                     </div>
                     {m.status !== "completed" ? (
-                      m.participant1_id && m.participant2_id ? (
+                      sideA && sideB ? (
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="text-xs text-text-muted mr-1">Winner:</span>
-                          <button
-                            disabled={busy}
-                            onClick={() =>
-                              run(
-                                () =>
-                                  convexClient.mutation(
-                                    "tournaments:updateMatchResult",
-                                    { matchId: m.id, winnerId: m.participant1_id! },
-                                  ),
-                                `Winner: ${getParticipantLabel(m.participant1_id)}`,
-                              )
-                            }
-                            className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-2.5 py-1.5 bg-brand-lime/15 text-brand-lime hover:bg-brand-lime/25 disabled:opacity-50"
-                          >
-                            {getParticipantLabel(m.participant1_id)}
-                          </button>
-                          <button
-                            disabled={busy}
-                            onClick={() =>
-                              run(
-                                () =>
-                                  convexClient.mutation(
-                                    "tournaments:updateMatchResult",
-                                    { matchId: m.id, winnerId: m.participant2_id! },
-                                  ),
-                                `Winner: ${getParticipantLabel(m.participant2_id)}`,
-                              )
-                            }
-                            className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-2.5 py-1.5 bg-brand-lime/15 text-brand-lime hover:bg-brand-lime/25 disabled:opacity-50"
-                          >
-                            {getParticipantLabel(m.participant2_id)}
-                          </button>
+                          {[sideA, sideB].map((side) => (
+                            <button
+                              key={side}
+                              disabled={busy}
+                              onClick={() =>
+                                run(
+                                  () =>
+                                    convexClient.mutation(
+                                      "tournaments:updateMatchResult",
+                                      {
+                                        matchId: m.id,
+                                        // winnerId is required by the arg
+                                        // validator; for a team fixture the
+                                        // team id must also go in
+                                        // winnerTeamId, otherwise the backend
+                                        // records a team winner as an
+                                        // individual one.
+                                        winnerId: side,
+                                        ...(teamFixture
+                                          ? { winnerTeamId: side }
+                                          : {}),
+                                      },
+                                    ),
+                                  `Winner: ${getParticipantLabel(side)}`,
+                                )
+                              }
+                              className="inline-flex items-center gap-1 rounded-md text-xs font-semibold px-2.5 py-1.5 bg-brand-lime/15 text-brand-lime hover:bg-brand-lime/25 disabled:opacity-50"
+                            >
+                              {getParticipantLabel(side)}
+                            </button>
+                          ))}
                         </div>
                       ) : (
                         <span className="text-xs text-text-muted italic">Waiting for contestants</span>
                       )
                     ) : (
                       <span className="text-xs font-semibold text-brand-lime flex items-center gap-1">
-                        <Check className="w-3.5 h-3.5" /> Won by {getParticipantLabel(m.winner_id)}
+                        <Check className="w-3.5 h-3.5" /> Won by{" "}
+                        {getParticipantLabel(winner)}
                       </span>
                     )}
                   </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
@@ -626,40 +674,60 @@ export default function ManageTournamentPage() {
                 <label className="block text-sm font-semibold text-text-main mb-1.5">
                   Tournament status
                 </label>
-                <div className="flex flex-wrap gap-2">
-                  <select
-                    value={statusDraft}
-                    onChange={(e) => setStatusDraft(e.target.value)}
-                    className="w-full sm:w-auto rounded-md border border-border-default bg-bg px-3.5 py-2.5 text-sm text-text-main focus:border-border-strong focus:outline-none"
-                  >
-                    {STATUS_OPTIONS.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    disabled={busy}
-                    onClick={() =>
-                      run(
-                        () =>
-                          convexClient.mutation(
-                            "tournaments:updateTournamentStatus",
-                            { tournamentId, status: statusDraft },
-                          ),
-                        "Status updated",
-                      )
-                    }
-                    className="inline-flex items-center gap-2 rounded-md text-sm font-semibold h-10 px-4 py-2 bg-brand-lime text-white hover:bg-brand-lime-hover disabled:opacity-50"
-                  >
-                    Update status
-                  </button>
-                </div>
+                <p className="text-xs text-text-muted mb-3">
+                  Current:{" "}
+                  <span className="font-mono text-text-main">
+                    {tournament.status}
+                  </span>
+                </p>
+                {/* Terminal statuses have no legal next state — say so
+                    instead of offering a dropdown the backend rejects. */}
+                {allowedStatusOptions.length === 0 ? (
+                  <p className="text-sm text-text-muted">
+                    This tournament is{" "}
+                    <span className="font-mono">{tournament.status}</span>{" "}
+                    — a final state. No further status changes are possible.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    <select
+                      value={statusDraft}
+                      onChange={(e) => setStatusDraft(e.target.value)}
+                      className="w-full sm:w-auto rounded-md border border-border-default bg-bg px-3.5 py-2.5 text-sm text-text-main focus:border-border-strong focus:outline-none"
+                    >
+                      {/* Illegal targets are disabled, not hidden, so the
+                          full lifecycle stays discoverable and the reason
+                          is obvious. */}
+                      {STATUS_TRANSITIONS[tournament.status]?.map((s) => (
+                        <option key={s} value={s} disabled={s !== statusDraft}>
+                          {STATUS_LABELS[s] ?? s}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      disabled={busy || !allowedStatusOptions.includes(statusDraft)}
+                      onClick={() =>
+                        run(
+                          () =>
+                            convexClient.mutation(
+                              "tournaments:updateTournamentStatus",
+                              { tournamentId, status: statusDraft },
+                            ),
+                          "Status updated",
+                        )
+                      }
+                      className="inline-flex items-center gap-2 rounded-md text-sm font-semibold h-10 px-4 py-2 bg-brand-lime text-white hover:bg-brand-lime-hover disabled:opacity-50"
+                    >
+                      Update status
+                    </button>
+                  </div>
+                )}
                 <p className="text-xs text-text-muted mt-2">
                   Use <span className="font-mono">registration_open</span> to
                   open registration, then{" "}
                   <span className="font-mono">in_progress</span> after
-                  generating the bracket.
+                  generating the bracket. Other transitions are rejected by
+                  the server.
                 </p>
               </div>
 

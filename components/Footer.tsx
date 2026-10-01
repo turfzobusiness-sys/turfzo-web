@@ -192,7 +192,7 @@ export default function Footer() {
               <li className="flex items-center gap-3 text-sm text-text-muted">
                 <Mail className="w-4 h-4 text-text-muted shrink-0 stroke-[1.5]" />
                 <span className="font-sans hover:text-text-main transition-colors cursor-pointer">
-                  support@turfzo.com
+                  support@turfzo.app
                 </span>
               </li>
             </ul>

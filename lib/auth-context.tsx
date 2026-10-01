@@ -161,33 +161,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error: null,
   });
 
-  const syncConvexUser = useCallback(async (firebaseUser: FirebaseUser, role?: string) => {
-    try {
-      const token = await getIdToken(firebaseUser);
-      const response = await convexClient.action<{
-        success: boolean;
-        user: AppUser;
-        session_token: string;
-      }>(
-        "auth:syncFirebaseUser",
-        {
-          displayName: firebaseUser.displayName || undefined,
-          avatarUrl: firebaseUser.photoURL || undefined,
-          phoneNumber: firebaseUser.phoneNumber || undefined,
-          role: role || undefined,
-        },
-        token,
-      );
-      convexClient.authToken = token;
-      if (response.success && response.user) {
-        return response.user;
+  /**
+   * Resolves the Convex profile for a Firebase identity.
+   *
+   * Returns `null` when the sync fails OR when the session changed while the
+   * round-trip was in flight (sign-out / account switch). Both cases mean
+   * "there is no current Convex user", and the callers must not install a
+   * token minted for a session that is no longer current — that would run
+   * every subsequent token-less call as the previous account. This is the
+   * same uid-at-start guard `getFreshToken` already implements.
+   */
+  const syncConvexUser = useCallback(
+    async (firebaseUser: FirebaseUser, role?: string) => {
+      const uidAtStart = firebaseUser.uid;
+      try {
+        const token = await getIdToken(firebaseUser);
+        const response = await convexClient.action<{
+          success: boolean;
+          user: AppUser;
+          session_token: string;
+        }>(
+          "auth:syncFirebaseUser",
+          {
+            displayName: firebaseUser.displayName || undefined,
+            avatarUrl: firebaseUser.photoURL || undefined,
+            phoneNumber: firebaseUser.phoneNumber || undefined,
+            role: role || undefined,
+          },
+          token,
+        );
+        // SECURITY: only install this token if the account we just synced is
+        // still the signed-in one.
+        if (auth.currentUser?.uid !== uidAtStart) {
+          return null;
+        }
+        convexClient.authToken = token;
+        if (response.success && response.user) {
+          return response.user;
+        }
+        return null;
+      } catch {
+        // Never clear a token that belongs to a *different*, still-current
+        // account — that would break the new session instead.
+        if (auth.currentUser?.uid === uidAtStart) {
+          convexClient.authToken = null;
+        }
+        return null;
       }
-      return null;
-    } catch {
-      convexClient.authToken = null;
-      return null;
-    }
-  }, []);
+    },
+    [],
+  );
 
   // MSG91 phone OTP is used ONLY for linking/verifying a phone on an
   // existing Firebase account (phone is not a login method on the web —
@@ -210,6 +233,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (firebaseUser) {
         setState((prev) => ({ ...prev, status: "loading" }));
         const convexUser = await syncConvexUser(firebaseUser);
+        // The session may have changed (or been signed out) while the sync
+        // was in flight — do not resurrect the previous account.
+        if (auth.currentUser?.uid !== firebaseUser.uid) return;
+        if (!convexUser) {
+          // Firebase is signed in but the Convex profile could not be
+          // resolved. Reporting "authenticated" with a null convexUser made
+          // every screen that reads convexUser?._id silently do nothing.
+          // Surface the failure instead.
+          setState({
+            status: "error",
+            firebaseUser,
+            convexUser: null,
+            error:
+              "We couldn't load your Turfzo profile. Please sign in again.",
+          });
+          return;
+        }
         setState({
           status: "authenticated",
           firebaseUser,
@@ -239,8 +279,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, (firebaseUser) => {
       if (!firebaseUser) return; // sign-out handled by onAuthStateChanged
+      // Same uid-at-start guard as getFreshToken / syncConvexUser: a token
+      // minted for an account the user has already left must never be
+      // installed, or every token-less call runs as the previous account.
+      const uidAtStart = firebaseUser.uid;
       getIdToken(firebaseUser)
         .then((token) => {
+          if (auth.currentUser?.uid !== uidAtStart) return;
           convexClient.authToken = token;
         })
         .catch(() => {

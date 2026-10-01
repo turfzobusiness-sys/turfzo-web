@@ -185,10 +185,17 @@ export default function AdminPage() {
         { userId },
         token
       );
-      // Best-effort approval email — never blocks the admin UI.
-      void convexClient
-        .action("admin:sendOwnerDecisionEmail", { userId, decision: "approved" }, token)
-        .catch(() => {});
+      // Best-effort approval email — surfaced, never blocks the admin UI.
+      try {
+        await convexClient.action(
+          "admin:sendOwnerDecisionEmail",
+          { userId, decision: "approved" },
+          token,
+        );
+      } catch (emailErr) {
+        console.error("Approval email failed:", emailErr);
+        toast.error("Owner approved, but the notification email failed to send.");
+      }
       await fetchData();
       toast.success("Owner approved!");
     } catch (err) {
@@ -209,14 +216,17 @@ export default function AdminPage() {
         { userId, reason },
         token
       );
-      // Best-effort rejection email — never blocks the admin UI.
-      void convexClient
-        .action(
+      // Best-effort rejection email — surfaced, never blocks the admin UI.
+      try {
+        await convexClient.action(
           "admin:sendOwnerDecisionEmail",
           { userId, decision: "rejected", reason },
-          token
-        )
-        .catch(() => {});
+          token,
+        );
+      } catch (emailErr) {
+        console.error("Rejection email failed:", emailErr);
+        toast.error("Owner rejected, but the notification email failed to send.");
+      }
       await fetchData();
       toast.success("Owner rejected.");
     } catch (err) {

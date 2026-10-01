@@ -53,7 +53,7 @@ export default function TermsPage() {
               To book slots or register for tournaments, you must create a Turfzo account. You agree to provide accurate, current, and complete information during registration and keep it updated.
             </p>
             <p>
-              You are entirely responsible for safeguarding your account credentials (whether password or Google OAuth tokens). Any activity performed through your account is deemed to be authorized by you, and you agree to notify us immediately at <a href="mailto:security@turfzo.com" className="text-brand-lime hover:underline">security@turfzo.com</a> of any unauthorized access or breach of security.
+              You are entirely responsible for safeguarding your account credentials (whether password or Google OAuth tokens). Any activity performed through your account is deemed to be authorized by you, and you agree to notify us immediately at <a href="mailto:security@turfzo.app" className="text-brand-lime hover:underline">security@turfzo.app</a> of any unauthorized access or breach of security.
             </p>
           </Section>
 
@@ -122,7 +122,7 @@ export default function TermsPage() {
               We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will provide at least 7 days&apos; notice via email or push notifications. Continued usage of the Platform after changes are published constitutes acceptance of the new Terms.
             </p>
             <p>
-              For legal inquiries, copyright notices, or general questions, please write to our legal desk at <a href="mailto:legal@turfzo.com" className="text-brand-lime hover:underline">legal@turfzo.com</a> or contact us through the <Link href="/contact" className="text-brand-lime underline">Contact Us</Link> portal.
+              For legal inquiries, copyright notices, or general questions, please write to our legal desk at <a href="mailto:legal@turfzo.app" className="text-brand-lime hover:underline">legal@turfzo.app</a> or contact us through the <Link href="/contact" className="text-brand-lime underline">Contact Us</Link> portal.
             </p>
           </Section>
         </article>

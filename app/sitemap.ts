@@ -10,7 +10,8 @@ const CITIES = [
   "aurangabad",
 ];
 
-const SPORTS = ["football", "cricket", "badminton", "tennis", "pickleball"];
+/** Sports Turfzo actually supports; "pickleball" had no product support. */
+const SPORTS = ["football", "cricket", "badminton", "tennis", "multipurpose"];
 
 // Real blog slugs — must match app/blog/page.tsx + app/blog/[slug]/page.tsx
 // generateStaticParams so every sitemap URL resolves (legacy static routes

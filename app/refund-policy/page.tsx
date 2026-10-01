@@ -105,7 +105,7 @@ export default function RefundPolicyPage() {
               <li><strong>Credit / Debit Cards:</strong> 5 to 7 business days.</li>
             </ul>
             <p>
-              If you do not see the refund credit in your statement after 7 business days, please contact our settlement team at <a href="mailto:refunds@turfzo.com" className="text-brand-lime hover:underline">refunds@turfzo.com</a> with your booking confirmation code.
+              If you do not see the refund credit in your statement after 7 business days, please contact our settlement team at <a href="mailto:refunds@turfzo.app" className="text-brand-lime hover:underline">refunds@turfzo.app</a> with your booking confirmation code.
             </p>
           </Section>
 
@@ -120,7 +120,7 @@ export default function RefundPolicyPage() {
 
           <Section title="7. Dispute Resolution">
             <p>
-              If you have any questions or disputes regarding a refund calculation or cancellation eligibility, please reach out to us within 30 days of the transaction at <a href="mailto:refunds@turfzo.com" className="text-brand-lime hover:underline">refunds@turfzo.com</a>. We review all claims and respond within 3 to 5 business days.
+              If you have any questions or disputes regarding a refund calculation or cancellation eligibility, please reach out to us within 30 days of the transaction at <a href="mailto:refunds@turfzo.app" className="text-brand-lime hover:underline">refunds@turfzo.app</a>. We review all claims and respond within 3 to 5 business days.
             </p>
           </Section>
         </article>
