@@ -52,6 +52,32 @@ function formatDate(iso: string) {
   });
 }
 
+/**
+ * Canonical team-vs-solo decision, shared with /tournaments. The backend's
+ * discriminator is `max_team_size != null` and its own helper
+ * `isTeamTournamentType()` keys off `tournament_type`; this page used
+ * `max_team_size` for the "Team size" row while the register button said
+ * "Register Team" unconditionally.
+ */
+function resolveIsTeam(t: {
+  max_team_size?: number | null;
+  tournament_type?: string;
+}): boolean {
+  if (t.max_team_size != null) return true;
+  const type = (t.tournament_type ?? "").trim().toLowerCase();
+  return type === "team" || type === "squad";
+}
+
+/** The backend refuses registrations once the deadline passes. */
+function isRegistrationClosed(t: {
+  status: string;
+  registration_deadline: string;
+}): boolean {
+  if (t.status === "cancelled" || t.status === "completed") return true;
+  const deadline = new Date(t.registration_deadline).getTime();
+  return Number.isFinite(deadline) && Date.now() > deadline;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { tournamentId } = await params;
   try {
@@ -96,6 +122,11 @@ export default async function TournamentPage({ params }: Props) {
   const viewOnly = isViewOnlyMode();
   const isOpen =
     tournament.status === "open" || tournament.status === "registration_open";
+  // A past deadline closes registration even while the status still reads
+  // "open" — the backend enforces this on register/registerParticipant.
+  const registrationClosed = isRegistrationClosed(tournament);
+  const isTeamEvent = resolveIsTeam(tournament);
+  const entryUnit = isTeamEvent ? "team" : "player";
   const tournamentImage = getLocalTournamentImage({
     title: tournament.name,
     sport: tournament.sport_type,
@@ -186,18 +217,27 @@ export default async function TournamentPage({ params }: Props) {
                   <div className="flex items-center gap-3 rounded-xl border border-border-default bg-surface p-3.5 shadow-sm">
                     <Timer className="w-4 h-4 text-brand-lime shrink-0" />
                     <div>
-                      <p className="text-xs text-text-muted">Registration closes</p>
-                      <p className="text-sm font-semibold">
+                      <p className="text-xs text-text-muted">
+                        Registration closes
+                      </p>
+                      <p
+                        className={`text-sm font-semibold ${
+                          registrationClosed ? "text-error" : ""
+                        }`}
+                      >
                         {formatDate(tournament.registration_deadline)}
+                        {registrationClosed ? " · closed" : ""}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 rounded-xl border border-border-default bg-surface p-3.5 shadow-sm">
                     <Users className="w-4 h-4 text-brand-lime shrink-0" />
                     <div>
-                      <p className="text-xs text-text-muted">Team size</p>
+                      <p className="text-xs text-text-muted">
+                        {isTeamEvent ? "Team size" : "Entry type"}
+                      </p>
                       <p className="text-sm font-semibold">
-                        {tournament.max_team_size
+                        {isTeamEvent
                           ? `${tournament.min_team_size ?? 1}–${tournament.max_team_size} players`
                           : "Individual entry"}
                       </p>
@@ -225,16 +265,24 @@ export default async function TournamentPage({ params }: Props) {
                   ₹{tournament.entry_fee}
                   <span className="text-sm font-medium text-text-muted">
                     {" "}
-                    / team
+                    / {entryUnit}
                   </span>
                 </p>
                 <div className="flex items-center gap-1.5 text-sm text-text-muted mb-5">
                   <Users className="w-4 h-4" />
-                  <span className="tabular-nums">Max {tournament.max_participants}</span>{" "}
-                  {tournament.max_team_size ? "teams" : "players"}
+                  <span className="tabular-nums">
+                    Max {tournament.max_participants}
+                  </span>{" "}
+                  {entryUnit === "team" ? "teams" : "players"}
                 </div>
+                {tournament.entry_fee === 0 && (
+                  <p className="text-xs text-text-muted -mt-3 mb-4">
+                    Free entry — the organizer approves each registration,
+                    and your pass is issued after approval.
+                  </p>
+                )}
 
-                {!isOpen ? (
+                {!isOpen || registrationClosed ? (
                   <div className="w-full bg-border-default text-text-muted font-bold text-sm py-3.5 rounded-md cursor-not-allowed text-center">
                     Registration Closed
                   </div>
@@ -259,7 +307,7 @@ export default async function TournamentPage({ params }: Props) {
                     href={`/tournaments?id=${tournamentId}`}
                     className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-md transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
                   >
-                    Register Team
+                    {isTeamEvent ? "Register Team" : "Register"}
                   </Link>
                 )}
 

@@ -1040,25 +1040,25 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════════
    FOCUS VISIBLE — keyboard navigation accessibility
-   ═══════════════════════════════════════════════════════════════════ */
-:focus-visible {
-  outline: 2px solid var(--color-brand-lime);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
+   ═══════════════════════════════════════════════════════════════════
+   These live in @layer base ON PURPOSE. Tailwind emits utilities into
+   @layer utilities, and unlayered rules outrank every layer in the
+   cascade regardless of specificity — so an unlayered `:focus-visible`
+   here silently beats a component's own `focus:outline-none` and paints a
+   second outline just outside the field, which reads as a double border.
+   From inside base, utilities win: a control that brings its own focus
+   treatment (border colour / ring) keeps exactly one indicator, and only
+   bare controls fall back to this accessible outline. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-brand-lime);
+    outline-offset: 2px;
+  }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--color-brand-lime);
-  outline-offset: 2px;
-}
-
-/* Remove default focus ring for mouse users */
-:focus:not(:focus-visible) {
-  outline: none;
+  /* Remove default focus ring for mouse users */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

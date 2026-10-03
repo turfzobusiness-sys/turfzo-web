@@ -24,7 +24,7 @@ import type { Booking, Turf } from "@/lib/types";
 
 export default function BookingsPage() {
   const router = useRouter();
-  const { status, getFreshToken } = useAuth();
+  const { status, convexUser, getFreshToken } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [turfs, setTurfs] = useState<Record<string, Turf>>({});
   const [loading, setLoading] = useState(true);
@@ -34,6 +34,10 @@ export default function BookingsPage() {
   >("all");
   const [activeQR, setActiveQR] = useState<string | null>(null);
   const [qrUrls, setQrUrls] = useState<Record<string, string>>({});
+  const [rescheduling, setRescheduling] = useState<string | null>(null);
+  const [newDate, setNewDate] = useState("");
+  const [newStartHour, setNewStartHour] = useState("10");
+  const [newDuration, setNewDuration] = useState("1");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -100,14 +104,37 @@ export default function BookingsPage() {
     };
   }, [status]);
 
-  const loadBookings = async () => {
+  const loadBookings = async (
+    activeFilter: "all" | "upcoming" | "past" | "cancelled" = filter,
+  ) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await queryWithAuthRetry<Booking[]>(
-        "bookings:getMyBookings",
-        {},
-      );
+      // Server-side filtering: upcoming/past/cancelled use dedicated
+      // indexed queries; "all" uses the hydrated getMyBookings list.
+      const userId = convexUser?._id;
+      let data: Booking[];
+      if (userId && activeFilter === "upcoming") {
+        data = await queryWithAuthRetry<Booking[]>(
+          "bookings:getUpcomingForUser",
+          { userId, limit: 100 },
+        );
+      } else if (userId && activeFilter === "past") {
+        data = await queryWithAuthRetry<Booking[]>(
+          "bookings:getPastForUser",
+          { userId, limit: 100 },
+        );
+      } else if (userId && activeFilter === "cancelled") {
+        data = await queryWithAuthRetry<Booking[]>(
+          "bookings:getForUserByStatus",
+          { userId, status: "cancelled", limit: 100 },
+        );
+      } else {
+        data = await queryWithAuthRetry<Booking[]>(
+          "bookings:getMyBookings",
+          {},
+        );
+      }
       setBookings(data);
       const turfIds = Array.from(new Set(data.map((b) => b.turf_id)));
       const turfMap: Record<string, Turf> = {};
@@ -134,6 +161,11 @@ export default function BookingsPage() {
    * dialog. Amounts come from bookings:getRefundPreview, which runs the
    * SAME math the cancellation itself runs, so this can never disagree
    * with the actual refund.
+   *
+   * The backend deliberately RETAINS the service fee on cancellation, so
+   * this never promises a refund of `total_price` (the pre-fee slot
+   * subtotal) as a "full refund" without saying the fee is kept. It names
+   * the refundable base and the non-refundable fee explicitly.
    */
   const refundMessage = (
     preview: {
@@ -144,22 +176,25 @@ export default function BookingsPage() {
     } | null,
     booking: Booking,
   ): string => {
+    const base = Math.round(booking.total_price);
+    const fee = Math.round(booking.service_fee ?? 0);
+    const feeNote =
+      fee > 0 ? ` The \u20B9${fee} service fee is non-refundable.` : "";
     if (!preview) {
-      return "Are you sure you want to cancel this booking? Refund details are unavailable right now — the policy that applied at booking time will be used.";
+      return `Are you sure you want to cancel this booking? The \u20B9${base} slot price is refundable.${feeNote} If refund details are unavailable, the policy that applied at booking time is used.`;
     }
     if (!preview.canCancel) {
       return "This booking can no longer be cancelled — the slot has already started or its status has changed.";
     }
-    const paid = `\u20B9${Math.round(booking.total_price)}`;
     switch (preview.refundPolicy) {
       case "not_charged":
         return "This is a pay-at-venue booking — nothing has been charged, so there is nothing to refund.";
       case "full":
-        return `You will receive a FULL refund of ${paid} back to your original payment method (may take 5\u20137 days to appear).`;
+        return `You will receive a FULL refund of the \u20B9${base} slot price back to your original payment method (may take 5\u20137 days to appear).${feeNote}`;
       case "partial":
-        return `Cancelling now refunds 50%: \u20B9${Math.round(preview.refundAmount)} of ${paid}. Full refunds only apply 24+ hours before the slot.`;
+        return `Cancelling now refunds 50% of the \u20B9${base} slot price: \u20B9${Math.round(preview.refundAmount)} to your original payment method.${feeNote} Full slot-price refunds only apply 24+ hours before the slot.`;
       default:
-        return "No refund is available — cancellations within 6 hours of the slot are non-refundable.";
+        return `No refund is available — cancellations within 6 hours of the slot are non-refundable.${feeNote}`;
     }
   };
 
@@ -213,22 +248,49 @@ export default function BookingsPage() {
     }
   };
 
-  const filteredBookings = bookings.filter((b) => {
-    if (filter === "all") return true;
-    if (filter === "cancelled") return b.status === "cancelled";
-    if (filter === "upcoming")
-      return (
-        (b.status === "confirmed" || b.status === "pending") &&
-        new Date(b.start_time) > new Date()
+  // Reload from the server whenever the tab changes so each tab uses
+  // its dedicated indexed query instead of client-side filtering.
+  const handleFilterChange = (f: "all" | "upcoming" | "past" | "cancelled") => {
+    setFilter(f);
+    void loadBookings(f);
+  };
+
+  const handleReschedule = async (booking: Booking) => {
+    if (!newDate || !newStartHour) {
+      toast.error("Pick a new date and start hour.");
+      return;
+    }
+    const startHour = parseInt(newStartHour, 10);
+    const duration = parseInt(newDuration, 10) || 1;
+    if (startHour < 0 || startHour > 23 || duration < 1 || duration > 4) {
+      toast.error("Enter a valid hour (0-23) and duration (1-4 hours).");
+      return;
+    }
+    const start = new Date(`${newDate}T${String(startHour).padStart(2, "0")}:00:00Z`);
+    const end = new Date(start.getTime() + duration * 3_600_000);
+    try {
+      const token = await getFreshToken().catch(() => undefined);
+      await convexClient.mutation(
+        "bookings:reschedule",
+        {
+          bookingId: booking._id,
+          start_time: start.toISOString(),
+          end_time: end.toISOString(),
+        },
+        token,
       );
-    if (filter === "past")
-      return (
-        b.status === "completed" ||
-        ((b.status === "confirmed" || b.status === "pending") &&
-          new Date(b.start_time) <= new Date())
+      toast.success("Booking rescheduled!");
+      setRescheduling(null);
+      await loadBookings();
+    } catch (err) {
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(
+        getErrorMessage(err, "Failed to reschedule. Please try again."),
       );
-    return true;
-  });
+    }
+  };
+
+  const filteredBookings = bookings;
 
   if (
     status === "initial" ||
@@ -280,7 +342,7 @@ export default function BookingsPage() {
             {(["all", "upcoming", "past", "cancelled"] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => setFilter(f)}
+                onClick={() => handleFilterChange(f)}
                 className={`px-4 py-2 rounded-md text-xs font-sans font-semibold capitalize transition-colors ${
                   filter === f
                     ? "bg-brand-lime text-black"
@@ -418,15 +480,60 @@ export default function BookingsPage() {
                             #{booking.booking_code}
                           </span>
                         </div>
+                        {/* The service fee is charged (total_price +
+                            service_fee), so it is shown rather than
+                            silently folded into a single number. */}
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-text-muted font-sans">
+                          <span>Slot price ₹{booking.total_price.toLocaleString("en-IN")}</span>
+                          <span>
+                            Service fee ₹{(booking.service_fee ?? 0).toLocaleString("en-IN")}
+                          </span>
+                          <span className="font-semibold text-text-main">
+                            Total ₹
+                            {(
+                              (booking.total_price ?? 0) +
+                              (booking.service_fee ?? 0)
+                            ).toLocaleString("en-IN")}
+                          </span>
+                          {booking.payment_method === "cash" && (
+                            <span className="text-amber-500">
+                              Pay at venue
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2 mt-4">
                         {isUpcoming && (
                           <>
+                            {/* An admission pass is only valid once the
+                                server says confirmed. A pending booking is
+                                still awaiting the venue, so no gate-scan QR
+                                is issued. */}
+                            {booking.status === "confirmed" ? (
+                              <button
+                                onClick={() => showQR(booking)}
+                                className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-xs py-2 px-4 rounded-md flex items-center gap-1.5 transition-colors"
+                              >
+                                <Ticket className="w-3.5 h-3.5" /> View QR
+                              </button>
+                            ) : (
+                              <span className="text-[11px] text-text-muted font-sans px-1">
+                                Awaiting venue approval — pass issued once
+                                confirmed
+                              </span>
+                            )}
                             <button
-                              onClick={() => showQR(booking)}
-                              className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-xs py-2 px-4 rounded-md flex items-center gap-1.5 transition-colors"
+                              onClick={() => {
+                                setRescheduling(booking._id);
+                                setNewDate(
+                                  new Date(booking.start_time)
+                                    .toISOString()
+                                    .slice(0, 10),
+                                );
+                              }}
+                              className="bg-elevated hover:bg-brand-lime/10 border border-border-subtle hover:border-brand-lime/30 text-text-main font-sans text-xs py-2 px-4 rounded-md transition-colors"
                             >
-                              <Ticket className="w-3.5 h-3.5" /> View QR
+                              Reschedule
                             </button>
                             <button
                               onClick={() => handleCancel(booking)}
@@ -445,6 +552,80 @@ export default function BookingsPage() {
           )}
         </div>
       </main>
+
+      {rescheduling && (
+        <div
+          className="fixed inset-0 z-50 bg-overlay-heavy backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setRescheduling(null)}
+        >
+          <div
+            className="bg-surface border border-border-default rounded-md max-w-sm w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-sans font-bold text-lg text-text-main mb-1">
+              Reschedule booking
+            </h3>
+            <p className="text-xs text-text-muted font-sans mb-4">
+              Pick a new date and start hour (whole hours only, within 7 days).
+              Price differences are settled at the venue or refunded per policy.
+            </p>
+            <label className="block text-xs font-semibold text-text-muted mb-1">
+              New date
+            </label>
+            <input
+              type="date"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+              className="w-full bg-elevated border border-border-subtle rounded-md px-3 py-2 text-sm text-text-main mb-3"
+            />
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div>
+                <label className="block text-xs font-semibold text-text-muted mb-1">
+                  Start hour (0-23 UTC)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={23}
+                  value={newStartHour}
+                  onChange={(e) => setNewStartHour(e.target.value)}
+                  className="w-full bg-elevated border border-border-subtle rounded-md px-3 py-2 text-sm text-text-main"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text-muted mb-1">
+                  Duration (hrs)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={4}
+                  value={newDuration}
+                  onChange={(e) => setNewDuration(e.target.value)}
+                  className="w-full bg-elevated border border-border-subtle rounded-md px-3 py-2 text-sm text-text-main"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setRescheduling(null)}
+                className="flex-1 py-2.5 border border-border-subtle rounded-md text-sm font-semibold text-text-muted hover:text-text-main"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  const b = bookings.find((x) => x._id === rescheduling);
+                  if (b) void handleReschedule(b);
+                }}
+                className="flex-1 py-2.5 bg-brand-lime text-white dark:text-black rounded-md text-sm font-bold"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {activeQR && qrUrls[activeQR] && (
         <div

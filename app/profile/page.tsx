@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +27,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/lib/auth-context";
 import { enableWebPush, isWebPushSupported, wasWebPushEnabled } from "@/lib/push";
+import { isAllowedRemoteImage } from "@/lib/turf-images";
 import { convexClient } from "@/lib/convex";
 import { toast } from "sonner";
 import type {
@@ -38,12 +39,12 @@ import type {
   UserNotification,
 } from "@/lib/types";
 
+/** Sports Turfzo actually supports — see the explore filter list. */
 const FAVORITE_SPORTS = [
   "Football",
   "Cricket",
   "Badminton",
   "Tennis",
-  "Pickleball",
   "Multipurpose",
 ];
 
@@ -193,6 +194,23 @@ export default function ProfilePage() {
       cancelled = true;
     };
   }, [status]);
+
+  /**
+   * Bookings that actually represent money taken. A cancelled booking was
+   * never charged, an unpaid one is not a spend, and a refunded one only
+   * nets out what came back. Summing every non-cancelled `total_price` (as
+   * the account summary used to) counted unpaid and refunded bookings in
+   * full and ignored the service fee.
+   */
+  const totalPaid = useMemo(
+    () =>
+      bookings.filter(
+        (b) =>
+          b.status !== "cancelled" &&
+          (b.payment_status === "paid" || b.payment_status === "refunded"),
+      ),
+    [bookings],
+  );
 
   // Fetch the user's reviews, favourites, payment history and notifications
   // once authenticated. Each sub-fetch is independent so a single failure
@@ -356,21 +374,52 @@ export default function ProfilePage() {
     }
   };
 
+  /**
+   * Password reset.
+   *
+   * `auth:sendPasswordReset` deliberately answers `{ success: true }` even
+   * when it sent nothing — for an unknown address (enumeration
+   * resistance), for a rate-limited/cooldown request, and above all for
+   * Firebase-backed accounts (`password_hash === "firebase_auth"`), where
+   * there is no Convex password to reset at all. Claiming "email sent" on
+   * every one of those told the player to go check an inbox that would
+   * never receive anything.
+   */
   const handleResetPassword = async () => {
     const email = convexUser?.email ?? firebaseUser?.email;
     if (!email) {
       toast.error("No email address on file.");
       return;
     }
+    // A Firebase identity is the authoritative signal that this account has
+    // no Convex-side password: Google/phone/OTP sign-ins never set one.
+    const isFirebaseBacked = Boolean(firebaseUser) || !convexUser;
+    if (isFirebaseBacked) {
+      toast.info("This account signs in with Google or a one-time code", {
+        description:
+          "There is no Turfzo password to reset. Use \"Forgot password\" on the sign-in screen, or continue with the same Google/OTP method you signed up with.",
+      });
+      return;
+    }
     setAccountActionLoading(true);
     try {
       const token = await getFreshToken();
-      await convexClient.action<{ success: boolean }>(
-        "auth:sendPasswordReset",
-        { email },
-        token,
-      );
-      toast.success("Password reset email sent! Check your inbox.");
+      const result = await convexClient.action<{
+        success: boolean;
+        email_sent?: boolean;
+        error?: string;
+      }>("auth:sendPasswordReset", { email }, token);
+      if (result?.email_sent === true) {
+        toast.success("Password reset email sent! Check your inbox.");
+        return;
+      }
+      // The backend does not confirm delivery (it cannot without leaking
+      // whether the account exists). Be explicit about the limits instead of
+      // promising an email.
+      toast.info("If this account has a Turfzo password, a reset link is on its way.", {
+        description:
+          "Nothing is sent for accounts that sign in with Google or a one-time code, or if the request was rate-limited. Try again in a minute, or sign in with your original method.",
+      });
     } catch (err) {
       const { getErrorMessage } = await import("@/lib/errors");
       toast.error(getErrorMessage(err, "Could not send reset email."));
@@ -436,7 +485,11 @@ export default function ProfilePage() {
           : ((convexUser?.email ?? firebaseUser?.email)?.split("@")[0] ??
             "User");
   const initial = displayName.charAt(0).toUpperCase();
-  const avatarUrl = convexUser?.avatar_url || firebaseUser?.photoURL;
+  // Google sign-in avatars come from lh3.googleusercontent.com (allow-listed
+  // in next.config.ts). A host outside the list is not served by the image
+  // pipeline, so fall back to initials rather than a broken image.
+  const rawAvatarUrl = convexUser?.avatar_url || firebaseUser?.photoURL;
+  const avatarUrl = isAllowedRemoteImage(rawAvatarUrl) ? rawAvatarUrl : null;
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main font-sans selection:bg-brand-lime/30">
@@ -800,8 +853,19 @@ export default function ProfilePage() {
                             value: String(bookings.length),
                           },
                           {
+                            // Money actually taken: a cancelled booking was
+                            // never charged, an unpaid one is not a spend, and
+                            // a refunded one only nets out the refund. The old
+                            // sum ignored payment status and refunds entirely.
                             label: "Total Spent",
-                            value: `₹${bookings.reduce((acc, b) => acc + (b.status !== "cancelled" ? b.total_price : 0), 0).toLocaleString("en-IN")}`,
+                            value: `₹${totalPaid
+                              .reduce((acc, b) => {
+                                const gross =
+                                  (b.total_price ?? 0) + (b.service_fee ?? 0);
+                                const refund = b.refunded_amount ?? 0;
+                                return acc + Math.max(0, gross - refund);
+                              }, 0)
+                              .toLocaleString("en-IN")}`,
                           },
                         ].map((row) => (
                           <div
@@ -814,14 +878,22 @@ export default function ProfilePage() {
                             </span>
                           </div>
                         ))}
+                        {/* There is no wallet: payments are settled with the
+                            gateway and refunds go back to the original method.
+                            Showing a hardcoded ₹0 implied a feature we do not
+                            have. */}
                         <div className="flex justify-between items-center pt-4 border-t border-border-subtle">
                           <span className="text-text-muted">
                             Wallet Balance
                           </span>
-                          <span className="font-semibold text-text-main">
-                            ₹0
+                          <span className="font-semibold text-text-muted">
+                            Not available
                           </span>
                         </div>
+                        <p className="text-[11px] text-text-muted -mt-2">
+                          Turfzo has no stored wallet — refunds return to your
+                          original payment method.
+                        </p>
                       </div>
                     </div>
 
@@ -924,6 +996,64 @@ export default function ProfilePage() {
                               )}
                             </p>
                           )}
+                          <div className="flex items-center gap-3 mt-3">
+                            <button
+                              onClick={async () => {
+                                const next = window.prompt(
+                                  "Edit your review (within 24h of posting):",
+                                  review.comment ?? "",
+                                );
+                                if (next === null) return;
+                                try {
+                                  await convexClient.mutation(
+                                    "reviews:editReview",
+                                    { review_id: review.id, comment: next },
+                                  );
+                                  setReviews((prev) =>
+                                    prev.map((r) =>
+                                      r.id === review.id ? { ...r, comment: next } : r,
+                                    ),
+                                  );
+                                  toast.success("Review updated.");
+                                } catch (err) {
+                                  const { getErrorMessage } = await import(
+                                    "@/lib/errors"
+                                  );
+                                  toast.error(
+                                    getErrorMessage(err, "Could not update review."),
+                                  );
+                                }
+                              }}
+                              className="text-[11px] font-semibold text-text-muted hover:text-brand-lime transition-colors"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={async () => {
+                                const reason = window.prompt(
+                                  "Report this review — why is it inappropriate?",
+                                );
+                                if (!reason?.trim()) return;
+                                try {
+                                  await convexClient.mutation(
+                                    "reviews:reportReview",
+                                    { review_id: review.id, reason: reason.trim() },
+                                  );
+                                  toast.success("Thanks — our team will review this report.");
+                                } catch (err) {
+                                  const { getErrorMessage } = await import(
+                                    "@/lib/errors"
+                                  );
+                                  toast.error(
+                                    getErrorMessage(err, "Could not report review."),
+                                  );
+                                }
+                              }}
+                              className="text-[11px] font-semibold text-text-muted hover:text-error transition-colors"
+                            >
+                              Report
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -1281,44 +1411,25 @@ export default function ProfilePage() {
                     </p>
                   </div>
 
+                  {/* These two toggles had no state and no handler — the
+                      user could flip them and nothing was stored or sent, and
+                      nothing read them back. There is no backend mutation for
+                      player-level email/SMS preferences (the only
+                      notification_preferences record belongs to OWNERS), so
+                      the row is removed rather than left as a dead control.
+                      The real, working push toggle lives in the push card
+                      below. */}
                   <div className="flex flex-col gap-4 border-b border-border-subtle pb-6">
                     <h4 className="text-sm font-bold text-text-main flex items-center gap-2">
                       <Bell className="w-4 h-4 text-text-muted" /> Notification
                       Preferences
                     </h4>
-                    <div className="space-y-4 pt-2">
-                      <div className="flex justify-between items-center">
-                        <div className="flex flex-col">
-                          <span className="text-xs font-semibold text-text-main">
-                            Email Updates
-                          </span>
-                          <span className="text-[10px] text-text-muted mt-0.5">
-                            Receive receipts and tournament confirmation emails
-                          </span>
-                        </div>
-                        <input
-                          type="checkbox"
-                          defaultChecked
-                          className="w-9 h-5 rounded-full bg-elevated border-border-default accent-brand-lime cursor-pointer"
-                        />
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex flex-col">
-                          <span className="text-xs font-semibold text-text-main">
-                            SMS alerts
-                          </span>
-                          <span className="text-[10px] text-text-muted mt-0.5">
-                            Get booking reminders and matching PIN alerts 1 hour
-                            before slots
-                          </span>
-                        </div>
-                        <input
-                          type="checkbox"
-                          defaultChecked
-                          className="w-9 h-5 rounded-full bg-elevated border-border-default accent-brand-lime cursor-pointer"
-                        />
-                      </div>
-                    </div>
+                    <p className="text-xs text-text-muted">
+                      Booking confirmations, payment receipts and tournament
+                      updates are always emailed to your account address and
+                      cannot be switched off here. On-device push alerts are
+                      controlled by the push button below.
+                    </p>
                   </div>
 
                   <div className="flex flex-col gap-4 border-b border-border-subtle pb-6">
@@ -1332,8 +1443,10 @@ export default function ProfilePage() {
                           Reset Password
                         </span>
                         <span className="text-[10px] text-text-muted mt-0.5">
-                          Triggers a password reset instruction link to{" "}
-                          {convexUser?.email ?? firebaseUser?.email}
+                          Sends a reset link to{" "}
+                          {convexUser?.email ?? firebaseUser?.email}. Accounts
+                          that sign in with Google or a one-time code have no
+                          password to reset — keep using that method.
                         </span>
                       </div>
                       <button

@@ -1,7 +1,7 @@
 # Turfzo Website — Claude Code Instructions
 
 > **MANDATORY: Read before any change:**
-> - `/home/akram/projects/turfzo/TURFZO_ARCHITECTURE.md` — domain, 29 tables, thin-client invariants
+> - `/home/akram/projects/turfzo/TURFZO_ARCHITECTURE.md` — domain, 31 tables, thin-client invariants
 > - `/home/akram/projects/turfzo/TURFZO_MIGRATION_AND_DEPLOYMENT.md` — live infra from Vercel → Cloudflare cutover
 > - `/home/akram/projects/turfzo/AGENTS.md` — monorepo execution protocol
 

@@ -6,19 +6,29 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
 
-const CITY_DATA: Record<string, { name: string; state: string; venues: string; avgPrice: string; highlights: string[] }> = {
-  bangalore: { name: "Bangalore", state: "Karnataka", venues: "20+", avgPrice: "₹1,100/hr", highlights: ["HSR Layout", "Koramangala", "Indiranagar", "Whitefield", "Marathahalli"] },
-  mumbai: { name: "Mumbai", state: "Maharashtra", venues: "15+", avgPrice: "₹1,300/hr", highlights: ["Andheri", "Bandra", "Powai", "Lower Parel", "Goregaon"] },
-  delhi: { name: "Delhi", state: "Delhi", venues: "12+", avgPrice: "₹1,400/hr", highlights: ["Saket", "Hauz Khas", "Dwarka", "Rohini", "Vasant Kunj"] },
-  hyderabad: { name: "Hyderabad", state: "Telangana", venues: "10+", avgPrice: "₹1,000/hr", highlights: ["Gachibowli", "Jubilee Hills", "Madhapur", "Kondapur", "Banjara Hills"] },
-  pune: { name: "Pune", state: "Maharashtra", venues: "8+", avgPrice: "₹1,200/hr", highlights: ["Koregaon Park", "Viman Nagar", "Kothrud", "Baner", "Hinjewadi"] },
-  chennai: { name: "Chennai", state: "Tamil Nadu", venues: "8+", avgPrice: "₹950/hr", highlights: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "OMR"] },
-  kolkata: { name: "Kolkata", state: "West Bengal", venues: "6+", avgPrice: "₹900/hr", highlights: ["Salt Lake", "Park Street", "Ballygunge", "New Town", "Howrah"] },
-  ahmedabad: { name: "Ahmedabad", state: "Gujarat", venues: "5+", avgPrice: "₹850/hr", highlights: ["Satellite", "Bodakdev", "Vastrapur", "SG Highway", "Prahlad Nagar"] },
-  aurangabad: { name: "Aurangabad", state: "Maharashtra", venues: "5+", avgPrice: "₹900/hr", highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"] },
+/** Geography only — see app/cities/[city]/page.tsx for why the venue counts
+ *  and average prices were removed. */
+const CITY_DATA: Record<
+  string,
+  { name: string; state: string; highlights: string[] }
+> = {
+  bangalore: { name: "Bangalore", state: "Karnataka", highlights: ["HSR Layout", "Koramangala", "Indiranagar", "Whitefield", "Marathahalli"] },
+  mumbai: { name: "Mumbai", state: "Maharashtra", highlights: ["Andheri", "Bandra", "Powai", "Lower Parel", "Goregaon"] },
+  delhi: { name: "Delhi", state: "Delhi", highlights: ["Saket", "Hauz Khas", "Dwarka", "Rohini", "Vasant Kunj"] },
+  hyderabad: { name: "Hyderabad", state: "Telangana", highlights: ["Gachibowli", "Jubilee Hills", "Madhapur", "Kondapur", "Banjara Hills"] },
+  pune: { name: "Pune", state: "Maharashtra", highlights: ["Koregaon Park", "Viman Nagar", "Kothrud", "Baner", "Hinjewadi"] },
+  chennai: { name: "Chennai", state: "Tamil Nadu", highlights: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "OMR"] },
+  kolkata: { name: "Kolkata", state: "West Bengal", highlights: ["Salt Lake", "Park Street", "Ballygunge", "New Town", "Howrah"] },
+  ahmedabad: { name: "Ahmedabad", state: "Gujarat", highlights: ["Satellite", "Bodakdev", "Vastrapur", "SG Highway", "Prahlad Nagar"] },
+  aurangabad: { name: "Aurangabad", state: "Maharashtra", highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"] },
 };
 
-const SPORTS = ["football", "cricket", "badminton", "tennis", "pickleball"];
+/**
+ * Sports Turfzo actually supports. "pickleball" was listed here and in the
+ * profile sport picker, but it has no support anywhere in the product — no
+ * slot, pricing or venue data — so it is dropped.
+ */
+const SPORTS = ["football", "cricket", "badminton", "tennis", "multipurpose"];
 
 type Props = { params: Promise<{ city: string; sport: string }> };
 
@@ -30,7 +40,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `Book ${formattedSport} Turfs in ${data.name} | Turfzo`,
-    description: `Looking to play ${formattedSport} in ${data.name}? Book premium ${formattedSport} turfs starting at ${data.avgPrice}. Verified venues in ${data.highlights.slice(0, 3).join(", ")}. Instant confirmation.`,
+    // No invented "starting at ₹X/hr" and no venue count.
+    description: `Looking to play ${formattedSport} in ${data.name}? Browse ${formattedSport} venues on Turfzo with real-time slot availability and per-hour pricing.`,
     keywords: [`${sport} turf booking ${data.name}`, `book ${sport} turf ${data.name}`, `${sport} ground ${data.name}`, `${data.name} ${sport} venue`],
     alternates: { canonical: `https://turfzo.app/cities/${city}/${sport}` },
   };
@@ -54,9 +65,9 @@ export default async function CitySportPage({ params }: Props) {
   const formattedSport = sport.charAt(0).toUpperCase() + sport.slice(1);
 
   const faqs = [
-    { question: `How much does a ${formattedSport} turf cost in ${data.name}?`, answer: `${formattedSport} turfs in ${data.name} typically start around ${data.avgPrice} per hour, depending on the area and time.` },
-    { question: `Where are the best ${formattedSport} venues in ${data.name}?`, answer: `Top locations for ${formattedSport} in ${data.name} include ${data.highlights.join(", ")}.` },
-    { question: `Do ${formattedSport} turfs in ${data.name} provide equipment?`, answer: `Many ${formattedSport} turfs provide basic equipment, but it's always recommended to carry your own gear or confirm with the venue during booking.` },
+    { question: `How much does a ${formattedSport} turf cost in ${data.name}?`, answer: `Prices are set by each venue and shown on its card, so they vary. Open the explore page filtered to ${data.name} to see every listed rate, then confirm the exact price for your slot at checkout.` },
+    { question: `Where are the best ${formattedSport} venues in ${data.name}?`, answer: `You can browse across ${data.name} from the explore page. Areas worth checking include ${data.highlights.join(", ")}.` },
+    { question: `Do ${formattedSport} turfs in ${data.name} provide equipment?`, answer: `Each venue lists its own amenities, including whether equipment rental is available. Check the venue's "What this turf offers" section before you book.` },
   ];
 
   return (
@@ -92,7 +103,9 @@ export default async function CitySportPage({ params }: Props) {
                 Book {formattedSport} Turfs in <span>{data.name}</span>
               </h1>
               <p className="mt-3 text-text-muted text-sm sm:text-base font-sans max-w-2xl leading-relaxed">
-                Looking to play {formattedSport}? Book premium turfs and grounds across {data.name} starting at {data.avgPrice}. Discover {data.venues} verified venues in {data.highlights.slice(0, 3).join(", ")} and more.
+                Browse {formattedSport.toLowerCase()} venues across {data.name}{" "}
+                with real-time slot availability. Every venue sets its own
+                hourly rate, shown on its card.
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Link href={`/explore?city=${city}&sport=${sport}`} className="bg-text-main hover:bg-text-main/90 text-bg font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
@@ -104,7 +117,10 @@ export default async function CitySportPage({ params }: Props) {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 flex flex-col gap-6">
-              <h2 className="font-sans font-bold text-2xl text-text-main tracking-tight text-left">Popular {formattedSport} areas in {data.name}</h2>
+              <h2 className="font-sans font-bold text-2xl text-text-main tracking-tight text-left">Browse {data.name} by area</h2>
+              <p className="text-sm text-text-muted font-sans -mt-3">
+                These links open the live explore page filtered to {formattedSport.toLowerCase()} in {data.name}.
+              </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {data.highlights.map((area) => (
                   <Link key={area} href={`/explore?city=${city}&sport=${sport}`}
@@ -115,7 +131,7 @@ export default async function CitySportPage({ params }: Props) {
                       </div>
                       <div>
                         <span className="font-sans font-bold text-sm text-text-main block">{area}</span>
-                        <span className="text-[10px] text-text-muted">{formattedSport} pitches</span>
+                        <span className="text-[10px] text-text-muted">{data.name}, {data.state}</span>
                       </div>
                     </div>
                     <ChevronRight className="w-4 h-4 text-text-muted" />
@@ -130,10 +146,18 @@ export default async function CitySportPage({ params }: Props) {
                   Quick facts
                 </h3>
                 <div className="flex flex-col gap-3 text-xs font-sans">
-                  <div className="flex justify-between"><span className="text-text-muted">Venues</span><span className="text-text-main font-bold tabular-nums">{data.venues}</span></div>
-                  <div className="flex justify-between"><span className="text-text-muted">Average price</span><span className="text-text-main font-bold tabular-nums">{data.avgPrice}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">City</span><span className="text-text-main font-bold">{data.name}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">State</span><span className="text-text-main font-bold">{data.state}</span></div>
                   <div className="flex justify-between"><span className="text-text-muted">Sport</span><span className="text-text-main font-bold">{formattedSport}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">Pricing</span><span className="text-text-main font-bold">Per venue, per hour</span></div>
                 </div>
+                <p className="text-[11px] text-text-muted mt-4">
+                  Live venue counts and prices are on the{" "}
+                  <Link href={`/explore?city=${city}&sport=${sport}`} className="text-brand-lime hover:underline">
+                    explore page
+                  </Link>
+                  .
+                </p>
               </div>
             </div>
           </div>

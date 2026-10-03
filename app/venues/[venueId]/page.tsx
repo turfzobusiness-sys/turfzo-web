@@ -131,7 +131,7 @@ export default async function VenuePage({ params }: Props) {
                   </div>
                 </div>
 
-                <h3 className="font-sans font-bold text-base text-text-main tracking-tight mb-3">Amenities</h3>
+                <h3 className="font-sans font-bold text-base text-text-main tracking-tight mb-3">Facilities</h3>
                 <div className="flex flex-wrap gap-2">
                   {turf.amenities?.map((amenity, idx) => (
                     <span key={idx} className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">

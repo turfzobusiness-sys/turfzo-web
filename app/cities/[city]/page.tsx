@@ -1,29 +1,45 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { MapPin, Star, ChevronRight, Trophy, CheckCircle2 } from "lucide-react";
+import { MapPin, ChevronRight, Trophy, CheckCircle2 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
 
-const CITY_DATA: Record<string, { name: string; state: string; venues: string; avgPrice: string; highlights: string[] }> = {
-  bangalore: { name: "Bangalore", state: "Karnataka", venues: "20+", avgPrice: "₹1,100/hr", highlights: ["HSR Layout", "Koramangala", "Indiranagar", "Whitefield", "Marathahalli"] },
-  mumbai: { name: "Mumbai", state: "Maharashtra", venues: "15+", avgPrice: "₹1,300/hr", highlights: ["Andheri", "Bandra", "Powai", "Lower Parel", "Goregaon"] },
-  delhi: { name: "Delhi", state: "Delhi", venues: "12+", avgPrice: "₹1,400/hr", highlights: ["Saket", "Hauz Khas", "Dwarka", "Rohini", "Vasant Kunj"] },
-  hyderabad: { name: "Hyderabad", state: "Telangana", venues: "10+", avgPrice: "₹1,000/hr", highlights: ["Gachibowli", "Jubilee Hills", "Madhapur", "Kondapur", "Banjara Hills"] },
-  pune: { name: "Pune", state: "Maharashtra", venues: "8+", avgPrice: "₹1,200/hr", highlights: ["Koregaon Park", "Viman Nagar", "Kothrud", "Baner", "Hinjewadi"] },
-  chennai: { name: "Chennai", state: "Tamil Nadu", venues: "8+", avgPrice: "₹950/hr", highlights: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "OMR"] },
-  kolkata: { name: "Kolkata", state: "West Bengal", venues: "6+", avgPrice: "₹900/hr", highlights: ["Salt Lake", "Park Street", "Ballygunge", "New Town", "Howrah"] },
-  ahmedabad: { name: "Ahmedabad", state: "Gujarat", venues: "5+", avgPrice: "₹850/hr", highlights: ["Satellite", "Bodakdev", "Vastrapur", "SG Highway", "Prahlad Nagar"] },
-  aurangabad: { name: "Aurangabad", state: "Maharashtra", venues: "5+", avgPrice: "₹900/hr", highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"] },
+/**
+ * Geography only — city name, state and well-known locality names used as
+ * browse entry points.
+ *
+ * The previous table also carried a venue count ("20+"), an average hourly
+ * price ("₹1,100/hr") and a list of named venues with 4.6–4.8 ratings. None
+ * of that came from the backend; it was invented, and because
+ * `FAQPageSchema` publishes the same strings as structured data it was also
+ * being served to search engines as fact. Numeric claims are now computed
+ * from live data (see the page) or omitted.
+ */
+const CITY_DATA: Record<
+  string,
+  { name: string; state: string; highlights: string[] }
+> = {
+  bangalore: { name: "Bangalore", state: "Karnataka", highlights: ["HSR Layout", "Koramangala", "Indiranagar", "Whitefield", "Marathahalli"] },
+  mumbai: { name: "Mumbai", state: "Maharashtra", highlights: ["Andheri", "Bandra", "Powai", "Lower Parel", "Goregaon"] },
+  delhi: { name: "Delhi", state: "Delhi", highlights: ["Saket", "Hauz Khas", "Dwarka", "Rohini", "Vasant Kunj"] },
+  hyderabad: { name: "Hyderabad", state: "Telangana", highlights: ["Gachibowli", "Jubilee Hills", "Madhapur", "Kondapur", "Banjara Hills"] },
+  pune: { name: "Pune", state: "Maharashtra", highlights: ["Koregaon Park", "Viman Nagar", "Kothrud", "Baner", "Hinjewadi"] },
+  chennai: { name: "Chennai", state: "Tamil Nadu", highlights: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "OMR"] },
+  kolkata: { name: "Kolkata", state: "West Bengal", highlights: ["Salt Lake", "Park Street", "Ballygunge", "New Town", "Howrah"] },
+  ahmedabad: { name: "Ahmedabad", state: "Gujarat", highlights: ["Satellite", "Bodakdev", "Vastrapur", "SG Highway", "Prahlad Nagar"] },
+  aurangabad: { name: "Aurangabad", state: "Maharashtra", highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"] },
 };
 
+/** Sports the product actually supports booking for. */
+const SUPPORTED_SPORTS = "football, cricket, badminton, tennis and multipurpose venues";
+
 const CITY_FAQS = [
-  { question: "How much does turf booking cost in {city}?", answer: "Turf booking in {city} typically costs ₹{avgPrice} depending on the venue, sport, and time of day. Premium turfs with floodlights and changing rooms may charge more, while off-peak hours (mornings, late nights) are usually discounted." },
-  { question: "How do I book a football turf in {city}?", answer: "Visit turfzo.app/explore, select {city} as your city, browse available football turfs, pick a date and time slot, and pay securely online. Your booking is confirmed instantly with a QR code ticket." },
-  { question: "Which are the best areas to play in {city}?", answer: "The most popular areas for turf sports in {city} are: {highlights}. These neighborhoods offer easy access, ample parking, and quality floodlit venues." },
-  { question: "Can I cancel my booking?", answer: "Yes, you can cancel your booking up to 24 hours before the slot for a full refund, 6-24 hours for a 50% refund, and no refund within 6 hours of the slot." },
-  { question: "What sports are available in {city}?", answer: "Turfzo lists football, cricket, badminton, and multipurpose sports venues across {city}. Use the sport filter on the explore page to see only relevant turfs." },
+  { question: "How do I book a football turf in {city}?", answer: "Visit turfzo.app/explore, select {city} as your city, browse the available football turfs, pick a date and time slot, and pay securely online. Every venue card shows its own hourly rate, and the exact price for your slot is confirmed at checkout before you pay." },
+  { question: "Which areas can I browse in {city}?", answer: "You can browse across {city} from the explore page. Popular areas include: {highlights}. Each card links to the live availability for that city." },
+  { question: "Can I cancel my booking?", answer: "Yes. You can cancel a booking from My Bookings. Cancellations more than 24 hours before the slot are refunded in full on the slot price, between 6 and 24 hours receive 50% of the slot price, and cancellations under 6 hours are non-refundable. The service fee is retained in every case." },
+  { question: "What sports are available in {city}?", answer: "Turfzo lists {sports} across {city}. Use the sport filter on the explore page to see only relevant turfs." },
 ];
 
 type Props = { params: Promise<{ city: string }> };
@@ -34,12 +50,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) return { title: "City Not Found" };
   return {
     title: `Book Turfs in ${data.name} | Football, Cricket & More | Turfzo`,
-    description: `Book football turfs, cricket grounds, and sports venues in ${data.name} starting at ${data.avgPrice}. ${data.venues} verified turfs across ${data.highlights.slice(0, 3).join(", ")} and more. Real-time availability, secure payment, instant confirmation.`,
+    // No venue count and no invented "starting at" price — both were
+    // fabricated and were being published as page metadata.
+    description: `Book football turfs, cricket grounds, and sports venues in ${data.name} on Turfzo. Browse live availability and transparent per-hour pricing across ${data.name}.`,
     keywords: [`turf booking ${data.name}`, `football turf ${data.name}`, `cricket ground ${data.name}`, `book turf ${data.name}`, `${data.name} sports venue`],
     alternates: { canonical: `https://turfzo.app/cities/${city}` },
     openGraph: {
       title: `Book Turfs in ${data.name} | Turfzo`,
-      description: `${data.venues} verified turfs in ${data.name}. Book instantly with real-time availability.`,
+      description: `Browse ${SUPPORTED_SPORTS} in ${data.name} with real-time availability.`,
       url: `https://turfzo.app/cities/${city}`,
       type: "website",
     },
@@ -56,8 +74,11 @@ export default async function CityPage({ params }: Props) {
   if (!data) notFound();
 
   const faqs = CITY_FAQS.map((f) => ({
-    question: f.question.replace(/{city}/g, data.name).replace(/{avgPrice}/g, data.avgPrice),
-    answer: f.answer.replace(/{city}/g, data.name).replace(/{avgPrice}/g, data.avgPrice).replace(/{highlights}/g, data.highlights.join(", ")),
+    question: f.question.replace(/{city}/g, data.name),
+    answer: f.answer
+      .replace(/{city}/g, data.name)
+      .replace(/{sports}/g, SUPPORTED_SPORTS)
+      .replace(/{highlights}/g, data.highlights.join(", ")),
   }));
 
   return (
@@ -91,7 +112,9 @@ export default async function CityPage({ params }: Props) {
                 Book Turfs in {data.name}
               </h1>
               <p className="mt-3 text-text-muted text-sm sm:text-base font-sans max-w-2xl leading-relaxed">
-                Book football turfs, cricket grounds, and sports venues across {data.name} starting at {data.avgPrice}. {data.venues} verified turfs in {data.highlights.slice(0, 3).join(", ")} and more. Real-time availability, secure payment, instant confirmation.
+                Browse football turfs, cricket grounds and sports venues across{" "}
+                {data.name} with real-time slot availability and transparent
+                per-hour pricing.
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Link href={`/explore?city=${city}`} className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
@@ -106,7 +129,10 @@ export default async function CityPage({ params }: Props) {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 flex flex-col gap-6">
-              <h2 className="font-sans font-bold text-2xl text-text-main tracking-tight text-left">Popular areas in {data.name}</h2>
+              <h2 className="font-sans font-bold text-2xl text-text-main tracking-tight text-left">Browse {data.name} by area</h2>
+              <p className="text-sm text-text-muted font-sans -mt-3">
+                These links open the live explore page filtered to {data.name}.
+              </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {data.highlights.map((area) => (
                   <Link key={area} href={`/explore?city=${city}`}
@@ -117,7 +143,7 @@ export default async function CityPage({ params }: Props) {
                       </div>
                       <div>
                         <span className="font-sans font-bold text-sm text-text-main block">{area}</span>
-                        <span className="text-[10px] text-text-muted">Football · Cricket · Multi-sport</span>
+                        <span className="text-[10px] text-text-muted">{data.name}, {data.state}</span>
                       </div>
                     </div>
                     <ChevronRight className="w-4 h-4 text-text-muted" />
@@ -131,12 +157,12 @@ export default async function CityPage({ params }: Props) {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
-                    `Instant booking confirmation with QR code tickets`,
-                    `Real-time slot availability across ${data.venues} venues`,
+                    `Real-time slot availability for venues in ${data.name}`,
                     `Secure online payment via UPI, cards, and net banking`,
-                    `Free cancellation up to 24 hours before your slot`,
-                    `Bill-splitting with teammates at checkout`,
-                    `Verified venues with photos, amenities, and reviews`,
+                    `Pay at the venue if you prefer — the slot is held either way`,
+                    `Free cancellation of the slot price up to 24 hours before your slot`,
+                    `Every venue lists its own hourly rate and player reviews`,
+                    `Book a turf or enter a tournament from the same account`,
                   ].map((point) => (
                     <div key={point} className="flex items-start gap-2 text-sm text-text-muted font-sans">
                       <CheckCircle2 className="w-4 h-4 text-brand-lime shrink-0 mt-0.5" />
@@ -153,34 +179,18 @@ export default async function CityPage({ params }: Props) {
                   Quick facts
                 </h3>
                 <div className="flex flex-col gap-3 text-xs font-sans">
-                  <div className="flex justify-between"><span className="text-text-muted">Venues</span><span className="text-text-main font-bold tabular-nums">{data.venues}</span></div>
-                  <div className="flex justify-between"><span className="text-text-muted">Average price</span><span className="text-text-main font-bold tabular-nums">{data.avgPrice}</span></div>
-                  <div className="flex justify-between"><span className="text-text-muted">Sports available</span><span className="text-text-main font-bold">Football, Cricket, Multi</span></div>
-                  <div className="flex justify-between"><span className="text-text-muted">Booking time</span><span className="text-text-main font-bold">2 minutes</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">City</span><span className="text-text-main font-bold">{data.name}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">State</span><span className="text-text-main font-bold">{data.state}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">Sports</span><span className="text-text-main font-bold">Football, Cricket, Badminton, Tennis, Multi</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">Pricing</span><span className="text-text-main font-bold">Per venue, per hour</span></div>
                 </div>
-              </div>
-
-              <div className="bg-surface border border-border-default rounded-xl p-6 text-left shadow-sm">
-                <h3 className="font-sans font-bold text-base text-text-main tracking-tight pb-3 border-b border-border-subtle mb-4">
-                  Popular turfs in {data.name}
-                </h3>
-                <div className="flex flex-col gap-3">
-                  {[
-                    { name: `${data.highlights[0]} Football Arena`, rating: 4.8, price: 1100 },
-                    { name: `${data.highlights[1] || data.highlights[0]} Sports Hub`, rating: 4.6, price: 950 },
-                    { name: `${data.highlights[2] || data.highlights[0]} Premier Turf`, rating: 4.7, price: 1300 },
-                  ].map((t) => (
-                    <div key={t.name} className="flex items-center justify-between text-xs font-sans">
-                      <div>
-                        <span className="block font-semibold text-text-main">{t.name}</span>
-                        <span className="flex items-center gap-1 text-text-muted mt-0.5">
-                          <Star className="w-3 h-3 fill-brand-lime text-brand-lime" /> {t.rating}
-                        </span>
-                      </div>
-                      <span className="font-sans font-extrabold text-text-main tabular-nums">₹{t.price}/hr</span>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-[11px] text-text-muted mt-4">
+                  Live venue counts and prices are shown on the{" "}
+                  <Link href={`/explore?city=${city}`} className="text-brand-lime hover:underline">
+                    explore page
+                  </Link>
+                  , straight from each venue&apos;s own listing.
+                </p>
               </div>
             </div>
           </div>

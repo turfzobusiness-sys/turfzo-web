@@ -8,48 +8,117 @@ on:
 jobs:
   deploy-staging:
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: false
     permissions:
       contents: read
+
+    # Public, build-time config, defined once at job level so `npm run build`
+    # and `npx opennextjs-cloudflare build` provably see identical values.
+    # Previously these were duplicated per step, so editing one block and not
+    # the other silently baked different config into the worker bundle.
+    # CLOUDFLARE_API_TOKEN is deliberately NOT here — it stays scoped to the
+    # deploy step below.
+    env:
+      # Staging env (mirrors .env.staging.example) — baked at build time.
+      # Not overridable via GitHub repo secrets (the values below already are
+      # the repo secrets, with real non-secret defaults where one exists).
+      NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_API_KEY }}
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'turfzo-staging.firebaseapp.com' }}
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'turfzo-staging' }}
+      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'turfzo-staging.firebasestorage.app' }}
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1060583963551' }}
+      NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_APP_ID || '1:1060583963551:web:52df50b8a3f6a75b249baa' }}
+      NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL || 'https://healthy-panther-67.eu-west-1.convex.cloud' }}
+      NEXT_PUBLIC_CONVEX_SITE_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_SITE_URL || 'https://healthy-panther-67.eu-west-1.convex.site' }}
+      NEXT_PUBLIC_CONVEX_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_URL || 'https://healthy-panther-67.eu-west-1.convex.cloud' }}
+      # No fallback on purpose. lib/env.ts treats this as required at runtime
+      # and fails closed with an HTTP 500, and there is no sane sandbox
+      # default to invent. The preflight below fails the job instead.
+      NEXT_PUBLIC_CASHFREE_APP_ID: ${{ secrets.STAGING_NEXT_PUBLIC_CASHFREE_APP_ID }}
+      NEXT_PUBLIC_CASHFREE_ENV: ${{ secrets.STAGING_NEXT_PUBLIC_CASHFREE_ENV || 'sandbox' }}
+      # No placeholder fallback. The previous
+      # `|| '0x4AAAAAAA-placeholder'` baked a dead Turnstile key into the
+      # staging bundle: /contact and the signup/login bot gate were broken
+      # there while the deploy reported success. lib/turnstile.ts counts a
+      # placeholder as "not configured", so it degraded silently. The
+      # preflight below now fails the job when this is unset.
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.STAGING_NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+      NEXT_PUBLIC_VIEW_ONLY_MODE: 'true'
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+
       - run: npm ci
+
+      # ---------------------------------------------------------------------
+      # Deploy preflight. Runs BEFORE any build or upload so a bundle that
+      # would fail at runtime never gets built, let alone uploaded.
+      # Mirrors PROD_REQUIRED in lib/env.ts, which is enforced at request time
+      # and fails closed with an HTTP 500. Only names and presence are
+      # reported — never values.
+      # NOTE: this block is duplicated in deploy-production.yml; keep them in sync.
+      # ---------------------------------------------------------------------
+      - name: Preflight — required public config
+        run: |
+          set -euo pipefail
+          required=(
+            NEXT_PUBLIC_FIREBASE_API_KEY
+            NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+            NEXT_PUBLIC_FIREBASE_PROJECT_ID
+            NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+            NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+            NEXT_PUBLIC_FIREBASE_APP_ID
+            NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL
+            NEXT_PUBLIC_CASHFREE_APP_ID
+            NEXT_PUBLIC_TURNSTILE_SITE_KEY
+          )
+          missing=()
+          placeholder=()
+          for key in "${required[@]}"; do
+            value="${!key-}"
+            if [ -z "${value// /}" ]; then
+              missing+=("$key")
+            else
+              # lib/env.ts and lib/turnstile.ts already treat any value
+              # containing "placeholder" as unset. Reject it here rather than
+              # shipping a bundle that is broken on arrival.
+              lower="${value,,}"
+              if [[ "$lower" == *placeholder* ]]; then
+                placeholder+=("$key")
+              fi
+            fi
+          done
+          status=0
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Required public env var(s) unset — refusing to build or deploy."
+            for key in "${missing[@]}"; do echo "  - $key (unset)"; done
+            status=1
+          fi
+          if [ "${#placeholder[@]}" -gt 0 ]; then
+            echo "::error::Required public env var(s) hold a placeholder value — refusing to build or deploy."
+            for key in "${placeholder[@]}"; do echo "  - $key (placeholder)"; done
+            status=1
+          fi
+          if [ "$status" -ne 0 ]; then
+            exit 1
+          fi
+          echo "OK: all ${#required[@]} required public env vars set, none a placeholder."
+
       - name: Build with staging environment
-        env:
-          # Staging env (mirrors .env.staging.example) — baked at build time;
-          # overridable via GitHub repo secrets when env-diff hygiene requires it.
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_API_KEY }}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'turfzo-staging.firebaseapp.com' }}
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'turfzo-staging' }}
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'turfzo-staging.firebasestorage.app' }}
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1060583963551' }}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_APP_ID || '1:1060583963551:web:52df50b8a3f6a75b249baa' }}
-          NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL || 'https://healthy-panther-67.eu-west-1.convex.cloud' }}
-          NEXT_PUBLIC_CONVEX_SITE_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_SITE_URL || 'https://healthy-panther-67.eu-west-1.convex.site' }}
-          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_URL || 'https://healthy-panther-67.eu-west-1.convex.cloud' }}
-          NEXT_PUBLIC_CASHFREE_APP_ID: ${{ secrets.STAGING_NEXT_PUBLIC_CASHFREE_APP_ID }}
-          NEXT_PUBLIC_CASHFREE_ENV: ${{ secrets.STAGING_NEXT_PUBLIC_CASHFREE_ENV || 'sandbox' }}
-          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.STAGING_NEXT_PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAAA-placeholder' }}
-          NEXT_PUBLIC_VIEW_ONLY_MODE: 'true'
         run: npm run build
-      - run: npx opennextjs-cloudflare build
-        env:
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_API_KEY }}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'turfzo-staging.firebaseapp.com' }}
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'turfzo-staging' }}
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'turfzo-staging.firebasestorage.app' }}
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1060583963551' }}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.STAGING_NEXT_PUBLIC_FIREBASE_APP_ID || '1:1060583963551:web:52df50b8a3f6a75b249baa' }}
-          NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL || 'https://healthy-panther-67.eu-west-1.convex.cloud' }}
-          NEXT_PUBLIC_CONVEX_SITE_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_SITE_URL || 'https://healthy-panther-67.eu-west-1.convex.site' }}
-          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.STAGING_NEXT_PUBLIC_CONVEX_URL || 'https://healthy-panther-67.eu-west-1.convex.cloud' }}
-          NEXT_PUBLIC_CASHFREE_APP_ID: ${{ secrets.STAGING_NEXT_PUBLIC_CASHFREE_APP_ID }}
-          NEXT_PUBLIC_CASHFREE_ENV: ${{ secrets.STAGING_NEXT_PUBLIC_CASHFREE_ENV || 'sandbox' }}
-          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.STAGING_NEXT_PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAAA-placeholder' }}
-          NEXT_PUBLIC_VIEW_ONLY_MODE: 'true'
+
+      - name: Bundle OpenNext worker
+        run: npx opennextjs-cloudflare build
+
       - name: Deploy staging worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

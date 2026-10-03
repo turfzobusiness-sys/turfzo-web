@@ -19,7 +19,6 @@ import {
   Download,
   ArrowLeft,
   AlertCircle,
-  Search,
   Smartphone,
   Sparkles,
   Info,
@@ -52,7 +51,7 @@ import {
 } from "@/lib/launch-cities";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
-import { openCashfreeCheckout } from "@/lib/cashfree";
+import { openCashfreeCheckout, CashfreeCheckoutError } from "@/lib/cashfree";
 import { isViewOnlyMode } from "@/lib/env";
 import { AppError } from "@/lib/errors";
 import type {
@@ -121,6 +120,10 @@ interface TurfDisplay {
   facilities: string[];
   image: string;
   city?: string;
+  /** Owner's own description of the venue (may be absent). */
+  description?: string;
+  /** Owner's uploaded photos, if any. */
+  imageGallery?: string[];
   /** Turf-local UTC offset (min); backend default 330 when absent. */
   timezoneOffsetMinutes?: number;
   hasFloodlights?: boolean;
@@ -129,6 +132,11 @@ interface TurfDisplay {
   hasDrinkingWater?: boolean;
   hasFirstAid?: boolean;
   isIndoor?: boolean;
+  /** Real headcount cap the owner set; drives the attendee stepper. */
+  maxPlayers?: number;
+  /** Number of playable grounds the venue has (info only — the booking
+      model has no pitch field, so we never claim a specific one). */
+  groundCount?: number;
 }
 
 function mapTurf(t: ConvexTurf): TurfDisplay {
@@ -146,6 +154,8 @@ function mapTurf(t: ConvexTurf): TurfDisplay {
     facilities: t.amenities ?? [],
     image: getLocalTurfImage(t),
     city: t.city,
+    description: t.description,
+    imageGallery: t.image_gallery,
     timezoneOffsetMinutes: t.timezone_offset_minutes,
     hasFloodlights: t.has_floodlights,
     hasFreeParking: t.has_free_parking,
@@ -153,6 +163,8 @@ function mapTurf(t: ConvexTurf): TurfDisplay {
     hasDrinkingWater: t.has_drinking_water,
     hasFirstAid: t.has_first_aid,
     isIndoor: t.is_indoor,
+    maxPlayers: t.max_players,
+    groundCount: t.ground_count,
   };
 }
 
@@ -170,6 +182,13 @@ interface SlotInfo {
 
 interface BookingPricePreview {
   subtotal: number;
+  /**
+   * Promo discount the backend already applied to `subtotal`. The backend
+   * (bookings:calculatePreview → pricing.applyPromoToSubtotal) returns
+   * `subtotal` POST-discount, so without this field a promo rendered a
+   * pre-discount-looking base next to a post-discount grand total.
+   */
+  discount: number;
   serviceFee: number;
   grandTotal: number;
 }
@@ -184,6 +203,26 @@ function toDateKey(d: Date, offsetMinutes?: number) {
 
 function formatPrice(amount: number) {
   return `₹${amount.toLocaleString("en-IN")}`;
+}
+
+// Headcount bounds. The lower bound is 2 (a 1-person "booking" is a walk-in,
+// not a slot) and the upper bound comes from the TURF's real max_players.
+// The backend accepts 1..100, so a turf with no max_players set falls back
+// to that documented ceiling rather than an invented 14/22 split.
+const MIN_ATTENDEES = 2;
+const FALLBACK_MAX_ATTENDEES = 100;
+
+function attendeeCeiling(maxPlayers?: number): number {
+  if (!maxPlayers || !Number.isFinite(maxPlayers) || maxPlayers < MIN_ATTENDEES) {
+    return FALLBACK_MAX_ATTENDEES;
+  }
+  return Math.min(Math.round(maxPlayers), FALLBACK_MAX_ATTENDEES);
+}
+
+function clampAttendees(value: number, maxPlayers?: number): number {
+  const ceiling = attendeeCeiling(maxPlayers);
+  if (!Number.isFinite(value)) return Math.min(10, ceiling);
+  return Math.min(Math.max(MIN_ATTENDEES, Math.round(value)), ceiling);
 }
 
 function formatDisplayDate(dateStr: string) {
@@ -447,6 +486,9 @@ function CalendarPicker({
 // app's isTransientConvexError. For these the outcome is UNKNOWN: the money
 // may have been collected, so NEVER cancel the booking in response.
 function isTransientPaymentError(err: unknown): boolean {
+  if (err instanceof CashfreeCheckoutError) {
+    return err.outcome === "unknown";
+  }
   const code = err instanceof AppError ? err.code : "";
   return [
     "NETWORK_ERROR",
@@ -463,23 +505,31 @@ function isTransientPaymentError(err: unknown): boolean {
 // behavior is preserved.
 const EXPLORE_SPORT_IDS = ["Football", "Cricket", "Badminton", "Tennis", "Multipurpose"];
 
+const EXPLORE_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 function ExploreQuerySync({
   currentCity,
   currentSport,
+  currentDate,
   onCity,
   onSport,
+  onDate,
   onTurfId,
 }: {
   currentCity: string;
   currentSport: string;
+  currentDate: string;
   onCity: (city: string) => void;
   onSport: (sport: string) => void;
+  onDate: (date: string) => void;
   onTurfId: (turfId: string) => void;
 }) {
   const searchParams = useSearchParams();
   const citySlug = (searchParams.get("city") ?? "").trim().toLowerCase();
   const sportSlug = (searchParams.get("sport") ?? "").trim().toLowerCase();
   const turfIdParam = (searchParams.get("turfId") ?? searchParams.get("id") ?? "").trim();
+  // The home hero sends ?date=YYYY-MM-DD for Today / Tomorrow / This Weekend.
+  const dateParam = (searchParams.get("date") ?? "").trim();
   useEffect(() => {
     if (citySlug) {
       // Alias-aware ("bengaluru" → "Bangalore", "sambhajinagar" → "Aurangabad")
@@ -494,10 +544,25 @@ function ExploreQuerySync({
       const match = EXPLORE_SPORT_IDS.find((id) => id.toLowerCase() === sportSlug);
       if (match && match !== currentSport) onSport(match);
     }
+    if (EXPLORE_DATE_RE.test(dateParam) && dateParam !== currentDate) {
+      onDate(dateParam);
+    }
     if (turfIdParam) {
       onTurfId(turfIdParam);
     }
-  }, [citySlug, sportSlug, turfIdParam, currentCity, currentSport, onCity, onSport, onTurfId]);
+  }, [
+    citySlug,
+    sportSlug,
+    dateParam,
+    turfIdParam,
+    currentCity,
+    currentSport,
+    currentDate,
+    onCity,
+    onSport,
+    onDate,
+    onTurfId,
+  ]);
   return null;
 }
 
@@ -554,7 +619,6 @@ export default function ExplorePage() {
   const [availableSlots, setAvailableSlots] = useState<SlotInfo[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
-  const [selectedPitch, setSelectedPitch] = useState("Pitch 1 (Premium Turf)");
   const [selectedPayment, setSelectedPayment] = useState<
     "upi" | "card" | "netbanking" | "pay_at_venue"
   >("upi");
@@ -917,9 +981,9 @@ export default function ExplorePage() {
 
   const handleOpenSlots = useCallback((turf: TurfDisplay) => {
     setSelectedTurf(turf);
-    setSelectedPitch(
-      turf.premium ? "Pitch 1 (Premium Turf)" : "Pitch 1 (Standard Turf)",
-    );
+    // Seed the headcount from the venue's real cap instead of a hardcoded
+    // premium/standard guess, and never exceed it.
+    setAttendees((prev) => clampAttendees(prev, turf.maxPlayers));
     setSelectedDate(searchDate);
     setViewMode("details");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -974,6 +1038,7 @@ export default function ExplorePage() {
     if (!selectedTurf)
       return {
         subtotal: 0,
+        discount: 0,
         serviceFee: 0,
         convenience: 0,
         gst: 0,
@@ -981,15 +1046,17 @@ export default function ExplorePage() {
         totalPaise: 0,
       };
     const subtotal = effectivePricePreview?.subtotal ?? selectedTurf.price;
-    // Fail-closed: the backend's 5% service fee (total_price + service_fee)
-    // is the real charge — never synthesize a fee client-side when the
-    // preview hasn't loaded, or the breakdown won't match what the booking
-    // actually charges. Pay is blocked until the preview arrives (see
-    // handlePayNow guard below).
+    // Fail-closed: the backend's service fee (total_price + service_fee) is
+    // the real charge — never synthesize a fee client-side when the preview
+    // hasn't loaded, or the breakdown won't match what the booking actually
+    // charges. Pay is blocked until the preview arrives (see handlePayNow
+    // guard below).
     const serviceFee = effectivePricePreview?.serviceFee ?? 0;
+    const discount = effectivePricePreview?.discount ?? 0;
     const total = effectivePricePreview?.grandTotal ?? subtotal;
     return {
       subtotal,
+      discount,
       serviceFee,
       convenience: 0,
       gst: 0,
@@ -1071,22 +1138,31 @@ export default function ExplorePage() {
       // ── Pay-at-venue: no online payment, the venue collects on arrival ──
       if (selectedPayment === "pay_at_venue") {
         // Render exactly what the backend stored — do not fabricate
-        // status/payment_status client-side.
+        // status/payment_status client-side. A cash booking is only
+        // "confirmed" when the owner's auto-approve setting is on; otherwise
+        // the server returns `pending` and the venue must approve it, so no
+        // admission pass may be shown.
         setConfirmedBooking(pendingBooking);
-        const qrPayload = JSON.stringify({
-          code: pendingBooking.booking_code,
-          turf: selectedTurf.name,
-          date: selectedDate,
-          slot: selectedTimeSlot,
-        });
-        const { default: QRCode } = await import("qrcode");
-        const qrDataUrl = await QRCode.toDataURL(qrPayload, {
-          width: 256,
-          margin: 1,
-          color: { dark: "#000000", light: "#FFFFFF" },
-        });
-        setQrCodeUrl(qrDataUrl);
-        setDownloadQrUrl(qrDataUrl);
+        if (pendingBooking.status === "confirmed") {
+          const qrPayload = JSON.stringify({
+            code: pendingBooking.booking_code,
+            turf: selectedTurf.name,
+            date: selectedDate,
+            slot: selectedTimeSlot,
+          });
+          const { default: QRCode } = await import("qrcode");
+          const qrDataUrl = await QRCode.toDataURL(qrPayload, {
+            width: 256,
+            margin: 1,
+            color: { dark: "#000000", light: "#FFFFFF" },
+          });
+          setQrCodeUrl(qrDataUrl);
+          setDownloadQrUrl(qrDataUrl);
+        } else {
+          // Not admitted yet — no gate-scan QR.
+          setQrCodeUrl("");
+          setDownloadQrUrl("");
+        }
         setFlowStep("confirmed");
         return;
       }
@@ -1272,6 +1348,96 @@ export default function ExplorePage() {
 
   const pricing = getPricingDetails();
 
+  // Owner's own words, or nothing — never a marketing paragraph about a
+  // "premium court" that the turf record does not contain.
+  const turfDescription = selectedTurf?.description?.trim() || "";
+
+  // Venue photos: the primary image plus any gallery the owner uploaded.
+  // No stock substitutes — a venue with one photo shows one photo.
+  const photoGallery = useMemo(() => {
+    if (!selectedTurf) return [] as string[];
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const src of [selectedTurf.image, ...(selectedTurf.imageGallery ?? [])]) {
+      if (typeof src !== "string") continue;
+      const trimmed = src.trim();
+      if (!trimmed || seen.has(trimmed)) continue;
+      seen.add(trimmed);
+      out.push(trimmed);
+    }
+    return out;
+  }, [selectedTurf]);
+
+  // Amenity list built strictly from the selected turf's boolean flags and
+  // its free-text `amenities` array. Undeclared amenities are omitted.
+  const turfAmenities = useMemo(() => {
+    if (!selectedTurf) return [] as { label: string; icon: React.ReactNode }[];
+    const declared = new Set(
+      (selectedTurf.facilities ?? []).map((a) => a.trim().toLowerCase()),
+    );
+    const items: { label: string; icon: React.ReactNode }[] = [];
+    if (selectedTurf.hasFloodlights) {
+      items.push({
+        label: "Floodlights",
+        icon: <Award className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.hasFreeParking) {
+      items.push({
+        label: "Free parking",
+        icon: <SlidersHorizontal className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.hasDrinkingWater) {
+      items.push({
+        label: "Drinking water",
+        icon: <Info className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.hasChangingRoom) {
+      items.push({
+        label: "Changing rooms",
+        icon: <Check className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.hasFirstAid) {
+      items.push({
+        label: "First-aid kit on site",
+        icon: <ShieldCheck className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.isIndoor) {
+      items.push({
+        label: "Indoor court",
+        icon: <Home className="w-4 h-4 text-text-muted" />,
+      });
+    } else if (selectedTurf.isIndoor === false) {
+      items.push({
+        label: "Outdoor field",
+        icon: <Sun className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    // Free-text amenities the owner typed that are not already covered by a
+    // boolean flag (e.g. "Equipment rental", "Cafeteria").
+    for (const raw of selectedTurf.facilities ?? []) {
+      const label = raw.trim();
+      if (!label) continue;
+      const lower = label.toLowerCase();
+      const covered = items.some((i) => i.label.toLowerCase() === lower);
+      if (!covered && declared.has(lower)) {
+        items.push({
+          label,
+          icon: <Check className="w-4 h-4 text-text-muted" />,
+        });
+      }
+    }
+    return items;
+  }, [selectedTurf]);
+
+  // A price filter that hides turfs the user never touched must be visible,
+  // otherwise the default 500–3000 range silently shrinks the results.
+  const isPriceFilterActive = filterMinPrice > 500 || filterMaxPrice < 3000;
+
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
       <FAQPageSchema items={exploreFaqItems} />
@@ -1279,8 +1445,15 @@ export default function ExplorePage() {
         <ExploreQuerySync
           currentCity={selectedCity}
           currentSport={selectedSport}
+          currentDate={searchDate}
           onCity={setSelectedCity}
           onSport={setSelectedSport}
+          onDate={(d) => {
+            setSearchDate(d);
+            // Keep the booking view in step with the search bar so opening a
+            // venue lands on the requested day, not on today.
+            setSelectedDate(d);
+          }}
           onTurfId={setTargetTurfId}
         />
       </Suspense>
@@ -1439,10 +1612,16 @@ export default function ExplorePage() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Search Button */}
-                  <button className="h-10 px-4 rounded-lg bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-bold text-xs flex items-center justify-center gap-1.5 mr-2.5 ml-auto shrink-0 transition-all cursor-pointer">
-                    <Search className="w-4 h-4" strokeWidth={2.5} />
-                    <span className="hidden sm:inline">Search</span>
+                  {/* Filters trigger — the Where/When/Sport segments filter
+                      the list live, so a separate no-op "Search" button was
+                      misleading. This opens the real filter controls. */}
+                  <button
+                    onClick={() => setIsFiltersModalOpen(true)}
+                    aria-label="Open filters"
+                    className="h-10 px-4 rounded-lg bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-bold text-xs flex items-center justify-center gap-1.5 mr-2.5 ml-auto shrink-0 transition-all cursor-pointer"
+                  >
+                    <SlidersHorizontal className="w-4 h-4" strokeWidth={2.5} />
+                    <span className="hidden sm:inline">Filters</span>
                   </button>
                 </div>
               </div>
@@ -1497,7 +1676,7 @@ export default function ExplorePage() {
               </div>
 
               {/* Sub-Filters and Count Row */}
-              <div className="flex items-center justify-between gap-4 mb-8">
+              <div className="flex items-center justify-between gap-4 mb-4">
                 <div className="text-sm text-text-muted font-medium">
                   {filteredTurfs.length} turf
                   {filteredTurfs.length !== 1 ? "s" : ""} available
@@ -1530,6 +1709,69 @@ export default function ExplorePage() {
                   </button>
                 </div>
               </div>
+
+              {/* Active-filter chips — a narrowed price range used to hide
+                  turfs with no visible sign it was applied. */}
+              {(isPriceFilterActive ||
+                filterFormat !== "all" ||
+                filterAmenities.length > 0) && (
+                <div className="flex flex-wrap items-center gap-2 mb-6">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                    Filters:
+                  </span>
+                  {isPriceFilterActive && (
+                    <button
+                      onClick={() => {
+                        setFilterMinPrice(500);
+                        setFilterMaxPrice(3000);
+                        setMinInputVal("500");
+                        setMaxInputVal("3000");
+                      }}
+                      className="px-3 py-1 rounded-lg bg-text-main text-bg text-[11px] font-semibold flex items-center gap-1.5"
+                    >
+                      {formatPrice(filterMinPrice)} – {formatPrice(filterMaxPrice)}
+                      /hr
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  {filterFormat !== "all" && (
+                    <button
+                      onClick={() => setFilterFormat("all")}
+                      className="px-3 py-1 rounded-lg bg-text-main text-bg text-[11px] font-semibold flex items-center gap-1.5"
+                    >
+                      {filterFormat} pitch
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  {filterAmenities.map((id) => (
+                    <button
+                      key={id}
+                      onClick={() =>
+                        setFilterAmenities((prev) =>
+                          prev.filter((x) => x !== id),
+                        )
+                      }
+                      className="px-3 py-1 rounded-lg bg-text-main text-bg text-[11px] font-semibold flex items-center gap-1.5"
+                    >
+                      {id.replace(/-/g, " ")}
+                      <X className="w-3 h-3" />
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => {
+                      setFilterFormat("all");
+                      setFilterMinPrice(500);
+                      setFilterMaxPrice(3000);
+                      setMinInputVal("500");
+                      setMaxInputVal("3000");
+                      setFilterAmenities([]);
+                    }}
+                    className="px-3 py-1 text-[11px] font-semibold text-text-muted hover:text-text-main underline"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
 
               {/* Error warning state */}
               {loadError && (
@@ -1704,19 +1946,21 @@ export default function ExplorePage() {
                 {selectedTurf.name}
               </h1>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text-muted mt-2">
-                <span className="flex items-center gap-1">
-                  <Star className="w-3.5 h-3.5 fill-text-main text-text-main" />{" "}
-                  {selectedTurf.rating > 0
-                    ? selectedTurf.rating.toFixed(2)
-                    : "4.8"}
-                </span>
-                <span>·</span>
-                <span className="underline cursor-pointer hover:text-text-main">
-                  {selectedTurf.reviews > 0
-                    ? `${selectedTurf.reviews} reviews`
-                    : "15 reviews"}
-                </span>
-                <span>·</span>
+                {/* No rating invented for an unrated venue — say "New". */}
+                {selectedTurf.rating > 0 && (
+                  <>
+                    <span className="flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 fill-text-main text-text-main" />{" "}
+                      {selectedTurf.rating.toFixed(2)}
+                    </span>
+                    <span>·</span>
+                    <span>
+                      {selectedTurf.reviews}{" "}
+                      {selectedTurf.reviews === 1 ? "review" : "reviews"}
+                    </span>
+                    <span>·</span>
+                  </>
+                )}
                 <span className="flex items-center gap-1 font-semibold text-text-main">
                   <MapPin className="w-3.5 h-3.5 text-brand-lime" />{" "}
                   {selectedTurf.location}
@@ -1724,44 +1968,49 @@ export default function ExplorePage() {
               </div>
             </div>
 
-            {/* Photos Grid Gallery */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-xl overflow-hidden bg-elevated relative h-[300px] md:h-[420px]">
+            {/* Photos Grid Gallery — built from the venue's own uploaded
+                photos only. Stock photos of a different pitch were shown
+                here before, so nothing is rendered when a venue has one. */}
+            <div
+              className={`grid gap-3 rounded-xl overflow-hidden bg-elevated relative ${
+                photoGallery.length > 1
+                  ? "grid-cols-1 md:grid-cols-3 h-[300px] md:h-[420px]"
+                  : "grid-cols-1 h-[300px] md:h-[420px]"
+              }`}
+            >
               {/* Left Large main photo */}
-              <div className="md:col-span-2 relative h-full w-full overflow-hidden group">
+              <div
+                className={`relative h-full w-full overflow-hidden group ${
+                  photoGallery.length > 1 ? "md:col-span-2" : ""
+                }`}
+              >
                 <Image
-                  src={selectedTurf.image}
+                  src={photoGallery[0]}
                   alt={selectedTurf.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 66vw"
                   className="object-cover group-hover:brightness-95 transition-all duration-300"
                 />
               </div>
-              {/* Right stacked photos */}
-              <div className="hidden md:flex flex-col gap-3 h-full">
-                <div className="relative flex-1 w-full overflow-hidden group">
-                  <Image
-                    src="/feature_verified.jpg"
-                    alt="Verified pitch conditions"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover group-hover:brightness-95 transition-all duration-300"
-                  />
+              {/* Right stacked photos — real gallery entries only */}
+              {photoGallery.length > 1 && (
+                <div className="hidden md:flex flex-col gap-3 h-full">
+                  {photoGallery.slice(1, 3).map((src) => (
+                    <div
+                      key={src}
+                      className="relative flex-1 w-full overflow-hidden group"
+                    >
+                      <Image
+                        src={src}
+                        alt={`${selectedTurf.name} photo`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover group-hover:brightness-95 transition-all duration-300"
+                      />
+                    </div>
+                  ))}
                 </div>
-                <div className="relative flex-1 w-full overflow-hidden group">
-                  <Image
-                    src="/images/marketing/explore/football-card.webp"
-                    alt="Verified pitch conditions"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover group-hover:brightness-95 transition-all duration-300"
-                  />
-                </div>
-              </div>
-
-              {/* Show all photos button */}
-              <button className="absolute bottom-6 right-6 bg-surface border border-border-strong text-text-main hover:bg-elevated transition-colors text-xs font-semibold py-2 px-4 rounded-xl flex items-center gap-1.5 shadow-sm">
-                <Info className="w-3.5 h-3.5" /> Show all photos
-              </button>
+              )}
             </div>
 
             {/* Split Content columns */}
@@ -1772,40 +2021,46 @@ export default function ExplorePage() {
                   <h2 className="text-xl sm:text-2xl font-bold text-text-main">
                     {selectedTurf.sport} court managed by Turfzo
                   </h2>
+                  {/* Every fact below is read from the selected turf's own
+                      record — nothing is asserted when the field is unset. */}
                   <p className="text-text-muted mt-1 text-sm">
-                    {selectedTurf.size} dimensions layout · Play up to 14
-                    players · Floodlight lighting system
+                    {(
+                      [
+                        selectedTurf.size !== "N/A"
+                          ? `${selectedTurf.size} format`
+                          : null,
+                        selectedTurf.maxPlayers
+                          ? `Plays up to ${selectedTurf.maxPlayers} players`
+                          : null,
+                        selectedTurf.groundCount
+                          ? `${selectedTurf.groundCount} ground${selectedTurf.groundCount === 1 ? "" : "s"}`
+                          : null,
+                        selectedTurf.isIndoor === true
+                          ? "Indoor"
+                          : selectedTurf.isIndoor === false
+                            ? "Outdoor"
+                            : null,
+                        selectedTurf.hasFloodlights ? "Floodlights" : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ") || "Venue details are still being added."
+                    )}
                   </p>
                 </div>
 
-                {/* Host card */}
-                <div className="pb-6 border-b border-border-default flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime font-bold text-lg border border-brand-lime/30 shrink-0">
-                      TZ
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-text-main">
-                        Verified Sports Arena
-                      </h3>
-                      <p className="text-xs text-text-muted">
-                        Superhost · Booking confirmed instantly
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bullet checklist highlights */}
+                {/* Bullet checklist highlights — Turfzo policy statements
+                    only. No invented host identity, inspection claim or
+                    "superhost" badge. */}
                 <div className="pb-6 border-b border-border-default space-y-5">
                   <div className="flex items-start gap-4">
                     <ShieldCheck className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-bold text-text-main text-sm">
-                        100% Inspected Field
+                        Owner-listed venue
                       </h4>
                       <p className="text-xs text-text-muted mt-0.5">
-                        Our venue specialists personally verify pitch grip,
-                        lighting level, and net quality.
+                        The owner manages this venue&apos;s slots and pricing
+                        directly on Turfzo.
                       </p>
                     </div>
                   </div>
@@ -1813,11 +2068,11 @@ export default function ExplorePage() {
                     <Check className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-bold text-text-main text-sm">
-                        Instant Confirmation
+                        No double bookings
                       </h4>
                       <p className="text-xs text-text-muted mt-0.5">
-                        Direct connection to the venue&apos;s manager dashboard
-                        guarantees no double bookings.
+                        Availability is reserved on the server the moment you
+                        pay, so a slot can only be held once.
                       </p>
                     </div>
                   </div>
@@ -1828,115 +2083,63 @@ export default function ExplorePage() {
                         Flexible Cancellations
                       </h4>
                       <p className="text-xs text-text-muted mt-0.5">
-                        Cancel up to 24 hours in advance to receive automatic
-                        full refund options.
+                        Cancel up to 24 hours in advance for a full refund of
+                        the slot price. The service fee is non-refundable.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Description text */}
-                <div className="pb-6 border-b border-border-default">
-                  <h3 className="text-lg font-bold text-text-main mb-3">
-                    About this venue
-                  </h3>
-                  <p className="text-text-muted text-sm leading-relaxed">
-                    This premium court features professional artificial grass
-                    turf designed to reduce joint strain and maximize ball
-                    control. Ideal for corporate matches, friendly matches, or
-                    intensive team training sessions. Changing room facilities
-                    and showers are available, and free parking spots are
-                    provided.
-                  </p>
-                </div>
-
-                {/* Amenities checklist icons */}
-                <div className="pb-6 border-b border-border-default">
-                  <h3 className="text-lg font-bold text-text-main mb-4">
-                    What this turf offers
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6">
-                    {[
-                      {
-                        label: "High-intensity floodlights",
-                        icon: <Award className="w-4 h-4 text-text-muted" />,
-                      },
-                      {
-                        label: "Free parking spots on premises",
-                        icon: (
-                          <SlidersHorizontal className="w-4 h-4 text-text-muted" />
-                        ),
-                      },
-                      {
-                        label: "Purified drinking water stations",
-                        icon: <Info className="w-4 h-4 text-text-muted" />,
-                      },
-                      {
-                        label: "Changing rooms & restroom blocks",
-                        icon: <Check className="w-4 h-4 text-text-muted" />,
-                      },
-                      {
-                        label: "Wi-Fi access for spectators",
-                        icon: <Star className="w-4 h-4 text-text-muted" />,
-                      },
-                      {
-                        label: "Equipped first-aid box on site",
-                        icon: (
-                          <ShieldCheck className="w-4 h-4 text-text-muted" />
-                        ),
-                      },
-                    ].map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-3 text-sm text-text-main"
-                      >
-                        {item.icon}
-                        <span>{item.label}</span>
-                      </div>
-                    ))}
+                {/* Description text — the owner's own words, or nothing. */}
+                {turfDescription && (
+                  <div className="pb-6 border-b border-border-default">
+                    <h3 className="text-lg font-bold text-text-main mb-3">
+                      About this venue
+                    </h3>
+                    <p className="text-text-muted text-sm leading-relaxed whitespace-pre-line">
+                      {turfDescription}
+                    </p>
                   </div>
-                </div>
+                )}
 
-                {/* Turf review rating progress bars */}
-                <div className="pb-6 border-b border-border-default">
-                  <h3 className="text-lg font-bold text-text-main flex items-center gap-1.5 mb-6">
-                    <Star className="w-5 h-5 fill-text-main text-text-main" />{" "}
-                    {selectedTurf.rating > 0
-                      ? selectedTurf.rating.toFixed(2)
-                      : "4.8"}{" "}
-                    · Venue Ratings
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4">
-                    {[
-                      { label: "Turf Grass Bounce", score: "4.8" },
-                      { label: "Lighting Uniformity", score: "4.9" },
-                      { label: "Facility Cleanliness", score: "4.7" },
-                      { label: "Staff Hospitality", score: "4.9" },
-                    ].map((rating, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between gap-4"
-                      >
-                        <span className="text-sm text-text-main">
-                          {rating.label}
-                        </span>
-                        <div className="flex items-center gap-3 shrink-0 w-36 sm:w-44">
-                          <div className="h-1.5 flex-grow bg-border-default rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-text-main rounded-full"
-                              style={{
-                                width: `${(parseFloat(rating.score) / 5) * 100}%`,
-                              }}
-                            />
-                          </div>
-                          <span className="text-xs font-bold text-text-main text-right w-5">
-                            {rating.score}
-                          </span>
+                {/* Amenities — built from the turf's own amenity/flag
+                    fields. Anything the venue has not declared is omitted
+                    rather than assumed present. */}
+                {turfAmenities.length > 0 && (
+                  <div className="pb-6 border-b border-border-default">
+                    <h3 className="text-lg font-bold text-text-main mb-4">
+                      What this turf offers
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6">
+                      {turfAmenities.map((item) => (
+                        <div
+                          key={item.label}
+                          className="flex items-center gap-3 text-sm text-text-main"
+                        >
+                          {item.icon}
+                          <span>{item.label}</span>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {/* Venue rating — only the aggregate the backend stores. The
+                    old fixed sub-scores (bounce/lighting/cleanliness/staff)
+                    were invented; there is no per-aspect rating in the data. */}
+                {selectedTurf.rating > 0 && (
+                  <div className="pb-6 border-b border-border-default">
+                    <h3 className="text-lg font-bold text-text-main flex items-center gap-1.5 mb-2">
+                      <Star className="w-5 h-5 fill-text-main text-text-main" />{" "}
+                      {selectedTurf.rating.toFixed(2)} · Venue Rating
+                    </h3>
+                    <p className="text-xs text-text-muted">
+                      {selectedTurf.reviews > 0
+                        ? `Based on ${selectedTurf.reviews} review${selectedTurf.reviews === 1 ? "" : "s"} from players who booked this venue.`
+                        : "Based on reviews from players who booked this venue."}
+                    </p>
+                  </div>
+                )}
 
                 {/* Frequently Asked Questions */}
                 <div>
@@ -1966,19 +2169,18 @@ export default function ExplorePage() {
                       / hour
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-text-muted">
-                    <Star className="w-3 h-3 fill-text-main text-text-main" />{" "}
-                    {selectedTurf.rating > 0
-                      ? selectedTurf.rating.toFixed(2)
-                      : "4.8"}
-                  </div>
+                  {selectedTurf.rating > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-text-muted">
+                      <Star className="w-3 h-3 fill-text-main text-text-main" />{" "}
+                      {selectedTurf.rating.toFixed(2)}
+                    </div>
+                  )}
                 </div>
 
                 {/* Select Date popup box selector */}
                 <div className="border border-border-strong rounded-xl overflow-visible text-xs bg-bg relative">
                   {/* Top split */}
-                  <div className="grid grid-cols-2 border-b border-border-strong overflow-visible">
-                    <div
+                  <div className="grid grid-cols-2 border-b border-border-strong overflow-visible">                    <div
                       className="p-3 border-r border-border-strong cursor-pointer hover:bg-elevated/25"
                       onClick={() =>
                         setShowCalendarBooking(!showCalendarBooking)
@@ -2017,35 +2219,20 @@ export default function ExplorePage() {
                               selectedTurf?.timezoneOffsetMinutes ?? 330
                             }
                             onSelect={(v) => {
+                              // The old slot's instants belong to the
+                              // PREVIOUS day — keeping them selected would let
+                              // checkout book yesterday's slot. Clear the
+                              // selection and its price preview before the
+                              // refetch lands.
                               setSelectedDate(v);
+                              setSelectedTimeSlot(null);
+                              setPricePreview(null);
                               setShowCalendarBooking(false);
                             }}
                           />
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </div>
-
-                  {/* Bottom selection Pitch */}
-                  <div className="p-3">
-                    <label className="block text-[8px] uppercase font-bold text-text-muted mb-1.5">
-                      Select Pitch
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        `Pitch 1 (${selectedTurf.premium ? "Premium" : "Standard"})`,
-                        `Pitch 2 (${selectedTurf.premium ? "Grass" : "Standard"})`,
-                      ].map((pitch) => (
-                        <button
-                          key={pitch}
-                          onClick={() => setSelectedPitch(pitch)}
-                          className={`py-1.5 border rounded-lg text-[10px] font-bold text-center cursor-pointer transition-all
-                            ${selectedPitch === pitch ? "border-text-main bg-elevated text-text-main" : "border-border-default text-text-muted hover:border-border-strong hover:text-text-main"}`}
-                        >
-                          {pitch.split(" ")[0]} {pitch.split(" ")[1]}
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 </div>
 
@@ -2059,9 +2246,46 @@ export default function ExplorePage() {
                       <Loader2 className="w-5 h-5 animate-spin text-brand-lime" />
                     </div>
                   ) : availableSlots.length === 0 ? (
-                    <p className="text-center text-xs text-text-muted py-2 bg-elevated/40 rounded-xl">
-                      No slots available. Try another date.
-                    </p>
+                    <div className="text-center py-2 bg-elevated/40 rounded-xl px-4">
+                      <p className="text-xs text-text-muted">
+                        No slots available. Try another date.
+                      </p>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const token = await getFreshToken().catch(
+                              () => undefined,
+                            );
+                            const dayStart = new Date(`${selectedDate}T10:00:00Z`);
+                            const dayEnd = new Date(
+                              dayStart.getTime() + 3_600_000,
+                            );
+                            await convexClient.mutation(
+                              "waitlists:join",
+                              {
+                                turf_id: selectedTurf.id,
+                                start_time: dayStart.toISOString(),
+                                end_time: dayEnd.toISOString(),
+                              },
+                              token,
+                            );
+                            toast.success(
+                              "You're on the waitlist — we'll notify you if a slot opens.",
+                            );
+                          } catch (err) {
+                            const { getErrorMessage } = await import(
+                              "@/lib/errors"
+                            );
+                            toast.error(
+                              getErrorMessage(err, "Could not join waitlist."),
+                            );
+                          }
+                        }}
+                        className="mt-2 text-xs font-bold text-brand-lime hover:underline"
+                      >
+                        Join waitlist for this day
+                      </button>
+                    </div>
                   ) : (
                     <div className="max-h-[280px] overflow-y-auto pr-1 space-y-4">
                       {groupedSlots.map((group) => {
@@ -2141,8 +2365,19 @@ export default function ExplorePage() {
                         {formatPrice(pricing.subtotal)}
                       </span>
                     </div>
+                    {pricing.discount > 0 && (
+                      <div className="flex justify-between">
+                        <span className="underline">Promo discount</span>
+                        <span className="text-brand-lime tabular-nums">
+                          −{formatPrice(pricing.discount)}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
-                      <span className="underline">Service fee (5%)</span>
+                      {/* Amount from the backend's preview; the rate is not
+                          hardcoded here so a backend rate change shows up
+                          automatically. */}
+                      <span className="underline">Service fee</span>
                       <span className="text-text-main tabular-nums">
                         {formatPrice(pricing.serviceFee)}
                       </span>
@@ -2231,31 +2466,35 @@ export default function ExplorePage() {
                     </span>
                   </div>
                   <div>
-                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
-                      Select Pitch
-                    </span>
-                    <span className="font-semibold text-text-main text-xs">
-                      {selectedPitch}
-                    </span>
-                  </div>
-                  <div>
                     <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold mb-1">
                       Attendees count
                     </span>
                     <div className="relative w-[100px]">
                       <input
                         type="number"
-                        min={2}
-                        max={selectedTurf.premium ? 22 : 14}
+                        min={MIN_ATTENDEES}
+                        max={attendeeCeiling(selectedTurf.maxPlayers)}
                         value={attendees}
                         onChange={(e) =>
                           setAttendees(
-                            Math.max(2, Math.min(22, Number(e.target.value))),
+                            clampAttendees(
+                              Number(e.target.value),
+                              selectedTurf.maxPlayers,
+                            ),
                           )
                         }
                         className="w-full bg-elevated border border-border-strong rounded-lg pl-3 pr-2 py-1.5 text-text-main text-xs font-semibold focus:outline-none focus:border-brand-lime transition-all"
                       />
                     </div>
+                    {selectedTurf.maxPlayers ? (
+                      <span className="block text-[9px] text-text-muted mt-1">
+                        Venue max {selectedTurf.maxPlayers} players
+                      </span>
+                    ) : (
+                      <span className="block text-[9px] text-text-muted mt-1">
+                        This venue has not set a player limit
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2326,8 +2565,18 @@ export default function ExplorePage() {
                     {formatPrice(pricing.subtotal)}
                   </span>
                 </div>
+                {pricing.discount > 0 && (
+                  <div className="flex justify-between">
+                    <span>Promo discount</span>
+                    <span className="text-brand-lime tabular-nums">
+                      −{formatPrice(pricing.discount)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
-                  <span>Service fee (5%)</span>
+                  {/* Rate comes from the backend's fee calculation — the
+                      label must not hardcode a percentage that can drift. */}
+                  <span>Service fee</span>
                   <span className="text-text-main tabular-nums">
                     {formatPrice(pricing.serviceFee)}
                   </span>
@@ -2428,7 +2677,17 @@ export default function ExplorePage() {
         {flowStep === "confirmed" &&
           confirmedBooking &&
           selectedTurf &&
-          selectedTimeSlot && (
+          selectedTimeSlot &&
+          (() => {
+            // A pass is only an ADMISSION PASS when the server says the
+            // booking is confirmed. Pending (venue must approve) and
+            // pay-at-venue bookings get an honest "payment due" state with
+            // no gate-scan QR.
+            const isAdmitted = confirmedBooking.status === "confirmed";
+            const isCash =
+              selectedPayment === "pay_at_venue" ||
+              confirmedBooking.payment_method === "cash";
+            return (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-sm overflow-y-auto">
               <motion.div
                 initial={{ scale: 0.96, opacity: 0 }}
@@ -2436,20 +2695,42 @@ export default function ExplorePage() {
                 exit={{ scale: 0.96, opacity: 0 }}
                 className="bg-surface border border-border-default rounded-xl max-w-md w-full p-6 shadow-sm z-10 text-center my-8"
               >
-                <div className="w-16 h-16 bg-brand-lime/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-lime/20">
-                  <Check className="w-8 h-8 text-brand-lime" strokeWidth={3} />
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border ${
+                    isAdmitted
+                      ? "bg-brand-lime/10 border-brand-lime/20"
+                      : "bg-amber-500/10 border-amber-500/25"
+                  }`}
+                >
+                  {isAdmitted ? (
+                    <Check className="w-8 h-8 text-brand-lime" strokeWidth={3} />
+                  ) : (
+                    <AlertCircle className="w-8 h-8 text-amber-500" />
+                  )}
                 </div>
                 <h3 className="text-xl font-extrabold text-text-main">
-                  Booking Confirmed!
+                  {isAdmitted
+                    ? "Booking Confirmed!"
+                    : "Awaiting Venue Approval"}
                 </h3>
                 <p className="text-xs text-text-muted mt-1">
-                  Your pitch reservation has been successfully booked.
+                  {isAdmitted
+                    ? isCash
+                      ? "Your slot is reserved. Pay at the venue before your game — the admission pass unlocks once the venue approves the booking."
+                      : "Your pitch reservation has been successfully booked."
+                    : "Your slot is held while the venue reviews this request. Payment is due at the venue once it is approved — no admission pass is issued yet."}
                 </p>
 
                 {/* Ticket receipt box */}
                 <div className="relative mt-6 rounded-xl overflow-hidden shadow-sm border border-border-default bg-surface">
                   {/* Top Section */}
-                  <div className="bg-gradient-to-br from-brand-lime to-green-600 p-5 text-white">
+                  <div
+                    className={`p-5 text-white ${
+                      isAdmitted
+                        ? "bg-gradient-to-br from-brand-lime to-green-600"
+                        : "bg-gradient-to-br from-amber-500 to-amber-700"
+                    }`}
+                  >
                     <div className="flex justify-between items-center mb-4">
                       <div>
                         <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-0.5">
@@ -2463,10 +2744,8 @@ export default function ExplorePage() {
                         <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-1.5">
                           Status
                         </span>
-                        <span className="font-black text-xs uppercase px-2 py-0.5 bg-bg text-brand-lime rounded-md shadow-sm">
-                          {selectedPayment === "pay_at_venue"
-                            ? "Pay at Venue"
-                            : "Paid"}
+                        <span className="font-black text-xs uppercase px-2 py-0.5 bg-bg text-text-main rounded-md shadow-sm">
+                          {isCash ? "Pay at Venue" : "Paid"}
                         </span>
                       </div>
                     </div>
@@ -2516,55 +2795,93 @@ export default function ExplorePage() {
                       </div>
                       <div>
                         <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">
-                          Pitch No
-                        </span>
-                        <span className="font-bold text-text-main text-sm">
-                          {selectedPitch}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">
-                          Amount
-                        </span>
-                        <span className="font-bold text-text-main text-sm tabular-nums">
-                          {formatPrice(confirmedBooking.total_price)}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">
                           Attendees
                         </span>
                         <span className="font-bold text-text-main text-sm">
-                          {attendees} Players
+                          {confirmedBooking.attendees ?? attendees} Players
                         </span>
                       </div>
                     </div>
 
-                    <div className="border-t border-border-default pt-5 flex flex-col items-center gap-3">
-                      {qrCodeUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={qrCodeUrl}
-                          alt="Booking QR Pass"
-                          className="w-24 h-24 rounded-xl bg-white p-1.5 shadow-sm"
-                        />
-                      ) : (
-                        <div className="w-24 h-24 bg-elevated animate-pulse rounded-xl" />
+                    {/* Amount breakdown — the service fee is charged
+                        (total_price + service_fee), so it is shown. */}
+                    <div className="border-t border-border-default pt-4 space-y-2 text-xs text-text-muted">
+                      <div className="flex justify-between">
+                        <span>Slot price</span>
+                        <span className="text-text-main tabular-nums">
+                          {formatPrice(confirmedBooking.total_price)}
+                        </span>
+                      </div>
+                      {pricing.discount > 0 && (
+                        <div className="flex justify-between">
+                          <span>Promo discount</span>
+                          <span className="text-brand-lime tabular-nums">
+                            −{formatPrice(pricing.discount)}
+                          </span>
+                        </div>
                       )}
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-text-muted">
-                        Scan at entrance gate
-                      </span>
+                      <div className="flex justify-between">
+                        <span>Service fee</span>
+                        <span className="text-text-main tabular-nums">
+                          {formatPrice(confirmedBooking.service_fee ?? 0)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between font-bold text-text-main border-t border-border-default pt-2 text-sm">
+                        <span>Total payable</span>
+                        <span className="tabular-nums">
+                          {formatPrice(
+                            (confirmedBooking.total_price ?? 0) +
+                              (confirmedBooking.service_fee ?? 0),
+                          )}
+                        </span>
+                      </div>
+                      {isCash && (
+                        <p className="text-[10px] text-text-muted pt-1">
+                          Payable at the venue on arrival.
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="border-t border-border-default pt-5 flex flex-col items-center gap-3">
+                      {isAdmitted ? (
+                        <>
+                          {qrCodeUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={qrCodeUrl}
+                              alt="Booking QR Pass"
+                              className="w-24 h-24 rounded-xl bg-white p-1.5 shadow-sm"
+                            />
+                          ) : (
+                            <div className="w-24 h-24 bg-elevated animate-pulse rounded-xl" />
+                          )}
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-text-muted">
+                            Scan at entrance gate
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-24 h-24 border border-dashed border-border-strong rounded-xl flex items-center justify-center">
+                            <AlertCircle className="w-8 h-8 text-text-muted" />
+                          </div>
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-text-muted">
+                            Admission pass issued after approval
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2 mt-6">
-                  <button
-                    onClick={handleDownloadTicket}
-                    className="w-full bg-elevated border border-border-default hover:bg-bg text-text-main font-semibold py-3 rounded-xl flex items-center justify-center gap-2 text-sm transition-colors cursor-pointer"
-                  >
-                    <Download className="w-4 h-4" /> Download Ticket Pass
-                  </button>
+                  {isAdmitted && (
+                    <button
+                      onClick={handleDownloadTicket}
+                      className="w-full bg-elevated border border-border-default hover:bg-bg text-text-main font-semibold py-3 rounded-xl flex items-center justify-center gap-2 text-sm transition-colors cursor-pointer"
+                    >
+                      <Download className="w-4 h-4" /> Download Ticket Pass
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       setFlowStep("listing");
@@ -2577,7 +2894,8 @@ export default function ExplorePage() {
                 </div>
               </motion.div>
             </div>
-          )}
+            );
+          })()}
       </AnimatePresence>
 
       {/* ========================================================
@@ -2918,7 +3236,7 @@ export default function ExplorePage() {
                     {/* Section 4: Amenities (Pills) */}
                     <div className="pb-8 border-b border-border-default mb-8">
                       <h4 className="text-base font-bold text-text-main mb-3">
-                        Amenities
+                        Facilities
                       </h4>
                       <div className="flex flex-wrap gap-2.5">
                         {[

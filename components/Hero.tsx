@@ -39,6 +39,34 @@ const DATES = [
   { id: "Anytime", label: "Any Date", sub: "View complete calendar" },
 ];
 
+/**
+ * Resolves a date choice to a concrete YYYY-MM-DD day key, or null for
+ * "Any Date" (no date constraint). The next Saturday/Sunday is used for
+ * "This Weekend" so the choice actually narrows the search instead of being
+ * silently dropped.
+ */
+function resolveDateKey(choice: string, offsetMinutes = 330): string | null {
+  // Turf-local day keys, matching explore's toDateKey().
+  const toKey = (d: Date) => {
+    const shifted = new Date(d.getTime() + offsetMinutes * 60_000);
+    return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, "0")}-${String(shifted.getUTCDate()).padStart(2, "0")}`;
+  };
+  const now = new Date();
+  if (choice === "Today") return toKey(now);
+  if (choice === "Tomorrow") {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 1);
+    return toKey(d);
+  }
+  if (choice === "Weekend") {
+    // Next Saturday (or today if today IS Saturday), in local time.
+    const d = new Date(now);
+    d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7));
+    return toKey(d);
+  }
+  return null; // Anytime
+}
+
 export default function Hero() {
   const router = useRouter();
   const [showComingSoon, setShowComingSoon] = useState(false);
@@ -64,9 +92,11 @@ export default function Hero() {
     const params = new URLSearchParams();
     if (selectedSport && selectedSport !== "All Sports") params.set("sport", selectedSport);
     if (selectedCity && selectedCity !== "All Cities") params.set("city", selectedCity);
-    if (selectedDate === "Today") {
-      params.set("date", new Date().toISOString().split("T")[0]);
-    }
+    // Every date choice is now passed through. Previously only "Today"
+    // produced a param, so Tomorrow / This Weekend / Any Date looked
+    // selectable but were discarded on submit.
+    const dateKey = resolveDateKey(selectedDate);
+    if (dateKey) params.set("date", dateKey);
     router.push(`/explore${params.toString() ? `?${params.toString()}` : ""}`);
   };
 

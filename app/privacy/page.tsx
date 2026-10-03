@@ -36,7 +36,7 @@ export default function PrivacyPage() {
 
           <Section title="2. Consent and Purpose Limitation">
             <p>
-              By signing up on Turfzo, completing booking checkout, or submitting inquiry forms, you provide your explicit consent for us to process your personal data for the specific purposes outlined in this policy. You have the right to withdraw your consent at any time by emailing us at <a href="mailto:privacy@turfzo.com" className="text-brand-lime hover:underline">privacy@turfzo.com</a>. Please note that withdrawing consent may limit our ability to provide booking facilitation services to you.
+              By signing up on Turfzo, completing booking checkout, or submitting inquiry forms, you provide your explicit consent for us to process your personal data for the specific purposes outlined in this policy. You have the right to withdraw your consent at any time by emailing us at <a href="mailto:privacy@turfzo.app" className="text-brand-lime hover:underline">privacy@turfzo.app</a>. Please note that withdrawing consent may limit our ability to provide booking facilitation services to you.
             </p>
           </Section>
 
@@ -93,7 +93,7 @@ export default function PrivacyPage() {
               We retain your account details as long as your account remains active. Transactional history and invoice logs are retained for a period of 7 years in compliance with Indian tax laws. For details on how billing data, reversals, and cancellations are settled, please see our <Link href="/refund-policy" className="text-brand-lime underline font-semibold">Refund & Cancellation Policy</Link>.
             </p>
             <p>
-              You have the right to request complete erasure of your account. You can trigger deletion directly from your <Link href="/profile" className="text-brand-lime underline">profile page</Link> or by sending an email to <a href="mailto:privacy@turfzo.com" className="text-brand-lime hover:underline">privacy@turfzo.com</a>. Upon verification, we will permanently purge all non-statutory data within 30 days.
+              You have the right to request complete erasure of your account. You can trigger deletion directly from your <Link href="/profile" className="text-brand-lime underline">profile page</Link> or by sending an email to <a href="mailto:privacy@turfzo.app" className="text-brand-lime hover:underline">privacy@turfzo.app</a>. Upon verification, we will permanently purge all non-statutory data within 30 days.
             </p>
           </Section>
 
@@ -104,7 +104,7 @@ export default function PrivacyPage() {
             <div className="bg-surface border border-border-default p-4 rounded-[8px] font-mono text-xs text-text-muted mt-2 space-y-1">
               <strong>Name:</strong> Akram Shaikh, Co-Founder
               <br />
-              <strong>Email:</strong> <a href="mailto:grievance@turfzo.com" className="text-brand-lime hover:underline">grievance@turfzo.com</a>
+              <strong>Email:</strong> <a href="mailto:grievance@turfzo.app" className="text-brand-lime hover:underline">grievance@turfzo.app</a>
               <br />
               <strong>Address:</strong> Turfzo Sports Technologies Pvt. Ltd., 100 Feet Rd, HSR Layout, Bengaluru, Karnataka 560102
             </div>

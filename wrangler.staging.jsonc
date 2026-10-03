@@ -4,6 +4,14 @@
   // so main pushes auto-deploying staging never touch the production routes
   // (turfzo.app/*, www.turfzo.app/*) which live only in wrangler.jsonc
   // used by deploy-production.yml.
+  //
+  // There is deliberately no `routes` entry: staging is reachable only via its
+  // workers.dev origin, which is why staging.turfzo.app is not a real host and
+  // must not be claimed by the Android App Links filter in the production-signed
+  // build (see turf_booking_app/android/app/src/main/AndroidManifest.xml).
+  //
+  // Same SCOPE LIMIT as production: this origin is on workers.dev, so the
+  // zone-scoped WAF rules in cloudflare/ do not cover it.
   "main": ".open-next/worker.js",
   "name": "turfzo-web-staging",
   "compatibility_date": "2026-08-01",

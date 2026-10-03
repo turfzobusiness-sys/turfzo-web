@@ -42,15 +42,34 @@ try {
     const data = event.notification.data || {};
     let url = "/profile?tab=notifications";
     if (data.booking_id) url = "/bookings";
-    else if (data.tournament_id) url = "/tournaments/" + data.tournament_id;
+    // The tournament detail route is /tournament/[tournamentId] (singular).
+    // "/tournaments/<id>" 404s — /tournaments only reads an ?id= query.
+    else if (data.tournament_id) url = "/tournament/" + data.tournament_id;
     else if (data.type === "owner_approved" || data.type === "turf_approved") {
       url = "/owners/dashboard";
     }
     event.waitUntil(
       clients.matchAll({ type: "window", includeUncontrolled: true }).then(
         (clientList) => {
-          for (const client of clientList) {
-            if ("focus" in client) return client.focus();
+          // Navigate a tab that is already showing the target (or a Turfzo
+          // tab we can reuse) instead of just focusing the first one —
+          // focusing left the user on whatever page they were already on.
+          const sameOrigin = clientList.filter(
+            (c) => new URL(c.url).origin === self.location.origin,
+          );
+          for (const client of sameOrigin) {
+            if (client.url.includes(url)) {
+              return "focus" in client ? client.focus() : undefined;
+            }
+          }
+          for (const client of sameOrigin) {
+            if ("navigate" in client && "focus" in client) {
+              return client
+                .navigate(url)
+                .then((navigated) =>
+                  "focus" in navigated ? navigated.focus() : undefined,
+                );
+            }
           }
           return clients.openWindow(url);
         },

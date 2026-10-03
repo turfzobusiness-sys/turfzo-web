@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail,
-  Phone,
   Clock,
   Send,
   Check,
@@ -23,12 +22,28 @@ import { getErrorMessage } from "@/lib/errors";
 import { TurnstileWidget } from "@/components/ui/turnstile-widget";
 import { isTurnstileConfigured } from "@/lib/turnstile";
 
+/**
+ * Support addresses are on the domain Turfzo actually owns, turfzo.app. The
+ * previous @turfzo.com addresses pointed at a domain the product does not
+ * control, so every one of them was undeliverable.
+ *
+ * There is no published support phone number, so none is offered.
+ *
+ * Response target: 2 business days. The FAQ used to promise 24 hours while
+ * the card said 2 hours; both now say the same thing, and neither claims a
+ * round-the-clock desk.
+ */
+const SUPPORT_EMAIL = "support@turfzo.app";
+const PARTNERSHIPS_EMAIL = "partnerships@turfzo.app";
+const OWNERS_EMAIL = "owners@turfzo.app";
+const RESPONSE_TARGET = "2 business days";
+
 const contactFaqItems = [
-  { question: "How do I contact Turfzo support?", answer: "You can reach us via email at support@turfzo.com, call us at +91 (80) 4567-8900, or use the contact form on this page. We respond within 24 hours." },
-  { question: "How do I cancel a booking?", answer: "You can cancel a booking from your booking history in the app or website. Cancellations more than 24 hours before the slot receive a 100% refund, between 6 and 24 hours receive a 50% refund, and cancellations under 6 hours are non-refundable." },
-  { question: "I have a partnership inquiry. Who do I contact?", answer: "For turf owner partnerships, venue listings, or business inquiries, email us at partnerships@turfzo.com or use the contact form with subject 'Partnership Inquiry'." },
-  { question: "How do I list my turf on Turfzo?", answer: "Turf owners can list their venue by contacting us at owners@turfzo.com. We'll guide you through the onboarding process which takes about 24 hours." },
-  { question: "What cities does Turfzo operate in?", answer: "Turfzo currently operates in Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, and CSN (Aurangabad). We're expanding to more cities soon." },
+  { question: "How do I contact Turfzo support?", answer: `Email us at ${SUPPORT_EMAIL} or use the contact form on this page. We aim to reply within ${RESPONSE_TARGET}.` },
+  { question: "How do I cancel a booking?", answer: "You can cancel a booking from your booking history in the app or website. Cancellations more than 24 hours before the slot are refunded in full on the slot price, between 6 and 24 hours receive 50% of the slot price, and cancellations under 6 hours are non-refundable. The service fee is retained in every case." },
+  { question: "I have a partnership inquiry. Who do I contact?", answer: `For turf owner partnerships, venue listings, or business inquiries, email ${PARTNERSHIPS_EMAIL} or use the contact form with subject 'Partnership Inquiry'.` },
+  { question: "How do I list my turf on Turfzo?", answer: `Turf owners can register and list their venue from the Owners dashboard, or email ${OWNERS_EMAIL} to get help with onboarding.` },
+  { question: "What cities does Turfzo operate in?", answer: "Turfzo is available in Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, and CSN (Aurangabad)." },
 ];
 
 
@@ -132,11 +147,11 @@ export default function ContactPage() {
                 <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                   <div>
                     <h2 className="font-sans font-bold text-lg text-text-main">Support Center</h2>
-                    <p className="text-[10px] text-text-muted mt-0.5">Live platform operations</p>
+                    <p className="text-[10px] text-text-muted mt-0.5">Booking and payments online</p>
                   </div>
                   <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-brand-lime/10 border border-brand-lime/20 text-brand-lime text-[10px] font-sans font-semibold tracking-wide uppercase select-none">
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-lime animate-pulse" />
-                    Operational
+                    Online
                   </div>
                 </div>
 
@@ -153,44 +168,56 @@ export default function ContactPage() {
                     <div className="flex-grow space-y-1">
                       <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Email Support</h3>
                       <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
-                        <a href="mailto:support@turfzo.com" className="text-sm font-semibold text-text-main hover:text-brand-lime transition-colors">
-                          support@turfzo.com
+                        <a href={`mailto:${SUPPORT_EMAIL}`} className="text-sm font-semibold text-text-main hover:text-brand-lime transition-colors">
+                          {SUPPORT_EMAIL}
                         </a>
                         <span className="hidden sm:inline text-text-muted/30">|</span>
-                        <a href="mailto:partnerships@turfzo.com" className="text-sm font-semibold text-text-main hover:text-brand-lime transition-colors">
-                          partnerships@turfzo.com
+                        <a href={`mailto:${PARTNERSHIPS_EMAIL}`} className="text-sm font-semibold text-text-main hover:text-brand-lime transition-colors">
+                          {PARTNERSHIPS_EMAIL}
                         </a>
                       </div>
-                      <p className="text-[10px] text-text-muted">We respond to support queries within 2 hours.</p>
+                      <p className="text-[10px] text-text-muted">We aim to reply within {RESPONSE_TARGET}.</p>
                     </div>
                   </div>
 
-                  {/* Phone Row */}
+                  {/* Urgent booking issue — points at the channels that
+                      actually exist. The previous "+91 (80) 4567-8900" and
+                      "call desk 09:00-21:00" were placeholders for a phone
+                      line Turfzo does not publish, so they are removed
+                      rather than restated. */}
                   <div className="flex gap-4 items-start group">
                     <div className="w-10 h-10 rounded-lg bg-surface border border-border-default flex items-center justify-center text-text-muted group-hover:text-brand-lime group-hover:border-brand-lime/30 transition-all duration-300">
-                      <Phone className="w-5 h-5 stroke-[1.5]" />
+                      <MessageSquare className="w-5 h-5 stroke-[1.5]" />
                     </div>
                     <div className="flex-grow space-y-1">
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Direct Line</h3>
-                      <a href="tel:+918045678900" className="text-sm font-semibold text-text-main hover:text-brand-lime transition-colors">
-                        +91 (80) 4567-8900
-                      </a>
-                      <p className="text-[10px] text-text-muted">Call desk operational daily: 09:00 AM - 09:00 PM.</p>
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+                        Urgent Booking Issue
+                      </h3>
+                      <p className="text-sm font-semibold text-text-main">
+                        Email {SUPPORT_EMAIL} with your booking code
+                      </p>
+                      <p className="text-[10px] text-text-muted">
+                        Include the booking code from My Bookings so we can look
+                        it up immediately.
+                      </p>
                     </div>
                   </div>
 
-                  {/* Operating Hours Row */}
+                  {/* Response target Row */}
                   <div className="flex gap-4 items-start group">
                     <div className="w-10 h-10 rounded-lg bg-surface border border-border-default flex items-center justify-center text-text-muted group-hover:text-brand-lime group-hover:border-brand-lime/30 transition-all duration-300">
                       <Clock className="w-5 h-5 stroke-[1.5]" />
                     </div>
                     <div className="flex-grow space-y-1">
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Support Hours</h3>
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+                        Response Target
+                      </h3>
                       <p className="text-sm font-semibold text-text-main">
-                        Daily: 06:00 AM - 11:00 PM
+                        Within {RESPONSE_TARGET}
                       </p>
                       <p className="text-[10px] text-brand-lime font-medium">
-                        Online Booking Portal remains active 24/7.
+                        Booking and payment are available 24/7 — the form below
+                        works at any hour.
                       </p>
                     </div>
                   </div>
@@ -347,7 +374,7 @@ export default function ContactPage() {
                     </div>
                     <h3 className="font-sans font-bold text-lg text-text-main">Submission Failed</h3>
                     <p className="text-xs text-text-muted max-w-xs font-sans leading-relaxed">
-                      {errorMsg ?? "Something went wrong. Please try again or email us directly at support@turfzo.com."}
+                      {errorMsg ?? `Something went wrong. Please try again or email us directly at ${SUPPORT_EMAIL}.`}
                     </p>
                     <button
                       onClick={() => setFormStep('form')}
@@ -373,7 +400,7 @@ export default function ContactPage() {
                     
                     <h3 className="font-sans font-bold text-xl text-text-main">Message Received!</h3>
                     <p className="text-xs text-text-muted max-w-xs font-sans leading-relaxed">
-                      Thank you, <span className="text-brand-lime font-bold">{name}</span>. Your inquiry has been safely received. A support specialist will respond to <span className="font-semibold text-text-main">{email}</span> within 2 hours.
+                      Thank you, <span className="text-brand-lime font-bold">{name}</span>. Your inquiry has been received. A support specialist will respond to <span className="font-semibold text-text-main">{email}</span> within {RESPONSE_TARGET}.
                     </p>
 
                     <button 

@@ -2,12 +2,23 @@
   "$schema": "https://developers.cloudflare.com/waf/custom-rules/",
   "zone": "turfzo.app",
   "phase": "http_request_firewall_custom",
-  "notes": "Free plan: max 5 custom rules. No regex. Managed Challenge preferred over Block for false-positive safety, except probing/scanners.",
+  "notes": "Free plan: max 5 custom rules. No regex. Managed Challenge preferred over Block for false-positive safety, except probing/scanners. Every path below is listed in BOTH its bare and trailing-slash form: Next.js normalises `/auth/login` and `/auth/login/` to the same route but `http.request.uri.path` is the raw request line, so a bare-only list left the canonical trailing-slash form unprotected. SCOPE LIMIT — READ BEFORE CHANGING: this ruleset is zone-scoped, so it only ever evaluated requests to turfzo.app and www.turfzo.app. wrangler.jsonc and wrangler.staging.jsonc both set workers_dev:true and preview_urls:true, so the same worker also answers on turfzo-web.turfzobusiness.workers.dev, turfzo-web-staging.turfzobusiness.workers.dev, and per-deploy <hash>-<worker>.<subdomain>.workers.dev. Those hosts are served by workers.dev, not by the turfzo.app zone, and Cloudflare does not allow WAF custom rules on workers.dev — no expression change can reach them from here. `origins` below is the full set the worker serves, for operators to keep in mind; closing that gap needs an in-worker check (app/middleware.ts) or removing workers_dev/preview_urls from the wrangler configs, both outside this file. Do not add an `http.host in {...}` clause to the path rules: the zone ruleset already applies to every zone host, so adding one would only narrow protection on www.",
+  "origins": {
+    "zone_protected_by_this_ruleset": [
+      "turfzo.app",
+      "www.turfzo.app"
+    ],
+    "served_by_worker_but_OUTSIDE_zone_scope": [
+      "turfzo-web.turfzobusiness.workers.dev",
+      "turfzo-web-staging.turfzobusiness.workers.dev",
+      "<hash>-turfzo-web.<subdomain>.workers.dev (per-deploy preview URLs)"
+    ]
+  },
   "rules": [
     {
       "ref": "turfzo-challenge-bots-auth-contact",
-      "description": "Challenge likely bots on signup/login/contact/owner-register",
-      "expression": "(http.request.uri.path in {\"/contact\" \"/auth/login\" \"/auth/signup\" \"/owners/register\" \"/auth/verify-phone\"}) and (cf.bot_management.score lt 30)",
+      "description": "Challenge likely bots on signup/login/contact/owner-register (bare + trailing-slash forms)",
+      "expression": "(http.request.uri.path in {\"/contact\" \"/contact/\" \"/auth/login\" \"/auth/login/\" \"/auth/signup\" \"/auth/signup/\" \"/auth/verify-phone\" \"/auth/verify-phone/\" \"/owners/register\" \"/owners/register/\"}) and (cf.bot_management.score lt 30)",
       "action": "managed_challenge"
     },
     {

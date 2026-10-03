@@ -16,14 +16,15 @@ import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 
+// Sports the product actually supports booking for (see lib/types.ts Turf
+// sport_type and the explore filter list). The old list offered Basketball,
+// Kabaddi and Volleyball, which have no slot/pricing support anywhere.
 const SPORTS = [
   "Cricket",
   "Football",
   "Badminton",
-  "Basketball",
   "Tennis",
-  "Kabaddi",
-  "Volleyball",
+  "Multipurpose",
   "Other",
 ];
 
@@ -32,11 +33,21 @@ const TOURNAMENT_TYPES = [
   { value: "individual", label: "Individual / Solo" },
 ];
 
+/**
+ * Only bracket types the backend actually generates. Double elimination and
+ * round robin were offered but tournaments:generateInitialMatches only
+ * implements a single-elimination bracket — picking either produced a
+ * single-elim bracket under a misleading label.
+ */
 const BRACKET_TYPES = [
   { value: "single_elimination", label: "Single Elimination (Knockout)" },
-  { value: "double_elimination", label: "Double Elimination" },
-  { value: "round_robin", label: "Round Robin (League)" },
 ];
+
+/** Team/squad modes are the ones that need a roster size. */
+function isTeamMode(type: string): boolean {
+  const t = type.trim().toLowerCase();
+  return t === "team" || t === "squad";
+}
 
 const inputCls =
   "w-full rounded-md border border-border-default bg-bg px-3.5 py-2.5 text-sm text-text-main placeholder:text-text-muted focus:border-border-strong focus:outline-none focus:ring-1 focus:ring-border-strong transition-all duration-200";
@@ -59,7 +70,6 @@ export default function CreateTournamentPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [regDeadline, setRegDeadline] = useState("");
-  const [autoBracket, setAutoBracket] = useState(true);
   const [description, setDescription] = useState("");
   const [rules, setRules] = useState("");
 
@@ -129,6 +139,25 @@ export default function CreateTournamentPage() {
       toast.error("Max teams/players must be at least 1.");
       return;
     }
+    // A team/squad event without a roster size has no way to display or
+    // enforce how many players a team brings.
+    const teamMode = isTeamMode(tournamentType);
+    const minSize = minTeamSize ? parseInt(minTeamSize, 10) : undefined;
+    const maxSize = maxTeamSize ? parseInt(maxTeamSize, 10) : undefined;
+    if (teamMode) {
+      if (!maxSize || !Number.isFinite(maxSize) || maxSize < 1) {
+        toast.error("Team events need a max team size.");
+        return;
+      }
+      if (minSize !== undefined && (!Number.isFinite(minSize) || minSize < 1)) {
+        toast.error("Min team size must be at least 1.");
+        return;
+      }
+      if (minSize !== undefined && minSize > maxSize) {
+        toast.error("Min team size cannot exceed max team size.");
+        return;
+      }
+    }
     setSaving(true);
     try {
       const token = await getFreshToken();
@@ -142,13 +171,21 @@ export default function CreateTournamentPage() {
           entry_fee: parseFloat(entryFee) || 0,
           prize_pool: prizePool ? parseFloat(prizePool) : undefined,
           max_participants: maxTeams,
-          min_team_size: minTeamSize ? parseInt(minTeamSize, 10) : undefined,
-          max_team_size: maxTeamSize ? parseInt(maxTeamSize, 10) : undefined,
+          // Solo events must not carry team sizes: the backend's own team
+          // discriminator is `tournament_type`, but a stray max_team_size
+          // would make the public page render team-size copy for an
+          // individual event.
+          min_team_size: teamMode ? minSize : undefined,
+          max_team_size: teamMode ? maxSize : undefined,
           registration_deadline: new Date(regDeadline).toISOString(),
           start_date: new Date(startDate).toISOString(),
           end_date: new Date(endDate).toISOString(),
           bracket_type: bracketType,
-          auto_generate_bracket: autoBracket,
+          // `auto_generate_bracket` is required by the mutation but is never
+          // read: the bracket is only ever created by
+          // tournaments:generateInitialMatches. Send a constant rather than
+          // exposing a toggle that does nothing.
+          auto_generate_bracket: true,
           status: "draft",
           rules: rules.trim() || undefined,
         },
@@ -230,7 +267,15 @@ export default function CreateTournamentPage() {
                 <label className={labelCls}>Format</label>
                 <select
                   value={tournamentType}
-                  onChange={(e) => setTournamentType(e.target.value)}
+                  onChange={(e) => {
+                    setTournamentType(e.target.value);
+                    if (!isTeamMode(e.target.value)) {
+                      // Solo events have no roster — drop the stale values
+                      // so a later switch back starts clean.
+                      setMinTeamSize("");
+                      setMaxTeamSize("");
+                    }
+                  }}
                   className={inputCls}
                 >
                   {TOURNAMENT_TYPES.map((t) => (
@@ -255,7 +300,9 @@ export default function CreateTournamentPage() {
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Max teams / players *</label>
+                <label className={labelCls}>
+                  Max {isTeamMode(tournamentType) ? "teams" : "players"} *
+                </label>
                 <input
                   type="number"
                   min={1}
@@ -287,26 +334,33 @@ export default function CreateTournamentPage() {
                   className={inputCls}
                 />
               </div>
-              <div>
-                <label className={labelCls}>Min team size (optional)</label>
-                <input
-                  type="number"
-                  min={1}
-                  value={minTeamSize}
-                  onChange={(e) => setMinTeamSize(e.target.value)}
-                  className={inputCls}
-                />
-              </div>
-              <div>
-                <label className={labelCls}>Max team size (team tournaments)</label>
-                <input
-                  type="number"
-                  min={1}
-                  value={maxTeamSize}
-                  onChange={(e) => setMaxTeamSize(e.target.value)}
-                  className={inputCls}
-                />
-              </div>
+              {/* Roster size only means something for a team event. */}
+              {isTeamMode(tournamentType) && (
+                <>
+                  <div>
+                    <label className={labelCls}>Min team size (optional)</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={maxTeamSize ? Number(maxTeamSize) : undefined}
+                      value={minTeamSize}
+                      onChange={(e) => setMinTeamSize(e.target.value)}
+                      className={inputCls}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Max team size *</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={maxTeamSize}
+                      onChange={(e) => setMaxTeamSize(e.target.value)}
+                      className={inputCls}
+                      required
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -342,17 +396,12 @@ export default function CreateTournamentPage() {
               </div>
             </div>
 
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={autoBracket}
-                onChange={(e) => setAutoBracket(e.target.checked)}
-                className="w-4 h-4 accent-brand-lime"
-              />
-              <span className="text-sm text-text-main">
-                Auto-generate the bracket once teams are approved
-              </span>
-            </label>
+            <p className="text-xs text-text-muted">
+              The bracket is generated from approved entrants after you move
+              the tournament to{" "}
+              <span className="font-mono">in_progress</span> on the Matches
+              tab.
+            </p>
 
             <div>
               <label className={labelCls}>Description (optional)</label>
