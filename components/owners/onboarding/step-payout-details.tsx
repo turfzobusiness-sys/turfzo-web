@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArrowLeft, ArrowRight, Loader2, CreditCard, Landmark, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, CreditCard, Landmark, CheckCircle2, Eye, EyeOff, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface PayoutData {
@@ -24,12 +24,40 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
   const [holderName, setHolderName] = useState(initialData.bank_account_holder_name || "");
   const [accountNumber, setAccountNumber] = useState(initialData.bank_account_number || "");
   const [confirmAccount, setConfirmAccount] = useState(initialData.bank_account_number || "");
+  const [showAccount, setShowAccount] = useState(false);
   const [ifsc, setIfsc] = useState(initialData.bank_ifsc_code || "");
   const [bankName, setBankName] = useState(initialData.bank_name || "");
   const [branch, setBranch] = useState(initialData.bank_branch || "");
   const [upi, setUpi] = useState(initialData.upi_id || "");
 
+  const [ifscLoading, setIfscLoading] = useState(false);
+  const [ifscVerified, setIfscVerified] = useState(false);
+  const [pasteWarning, setPasteWarning] = useState(false);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleIfscChange = async (val: string) => {
+    const clean = val.toUpperCase().trim();
+    setIfsc(clean);
+    setIfscVerified(false);
+
+    if (clean.length === 11 && /^[A-Z]{4}0[A-Z0-9]{6}$/.test(clean)) {
+      setIfscLoading(true);
+      try {
+        const res = await fetch(`https://ifsc.razorpay.com/${clean}`);
+        if (res.ok) {
+          const data = (await res.json()) as { BANK?: string; BRANCH?: string };
+          if (data.BANK) setBankName(data.BANK);
+          if (data.BRANCH) setBranch(data.BRANCH);
+          setIfscVerified(true);
+        }
+      } catch {
+        // Fall back gracefully to manual input if service is unreachable
+      } finally {
+        setIfscLoading(false);
+      }
+    }
+  };
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -119,14 +147,33 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
 
         {/* Account Number */}
         <div className="space-y-1.5">
-          <label htmlFor="account_num" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
-            Bank Account Number <span className="text-brand-lime">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label htmlFor="account_num" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
+              Bank Account Number <span className="text-brand-lime">*</span>
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowAccount(!showAccount)}
+              className="flex items-center gap-1 text-[11px] text-text-muted hover:text-text-main font-sans cursor-pointer transition-colors"
+            >
+              {showAccount ? (
+                <>
+                  <EyeOff className="h-3 w-3 text-text-muted" />
+                  Hide
+                </>
+              ) : (
+                <>
+                  <Eye className="h-3 w-3 text-brand-lime" />
+                  Show
+                </>
+              )}
+            </button>
+          </div>
           <div className="relative">
             <CreditCard className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="account_num"
-              type="password"
+              type={showAccount ? "text" : "password"}
               value={accountNumber}
               onChange={(e) => setAccountNumber(e.target.value)}
               placeholder="Enter account number"
@@ -147,13 +194,23 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
             <CreditCard className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-muted" />
             <input
               id="confirm_account"
-              type="text"
+              type={showAccount ? "text" : "password"}
               value={confirmAccount}
               onChange={(e) => setConfirmAccount(e.target.value)}
+              onPaste={(e) => {
+                e.preventDefault();
+                setPasteWarning(true);
+                setTimeout(() => setPasteWarning(false), 3500);
+              }}
               placeholder="Re-enter account number"
               className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 pl-11 pr-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
             />
           </div>
+          {pasteWarning && (
+            <span className="font-sans text-[11px] text-amber-400 block">
+              For security, please type your account number manually.
+            </span>
+          )}
           {errors.confirmAccount && (
             <span className="font-sans text-xs text-error-light">{errors.confirmAccount}</span>
           )}
@@ -161,17 +218,31 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
 
         {/* IFSC Code */}
         <div className="space-y-1.5">
-          <label htmlFor="ifsc" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
-            IFSC Code <span className="text-brand-lime">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label htmlFor="ifsc" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
+              IFSC Code <span className="text-brand-lime">*</span>
+            </label>
+            {ifscLoading && (
+              <span className="flex items-center gap-1 text-[11px] text-text-muted font-sans">
+                <Loader2 className="h-3 w-3 animate-spin text-brand-lime" />
+                Validating IFSC...
+              </span>
+            )}
+            {ifscVerified && (
+              <span className="flex items-center gap-1 text-[11px] text-brand-lime font-sans font-semibold">
+                <Sparkles className="h-3 w-3" />
+                Bank auto-filled
+              </span>
+            )}
+          </div>
           <input
             id="ifsc"
             type="text"
             value={ifsc}
-            onChange={(e) => setIfsc(e.target.value.toUpperCase())}
+            onChange={(e) => handleIfscChange(e.target.value)}
             placeholder="e.g., HDFC0001234"
             maxLength={11}
-            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+            className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200 uppercase"
           />
           {errors.ifsc && (
             <span className="font-sans text-xs text-error-light">{errors.ifsc}</span>
@@ -180,9 +251,14 @@ export function StepPayoutDetails({ initialData, onNext, onBack, loading }: Step
 
         {/* Bank Name */}
         <div className="space-y-1.5">
-          <label htmlFor="bank_name" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
-            Bank Name <span className="text-brand-lime">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label htmlFor="bank_name" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
+              Bank Name <span className="text-brand-lime">*</span>
+            </label>
+            {ifscVerified && (
+              <span className="text-[10px] text-brand-lime font-sans uppercase">Verified via IFSC</span>
+            )}
+          </div>
           <input
             id="bank_name"
             type="text"

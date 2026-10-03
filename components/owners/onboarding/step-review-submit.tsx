@@ -28,6 +28,8 @@ interface SummaryData {
     ground_count?: number;
     is_indoor?: boolean;
     image_gallery?: string[];
+    operating_hours?: { open?: string; close?: string };
+    max_players?: number;
   };
   payout: {
     bank_account_holder_name?: string;
@@ -160,6 +162,20 @@ export function StepReviewSubmit({ data, onEditStep, onBack, onSubmit, loading, 
             <div>
               <span className="text-text-secondary uppercase font-semibold block tracking-wider">Primary Sport</span>
               <span className="text-text-main font-medium mt-0.5 block capitalize">{data.venue.sport_type || "N/A"}</span>
+            </div>
+            <div>
+              <span className="text-text-secondary uppercase font-semibold block tracking-wider">Operating Hours</span>
+              <span className="text-text-main font-medium mt-0.5 block">
+                {data.venue.operating_hours?.open && data.venue.operating_hours?.close
+                  ? `${data.venue.operating_hours.open} – ${data.venue.operating_hours.close}`
+                  : "06:00 – 23:00"}
+              </span>
+            </div>
+            <div>
+              <span className="text-text-secondary uppercase font-semibold block tracking-wider">Max Capacity</span>
+              <span className="text-text-main font-medium mt-0.5 block">
+                {data.venue.max_players ? `${data.venue.max_players} players / court` : "Not specified"}
+              </span>
             </div>
             {data.venue.amenities && data.venue.amenities.length > 0 && (
               <div className="md:col-span-2">
