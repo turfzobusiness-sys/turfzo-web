@@ -174,7 +174,8 @@ export function OnboardingWizard() {
       setStep(4);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to save. Please try again.");
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(getErrorMessage(err, "Failed to save. Please try again."));
     } finally {
       setActionLoading(false);
     }
@@ -303,6 +304,8 @@ export function OnboardingWizard() {
       ground_count: onboardingState.profile?.venue_draft?.ground_count,
       is_indoor: onboardingState.profile?.venue_draft?.is_indoor,
       image_gallery: onboardingState.profile?.venue_draft?.image_gallery,
+      operating_hours: onboardingState.profile?.venue_draft?.operating_hours,
+      max_players: onboardingState.profile?.venue_draft?.max_players,
     },
     payout: {
       bank_account_holder_name: onboardingState.payout?.bank_account_holder_name,
@@ -314,7 +317,7 @@ export function OnboardingWizard() {
     },
   };
 
-  const percentComplete = Math.round(((step - 1) / 4) * 100);
+  const percentComplete = step === 4 ? 100 : Math.round(((step - 1) / 3) * 100);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">

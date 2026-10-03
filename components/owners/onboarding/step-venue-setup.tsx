@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { MapPin, Info, ArrowLeft, ArrowRight, Loader2, IndianRupee, Layers } from "lucide-react";
+import { MapPin, Info, ArrowLeft, ArrowRight, Loader2, IndianRupee, Layers, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/ui/image-uploader";
+
+import { LAUNCH_CITIES } from "@/lib/launch-cities";
 
 export interface VenueDraftData {
   name?: string;
@@ -37,27 +39,49 @@ interface StepVenueSetupProps {
   loading: boolean;
 }
 
+const CITY_STATE_MAP: Record<string, string> = {
+  "Mumbai": "Maharashtra",
+  "Delhi": "Delhi",
+  "Bangalore": "Karnataka",
+  "Hyderabad": "Telangana",
+  "Chennai": "Tamil Nadu",
+  "Kolkata": "West Bengal",
+  "Pune": "Maharashtra",
+  "Ahmedabad": "Gujarat",
+  "CSN (Aurangabad)": "Maharashtra",
+};
+
 const SPORTS_OPTIONS = [
   { id: "football", label: "Football" },
   { id: "cricket", label: "Cricket" },
   { id: "badminton", label: "Badminton" },
   { id: "tennis", label: "Tennis" },
-  { id: "volleyball", label: "Volleyball" },
   { id: "basketball", label: "Basketball" },
+  { id: "hockey", label: "Hockey" },
+  { id: "other", label: "Other Sports" },
 ];
 
 export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVenueSetupProps) {
   const [name, setName] = useState(initialData.name || "");
   const [description, setDescription] = useState(initialData.description || "");
   const [address, setAddress] = useState(initialData.address || "");
-  const [city, setCity] = useState(initialData.city || "");
-  const [state, setState] = useState(initialData.state || "");
-  const [zipCode] = useState(initialData.zip_code || "");
+  
+  // Resolve initial city selection
+  const initialCityValue = initialData.city?.trim() || "";
+  const isInitialLaunchCity = Boolean(initialCityValue && CITY_STATE_MAP[initialCityValue]);
+  const [cityChoice, setCityChoice] = useState(
+    isInitialLaunchCity ? initialCityValue : (initialCityValue ? "Other" : "Bangalore")
+  );
+  const [customCity, setCustomCity] = useState(isInitialLaunchCity ? "" : initialCityValue);
+  const [state, setState] = useState(initialData.state || CITY_STATE_MAP[initialCityValue] || "Karnataka");
+  const [zipCode, setZipCode] = useState(initialData.zip_code || "");
   const [price, setPrice] = useState(initialData.price_per_hour?.toString() || "");
   const [sportType, setSportType] = useState(initialData.sport_type || "football");
   const [groundCount, setGroundCount] = useState(initialData.ground_count || 1);
   const [isIndoor, setIsIndoor] = useState(initialData.is_indoor || false);
-  const [maxPlayers] = useState(initialData.max_players || 14);
+  const [maxPlayers, setMaxPlayers] = useState(initialData.max_players || 14);
+  const [openTime, setOpenTime] = useState(initialData.operating_hours?.open || "06:00");
+  const [closeTime, setCloseTime] = useState(initialData.operating_hours?.close || "23:00");
   const [imageGallery, setImageGallery] = useState<string[]>(initialData.image_gallery || []);
 
   // Amenities
@@ -69,12 +93,21 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const effectiveCity = cityChoice === "Other" ? customCity.trim() : cityChoice;
+
+  const handleCityChange = (newCity: string) => {
+    setCityChoice(newCity);
+    if (newCity !== "Other" && CITY_STATE_MAP[newCity]) {
+      setState(CITY_STATE_MAP[newCity]);
+    }
+  };
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
     if (!name.trim()) newErrors.name = "Venue name is required";
     if (!address.trim()) newErrors.address = "Full address is required";
-    if (!city.trim()) newErrors.city = "City is required";
+    if (!effectiveCity) newErrors.city = "City is required";
     if (!price.trim()) {
       newErrors.price = "Hourly rate is required";
     } else if (isNaN(Number(price)) || Number(price) <= 0) {
@@ -97,14 +130,13 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
     if (hasDrinkingWater) amenities.push("drinking_water");
     if (hasFirstAid) amenities.push("first_aid");
 
-    // Standard default operating hours
-    const operatingHours = { open: "06:00", close: "23:00" };
+    const operatingHours = { open: openTime, close: closeTime };
 
     onNext({
       name: name.trim(),
       description: description.trim(),
       address: address.trim(),
-      city: city.trim(),
+      city: effectiveCity,
       state: state.trim(),
       zip_code: zipCode.trim(),
       price_per_hour: Number(price),
@@ -193,24 +225,50 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
             )}
           </div>
 
-          {/* City & ZIP */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* City Selection */}
+          <div className="space-y-1.5">
+            <label htmlFor="venue_city" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
+              City <span className="text-brand-lime">*</span>
+            </label>
+            <select
+              id="venue_city"
+              value={cityChoice}
+              onChange={(e) => handleCityChange(e.target.value)}
+              className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200 cursor-pointer"
+            >
+              {LAUNCH_CITIES.map((c) => (
+                <option key={c.label} value={c.label} className="bg-bg text-text-main">
+                  {c.label}
+                </option>
+              ))}
+              <option value="Other" className="bg-bg text-text-main">
+                Other (Enter custom city)
+              </option>
+            </select>
+            {errors.city && (
+              <span className="font-sans text-xs text-error-light">{errors.city}</span>
+            )}
+          </div>
+
+          {/* Custom City input if Other selected */}
+          {cityChoice === "Other" && (
             <div className="space-y-1.5">
-              <label htmlFor="venue_city" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
-                City <span className="text-brand-lime">*</span>
+              <label htmlFor="venue_custom_city" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
+                Specify City Name <span className="text-brand-lime">*</span>
               </label>
               <input
-                id="venue_city"
+                id="venue_custom_city"
                 type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Bangalore"
+                value={customCity}
+                onChange={(e) => setCustomCity(e.target.value)}
+                placeholder="e.g., Jaipur"
                 className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
               />
-              {errors.city && (
-                <span className="font-sans text-xs text-error-light">{errors.city}</span>
-              )}
             </div>
+          )}
+
+          {/* State & PIN Code */}
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label htmlFor="venue_state" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
                 State
@@ -220,7 +278,21 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
                 type="text"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                placeholder="Karnataka"
+                placeholder="e.g., Karnataka"
+                className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="venue_zip" className="font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
+                PIN / Postal Code
+              </label>
+              <input
+                id="venue_zip"
+                type="text"
+                value={zipCode}
+                onChange={(e) => setZipCode(e.target.value)}
+                placeholder="e.g., 560102"
+                maxLength={6}
                 className="w-full rounded-[8px] border border-border-default bg-elevated py-2.5 px-4 font-sans text-sm text-text-main placeholder:text-text-muted hover:border-border-strong focus:border-brand-lime focus:bg-surface focus:outline-none focus:ring-2 focus:ring-brand-lime/10 transition-all duration-200"
               />
             </div>
@@ -300,29 +372,68 @@ export function StepVenueSetup({ initialData, onNext, onBack, loading }: StepVen
             </div>
           </div>
 
-          {/* Specifications Toggles */}
-          <div className="grid grid-cols-2 gap-4 bg-surface/50 border border-border-default p-3 rounded-[10px]">
-            <div className="flex items-center justify-between col-span-2">
-              <span className="font-sans text-xs font-semibold text-text-main">Indoor Venue?</span>
-              <button
-                type="button"
-                onClick={() => setIsIndoor(!isIndoor)}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  isIndoor ? "bg-brand-lime" : "bg-border-default"
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-4.5 w-4.5 transform rounded-full bg-bg shadow ring-0 transition duration-200 ease-in-out ${
-                    isIndoor ? "translate-x-4" : "translate-x-0"
+          {/* Specifications: Indoor, Max Players & Operating Hours */}
+          <div className="space-y-3 bg-surface/50 border border-border-default p-3.5 rounded-[10px]">
+            {/* Indoor Toggle & Max Players */}
+            <div className="grid grid-cols-2 gap-3 items-center">
+              <div className="flex items-center justify-between bg-elevated/50 p-2.5 rounded-[8px] border border-border-default/60">
+                <span className="font-sans text-xs font-semibold text-text-main">Indoor Turf</span>
+                <button
+                  type="button"
+                  onClick={() => setIsIndoor(!isIndoor)}
+                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    isIndoor ? "bg-brand-lime" : "bg-border-default"
                   }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-4.5 w-4.5 transform rounded-full bg-bg shadow ring-0 transition duration-200 ease-in-out ${
+                      isIndoor ? "translate-x-4" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center gap-1 text-text-muted text-[11px] font-semibold uppercase tracking-wider">
+                  <Users className="h-3 w-3 text-brand-lime" />
+                  <span>Max Players</span>
+                </div>
+                <input
+                  type="number"
+                  min={2}
+                  max={50}
+                  value={maxPlayers}
+                  onChange={(e) => setMaxPlayers(Math.max(2, parseInt(e.target.value) || 2))}
+                  className="w-full rounded-[6px] border border-border-default bg-elevated py-1.5 px-2.5 font-sans text-xs text-text-main hover:border-border-strong focus:border-brand-lime focus:outline-none transition-all"
                 />
-              </button>
+              </div>
             </div>
-            
-            <div className="flex items-center justify-between col-span-2 text-xs font-sans text-text-muted">
-              <div className="flex items-center gap-1">
-                <Info className="h-3.5 w-3.5 text-brand-lime" />
-                <span>Operating hours defaulted to 6 AM - 11 PM</span>
+
+            {/* Operating Hours Pickers */}
+            <div className="pt-2 border-t border-border-default/50 space-y-1.5">
+              <div className="flex items-center gap-1.5 font-sans text-xs font-semibold text-text-muted uppercase tracking-wider">
+                <Clock className="h-3.5 w-3.5 text-brand-lime" />
+                <span>Operating Hours</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <span className="text-[11px] text-text-muted font-sans">Opening Time</span>
+                  <input
+                    type="time"
+                    value={openTime}
+                    onChange={(e) => setOpenTime(e.target.value)}
+                    className="w-full rounded-[6px] border border-border-default bg-elevated py-1.5 px-2.5 font-sans text-xs text-text-main hover:border-border-strong focus:border-brand-lime focus:outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[11px] text-text-muted font-sans">Closing Time</span>
+                  <input
+                    type="time"
+                    value={closeTime}
+                    onChange={(e) => setCloseTime(e.target.value)}
+                    className="w-full rounded-[6px] border border-border-default bg-elevated py-1.5 px-2.5 font-sans text-xs text-text-main hover:border-border-strong focus:border-brand-lime focus:outline-none transition-all"
+                  />
+                </div>
               </div>
             </div>
           </div>
