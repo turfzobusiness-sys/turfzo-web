@@ -26,7 +26,7 @@ const howToSteps = [
 const faqItems = [
   { question: "How do I book a turf on Turfzo?", answer: "Visit turfzo.app/explore, select your city, browse available turfs, choose your date and time slot, and complete payment online. Your booking is confirmed instantly with a QR code ticket pass." },
   { question: "How much does turf booking cost?", answer: "Turf booking prices in India range from ₹500 to ₹2000 per hour depending on the city, sport, and facilities. Football turfs typically cost ₹800-1500/hour in metro cities." },
-  { question: "Can I cancel my booking?", answer: "Yes, you can cancel your booking up to 6 hours before the scheduled time for a full refund. Cancellations within 6 hours receive a 50% refund." },
+  { question: "Can I cancel my booking?", answer: "Yes. Cancel 24+ hours before the slot for a full refund of the slot price, 6–24 hours before for a 50% refund. Cancellations under 6 hours are non-refundable. The service fee is retained in every case." },
   { question: "How does bill splitting work?", answer: "When you book a turf on Turfzo, you can add your teammates' phone numbers at checkout. Each teammate receives a payment request for their share. Everyone pays their portion online." },
   { question: "What sports can I book on Turfzo?", answer: "Turfzo supports football, cricket, badminton, tennis, and multipurpose sports venues. We have turfs across 9 Indian cities, from Mumbai to CSN (Aurangabad)." },
   { question: "Is online payment safe on Turfzo?", answer: "Yes, Turfzo uses Cashfree for payment processing, which is PCI DSS compliant. We support UPI, credit cards, debit cards, and net banking." },

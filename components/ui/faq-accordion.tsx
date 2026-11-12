@@ -20,10 +20,10 @@ export function FaqAccordion({ items }: { items: { question: string; answer: str
               onClick={() => setOpenIdx(isOpen ? null : idx)}
               className="w-full text-left font-sans font-semibold text-sm text-text-main px-6 py-4.5 flex items-center justify-between gap-4 focus:outline-none"
             >
-              <span className={isOpen ? "text-brand-lime transition-colors" : "text-text-main transition-colors"}>
+              <span className={isOpen ? "text-brand-text transition-colors" : "text-text-main transition-colors"}>
                 {item.question}
               </span>
-              <ChevronDown className={`w-4 h-4 text-text-muted transition-transform duration-300 shrink-0 ${isOpen ? "rotate-180 text-brand-lime" : ""}`} />
+              <ChevronDown className={`w-4 h-4 text-text-muted transition-transform duration-300 shrink-0 ${isOpen ? "rotate-180 text-brand-text" : ""}`} />
             </button>
             <AnimatePresence initial={false}>
               {isOpen && (

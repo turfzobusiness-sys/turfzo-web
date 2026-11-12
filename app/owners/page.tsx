@@ -17,15 +17,10 @@ import {
   Star,
   Clock,
   ShieldCheck,
-  Percent,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
   CheckCircle2,
   MapPin,
-  Lightbulb,
-  Car,
-  Droplets,
   X,
   Zap,
   CreditCard,
@@ -1354,7 +1349,6 @@ export default function OwnersPage() {
                   <div className="space-y-3 sm:space-y-3.5">
                     {ONBOARDING_STEPS.map((step, idx) => {
                       const isActive = activeStepIdx === idx;
-                      const Icon = step.icon;
                       return (
                         <button
                           key={step.step}

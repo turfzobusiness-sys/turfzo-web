@@ -6,8 +6,13 @@
 import { getOptionalEnv } from "./env";
 
 export const posthogKey = getOptionalEnv("NEXT_PUBLIC_POSTHOG_KEY") ?? "";
-export const posthogHost = getOptionalEnv("NEXT_PUBLIC_POSTHOG_HOST") ?? "https://us.i.posthog.com";
+export const posthogHost =
+  getOptionalEnv("NEXT_PUBLIC_POSTHOG_HOST") ?? "https://us.i.posthog.com";
 export const posthogEnabled = Boolean(posthogKey);
+let initialization: Promise<{
+  init: (key: string, opts: Record<string, unknown>) => void;
+  capture?: (event: string, properties?: Record<string, unknown>) => void;
+} | null> | null = null;
 
 // posthog-js is an optional dependency that may not be installed.
 // `webpackIgnore` keeps the dynamic import unbundled (no build failure
@@ -16,12 +21,14 @@ export const posthogEnabled = Boolean(posthogKey);
 // `new Function` would violate the strict CSP ('unsafe-eval' is not allowed).
 async function loadPosthog(): Promise<{
   init: (key: string, opts: Record<string, unknown>) => void;
+  capture?: (event: string, properties?: Record<string, unknown>) => void;
 } | null> {
   try {
     // @ts-expect-error posthog-js is an optional dependency (not installed)
     const sdkModule = await import(/* webpackIgnore: true */ "posthog-js");
     return sdkModule.default as {
       init: (key: string, opts: Record<string, unknown>) => void;
+      capture?: (event: string, properties?: Record<string, unknown>) => void;
     };
   } catch {
     // posthog-js not installed — silently skip.
@@ -29,14 +36,29 @@ async function loadPosthog(): Promise<{
   }
 }
 
-export async function initPostHog(): Promise<void> {
-  if (!posthogEnabled) return;
-  if (typeof window === "undefined") return;
-  const posthog = await loadPosthog();
-  if (!posthog) return;
-  posthog.init(posthogKey, {
-    api_host: posthogHost,
-    capture_pageview: false,
-    capture_pageleave: true,
+async function getInitializedPosthog() {
+  if (!posthogEnabled || typeof window === "undefined") return null;
+  initialization ??= loadPosthog().then((posthog) => {
+    posthog?.init(posthogKey, {
+      api_host: posthogHost,
+      capture_pageview: false,
+      capture_pageleave: true,
+    });
+    return posthog;
   });
+  return initialization;
+}
+
+/** Product events are optional and contain only coarse, non-identifying data. */
+export async function captureProductEvent(
+  event: string,
+  properties: Record<string, string | number | boolean | null> = {},
+): Promise<void> {
+  if (!posthogEnabled || typeof window === "undefined") return;
+  const posthog = await getInitializedPosthog();
+  posthog?.capture?.(event, properties);
+}
+
+export async function initPostHog(): Promise<void> {
+  await getInitializedPosthog();
 }

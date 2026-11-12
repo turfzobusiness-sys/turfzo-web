@@ -59,6 +59,8 @@ export default function CreateTournamentPage() {
   const [saving, setSaving] = useState(false);
 
   const [name, setName] = useState("");
+  const [turfs, setTurfs] = useState<{ id: string; name: string; city?: string }[]>([]);
+  const [selectedTurfId, setSelectedTurfId] = useState<string>("");
   const [sportType, setSportType] = useState(SPORTS[0]);
   const [tournamentType, setTournamentType] = useState(TOURNAMENT_TYPES[0].value);
   const [bracketType, setBracketType] = useState(BRACKET_TYPES[0].value);
@@ -78,6 +80,36 @@ export default function CreateTournamentPage() {
       router.replace("/auth/login");
     }
   }, [status, router]);
+
+  useEffect(() => {
+    let active = true;
+    if (status === "authenticated") {
+      (async () => {
+        try {
+          const token = await getFreshToken();
+          const res = await convexClient.query<
+            Array<{ _id?: string; id?: string; name: string; city?: string }>
+          >("auth:getOwnerTurfs", {}, token);
+          if (active && Array.isArray(res)) {
+            const mapped = res.map((t) => ({
+              id: (t._id || t.id) ?? "",
+              name: t.name,
+              city: t.city,
+            }));
+            setTurfs(mapped);
+            if (mapped.length > 0) {
+              setSelectedTurfId(mapped[0].id);
+            }
+          }
+        } catch {
+          // Ignored
+        }
+      })();
+    }
+    return () => {
+      active = false;
+    };
+  }, [status, getFreshToken]);
 
   if (status !== "authenticated") {
     return (
@@ -165,6 +197,7 @@ export default function CreateTournamentPage() {
         "tournaments:createTournament",
         {
           name: name.trim(),
+          turf_id: selectedTurfId || undefined,
           description: description.trim() || undefined,
           sport_type: sportType,
           tournament_type: tournamentType,
@@ -247,6 +280,27 @@ export default function CreateTournamentPage() {
                 required
               />
             </div>
+
+            {turfs.length > 0 && (
+              <div>
+                <label className={labelCls}>Host Venue (Turf)</label>
+                <select
+                  value={selectedTurfId}
+                  onChange={(e) => setSelectedTurfId(e.target.value)}
+                  className={inputCls}
+                >
+                  <option value="">No specific venue (Virtual / Unlinked)</option>
+                  {turfs.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name} {t.city ? `(${t.city})` : ""}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-text-muted mt-1 font-sans">
+                  Reserves slots on this turf for the tournament duration and sets the tournament city filter.
+                </p>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>

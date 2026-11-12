@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -157,22 +157,25 @@ export default function ProfilePage() {
   // async callbacks (after the await), which is the correct pattern.
   // Authenticated reads pass a fresh Firebase ID token explicitly; on a
   // 401 (token raced expiry) retry once with a new token before failing.
-  const queryWithAuthRetry = async <T,>(
-    path: string,
-    args: Record<string, unknown>,
-  ): Promise<T> => {
-    const token = await getFreshToken().catch(() => undefined);
-    try {
-      return await convexClient.query<T>(path, args, token);
-    } catch (err) {
-      const code = (err as { code?: string })?.code;
-      if (code === "CONVEX_UNAUTHORIZED") {
-        const retryToken = await getFreshToken().catch(() => undefined);
-        return await convexClient.query<T>(path, args, retryToken);
+  const queryWithAuthRetry = useCallback(
+    async <T,>(
+      path: string,
+      args: Record<string, unknown>,
+    ): Promise<T> => {
+      const token = await getFreshToken().catch(() => undefined);
+      try {
+        return await convexClient.query<T>(path, args, token);
+      } catch (err) {
+        const code = (err as { code?: string })?.code;
+        if (code === "CONVEX_UNAUTHORIZED") {
+          const retryToken = await getFreshToken().catch(() => undefined);
+          return await convexClient.query<T>(path, args, retryToken);
+        }
+        throw err;
       }
-      throw err;
-    }
-  };
+    },
+    [getFreshToken],
+  );
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -193,7 +196,7 @@ export default function ProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [status]);
+  }, [status, queryWithAuthRetry]);
 
   /**
    * Bookings that actually represent money taken. A cancelled booking was
@@ -505,6 +508,7 @@ export default function ProfilePage() {
                 <div className="relative flex-shrink-0">
                   <div className="w-24 h-24 rounded-full overflow-hidden bg-elevated">
                     {avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- small (96px) avatar of dynamic user content on a rotating provider host; next/image brings no LCP win here and 400s on hosts outside remotePatterns.
                       <img
                         src={avatarUrl}
                         alt={displayName}
@@ -1200,6 +1204,19 @@ export default function ProfilePage() {
                     <div className="flex flex-col gap-3">
                       {payments.map((p) => {
                         const isTournament = Boolean(p.metadata?.tournament_id);
+                        // Refund attempts live on the payment order's metadata
+                        // (written by payments.ts / payments_internal.ts). The
+                        // order status only flips once the refund settles, so
+                        // without this a PENDING or FAILED refund looked like a
+                        // plain successful payment.
+                        const refund = p.metadata?.refund as
+                          | {
+                              refund_status?: string;
+                              refund_amount?: number;
+                              refund_message?: string;
+                            }
+                          | undefined;
+                        const refundStatus = refund?.refund_status?.toUpperCase();
                         const isRefunded = p.status.startsWith("refund");
                         const isSuccess = p.status === "paid" || p.verified === true;
                         const statusLabel = isRefunded
@@ -1241,6 +1258,31 @@ export default function ProfilePage() {
                                 <p className="text-xs text-text-muted mt-0.5">
                                   Order #{p.receipt}
                                 </p>
+                                {refundStatus && (
+                                  <p
+                                    className={`text-[11px] mt-1 font-semibold ${
+                                      refundStatus === "SUCCESS"
+                                        ? "text-brand-lime"
+                                        : refundStatus === "FAILED"
+                                          ? "text-error"
+                                          : "text-warning"
+                                    }`}
+                                  >
+                                    Refund
+                                    {typeof refund?.refund_amount === "number"
+                                      ? ` ₹${refund.refund_amount.toLocaleString("en-IN")}`
+                                      : ""}
+                                    {" · "}
+                                    {refundStatus === "SUCCESS"
+                                      ? "completed"
+                                      : refundStatus === "FAILED"
+                                        ? "failed — contact support"
+                                        : "in progress"}
+                                    {refund?.refund_message
+                                      ? ` (${refund.refund_message})`
+                                      : ""}
+                                  </p>
+                                )}
                               </div>
                             </div>
                             <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 sm:gap-1">

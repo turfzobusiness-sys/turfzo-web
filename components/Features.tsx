@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ArrowUpRight, ShieldCheck, Zap, CircleDollarSign, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const FEATURES = [
   {
@@ -87,10 +88,12 @@ export default function Features() {
                       : "opacity-0 scale-[1.04] z-0 pointer-events-none"
                   )}
                 >
-                  <img
+                  <Image
                     src={src}
                     alt={`Feature preview ${idx + 1}`}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
                   />
                   
                 </div>
@@ -116,7 +119,6 @@ export default function Features() {
           <div className="flex flex-col gap-6">
             {FEATURES.map((feature, idx) => {
               const isHovered = hoveredIdx === idx;
-              const isAnyHovered = hoveredIdx !== null;
               const Icon = feature.icon;
               
               return (

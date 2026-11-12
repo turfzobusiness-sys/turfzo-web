@@ -18,6 +18,8 @@ import {
   AlertTriangle,
   Trophy,
   ChevronRight,
+  Wallet,
+  Store,
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
@@ -49,7 +51,7 @@ interface PendingOwner {
 }
 
 interface AdminUser {
-  _id: string;
+  id: string;
   email: string;
   full_name?: string;
   display_name?: string;
@@ -58,6 +60,53 @@ interface AdminUser {
   city?: string;
   created_at: string;
 }
+
+/** A venue awaiting approval, as returned by `admin:listPendingTurfs`. */
+interface AdminTurf {
+  id: string;
+  name: string;
+  city: string;
+  address: string;
+  sport_type?: string;
+  price_per_hour: number;
+  image_url?: string;
+  status?: string;
+  created_at?: string;
+  owner_name: string | null;
+  owner_email: string | null;
+  owner_is_approved: boolean;
+}
+
+/** A payout row as returned by `payouts:listPayouts` (payment_orders with a
+ *  payout_* status, joined to the owner's display fields). */
+interface AdminPayout {
+  _id: string;
+  user_id?: string;
+  owner_name: string | null;
+  owner_email: string | null;
+  amount: number;
+  status: string;
+  created_at: string;
+  failure_reason: string | null;
+  gateway_reference: string | null;
+  utr: string | null;
+}
+
+const PAYOUT_STATUS_LABELS: Record<string, string> = {
+  payout_pending: "Pending",
+  payout_processing: "Processing",
+  payout_completed: "Completed",
+  payout_failed: "Failed",
+  payout_rejected: "Rejected",
+};
+
+const PAYOUT_STATUS_COLORS: Record<string, string> = {
+  payout_pending: "bg-warning/15 text-warning",
+  payout_processing: "bg-violet-500/15 text-violet-500",
+  payout_completed: "bg-emerald-500/15 text-emerald-500",
+  payout_failed: "bg-error/15 text-error",
+  payout_rejected: "bg-error/15 text-error",
+};
 
 interface ContactMessage {
   _id: string;
@@ -104,7 +153,14 @@ const TOURNAMENT_STATUS_COLORS: Record<string, string> = {
   cancelled: "bg-error/15 text-error",
 };
 
-type Tab = "pending" | "users" | "messages" | "tournaments" | "add-owner";
+type Tab =
+  | "pending"
+  | "venues"
+  | "users"
+  | "payouts"
+  | "messages"
+  | "tournaments"
+  | "add-owner";
 
 export default function AdminPage() {
   const { status, convexUser, firebaseUser } = useAuth();
@@ -113,6 +169,8 @@ export default function AdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [tournaments, setTournaments] = useState<AdminTournament[]>([]);
+  const [payouts, setPayouts] = useState<AdminPayout[]>([]);
+  const [pendingTurfs, setPendingTurfs] = useState<AdminTurf[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -134,13 +192,31 @@ export default function AdminPage() {
           token
         );
         setPendingOwners(data);
+      } else if (tab === "venues") {
+        const data = await convexClient.query<AdminTurf[]>(
+          // Turf approval had no client at all — approveTurf/rejectTurf were
+          // only reachable from `npx convex run`, so pending venues piled up.
+          "admin:listPendingTurfs",
+          { limit: 200 },
+          token
+        );
+        setPendingTurfs(data ?? []);
       } else if (tab === "users") {
         const data = await convexClient.query<AdminUser[]>(
-          "admin:listAllUsers",
-          {},
+          // One admin user-listing query for both clients (admin:getUsers).
+          // listAllUsers/getAllUsers were duplicates with different shapes.
+          "admin:getUsers",
+          { limit: 200 },
           token
         );
         setUsers(data);
+      } else if (tab === "payouts") {
+        const data = await convexClient.query<{ payouts: AdminPayout[] }>(
+          "payouts:listPayouts",
+          { limit: 100 },
+          token
+        );
+        setPayouts(data?.payouts ?? []);
       } else if (tab === "tournaments") {
         const data = await convexClient.query<AdminTournament[]>(
           "tournaments:getAllTournaments",
@@ -237,6 +313,70 @@ export default function AdminPage() {
     }
   };
 
+  const handleApproveTurf = async (turfId: string) => {
+    if (!firebaseUser) return;
+    setActionLoading(turfId);
+    try {
+      const token = await firebaseUser.getIdToken();
+      await convexClient.mutation("admin:approveTurf", { turfId }, token);
+      await fetchData();
+      toast.success("Venue approved and live.");
+    } catch (err) {
+      const { getErrorMessage } = await import("@/lib/errors");
+      setError(getErrorMessage(err, "Failed to approve venue."));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRejectTurf = async (turfId: string, reason: string) => {
+    if (!firebaseUser) return;
+    setActionLoading(turfId);
+    try {
+      const token = await firebaseUser.getIdToken();
+      await convexClient.mutation(
+        "admin:rejectTurf",
+        { turfId, reason },
+        token
+      );
+      await fetchData();
+      toast.success("Venue rejected.");
+    } catch (err) {
+      const { getErrorMessage } = await import("@/lib/errors");
+      setError(getErrorMessage(err, "Failed to reject venue."));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  /**
+   * Manual settlement override. The automated gateway crons drive the normal
+   * path; this is the escape hatch for a transfer the gateway refused, a bank
+   * change, or a support escalation — the reason `updatePayoutStatus` exists.
+   */
+  const handlePayoutStatus = async (
+    payoutId: string,
+    next: "payout_processing" | "payout_completed" | "payout_failed" | "payout_rejected"
+  ) => {
+    if (!firebaseUser) return;
+    setActionLoading(payoutId);
+    try {
+      const token = await firebaseUser.getIdToken();
+      await convexClient.mutation(
+        "payouts:updatePayoutStatus",
+        { payoutId, status: next },
+        token
+      );
+      await fetchData();
+      toast.success(`Payout marked ${PAYOUT_STATUS_LABELS[next].toLowerCase()}.`);
+    } catch (err) {
+      const { getErrorMessage } = await import("@/lib/errors");
+      setError(getErrorMessage(err, "Failed to update payout."));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (status === "initial" || status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg">
@@ -297,6 +437,13 @@ export default function AdminPage() {
               badge={pendingOwners.length}
             />
             <TabButton
+              active={tab === "venues"}
+              onClick={() => setTab("venues")}
+              icon={<Store className="w-4 h-4" />}
+              label="Venues"
+              badge={pendingTurfs.length}
+            />
+            <TabButton
               active={tab === "users"}
               onClick={() => setTab("users")}
               icon={<Users className="w-4 h-4" />}
@@ -314,6 +461,12 @@ export default function AdminPage() {
               onClick={() => setTab("tournaments")}
               icon={<Trophy className="w-4 h-4" />}
               label="Tournaments"
+            />
+            <TabButton
+              active={tab === "payouts"}
+              onClick={() => setTab("payouts")}
+              icon={<Wallet className="w-4 h-4" />}
+              label="Payouts"
             />
             <TabButton
               active={tab === "add-owner"}
@@ -340,8 +493,21 @@ export default function AdminPage() {
               onReject={handleReject}
               actionLoading={actionLoading}
             />
+          ) : tab === "venues" ? (
+            <PendingVenuesList
+              venues={pendingTurfs}
+              onApprove={handleApproveTurf}
+              onReject={handleRejectTurf}
+              actionLoading={actionLoading}
+            />
           ) : tab === "users" ? (
             <UsersList users={users} />
+          ) : tab === "payouts" ? (
+            <PayoutsList
+              payouts={payouts}
+              onTransition={handlePayoutStatus}
+              actionLoading={actionLoading}
+            />
           ) : tab === "tournaments" ? (
             <TournamentsList tournaments={tournaments} />
           ) : tab === "add-owner" ? (
@@ -705,7 +871,7 @@ function UsersList({ users }: { users: AdminUser[] }) {
         </thead>
         <tbody>
           {users.map((u) => (
-            <tr key={u._id} className="border-t border-border-subtle">
+            <tr key={u.id} className="border-t border-border-subtle">
               <td className="px-4 py-3">
                 <div className="font-semibold text-text-main">
                   {u.full_name || u.display_name || "—"}
@@ -744,6 +910,227 @@ function UsersList({ users }: { users: AdminUser[] }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function PayoutsList({
+  payouts,
+  onTransition,
+  actionLoading,
+}: {
+  payouts: AdminPayout[];
+  onTransition: (
+    payoutId: string,
+    next: "payout_processing" | "payout_completed" | "payout_failed" | "payout_rejected"
+  ) => void;
+  actionLoading: string | null;
+}) {
+  if (payouts.length === 0) {
+    return (
+      <div className="bg-surface border border-border-subtle rounded-md p-12 text-center">
+        <Wallet className="w-12 h-12 text-text-muted mx-auto mb-3" />
+        <p className="text-text-muted">No payouts yet.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      {payouts.map((p) => {
+        const canTransition =
+          p.status === "payout_pending" || p.status === "payout_processing";
+        const busy = actionLoading === p._id;
+        return (
+          <div
+            key={p._id}
+            className="bg-surface border border-border-subtle rounded-md p-4"
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="min-w-0">
+                <p className="font-semibold text-text-main truncate">
+                  {p.owner_name || p.owner_email || p.user_id || "Unknown owner"}
+                </p>
+                <p className="text-xs text-text-muted truncate">
+                  {p.owner_email} · {new Date(p.created_at).toLocaleString("en-IN")}
+                </p>
+              </div>
+              <span className="ml-auto font-sans text-lg font-extrabold text-brand-lime">
+                ₹{Number(p.amount ?? 0).toLocaleString("en-IN")}
+              </span>
+              <span
+                className={`inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold ${
+                  PAYOUT_STATUS_COLORS[p.status] || "bg-border-default text-text-muted"
+                }`}
+              >
+                {PAYOUT_STATUS_LABELS[p.status] || p.status}
+              </span>
+            </div>
+
+            {p.failure_reason && (
+              <p className="mt-2 text-xs text-error flex items-start gap-1">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                {p.failure_reason}
+              </p>
+            )}
+
+            {canTransition && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {p.status === "payout_pending" && (
+                  <button
+                    disabled={busy}
+                    onClick={() => onTransition(p._id, "payout_processing")}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 disabled:opacity-50"
+                  >
+                    Mark processing
+                  </button>
+                )}
+                <button
+                  disabled={busy}
+                  onClick={() => onTransition(p._id, "payout_completed")}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-md bg-brand-lime text-black hover:bg-brand-lime-hover disabled:opacity-50"
+                >
+                  Mark paid
+                </button>
+                <button
+                  disabled={busy}
+                  onClick={() => onTransition(p._id, "payout_failed")}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-md bg-error/15 text-error hover:bg-error/25 disabled:opacity-50"
+                >
+                  Mark failed
+                </button>
+                <button
+                  disabled={busy}
+                  onClick={() => onTransition(p._id, "payout_rejected")}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-md bg-white/5 text-text-muted hover:bg-white/10 disabled:opacity-50"
+                >
+                  Reject
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PendingVenuesList({
+  venues,
+  onApprove,
+  onReject,
+  actionLoading,
+}: {
+  venues: AdminTurf[];
+  onApprove: (turfId: string) => void;
+  onReject: (turfId: string, reason: string) => void;
+  actionLoading: string | null;
+}) {
+  const [rejectId, setRejectId] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+
+  if (venues.length === 0) {
+    return (
+      <div className="bg-surface border border-border-subtle rounded-md p-12 text-center">
+        <Store className="w-12 h-12 text-text-muted mx-auto mb-3" />
+        <p className="text-text-muted">No venues waiting for approval.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {venues.map((v) => {
+        const busy = actionLoading === v.id;
+        return (
+          <div
+            key={v.id}
+            className="bg-surface border border-border-subtle rounded-md p-4 flex flex-col sm:flex-row sm:items-center gap-4"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-text-main truncate">{v.name}</p>
+              <p className="text-xs text-text-muted">
+                {v.sport_type ? `${v.sport_type} · ` : ""}
+                {v.city} · ₹{v.price_per_hour}/hr
+              </p>
+              <p className="text-xs text-text-muted mt-0.5 truncate">
+                {v.owner_name || "Unknown owner"}
+                {v.owner_email ? ` · ${v.owner_email}` : ""}
+                {v.created_at
+                  ? ` · submitted ${new Date(v.created_at).toLocaleDateString("en-IN")}`
+                  : ""}
+              </p>
+              {!v.owner_is_approved && (
+                <p className="text-xs text-warning mt-1 flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  Owner is not approved yet — approve the owner first.
+                </p>
+              )}
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <button
+                disabled={busy || !v.owner_is_approved}
+                onClick={() => onApprove(v.id)}
+                className="text-xs font-semibold px-3 py-1.5 rounded-md bg-brand-lime text-black hover:bg-brand-lime-hover disabled:opacity-50"
+              >
+                Approve
+              </button>
+              <button
+                disabled={busy}
+                onClick={() => {
+                  setRejectId(v.id);
+                  setRejectReason("");
+                }}
+                className="text-xs font-semibold px-3 py-1.5 rounded-md bg-error/10 text-error hover:bg-error/20 disabled:opacity-50"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        );
+      })}
+
+      {rejectId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-md rounded-lg border border-border-subtle bg-surface p-5">
+            <h3 className="font-sans font-bold text-lg text-text-main">
+              Reject Venue
+            </h3>
+            <p className="text-xs text-text-muted mt-1 mb-3">
+              The owner is notified with this reason. The venue is not deleted.
+            </p>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              rows={3}
+              placeholder="Photos are missing and the address does not match the map."
+              className="w-full rounded-md border border-border-default bg-bg px-3 py-2 text-sm text-text-main placeholder:text-text-muted focus:border-brand-lime focus:outline-none"
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setRejectId(null);
+                  setRejectReason("");
+                }}
+                className="rounded-md px-4 py-2 text-sm font-semibold text-text-muted hover:bg-elevated"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (!rejectReason.trim()) return;
+                  onReject(rejectId, rejectReason.trim());
+                  setRejectId(null);
+                  setRejectReason("");
+                }}
+                disabled={!rejectReason.trim()}
+                className="rounded-md bg-error px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                Reject Venue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

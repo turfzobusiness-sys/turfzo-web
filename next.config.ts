@@ -2,7 +2,16 @@ import type { NextConfig } from "next";
 import path from "path";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
-initOpenNextCloudflareForDev();
+// Opt-in only. OpenNext's dev integration starts a workerd sidecar, and with
+// wrangler.jsonc's WORKER_SELF_REFERENCE binding pointing at `turfzo-web` the
+// sidecar resolves it back to the stale .open-next/worker.js build. Every
+// revalidation HEAD then re-enters the same worker, doubling sockets + RSS
+// (~6 GB and 50k fds within 15 min — enough to freeze this 16 GB machine).
+// Nothing under app/ calls getCloudflareContext, so plain `next dev` is fine.
+// Enable when you actually need local bindings:  OPEN_NEXT_DEV=1 npm run dev
+if (process.env.OPEN_NEXT_DEV === "1") {
+  initOpenNextCloudflareForDev();
+}
 
 const isProd = process.env.NODE_ENV === "production";
 

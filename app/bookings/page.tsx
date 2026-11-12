@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -22,6 +22,24 @@ import { convexClient } from "@/lib/convex";
 import { toast } from "sonner";
 import type { Booking, Turf } from "@/lib/types";
 
+/** One row of `waitlists:listMine` (convex/waitlists.ts). */
+interface WaitlistEntry {
+  _id: string;
+  id?: string;
+  turf_id: string;
+  start_time: string;
+  end_time: string;
+  status: "waiting" | "offered" | "cancelled" | "expired" | string;
+  created_at: string;
+}
+
+const WAITLIST_STATUS_LABEL: Record<string, string> = {
+  waiting: "Waiting",
+  offered: "Slot offered",
+  cancelled: "Cancelled",
+  expired: "Expired",
+};
+
 export default function BookingsPage() {
   const router = useRouter();
   const { status, convexUser, getFreshToken } = useAuth();
@@ -30,8 +48,9 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<
-    "all" | "upcoming" | "past" | "cancelled"
+    "all" | "upcoming" | "past" | "cancelled" | "waitlist"
   >("all");
+  const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([]);
   const [activeQR, setActiveQR] = useState<string | null>(null);
   const [qrUrls, setQrUrls] = useState<Record<string, string>>({});
   const [rescheduling, setRescheduling] = useState<string | null>(null);
@@ -49,22 +68,25 @@ export default function BookingsPage() {
   // async callbacks (after the await), which is the correct pattern.
   // Authenticated reads pass a fresh Firebase ID token explicitly; on a
   // 401 (token raced expiry) retry once with a new token before failing.
-  const queryWithAuthRetry = async <T,>(
-    path: string,
-    args: Record<string, unknown>,
-  ): Promise<T> => {
-    const token = await getFreshToken().catch(() => undefined);
-    try {
-      return await convexClient.query<T>(path, args, token);
-    } catch (err) {
-      const code = (err as { code?: string })?.code;
-      if (code === "CONVEX_UNAUTHORIZED") {
-        const retryToken = await getFreshToken().catch(() => undefined);
-        return await convexClient.query<T>(path, args, retryToken);
+  const queryWithAuthRetry = useCallback(
+    async <T,>(
+      path: string,
+      args: Record<string, unknown>,
+    ): Promise<T> => {
+      const token = await getFreshToken().catch(() => undefined);
+      try {
+        return await convexClient.query<T>(path, args, token);
+      } catch (err) {
+        const code = (err as { code?: string })?.code;
+        if (code === "CONVEX_UNAUTHORIZED") {
+          const retryToken = await getFreshToken().catch(() => undefined);
+          return await convexClient.query<T>(path, args, retryToken);
+        }
+        throw err;
       }
-      throw err;
-    }
-  };
+    },
+    [getFreshToken],
+  );
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -102,14 +124,41 @@ export default function BookingsPage() {
     return () => {
       cancelled = true;
     };
-  }, [status]);
+  }, [status, queryWithAuthRetry]);
 
   const loadBookings = async (
-    activeFilter: "all" | "upcoming" | "past" | "cancelled" = filter,
+    activeFilter:
+      | "all"
+      | "upcoming"
+      | "past"
+      | "cancelled"
+      | "waitlist" = filter,
   ) => {
     setLoading(true);
     setError(null);
     try {
+      // The waitlist is a different entity (waitlists:listMine), not a status
+      // of bookings — one screen, two sources, so players never have to
+      // remember where they queued.
+      if (activeFilter === "waitlist") {
+        const rows = await queryWithAuthRetry<WaitlistEntry[]>(
+          "waitlists:listMine",
+          {},
+        );
+        setWaitlist(rows);
+        const turfIds = Array.from(new Set(rows.map((r) => r.turf_id)));
+        const turfMap: Record<string, Turf> = {};
+        try {
+          const found = await convexClient.query<Turf[]>("turfs:getMany", {
+            turfIds,
+          });
+          for (const t of found) turfMap[t._id] = t;
+        } catch {
+          // cards fall back to the slot time alone
+        }
+        setTurfs(turfMap);
+        return;
+      }
       // Server-side filtering: upcoming/past/cancelled use dedicated
       // indexed queries; "all" uses the hydrated getMyBookings list.
       const userId = convexUser?._id;
@@ -250,9 +299,32 @@ export default function BookingsPage() {
 
   // Reload from the server whenever the tab changes so each tab uses
   // its dedicated indexed query instead of client-side filtering.
-  const handleFilterChange = (f: "all" | "upcoming" | "past" | "cancelled") => {
+  const handleFilterChange = (
+    f: "all" | "upcoming" | "past" | "cancelled" | "waitlist"
+  ) => {
     setFilter(f);
     void loadBookings(f);
+  };
+
+  /** Leave a waitlist entry (`waitlists:cancel`). */
+  const handleLeaveWaitlist = async (entry: WaitlistEntry) => {
+    const id = entry.id ?? entry._id;
+    if (!id) return;
+    try {
+      const token = await getFreshToken().catch(() => undefined);
+      await convexClient.mutation("waitlists:cancel", { waitlistId: id }, token);
+      // Update in place so the history row stays visible as cancelled,
+      // matching what the backend now stores.
+      setWaitlist((prev) =>
+        prev.map((w) =>
+          (w.id ?? w._id) === id ? { ...w, status: "cancelled" } : w
+        )
+      );
+      toast.success("Left the waitlist.");
+    } catch (err) {
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(getErrorMessage(err, "Could not leave the waitlist."));
+    }
   };
 
   const handleReschedule = async (booking: Booking) => {
@@ -339,7 +411,7 @@ export default function BookingsPage() {
           </div>
 
           <div className="flex gap-2 mb-6 bg-surface border border-border-subtle rounded-md p-1 w-fit">
-            {(["all", "upcoming", "past", "cancelled"] as const).map((f) => (
+            {(["all", "upcoming", "past", "cancelled", "waitlist"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => handleFilterChange(f)}
@@ -368,6 +440,93 @@ export default function BookingsPage() {
                 Loading Bookings
               </h3>
             </div>
+          ) : filter === "waitlist" ? (
+            waitlist.length === 0 ? (
+              <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center gap-3">
+                <Clock className="w-12 h-12 text-text-muted opacity-50" />
+                <h3 className="font-sans font-bold text-lg text-text-main">
+                  No Waitlist Entries
+                </h3>
+                <p className="text-text-muted text-sm font-sans max-w-sm">
+                  Join a waitlist from a full slot on the explore page and we
+                  will notify you the moment it opens up.
+                </p>
+                <Link
+                  href="/explore"
+                  className="bg-brand-lime text-white dark:text-black font-sans font-bold text-xs py-2.5 px-6 rounded-md mt-2"
+                >
+                  Explore Turfs
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {waitlist.map((entry) => {
+                  const turf = turfs[entry.turf_id];
+                  const active =
+                    entry.status === "waiting" || entry.status === "offered";
+                  const start = new Date(entry.start_time);
+                  const end = new Date(entry.end_time);
+                  return (
+                    <div
+                      key={entry.id ?? entry._id}
+                      className={`bg-surface border rounded-md p-5 flex flex-col sm:flex-row sm:items-center gap-4 ${
+                        entry.status === "offered"
+                          ? "border-brand-lime/40"
+                          : "border-border-default"
+                      }`}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="font-sans font-bold text-text-main truncate">
+                          {turf?.name ?? "Turf"}
+                        </p>
+                        <p className="text-xs text-text-muted font-sans mt-1">
+                          {start.toLocaleDateString("en-IN", {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                          })}{" "}
+                          ·{" "}
+                          {start.toLocaleTimeString("en-IN", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                          {start.toDateString() === end.toDateString()
+                            ? ` – ${end.toLocaleTimeString("en-IN", {
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}`
+                            : " · full day"}
+                        </p>
+                        {entry.status === "offered" && (
+                          <p className="text-xs text-brand-lime font-sans mt-1">
+                            A slot opened up — book it before the hold expires.
+                          </p>
+                        )}
+                      </div>
+                      <span
+                        className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
+                          entry.status === "offered"
+                            ? "bg-brand-lime/15 text-brand-lime"
+                            : entry.status === "waiting"
+                              ? "bg-warning/15 text-warning"
+                              : "bg-white/5 text-text-muted"
+                        }`}
+                      >
+                        {WAITLIST_STATUS_LABEL[entry.status] ?? entry.status}
+                      </span>
+                      {active && (
+                        <button
+                          onClick={() => void handleLeaveWaitlist(entry)}
+                          className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-md bg-error/10 text-error hover:bg-error/20 transition-colors"
+                        >
+                          Leave
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )
           ) : filteredBookings.length === 0 ? (
             <div className="bg-surface border border-border-default rounded-md p-16 text-center flex flex-col items-center gap-3">
               <Ticket className="w-12 h-12 text-text-muted opacity-50" />

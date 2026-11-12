@@ -17,6 +17,10 @@
   --color-brand-lime: #6DB631;
   --color-brand-lime-hover: #5CA426;
   --color-brand-lime-light: #8ED45A;
+  /* Text-only lime: the accent fails 4.5:1 for small text on white surfaces
+     (3.3:1). Dark mode reuses the accent unchanged; .light/.marketing darken
+     it. Use this for lime text, keep --color-brand-lime for backgrounds. */
+  --color-brand-text: #6DB631;
   --color-brand-btn-bg: #0D0D0D;
   --color-brand-btn-bg-hover: #161C19;
 
@@ -24,7 +28,7 @@
   --color-text-main: #F3F6F3;
   --color-text-secondary: #C3CBC4;
   --color-text-muted: #8A988E;
-  --color-text-hint: #6B786E;
+  --color-text-hint: #8B978C;
 
   /* Borders — hairline opacity-based */
   --color-border-subtle: rgba(255, 255, 255, 0.05);
@@ -62,6 +66,32 @@
   --shadow-card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
+/* ========== SHADCN TOKEN BRIDGE ==========
+   shadcn components request role names (background, card, primary…).
+   Map them to Turfzo's own tokens so every mode (.light/.dark/.marketing)
+   switches them automatically. No new palette is introduced. */
+@theme inline {
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text-main);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text-main);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-text-main);
+  --color-primary: var(--color-brand-lime);
+  --color-primary-foreground: #0C100E;
+  --color-secondary: var(--color-elevated);
+  --color-secondary-foreground: var(--color-text-main);
+  --color-muted: var(--color-elevated);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-accent: var(--color-elevated);
+  --color-accent-foreground: var(--color-text-main);
+  --color-destructive: var(--color-error);
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: var(--color-border-default);
+  --color-input: var(--color-border-default);
+  --color-ring: var(--color-border-focused);
+}
+
 /* ========== LIGHT MODE ========== */
 .light {
   --color-bg: #FBFDFB;
@@ -71,6 +101,7 @@
   /* Rich Green Accent for Light Mode */
   --color-brand-lime-hover: #15803D;
   --color-brand-lime-light: #4ADE80;
+  --color-brand-text: #166534;
   --color-brand-btn-bg: #0f1f0f;
   --color-brand-btn-bg-hover: #162f16;
   --color-text-main: #090D0A;
@@ -84,6 +115,14 @@
   --color-border-glow: rgba(0, 0, 0, 0.08);
   --color-overlay: rgba(0, 0, 0, 0.5);
   --color-overlay-heavy: rgba(0, 0, 0, 0.6);
+  /* Status — darkened for AA text on white surfaces. The default (@theme)
+     values are tuned for dark backgrounds and fail 4.5:1 on #FFFFFF. */
+  --color-error: #B42318;
+  --color-error-light: #9B2C21;
+  --color-warning: #8A5A00;
+  --color-warning-light: #7A4F00;
+  --color-success: #2F7D12;
+  --color-info: #1D5C8F;
   --shadow-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
@@ -98,6 +137,7 @@
   --color-brand-lime: #16A34A;
   --color-brand-lime-hover: #15803D;
   --color-brand-lime-light: #4ADE80;
+  --color-brand-text: #166534;
   --color-brand-btn-bg: #162019;
   --color-brand-btn-bg-hover: #243428;
   --color-text-main: #162019;
@@ -127,7 +167,7 @@
   --color-text-main: #F3F6F3;
   --color-text-secondary: #C3CBC4;
   --color-text-muted: #8A988E;
-  --color-text-hint: #6B786E;
+  --color-text-hint: #8B978C;
   --color-border-subtle: rgba(255, 255, 255, 0.05);
   --color-border-default: rgba(255, 255, 255, 0.08);
   --color-border-strong: rgba(255, 255, 255, 0.14);
