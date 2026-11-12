@@ -87,7 +87,7 @@ const exploreFaqItems = [
   {
     question: "Which cities are available on Turfzo?",
     answer:
-      "Turfzo is onboarding venues city by city, starting with Bangalore. Check the explore page for currently live venues, or contact us to request your city.",
+      "Turfzo is onboarding venues city by city — with active venues in Mumbai and expansion underway across Bangalore, Delhi NCR, Hyderabad, and Pune. Check the explore page for currently live venues, or contact us to request your city.",
   },
   {
     question: "What sports can I book on Turfzo?",

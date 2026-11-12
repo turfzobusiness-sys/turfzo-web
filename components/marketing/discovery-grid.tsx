@@ -10,7 +10,7 @@ const SPORTS = [
 ];
 
 /**
- * Neutral sport discovery grid. Links into /explore filtered by sport —
+ * Neutral sport discovery grid. Links to dedicated canonical sport hubs —
  * no invented venue names, ratings, prices or slots.
  */
 export default function DiscoveryGrid() {
@@ -19,7 +19,7 @@ export default function DiscoveryGrid() {
       {SPORTS.map((sport) => (
         <Link
           key={sport.name}
-          href={`/explore?sport=${encodeURIComponent(sport.name)}`}
+          href={`/sports/${sport.name.toLowerCase()}`}
           className="group bg-surface border border-border-default hover:border-border-strong rounded-xl overflow-hidden transition-all shadow-md flex flex-col"
         >
           <div className="relative w-full aspect-[4/3] overflow-hidden">

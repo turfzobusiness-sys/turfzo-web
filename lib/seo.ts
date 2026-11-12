@@ -4,19 +4,17 @@ import { convexClient } from "@/lib/convex";
 import type { Turf } from "@/lib/types";
 
 /**
- * Testing-phase SEO switches.
- *
- * Turfzo has no real venue partners yet: every venue in production is seed
- * data. Indexing empty city pages or test venues teaches Google the pages
- * are thin, and spends the ranking position needed when inventory lands.
+ * SEO & programmatic indexability switches.
  *
  * - City pages auto-index PER CITY once Convex has >= 1 non-mock venue in
  *   that city (or if `CITY_PAGES_INDEXABLE` is flipped to `true`).
- * - `VENUE_PAGES_INDEXABLE` stays a manual kill switch until real partner
- *   venues are ready; mock venues stay excluded by `isTestVenue()` forever.
+ * - City+Sport pages auto-index PER PAIR once Convex has >= 1 non-mock venue
+ *   matching that city and sport, so empty combinations stay `noindex`.
+ * - `VENUE_PAGES_INDEXABLE` is enabled for non-mock live venues; seed records
+ *   marked `(Mock)` stay excluded by `isTestVenue()` forever.
  */
 export const CITY_PAGES_INDEXABLE = false;
-export const VENUE_PAGES_INDEXABLE = false;
+export const VENUE_PAGES_INDEXABLE = true;
 
 export const SITE_URL = "https://turfzo.app";
 export const DEFAULT_OG_IMAGE_URL = `${SITE_URL}/og-cover.jpg`;
@@ -73,33 +71,72 @@ export function normalizeCityToSlug(city: string | undefined | null): string | n
   return null;
 }
 
+export function getMatchingSportSlugs(sport: string | undefined | null): string[] {
+  const key = (sport ?? "").trim().toLowerCase();
+  if (!key) return [];
+  return INDEXABLE_SPORT_SLUGS.filter((slug) => key.includes(slug));
+}
+
 /**
- * Per-request cached set of city slugs with at least one non-mock live venue.
- * Returns an empty set when Convex is unconfigured or unreachable so builds
- * and SSR pages never fail closed.
+ * Per-request cached list of all available non-mock venues from Convex.
+ * Fails open to `[]` when Convex is unconfigured or unreachable so builds
+ * and SSR routes never throw.
  */
-export const getLiveCitySlugs = cache(async (): Promise<Set<string>> => {
+export const getLiveTurfs = cache(async (): Promise<Turf[]> => {
   if (!process.env.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL) {
-    return new Set();
+    return [];
   }
   try {
     const turfs = await convexClient.query<Turf[]>("turfs:getAvailable", {});
-    const slugs = new Set<string>();
-    for (const turf of turfs ?? []) {
-      if (isTestVenue(turf)) continue;
-      const slug = normalizeCityToSlug(turf.city);
-      if (slug) slugs.add(slug);
-    }
-    return slugs;
+    return (turfs ?? []).filter((turf) => !isTestVenue(turf));
   } catch {
-    return new Set();
+    return [];
   }
+});
+
+/**
+ * Per-request cached set of city slugs with at least one non-mock live venue.
+ */
+export const getLiveCitySlugs = cache(async (): Promise<Set<string>> => {
+  const turfs = await getLiveTurfs();
+  const slugs = new Set<string>();
+  for (const turf of turfs) {
+    const slug = normalizeCityToSlug(turf.city);
+    if (slug) slugs.add(slug);
+  }
+  return slugs;
+});
+
+/**
+ * Per-request cached set of `${citySlug}/${sportSlug}` pairs that have at least
+ * one non-mock live venue matching both city and sport.
+ */
+export const getLiveCitySportSlugs = cache(async (): Promise<Set<string>> => {
+  const turfs = await getLiveTurfs();
+  const pairs = new Set<string>();
+  for (const turf of turfs) {
+    const citySlug = normalizeCityToSlug(turf.city);
+    if (!citySlug) continue;
+    for (const sportSlug of getMatchingSportSlugs(turf.sport_type)) {
+      pairs.add(`${citySlug}/${sportSlug}`);
+    }
+  }
+  return pairs;
 });
 
 export async function isCityIndexable(citySlug: string): Promise<boolean> {
   if (CITY_PAGES_INDEXABLE) return true;
   const live = await getLiveCitySlugs();
   return live.has(citySlug.toLowerCase());
+}
+
+export async function isCitySportIndexable(
+  citySlug: string,
+  sportSlug: string,
+): Promise<boolean> {
+  if (CITY_PAGES_INDEXABLE) return true;
+  const live = await getLiveCitySportSlugs();
+  return live.has(`${citySlug.toLowerCase()}/${sportSlug.toLowerCase()}`);
 }
 
 /**

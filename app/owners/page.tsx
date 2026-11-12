@@ -26,38 +26,24 @@ import {
   CreditCard,
   Quote,
 } from "lucide-react";
-import { motion, AnimatePresence, useInView } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FaqAccordion } from "@/components/ui/faq-accordion";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
-/*  Scroll-triggered animation wrapper                                */
+/*  Section wrapper — keeps SSR HTML immediately visible (no opacity:0)*/
 /* ------------------------------------------------------------------ */
 function FadeInSection({
   children,
   className = "",
-  delay = 0,
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
 }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.3, ease: "easeOut", delay }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -74,33 +60,35 @@ function AnimatedCounter({
   suffix?: string;
   className?: string;
 }) {
-  const [displayValue, setDisplayValue] = useState(0);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  const [displayValue, setDisplayValue] = useState(value);
+  const prevValueRef = useRef(value);
 
   useEffect(() => {
-    if (!isInView) return;
-    let start = 0;
-    const end = value;
-    const duration = 1200;
+    const startVal = prevValueRef.current;
+    const endVal = value;
+    if (startVal === endVal) return;
+
+    const duration = 350;
     const startTime = performance.now();
+    let frameId = 0;
 
     function step(currentTime: number) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
-      start = Math.round(eased * end);
-      setDisplayValue(start);
+      setDisplayValue(Math.round(startVal + (endVal - startVal) * eased));
       if (progress < 1) {
-        requestAnimationFrame(step);
+        frameId = requestAnimationFrame(step);
+      } else {
+        prevValueRef.current = endVal;
       }
     }
-    requestAnimationFrame(step);
-  }, [isInView, value]);
+    frameId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frameId);
+  }, [value]);
 
   return (
-    <span ref={ref} className={className}>
+    <span className={className}>
       {prefix}
       {displayValue.toLocaleString("en-IN")}
       {suffix}
@@ -454,12 +442,9 @@ export default function OwnersPage() {
                   { value: "24h", label: "Settlement SLA", highlight: false },
                   { value: "₹0", label: "Listing Fee", highlight: true },
                   
-                ].map((stat, i) => (
-                  <motion.div
+                ].map((stat) => (
+                  <div
                     key={stat.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 + i * 0.05, duration: 0.5 }}
                     className="bg-surface border border-border-default rounded-xl p-3.5 sm:p-4 text-center transition-transform duration-200"
                   >
                     <div className={cn(
@@ -471,7 +456,7 @@ export default function OwnersPage() {
                     <div className="text-[10px] sm:text-[11px] text-text-muted font-sans uppercase tracking-wider mt-0.5">
                       {stat.label}
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </FadeInSection>
@@ -733,18 +718,15 @@ export default function OwnersPage() {
 
                     <div className="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
                       {activePillar.points.map((point, pIdx) => (
-                        <motion.div
+                        <div
                           key={pIdx}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: pIdx * 0.08 }}
                           className="flex items-start gap-2.5 sm:gap-3 text-xs sm:text-sm text-text-main"
                         >
                           <div className="w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full bg-brand-lime flex items-center justify-center shrink-0 mt-0.5 text-white dark:text-black shadow-xs">
                             <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white dark:text-black stroke-[2.5]" />
                           </div>
                           <span className="leading-snug">{point}</span>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
 
@@ -764,7 +746,7 @@ export default function OwnersPage() {
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={activePillarIdx}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={false}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.25 }}

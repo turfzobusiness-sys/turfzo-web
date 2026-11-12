@@ -1,11 +1,24 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { MapPin, ChevronRight, Trophy, CheckCircle2 } from "lucide-react";
+import Image from "next/image";
+import { MapPin, ChevronRight, Trophy, CheckCircle2, Star } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
-import { buildOpenGraph, isCityIndexable } from "@/lib/seo";
+import {
+  FAQPageSchema,
+  BreadcrumbListSchema,
+  ItemListSchema,
+} from "@/lib/schema";
+import {
+  INDEXABLE_SPORT_SLUGS,
+  buildOpenGraph,
+  getLiveTurfs,
+  getMatchingSportSlugs,
+  isCityIndexable,
+  normalizeCityToSlug,
+} from "@/lib/seo";
+import { getLocalTurfImage } from "@/lib/turf-images";
 
 export const revalidate = 300;
 
@@ -77,10 +90,23 @@ export async function generateStaticParams() {
 
 export default async function CityPage({ params }: Props) {
   const { city } = await params;
-  const data = CITY_DATA[city.toLowerCase()];
+  const citySlug = city.toLowerCase();
+  const data = CITY_DATA[citySlug];
   if (!data) notFound();
 
-  const indexable = await isCityIndexable(city);
+  const [indexable, liveTurfs] = await Promise.all([
+    isCityIndexable(citySlug),
+    getLiveTurfs(),
+  ]);
+  const cityVenues = liveTurfs.filter(
+    (t) => normalizeCityToSlug(t.city) === citySlug,
+  );
+  const activeSportSlugs = new Set<string>();
+  for (const v of cityVenues) {
+    for (const s of getMatchingSportSlugs(v.sport_type)) {
+      activeSportSlugs.add(s);
+    }
+  }
 
   const faqs = CITY_FAQS.map((f) => ({
     question: f.question.replace(/{city}/g, data.name),
@@ -93,14 +119,23 @@ export default async function CityPage({ params }: Props) {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
       {/* Canonical + OG come from generateMetadata above (Next metadata API).
-          No invented-venue JSON-LD here: only Breadcrumb + FAQ schemas built
-          from real page data. No hardcoded postal codes. */}
+          Structured data is generated strictly from live Convex venues + FAQs. */}
       <BreadcrumbListSchema items={[
         { name: "Home", url: "https://turfzo.app" },
         { name: "Explore", url: "https://turfzo.app/explore" },
-        { name: data.name, url: `https://turfzo.app/cities/${city}` },
+        { name: data.name, url: `https://turfzo.app/cities/${citySlug}` },
       ]} />
       <FAQPageSchema items={faqs} />
+      {cityVenues.length > 0 && (
+        <ItemListSchema
+          name={`Live Sports Venues in ${data.name}`}
+          url={`https://turfzo.app/cities/${citySlug}`}
+          items={cityVenues.slice(0, 12).map((v) => ({
+            name: v.name,
+            url: `https://turfzo.app/venues/${v._id}`,
+          }))}
+        />
+      )}
       <Header />
 
       <main className="flex-grow pt-24 pb-16">
@@ -126,7 +161,7 @@ export default async function CityPage({ params }: Props) {
                 per-hour pricing.
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-3">
-                <Link href={`/explore?city=${city}`} className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
+                <Link href={`/explore?city=${citySlug}`} rel="nofollow" className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
                   Browse {data.name} Turfs <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                 </Link>
                 <Link href="/tournaments" className="bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-sans font-semibold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
@@ -141,7 +176,7 @@ export default async function CityPage({ params }: Props) {
               <span className="font-bold">Turfzo is onboarding venues in {data.name}.</span>{" "}
               <span className="text-text-muted">
                 Browse what is live on{" "}
-                <Link href={`/explore?city=${city}`} className="text-brand-lime hover:underline">
+                <Link href="/explore" className="text-brand-lime hover:underline">
                   Explore
                 </Link>
                 , or{" "}
@@ -153,15 +188,103 @@ export default async function CityPage({ params }: Props) {
             </div>
           )}
 
+          {cityVenues.length > 0 && (
+            <section className="mb-12" aria-label={`Live sports venues in ${data.name}`}>
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+                <div>
+                  <h2 className="font-sans font-bold text-2xl text-text-main tracking-tight text-left">
+                    Live Venues in {data.name}
+                  </h2>
+                  <p className="text-sm text-text-muted font-sans mt-1">
+                    {cityVenues.length} active venue{cityVenues.length === 1 ? "" : "s"} with online slot availability
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {INDEXABLE_SPORT_SLUGS.map((sportSlug) => {
+                    const label = sportSlug.charAt(0).toUpperCase() + sportSlug.slice(1);
+                    const href = activeSportSlugs.has(sportSlug)
+                      ? `/cities/${citySlug}/${sportSlug}`
+                      : `/sports/${sportSlug}`;
+                    return (
+                      <Link
+                        key={sportSlug}
+                        href={href}
+                        className="px-3 py-1.5 rounded-lg bg-surface border border-border-default hover:border-brand-lime/40 text-xs font-semibold text-text-main hover:text-brand-lime transition-colors"
+                      >
+                        {label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {cityVenues.map((v) => (
+                  <div
+                    key={v._id}
+                    className="bg-surface border border-border-default hover:border-border-strong rounded-xl overflow-hidden flex flex-col transition-all"
+                  >
+                    <Link href={`/venues/${v._id}`} className="relative aspect-[4/3] bg-elevated block overflow-hidden group">
+                      <Image
+                        src={getLocalTurfImage(v)}
+                        alt={`${v.name} — ${v.sport_type || "sports"} venue in ${data.name}`}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                      />
+                    </Link>
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between text-xs text-text-muted mb-1">
+                          <span className="inline-flex items-center gap-1 truncate">
+                            <MapPin className="w-3.5 h-3.5 text-brand-lime shrink-0" />
+                            <span className="truncate">{v.address || v.location_name || data.name}</span>
+                          </span>
+                          {typeof v.rating === "number" && v.rating > 0 && (
+                            <span className="inline-flex items-center gap-1 font-semibold text-text-main shrink-0 ml-2">
+                              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                              {v.rating.toFixed(1)}
+                            </span>
+                          )}
+                        </div>
+                        <Link href={`/venues/${v._id}`}>
+                          <h3 className="font-sans font-bold text-base text-text-main hover:text-brand-lime transition-colors">
+                            {v.name}
+                          </h3>
+                        </Link>
+                        {v.sport_type && (
+                          <p className="text-xs text-text-muted mt-1 capitalize">
+                            {v.sport_type}
+                          </p>
+                        )}
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-border-default flex items-center justify-between">
+                        <Link
+                          href={`/venues/${v._id}`}
+                          className="text-xs font-semibold text-brand-lime hover:underline inline-flex items-center gap-1"
+                        >
+                          View slots <ChevronRight className="w-3.5 h-3.5" />
+                        </Link>
+                        <span className="text-sm font-bold text-text-main tabular-nums">
+                          ₹{v.price_per_hour.toLocaleString("en-IN")}/hr
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 flex flex-col gap-6">
               <h2 className="font-sans font-bold text-2xl text-text-main tracking-tight text-left">Browse {data.name} by area</h2>
               <p className="text-sm text-text-muted font-sans -mt-3">
-                These links open the live explore page filtered to {data.name}.
+                Explore live slot availability across popular {data.name} neighborhoods.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {data.highlights.map((area) => (
-                  <Link key={area} href={`/explore?city=${city}`}
+                  <Link key={area} href={`/explore?city=${citySlug}`} rel="nofollow"
                     className="bg-surface border border-border-default hover:border-border-strong rounded-xl p-5 flex items-center justify-between transition-all">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime">
@@ -207,12 +330,13 @@ export default async function CityPage({ params }: Props) {
                 <div className="flex flex-col gap-3 text-xs font-sans">
                   <div className="flex justify-between"><span className="text-text-muted">City</span><span className="text-text-main font-bold">{data.name}</span></div>
                   <div className="flex justify-between"><span className="text-text-muted">State</span><span className="text-text-main font-bold">{data.state}</span></div>
+                  <div className="flex justify-between"><span className="text-text-muted">Live venues</span><span className="text-text-main font-bold">{cityVenues.length}</span></div>
                   <div className="flex justify-between"><span className="text-text-muted">Sports</span><span className="text-text-main font-bold">Football, Cricket, Badminton, Tennis, Multi</span></div>
                   <div className="flex justify-between"><span className="text-text-muted">Pricing</span><span className="text-text-main font-bold">Per venue, per hour</span></div>
                 </div>
                 <p className="text-[11px] text-text-muted mt-4">
-                  Live venue counts and prices are shown on the{" "}
-                  <Link href={`/explore?city=${city}`} className="text-brand-lime hover:underline">
+                  See all live slot calendars on the{" "}
+                  <Link href="/explore" className="text-brand-lime hover:underline">
                     explore page
                   </Link>
                   , straight from each venue&apos;s own listing.

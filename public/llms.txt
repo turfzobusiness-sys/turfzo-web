@@ -20,8 +20,8 @@ Canonical URL: https://turfzo.app
 - Multipurpose Venues: https://turfzo.app/sports/multipurpose
 
 ## Browse by City (Live Availability)
+- Mumbai (Active City Hub): https://turfzo.app/cities/mumbai
 - Bangalore: https://turfzo.app/explore?city=bangalore
-- Mumbai: https://turfzo.app/explore?city=mumbai
 - Delhi: https://turfzo.app/explore?city=delhi
 - Hyderabad: https://turfzo.app/explore?city=hyderabad
 - Pune: https://turfzo.app/explore?city=pune
