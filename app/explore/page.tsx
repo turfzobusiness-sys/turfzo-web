@@ -65,6 +65,7 @@ import type {
 } from "@/lib/types";
 import { FAQPageSchema } from "@/lib/schema";
 import { captureProductEvent } from "@/lib/posthog";
+import ExploreSeoContent from "@/components/ExploreSeoContent";
 
 const exploreFaqItems = [
   {
@@ -75,17 +76,17 @@ const exploreFaqItems = [
   {
     question: "What is the average turf booking price in India?",
     answer:
-      "Turf booking prices in India range from ₹500 to ₹2000 per hour. Football turfs typically cost ₹800-1500/hour in metro cities like Bangalore, Mumbai, and Delhi. Prices vary by location, amenities, and time of day.",
+      "Turf booking prices typically range from ₹800 to ₹1,500 per hour for football turfs, ₹500 to ₹1,500 for cricket grounds, and ₹300 to ₹800 for badminton courts. Exact rates depend on the venue, facilities, and time slot.",
   },
   {
     question: "Can I book a turf for tonight?",
     answer:
-      "Yes, Turfzo shows real-time availability. If a turf has open slots for tonight, you can book it instantly. The booking is confirmed immediately with a QR code ticket.",
+      "Yes, Turfzo shows real-time availability. If a turf has open slots for tonight, you can book it instantly and receive a confirmation with a QR code ticket.",
   },
   {
-    question: "How many turfs are available on Turfzo?",
+    question: "Which cities are available on Turfzo?",
     answer:
-      "Turfzo has verified turfs across 9 Indian cities including Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, and CSN (Aurangabad). You can filter by city at the top of this page.",
+      "Turfzo is onboarding venues city by city, starting with Bangalore. Check the explore page for currently live venues, or contact us to request your city.",
   },
   {
     question: "What sports can I book on Turfzo?",
@@ -95,7 +96,7 @@ const exploreFaqItems = [
   {
     question: "Is there a cancellation policy?",
     answer:
-      "Yes, you can cancel your booking up to 24 hours before the scheduled time for a full refund, 6-24 hours for a 50% refund, and no refund within 6 hours of the slot.",
+      "Yes. Cancellations more than 24 hours before the scheduled slot receive a 100% slot refund, 6 to 24 hours before receive a 50% slot refund, and cancellations under 6 hours are non-refundable. The service fee is retained in every case.",
   },
 ];
 
@@ -2036,6 +2037,8 @@ export default function ExplorePage() {
                   ))}
                 </div>
               )}
+
+              <ExploreSeoContent faqs={exploreFaqItems} />
             </div>
           </div>
         )}
