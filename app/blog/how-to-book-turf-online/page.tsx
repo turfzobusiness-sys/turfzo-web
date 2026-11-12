@@ -101,31 +101,6 @@ const steps = [
 export default function HowToBookTurfOnline() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>
-          How to Book a Turf Online in 2 Minutes [Step-by-Step Guide] | Turfzo
-        </title>
-        <meta
-          name="description"
-          content="Never booked a turf online before? This step-by-step guide walks you through searching, selecting slots, making payment, and getting confirmed in 2 minutes on Turfzo."
-        />
-        <link
-          rel="canonical"
-          href="https://turfzo.app/blog/how-to-book-turf-online"
-        />
-        <meta
-          property="og:title"
-          content="How to Book a Turf Online in 2 Minutes | Turfzo"
-        />
-        <meta
-          property="og:description"
-          content="Step-by-step guide to booking a football turf, cricket ground, or sports venue online in 2 minutes."
-        />
-        <meta
-          property="og:url"
-          content="https://turfzo.app/blog/how-to-book-turf-online"
-        />
-      </head>
       <ArticleSchema
         name="How to Book a Turf Online in 2 Minutes [Step-by-Step Guide]"
         description="Step-by-step guide to booking a football turf online in 2 minutes."

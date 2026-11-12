@@ -61,32 +61,6 @@ const comparisonData = [
 export default function TurfVsGround() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>
-          Turf vs Ground: Which is Better for Football? [2026 Comparison] |
-          Turfzo
-        </title>
-        <meta
-          name="description"
-          content="Turf vs natural ground for football — we compare cost, playability, injury risk, availability, and maintenance to help you choose the best playing surface."
-        />
-        <link
-          rel="canonical"
-          href="https://turfzo.app/blog/turf-vs-ground"
-        />
-        <meta
-          property="og:title"
-          content="Turf vs Ground: Which is Better for Football? | Turfzo"
-        />
-        <meta
-          property="og:description"
-          content="Complete comparison of turf vs natural ground for football. Cost, playability, injuries, and more."
-        />
-        <meta
-          property="og:url"
-          content="https://turfzo.app/blog/turf-vs-ground"
-        />
-      </head>
       <ArticleSchema
         name="Turf vs Ground: Which is Better for Football?"
         description="Complete comparison of turf vs natural ground for football including cost, playability, injury risk, and availability."

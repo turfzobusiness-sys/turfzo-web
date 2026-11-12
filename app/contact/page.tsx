@@ -43,7 +43,7 @@ const contactFaqItems = [
   { question: "How do I cancel a booking?", answer: "You can cancel a booking from your booking history in the app or website. Cancellations more than 24 hours before the slot are refunded in full on the slot price, between 6 and 24 hours receive 50% of the slot price, and cancellations under 6 hours are non-refundable. The service fee is retained in every case." },
   { question: "I have a partnership inquiry. Who do I contact?", answer: `For turf owner partnerships, venue listings, or business inquiries, email ${PARTNERSHIPS_EMAIL} or use the contact form with subject 'Partnership Inquiry'.` },
   { question: "How do I list my turf on Turfzo?", answer: `Turf owners can register and list their venue from the Owners dashboard, or email ${OWNERS_EMAIL} to get help with onboarding.` },
-  { question: "What cities does Turfzo operate in?", answer: "Turfzo is available in Bangalore, Mumbai, Delhi, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, and CSN (Aurangabad)." },
+  { question: "What cities does Turfzo operate in?", answer: "Turfzo is launching city by city. Bangalore is the first focus, and live venues are added as owners come on board. Check the explore page for the current venues, or email us to request your city." },
 ];
 
 
@@ -100,14 +100,6 @@ export default function ContactPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>Contact Us | Get in Touch with Turfzo</title>
-        <meta name="description" content="Have questions about turf booking? Contact Turfzo support via email, phone, or our contact form. We're here to help with bookings, cancellations, and partnerships." />
-        <link rel="canonical" href="https://turfzo.app/contact" />
-        <meta property="og:title" content="Contact Us | Turfzo" />
-        <meta property="og:description" content="Get in touch with Turfzo for booking support, partnerships, and general inquiries." />
-        <meta property="og:url" content="https://turfzo.app/contact" />
-      </head>
       <FAQPageSchema items={contactFaqItems} />
       <Header />
 

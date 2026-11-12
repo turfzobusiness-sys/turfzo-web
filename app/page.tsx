@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Turfzo | Book Premium Turfs & Sports Venues Instantly",
-  description: "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly.",
-  alternates: { canonical: "https://turfzo.app" }
+  title: { absolute: "Turfzo | Turf Booking & Sports Venue Booking in India" },
+  description:
+    "Book football turfs, cricket grounds, badminton courts and tennis venues online. Compare hourly prices and live availability on Turfzo.",
+  alternates: { canonical: "https://turfzo.app" },
+  openGraph: {
+    title: "Turfzo | Turf Booking & Sports Venue Booking in India",
+    description:
+      "Book football turfs, cricket grounds, badminton courts and tennis venues online. Compare hourly prices and live availability on Turfzo.",
+    url: "https://turfzo.app",
+  },
 };
 
 import { Header } from "@/components/ui/header-2";
@@ -12,7 +19,9 @@ import PopularTurfs, { type PopularTurfItem } from "@/components/PopularTurfs";
 import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
 import CTABanner from "@/components/CTABanner";
+import HomeSeoContent, { HOME_FAQ_ITEMS } from "@/components/HomeSeoContent";
 import Footer from "@/components/Footer";
+import { FAQPageSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
 import { getLocalTurfImage } from "@/lib/turf-images";
 import type { Turf } from "@/lib/types";
@@ -78,6 +87,8 @@ export default async function Home() {
         <PopularTurfs venues={venues} />
         <Features />
         <HowItWorks />
+        <HomeSeoContent />
+        <FAQPageSchema items={HOME_FAQ_ITEMS} />
         <CTABanner />
       </main>
       <Footer />

@@ -18,21 +18,26 @@ const CITIES = [
 /** Sports Turfzo actually supports; "pickleball" had no product support. */
 const SPORTS = ["football", "cricket", "badminton", "tennis", "multipurpose"];
 
-// Real blog slugs — must match app/blog/page.tsx + app/blog/[slug]/page.tsx
-// generateStaticParams so every sitemap URL resolves (legacy static routes
-// under app/blog/<slug>/ stay live but are no longer listed here).
+// Blog slugs. The first five resolve through app/blog/[slug]/page.tsx; the
+// static guides resolve through their own app/blog/<slug>/page.tsx routes.
+// Every slug here is also linked from app/blog/page.tsx.
 const BLOG_SLUGS = [
   "book-football-turf-instantly",
   "organize-local-sports-tournaments",
   "maximize-turf-roi-booking-management",
   "future-of-amateur-sports-india",
   "turf-vs-ground-injury-prevention",
+  "how-to-book-turf-online",
+  "turf-booking-price-india",
+  "best-football-turfs-bangalore",
+  "turf-vs-ground",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 1.0 },
     { url: `${SITE_URL}/explore`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.9 },
+    { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${SITE_URL}/how-it-works`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${SITE_URL}/owners`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${SITE_URL}/tournaments`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
