@@ -930,7 +930,7 @@ export default function TournamentsPage() {
             <div className="absolute inset-0 z-0">
               <Image
                 src="/images/marketing/tournaments/tournament-hero.webp"
-                alt=""
+                alt="Players competing in a community sports tournament on a floodlit turf"
                 fill
                 className="object-cover object-center"
                 sizes="100vw"
@@ -1327,7 +1327,13 @@ export default function TournamentsPage() {
                             )}
 
                             <h3 className="text-lg font-bold text-text-main leading-tight mb-2 group-hover:text-brand-lime transition-colors duration-200">
-                              {t.title}
+                              <Link
+                                href={`/tournament/${t._id}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="hover:underline"
+                              >
+                                {t.title}
+                              </Link>
                             </h3>
 
                             {/* Spot status indicator */}
@@ -1369,10 +1375,14 @@ export default function TournamentsPage() {
                                 </span>
                               </span>
                             </div>
-                            <span className="flex items-center gap-1.5 text-xs font-bold text-text-main group-hover:text-brand-lime transition-colors duration-200">
+                            <Link
+                              href={`/tournament/${t._id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1.5 text-xs font-bold text-text-main group-hover:text-brand-lime transition-colors duration-200"
+                            >
                               View details{" "}
                               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </span>
+                            </Link>
                           </div>
                         </div>
                       </motion.div>

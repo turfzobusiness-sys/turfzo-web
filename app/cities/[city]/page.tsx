@@ -5,7 +5,9 @@ import { MapPin, ChevronRight, Trophy, CheckCircle2 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
-import { CITY_PAGES_INDEXABLE } from "@/lib/seo";
+import { buildOpenGraph, isCityIndexable } from "@/lib/seo";
+
+export const revalidate = 300;
 
 /**
  * Geography only — city name, state and well-known locality names used as
@@ -48,23 +50,24 @@ type Props = { params: Promise<{ city: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { city } = await params;
   const data = CITY_DATA[city.toLowerCase()];
-  if (!data) return { title: "City Not Found" };
+  if (!data) notFound();
+  const indexable = await isCityIndexable(city);
+  const title = `Turf Booking in ${data.name} — Areas & Prices`;
+  const description = `Find football, cricket, badminton and tennis venues in ${data.name} on Turfzo. Every listing shows its hourly rate, amenities and live slot availability.`;
   return {
-    title: `Turf Booking in ${data.name} — Areas & Prices`,
+    title,
     // No venue count and no invented "starting at" price — both were
     // fabricated and were being published as page metadata.
-    description: `Find football, cricket, badminton and tennis venues in ${data.name} on Turfzo. Every listing shows its hourly rate, amenities and live slot availability.`,
+    description,
     keywords: [`turf booking ${data.name}`, `football turf ${data.name}`, `cricket ground ${data.name}`, `book turf ${data.name}`, `${data.name} sports venue`],
     alternates: { canonical: `https://turfzo.app/cities/${city}` },
-    // Testing phase: no real inventory yet, so keep the page out of the index
-    // rather than teach Google it is a thin doorway (see lib/seo.ts).
-    robots: CITY_PAGES_INDEXABLE ? undefined : { index: false, follow: true },
-    openGraph: {
+    // Auto-indexes per city once Convex has 1+ real non-mock venue in that city.
+    robots: indexable ? undefined : { index: false, follow: true },
+    openGraph: buildOpenGraph({
       title: `Turf Booking in ${data.name}`,
       description: `Browse ${SUPPORTED_SPORTS} in ${data.name} with per-hour pricing and live availability.`,
       url: `https://turfzo.app/cities/${city}`,
-      type: "website",
-    },
+    }),
   };
 }
 
@@ -76,6 +79,8 @@ export default async function CityPage({ params }: Props) {
   const { city } = await params;
   const data = CITY_DATA[city.toLowerCase()];
   if (!data) notFound();
+
+  const indexable = await isCityIndexable(city);
 
   const faqs = CITY_FAQS.map((f) => ({
     question: f.question.replace(/{city}/g, data.name),
@@ -131,7 +136,7 @@ export default async function CityPage({ params }: Props) {
             </div>
           </div>
 
-          {!CITY_PAGES_INDEXABLE && (
+          {!indexable && (
             <div className="mb-10 rounded-xl border border-brand-lime/30 bg-brand-lime/5 p-5 text-sm font-sans text-text-main">
               <span className="font-bold">Turfzo is onboarding venues in {data.name}.</span>{" "}
               <span className="text-text-muted">

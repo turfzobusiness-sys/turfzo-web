@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
+import { buildOpenGraph } from "@/lib/seo";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "Turfzo | Turf Booking & Sports Venue Booking in India" },
   description:
     "Book football turfs, cricket grounds, badminton courts and tennis venues online. Compare hourly prices and live availability on Turfzo.",
   alternates: { canonical: "https://turfzo.app" },
-  openGraph: {
+  openGraph: buildOpenGraph({
     title: "Turfzo | Turf Booking & Sports Venue Booking in India",
     description:
       "Book football turfs, cricket grounds, badminton courts and tennis venues online. Compare hourly prices and live availability on Turfzo.",
     url: "https://turfzo.app",
-  },
+  }),
 };
 
 import { Header } from "@/components/ui/header-2";

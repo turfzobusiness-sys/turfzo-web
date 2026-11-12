@@ -115,7 +115,8 @@ export default function RootLayout({
             "https://linkedin.com/company/turfzo",
           ]}
           contactPoint={{
-            telephone: "+91-78452-41686",
+            email: "support@turfzo.app",
+            url: `${SITE_URL}/contact`,
             contactType: "customer service",
             areaServed: "IN",
             availableLanguage: ["en", "hi"],

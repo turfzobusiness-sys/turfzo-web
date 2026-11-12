@@ -40,12 +40,37 @@ export default function robots(): MetadataRoute.Robots {
         disallow: DISALLOW,
       },
       {
+        userAgent: "Claude-SearchBot",
+        allow: "/",
+        disallow: DISALLOW,
+      },
+      {
+        userAgent: "Claude-User",
+        allow: "/",
+        disallow: DISALLOW,
+      },
+      {
         userAgent: "PerplexityBot",
         allow: "/",
         disallow: DISALLOW,
       },
       {
+        userAgent: "Perplexity-User",
+        allow: "/",
+        disallow: DISALLOW,
+      },
+      {
         userAgent: "Google-Extended",
+        allow: "/",
+        disallow: DISALLOW,
+      },
+      {
+        userAgent: "meta-webindexer",
+        allow: "/",
+        disallow: DISALLOW,
+      },
+      {
+        userAgent: "meta-externalagent",
         allow: "/",
         disallow: DISALLOW,
       },

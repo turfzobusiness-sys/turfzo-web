@@ -44,6 +44,8 @@ export interface Turf {
   status?: "pending" | "approved" | "rejected" | "active" | "inactive";
   /** Minutes east of UTC for the turf's local day (backend default 330). */
   timezone_offset_minutes?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface AppUser {

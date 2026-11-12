@@ -17,7 +17,6 @@ import {
   ExternalLink,
   Loader2,
   Mail,
-  Phone,
   RefreshCw,
   ShieldCheck,
   Smartphone,
@@ -804,18 +803,18 @@ export default function OwnerDashboardPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-1 text-xs font-sans">
               <a
-                href="mailto:partners@turfzo.com"
+                href="mailto:owners@turfzo.app"
                 className="inline-flex items-center gap-1.5 text-brand-text hover:underline"
               >
                 <Mail className="h-4 w-4 text-brand-lime" />
-                partners@turfzo.com
+                owners@turfzo.app
               </a>
               <a
-                href="tel:+918042424242"
+                href="mailto:partnerships@turfzo.app"
                 className="inline-flex items-center gap-1.5 text-brand-text hover:underline"
               >
-                <Phone className="h-4 w-4 text-brand-lime" />
-                +91 80 4242 4242
+                <Mail className="h-4 w-4 text-brand-lime" />
+                partnerships@turfzo.app
               </a>
             </div>
           </div>

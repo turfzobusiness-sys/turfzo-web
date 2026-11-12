@@ -1,12 +1,12 @@
-Contact: mailto:security@turfzo.com
+Contact: mailto:security@turfzo.app
 Expires: 2027-12-31T23:59:59z
 Preferred-Languages: en
-Canonical: https://turfzo.com/.well-known/security.txt
+Canonical: https://turfzo.app/.well-known/security.txt
 
 # Responsible Disclosure Policy
 
 We take security seriously. If you discover a vulnerability, please report
-it to security@turfzo.com with the subject "Security Disclosure".
+it to security@turfzo.app with the subject "Security Disclosure".
 
 We will:
 - Acknowledge your report within 48 hours

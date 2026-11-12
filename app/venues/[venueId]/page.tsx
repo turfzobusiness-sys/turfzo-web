@@ -7,7 +7,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { BreadcrumbListSchema, SportsActivityLocationSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
-import { VENUE_PAGES_INDEXABLE, isTestVenue } from "@/lib/seo";
+import { VENUE_PAGES_INDEXABLE, buildOpenGraph, isTestVenue } from "@/lib/seo";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import type { Turf } from "@/lib/types";
 import { getLocalTurfImage } from "@/lib/turf-images";
@@ -27,28 +27,36 @@ const getTurf = cache((turfId: string) =>
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { venueId } = await params;
+  let turf: Turf | null = null;
   try {
-    const turf = await getTurf(venueId);
-    if (!turf) return { title: "Venue Not Found" };
+    turf = await getTurf(venueId);
+  } catch {
+    turf = null;
+  }
+  if (!turf) notFound();
 
-    const sport = turf.sport_type || "Sports";
-    const city = turf.city || "India";
-    const title = `${turf.name} — ${sport} Turf in ${city}`;
-    const description = `Book ${turf.name} for ${sport} in ${city}. See hourly rates, amenities and live slot availability. Starts at ₹${turf.price_per_hour}/hr.`;
-    // Testing phase: no real partner venues yet. Keep venue pages out of the
-    // index, and never index a seed venue even after the flag flips.
-    const indexable = VENUE_PAGES_INDEXABLE && !isTestVenue(turf);
+  const sport = turf.sport_type || "Sports";
+  const city = turf.city || "India";
+  const title = `${turf.name} — ${sport} Turf in ${city}`;
+  const description = `Book ${turf.name} for ${sport} in ${city}. See hourly rates, amenities and live slot availability. Starts at ₹${turf.price_per_hour}/hr.`;
+  // Testing phase: no real partner venues yet. Keep venue pages out of the
+  // index, and never index a seed venue even after the flag flips.
+  const indexable = VENUE_PAGES_INDEXABLE && !isTestVenue(turf);
 
-    return {
+  return {
+    title,
+    description,
+    keywords: [`${turf.name}`, `${sport} turf ${city}`, `book ${turf.name}`, `turf booking near me`],
+    alternates: { canonical: `https://turfzo.app/venues/${venueId}` },
+    robots: indexable ? undefined : { index: false, follow: true },
+    openGraph: buildOpenGraph({
       title,
       description,
-      keywords: [`${turf.name}`, `${sport} turf ${city}`, `book ${turf.name}`, `turf booking near me`],
-      alternates: { canonical: `https://turfzo.app/venues/${venueId}` },
-      robots: indexable ? undefined : { index: false, follow: true },
-    };
-  } catch {
-    return { title: "Venue Not Found" };
-  }
+      url: `https://turfzo.app/venues/${venueId}`,
+      image: getLocalTurfImage(turf),
+      alt: `${turf.name} — ${sport} turf in ${city}`,
+    }),
+  };
 }
 
 export default async function VenuePage({ params, searchParams }: Props) {
@@ -107,10 +115,21 @@ export default async function VenuePage({ params, searchParams }: Props) {
       ]} />
       <SportsActivityLocationSchema
         name={turf.name}
-        description={`Online booking for ${turf.name}. Play ${sport} in ${city}.`}
+        description={turf.description?.trim() || `Online booking for ${turf.name}. Play ${sport} in ${city}.`}
         address={{ streetAddress: turf.address || "", addressLocality: city, addressRegion: turf.state || "", postalCode: turf.zip_code || "" }}
+        geo={
+          typeof turf.latitude === "number" && typeof turf.longitude === "number"
+            ? { latitude: turf.latitude, longitude: turf.longitude }
+            : undefined
+        }
         sportType={sport}
         pricePerHour={turf.price_per_hour || 1000}
+        rating={typeof turf.rating === "number" && turf.rating > 0 ? turf.rating : undefined}
+        reviewCount={
+          typeof turf.review_count === "number" && turf.review_count > 0
+            ? turf.review_count
+            : undefined
+        }
         image={venueImage}
         openingHours={venueOpeningHours}
       />
@@ -138,6 +157,11 @@ export default async function VenuePage({ params, searchParams }: Props) {
             <div className="lg:col-span-2 flex flex-col gap-8">
               <div className="bg-surface border border-border-default rounded-xl p-6 shadow-sm">
                 <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mb-4">About Venue</h2>
+                {turf.description && (
+                  <p className="text-text-muted text-sm leading-relaxed mb-6">
+                    {turf.description}
+                  </p>
+                )}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm mb-6">
                   <div>
                     <span className="text-text-muted text-xs block mb-1">Sport</span>
@@ -175,6 +199,26 @@ export default async function VenuePage({ params, searchParams }: Props) {
                   {turf.has_free_parking && (
                     <span key="parking" className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">
                       <CheckCircle2 className="w-3 h-3 text-brand-lime" /> Free Parking
+                    </span>
+                  )}
+                  {turf.has_changing_room && (
+                    <span key="changing-room" className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3 h-3 text-brand-lime" /> Changing Rooms
+                    </span>
+                  )}
+                  {turf.has_drinking_water && (
+                    <span key="water" className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3 h-3 text-brand-lime" /> Drinking Water
+                    </span>
+                  )}
+                  {turf.has_first_aid && (
+                    <span key="first-aid" className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3 h-3 text-brand-lime" /> First Aid
+                    </span>
+                  )}
+                  {turf.is_indoor && (
+                    <span key="indoor" className="bg-elevated px-3 py-1.5 rounded-md text-xs text-text-main font-medium flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3 h-3 text-brand-lime" /> Indoor Arena
                     </span>
                   )}
                 </div>

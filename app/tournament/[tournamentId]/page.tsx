@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { cache } from "react";
 import {
   MapPin,
   CalendarDays,
@@ -13,10 +14,11 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { BreadcrumbListSchema } from "@/lib/schema";
+import { BreadcrumbListSchema, SportsEventSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
 import { isViewOnlyMode } from "@/lib/env";
 import { getLocalTournamentImage } from "@/lib/turf-images";
+import { buildOpenGraph } from "@/lib/seo";
 
 type Props = { params: Promise<{ tournamentId: string }> };
 
@@ -39,9 +41,17 @@ interface TournamentDoc {
   rules?: string;
   image_url?: string;
   turf_id?: string;
+  venue?: string;
+  city?: string | null;
   organizer_id: string;
   created_at: string;
 }
+
+const getTournament = cache((tournamentId: string) =>
+  convexClient.query<TournamentDoc | null>("tournaments:getTournamentById", {
+    tournamentId,
+  }),
+);
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -80,28 +90,28 @@ function isRegistrationClosed(t: {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { tournamentId } = await params;
+  let t: TournamentDoc | null = null;
   try {
-    const t = await convexClient.query<TournamentDoc>(
-      "tournaments:getTournamentById",
-      { tournamentId },
-    );
-    if (!t) return { title: "Tournament Not Found" };
-    const title = `${t.name} — ${t.sport_type} Tournament`;
-    const description = `${t.name} — ${t.tournament_type} tournament. Entry ₹${t.entry_fee}, prize pool ${t.prize_pool ? `₹${t.prize_pool.toLocaleString()}` : "Trophy"}. Register on the Turfzo app.`;
-    return {
+    t = await getTournament(tournamentId);
+  } catch {
+    t = null;
+  }
+  if (!t) notFound();
+
+  const title = `${t.name} — ${t.sport_type} Tournament`;
+  const description = `${t.name} — ${t.tournament_type} tournament. Entry ₹${t.entry_fee}, prize pool ${t.prize_pool ? `₹${t.prize_pool.toLocaleString()}` : "Trophy"}. Register on the Turfzo app.`;
+  return {
+    title,
+    description,
+    openGraph: buildOpenGraph({
       title,
       description,
-      openGraph: {
-        title,
-        description,
-        type: "website",
-        images: t.image_url ? [{ url: t.image_url }] : undefined,
-      },
-      alternates: { canonical: `https://turfzo.app/tournament/${tournamentId}` },
-    };
-  } catch {
-    return { title: "Tournament Not Found" };
-  }
+      url: `https://turfzo.app/tournament/${tournamentId}`,
+      image: t.image_url,
+      alt: title,
+    }),
+    alternates: { canonical: `https://turfzo.app/tournament/${tournamentId}` },
+  };
 }
 
 export default async function TournamentPage({ params }: Props) {
@@ -109,10 +119,7 @@ export default async function TournamentPage({ params }: Props) {
 
   let tournament: TournamentDoc | null = null;
   try {
-    tournament = await convexClient.query<TournamentDoc>(
-      "tournaments:getTournamentById",
-      { tournamentId },
-    );
+    tournament = await getTournament(tournamentId);
   } catch (err) {
     console.error("Failed to fetch tournament:", err);
   }
@@ -135,18 +142,28 @@ export default async function TournamentPage({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <link
-          rel="canonical"
-          href={`https://turfzo.app/tournament/${tournamentId}`}
-        />
-      </head>
       <BreadcrumbListSchema
         items={[
           { name: "Home", url: "https://turfzo.app" },
           { name: "Tournaments", url: "https://turfzo.app/tournaments" },
           { name: tournament.name, url: `https://turfzo.app/tournament/${tournamentId}` },
         ]}
+      />
+      <SportsEventSchema
+        name={tournament.name}
+        description={
+          tournament.description?.trim() ||
+          `${tournament.name} — ${tournament.sport_type} ${tournament.tournament_type} tournament on Turfzo.`
+        }
+        startDate={tournament.start_date}
+        endDate={tournament.end_date}
+        url={`https://turfzo.app/tournament/${tournamentId}`}
+        sport={tournament.sport_type}
+        entryFee={tournament.entry_fee}
+        image={`https://turfzo.app${tournamentImage}`}
+        eventStatus={tournament.status}
+        locationName={tournament.venue}
+        city={tournament.city}
       />
       <Header />
 

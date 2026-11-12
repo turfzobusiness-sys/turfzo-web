@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   Search,
   Calendar,
@@ -15,7 +12,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { FAQPageSchema, ArticleSchema, HowToSchema } from "@/lib/schema";
+import { FAQPageSchema, ArticleSchema, HowToSchema, BreadcrumbListSchema } from "@/lib/schema";
 
 const faqItems = [
   {
@@ -101,6 +98,13 @@ const steps = [
 export default function HowToBookTurfOnline() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
+      <BreadcrumbListSchema
+        items={[
+          { name: "Home", url: "https://turfzo.app" },
+          { name: "Blog", url: "https://turfzo.app/blog" },
+          { name: "How to Book a Turf Online", url: "https://turfzo.app/blog/how-to-book-turf-online" },
+        ]}
+      />
       <ArticleSchema
         name="How to Book a Turf Online in 2 Minutes [Step-by-Step Guide]"
         description="Step-by-step guide to booking a football turf online in 2 minutes."
@@ -133,11 +137,7 @@ export default function HowToBookTurfOnline() {
             <span className="text-text-main">How to Book a Turf Online</span>
           </nav>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
-          >
+          <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-brand-lime/10 text-brand-lime font-sans font-bold text-[10px] px-2.5 py-1 rounded-md">How-To</span>
               <span className="text-[10px] text-text-muted font-sans">May 2026 · 4 min read</span>
@@ -152,7 +152,7 @@ export default function HowToBookTurfOnline() {
               <span>By Turfzo Team</span>
               <span>Updated May 2026</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* Quick Answer */}
           <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">
@@ -171,11 +171,8 @@ export default function HowToBookTurfOnline() {
               {steps.map((step, idx) => {
                 const Icon = step.icon;
                 return (
-                  <motion.div
+                  <div
                     key={idx}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: idx * 0.1 }}
                     className="bg-surface border border-border-subtle hover:border-brand-lime/10 rounded-md p-6 flex gap-5 transition-all duration-300"
                   >
                     <div className="w-12 h-12 rounded-full bg-brand-lime/10 flex items-center justify-center text-brand-lime border border-brand-lime/10 shrink-0">
@@ -195,7 +192,7 @@ export default function HowToBookTurfOnline() {
                         💡 {step.tip}
                       </p>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>

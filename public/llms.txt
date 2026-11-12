@@ -1,27 +1,57 @@
-# Turfzo - Turf Booking Platform
-# https://turfzo.com
+# Turfzo — Turf & Sports Venue Booking Platform
+> Book football turfs, cricket grounds, badminton courts, and tennis venues across India with real-time slot availability and transparent per-hour pricing.
+
+Canonical URL: https://turfzo.app
 
 ## Core Pages
-- Home: https://turfzo.com
-- Explore Turfs: https://turfzo.com/explore
-- How It Works: https://turfzo.com/how-it-works
-- Contact: https://turfzo.com/contact
+- Home: https://turfzo.app/
+- Explore & Book Turfs: https://turfzo.app/explore
+- How It Works: https://turfzo.app/how-it-works
+- Tournaments: https://turfzo.app/tournaments
+- List Your Turf (Venue Owners): https://turfzo.app/owners
+- About Turfzo: https://turfzo.app/about
+- Contact & Support: https://turfzo.app/contact
 
-## City Pages
-- Bangalore: https://turfzo.com/cities/bangalore
-- Mumbai: https://turfzo.com/cities/mumbai
-- Delhi: https://turfzo.com/cities/delhi
-- Hyderabad: https://turfzo.com/cities/hyderabad
-- Pune: https://turfzo.com/cities/pune
+## Browse by Sport
+- Football Turfs: https://turfzo.app/sports/football
+- Cricket Grounds & Nets: https://turfzo.app/sports/cricket
+- Badminton Courts: https://turfzo.app/sports/badminton
+- Tennis Courts: https://turfzo.app/sports/tennis
+- Multipurpose Venues: https://turfzo.app/sports/multipurpose
 
-## Sports Pages
-- Football: https://turfzo.com/sports/football
-- Cricket: https://turfzo.com/sports/cricket
-- Badminton: https://turfzo.com/sports/badminton
+## Browse by City (Live Availability)
+- Bangalore: https://turfzo.app/explore?city=bangalore
+- Mumbai: https://turfzo.app/explore?city=mumbai
+- Delhi: https://turfzo.app/explore?city=delhi
+- Hyderabad: https://turfzo.app/explore?city=hyderabad
+- Pune: https://turfzo.app/explore?city=pune
+- Chennai: https://turfzo.app/explore?city=chennai
+- Kolkata: https://turfzo.app/explore?city=kolkata
+- Ahmedabad: https://turfzo.app/explore?city=ahmedabad
+- Aurangabad: https://turfzo.app/explore?city=aurangabad
 
-## Tournaments
-- Tournaments: https://turfzo.com/tournaments
+## Guides & Blog
+- Blog Index: https://turfzo.app/blog
+- How to Book a Turf Online in India: https://turfzo.app/blog/how-to-book-turf-online
+- Turf Booking Price in India (2026 Guide): https://turfzo.app/blog/turf-booking-price-india
+- Football Turf Booking in Bangalore: https://turfzo.app/blog/best-football-turfs-bangalore
+- Turf vs Ground Comparison: https://turfzo.app/blog/turf-vs-ground
+- How to Book Football Turfs Instantly: https://turfzo.app/blog/book-football-turf-instantly
+- How to Organize Local Sports Tournaments: https://turfzo.app/blog/organize-local-sports-tournaments
+- Maximize Turf ROI with Smart Slot Management: https://turfzo.app/blog/maximize-turf-roi-booking-management
+- Future of Amateur Sports Infrastructure in India: https://turfzo.app/blog/future-of-amateur-sports-india
+- Turf Quality & Injury Prevention Guide: https://turfzo.app/blog/turf-vs-ground-injury-prevention
 
-## API
-- Turfs query: convex query turfs:getAvailable
-- Auth: convex action auth:syncFirebaseUser
+## Legal & Policies
+- Terms of Service: https://turfzo.app/terms
+- Privacy Policy: https://turfzo.app/privacy
+- Refund & Cancellation Policy: https://turfzo.app/refund-policy
+
+## Platform Facts
+- Sports supported: Football, Cricket, Badminton, Tennis, Multipurpose venues.
+- Booking pricing: Hourly rates set by each venue (INR/hr), plus a flat 5% platform service fee shown upfront before checkout.
+- Cancellation policy: 100% slot refund 24+ hours before start, 50% slot refund 6-24 hours before start, non-refundable under 6 hours (platform service fee is retained).
+- Venue owners: Free to list (₹0 monthly subscription); 95% owner payout / 5% platform commission on completed bookings, with 24-hour payout turnaround via UPI or bank transfer.
+
+## Extended Reference
+- Full summary: https://turfzo.app/llms-full.txt

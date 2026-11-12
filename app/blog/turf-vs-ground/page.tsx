@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   CheckCircle2,
   ArrowRight,
@@ -10,7 +7,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { FAQPageSchema, ArticleSchema } from "@/lib/schema";
+import { FAQPageSchema, ArticleSchema, BreadcrumbListSchema } from "@/lib/schema";
 
 const faqItems = [
   {
@@ -61,6 +58,13 @@ const comparisonData = [
 export default function TurfVsGround() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
+      <BreadcrumbListSchema
+        items={[
+          { name: "Home", url: "https://turfzo.app" },
+          { name: "Blog", url: "https://turfzo.app/blog" },
+          { name: "Turf vs Ground", url: "https://turfzo.app/blog/turf-vs-ground" },
+        ]}
+      />
       <ArticleSchema
         name="Turf vs Ground: Which is Better for Football?"
         description="Complete comparison of turf vs natural ground for football including cost, playability, injury risk, and availability."
@@ -87,11 +91,7 @@ export default function TurfVsGround() {
             <span className="text-text-main">Turf vs Ground</span>
           </nav>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
-          >
+          <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-brand-lime/10 text-brand-lime font-sans font-bold text-[10px] px-2.5 py-1 rounded-md">Comparison</span>
               <span className="text-[10px] text-text-muted font-sans">May 2026 · 5 min read</span>
@@ -106,7 +106,7 @@ export default function TurfVsGround() {
               <span>By Turfzo Team</span>
               <span>Updated May 2026</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* Quick Answer */}
           <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">

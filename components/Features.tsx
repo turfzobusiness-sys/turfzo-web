@@ -44,10 +44,22 @@ const STATS = [
 ];
 
 const IMAGES = [
-  "/feature_verified.jpg",
-  "/feature_instant.jpg",
-  "/feature_zero_fees.jpg",
-  "/feature_refunds.jpg"
+  {
+    src: "/feature_verified.jpg",
+    alt: "Verified artificial football turf pitch inspected for lighting and surface quality",
+  },
+  {
+    src: "/feature_instant.jpg",
+    alt: "Real-time hourly turf slot booking and instant confirmation",
+  },
+  {
+    src: "/feature_zero_fees.jpg",
+    alt: "Transparent per-hour sports venue pricing shown upfront at checkout",
+  },
+  {
+    src: "/feature_refunds.jpg",
+    alt: "Flexible booking cancellation and automated refund timeline",
+  },
 ];
 
 export default function Features() {
@@ -78,7 +90,7 @@ export default function Features() {
 
             {/* DYNAMIC AESTHETIC IMAGE SLIDESHOW */}
             <div className="relative h-60 sm:h-72 w-full rounded-md border border-border-default overflow-hidden bg-surface">
-              {IMAGES.map((src, idx) => (
+              {IMAGES.map((img, idx) => (
                 <div
                   key={idx}
                   className={cn(
@@ -89,8 +101,8 @@ export default function Features() {
                   )}
                 >
                   <Image
-                    src={src}
-                    alt={`Feature preview ${idx + 1}`}
+                    src={img.src}
+                    alt={img.alt}
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover"

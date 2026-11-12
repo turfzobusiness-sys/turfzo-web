@@ -5,7 +5,9 @@ import { MapPin, ChevronRight } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
-import { CITY_PAGES_INDEXABLE } from "@/lib/seo";
+import { buildOpenGraph, isCityIndexable } from "@/lib/seo";
+
+export const revalidate = 300;
 
 /** Geography only — see app/cities/[city]/page.tsx for why the venue counts
  *  and average prices were removed. */
@@ -36,18 +38,26 @@ type Props = { params: Promise<{ city: string; sport: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { city, sport } = await params;
   const data = CITY_DATA[city.toLowerCase()];
-  if (!data || !SPORTS.includes(sport.toLowerCase())) return { title: "Not Found" };
+  if (!data || !SPORTS.includes(sport.toLowerCase())) notFound();
   const formattedSport = sport.charAt(0).toUpperCase() + sport.slice(1);
 
+  const indexable = await isCityIndexable(city);
+  const title = `Book ${formattedSport} Turfs in ${data.name} — Prices & Areas`;
+  const description = `Looking for ${formattedSport.toLowerCase()} in ${data.name}? See every Turfzo listing's hourly rate, amenities and live slot availability, then book online.`;
+
   return {
-    title: `Book ${formattedSport} Turfs in ${data.name} — Prices & Areas`,
+    title,
     // No invented "starting at ₹X/hr" and no venue count.
-    description: `Looking for ${formattedSport.toLowerCase()} in ${data.name}? See every Turfzo listing's hourly rate, amenities and live slot availability, then book online.`,
+    description,
     keywords: [`${sport} turf booking ${data.name}`, `book ${sport} turf ${data.name}`, `${sport} ground ${data.name}`, `${data.name} ${sport} venue`],
     alternates: { canonical: `https://turfzo.app/cities/${city}/${sport}` },
-    // Testing phase: no real inventory yet, so keep the page out of the index
-    // rather than teach Google it is a thin doorway (see lib/seo.ts).
-    robots: CITY_PAGES_INDEXABLE ? undefined : { index: false, follow: true },
+    // Auto-indexes per city once Convex has 1+ real non-mock venue in that city.
+    robots: indexable ? undefined : { index: false, follow: true },
+    openGraph: buildOpenGraph({
+      title,
+      description,
+      url: `https://turfzo.app/cities/${city}/${sport}`,
+    }),
   };
 }
 
@@ -65,6 +75,8 @@ export default async function CitySportPage({ params }: Props) {
   const { city, sport } = await params;
   const data = CITY_DATA[city.toLowerCase()];
   if (!data || !SPORTS.includes(sport.toLowerCase())) notFound();
+
+  const indexable = await isCityIndexable(city);
 
   const formattedSport = sport.charAt(0).toUpperCase() + sport.slice(1);
 
@@ -119,7 +131,7 @@ export default async function CitySportPage({ params }: Props) {
             </div>
           </div>
 
-          {!CITY_PAGES_INDEXABLE && (
+          {!indexable && (
             <div className="mb-10 rounded-xl border border-brand-lime/30 bg-brand-lime/5 p-5 text-sm font-sans text-text-main">
               <span className="font-bold">
                 Turfzo is onboarding {formattedSport.toLowerCase()} venues in {data.name}.

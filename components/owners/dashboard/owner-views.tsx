@@ -30,7 +30,6 @@ import {
   Pencil,
   Pause,
   PauseCircle,
-  Phone,
   Plus,
   Play,
   Share2,
@@ -1419,18 +1418,18 @@ export function SupportView() {
         />
         <div className="flex flex-col sm:flex-row gap-4 text-xs font-sans">
           <a
-            href="mailto:partners@turfzo.com"
+            href="mailto:owners@turfzo.app"
             className="inline-flex items-center gap-2 text-brand-text hover:underline"
           >
             <Mail className="h-4 w-4" />
-            partners@turfzo.com
+            owners@turfzo.app
           </a>
           <a
-            href="tel:+918042424242"
+            href="mailto:partnerships@turfzo.app"
             className="inline-flex items-center gap-2 text-brand-text hover:underline"
           >
-            <Phone className="h-4 w-4" />
-            +91 80 4242 4242
+            <Mail className="h-4 w-4" />
+            partnerships@turfzo.app
           </a>
         </div>
       </Box>

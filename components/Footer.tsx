@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Mail, Phone, MapPin, ArrowRight, Check } from "lucide-react";
+import { Mail, MapPin, ArrowRight, Check } from "lucide-react";
 
 // Local SVG Brand Icons
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -54,10 +54,11 @@ export default function Footer() {
   ];
 
   const exploreLinks = [
-    { name: "Football Grounds", href: "/explore?sport=football" },
-    { name: "Cricket Nets", href: "/explore?sport=cricket" },
-    { name: "Badminton Courts", href: "/explore?sport=badminton" },
-    { name: "Tennis Courts", href: "/explore?sport=tennis" },
+    { name: "Football Turfs", href: "/sports/football" },
+    { name: "Cricket Grounds", href: "/sports/cricket" },
+    { name: "Badminton Courts", href: "/sports/badminton" },
+    { name: "Tennis Courts", href: "/sports/tennis" },
+    { name: "Tournaments", href: "/tournaments" },
   ];
 
   const supportLinks = [
@@ -131,9 +132,9 @@ export default function Footer() {
               <ul className="flex flex-col gap-2.5">
                 {companyLinks.map((link) => (
                   <li key={link.name}>
-                    <a href={link.href} className="text-sm font-sans text-text-muted hover:text-text-main transition-colors">
+                    <Link href={link.href} className="text-sm font-sans text-text-muted hover:text-text-main transition-colors">
                       {link.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -147,9 +148,9 @@ export default function Footer() {
               <ul className="flex flex-col gap-2.5">
                 {exploreLinks.map((link) => (
                   <li key={link.name}>
-                    <a href={link.href} className="text-sm font-sans text-text-muted hover:text-text-main transition-colors">
+                    <Link href={link.href} className="text-sm font-sans text-text-muted hover:text-text-main transition-colors">
                       {link.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -163,9 +164,9 @@ export default function Footer() {
               <ul className="flex flex-col gap-2.5">
                 {supportLinks.map((link) => (
                   <li key={link.name}>
-                    <a href={link.href} className="text-sm font-sans text-text-muted hover:text-text-main transition-colors">
+                    <Link href={link.href} className="text-sm font-sans text-text-muted hover:text-text-main transition-colors">
                       {link.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -185,16 +186,13 @@ export default function Footer() {
                 </span>
               </li>
               <li className="flex items-center gap-3 text-sm text-text-muted">
-                <Phone className="w-4 h-4 text-text-muted shrink-0 stroke-[1.5]" />
-                <span className="font-sans">
-                  +91 (80) 4567-8900
-                </span>
-              </li>
-              <li className="flex items-center gap-3 text-sm text-text-muted">
                 <Mail className="w-4 h-4 text-text-muted shrink-0 stroke-[1.5]" />
-                <span className="font-sans hover:text-text-main transition-colors cursor-pointer">
+                <a
+                  href="mailto:support@turfzo.app"
+                  className="font-sans hover:text-text-main transition-colors"
+                >
                   support@turfzo.app
-                </span>
+                </a>
               </li>
             </ul>
 
@@ -221,10 +219,10 @@ export default function Footer() {
         {/* Bottom Bar: Copyright & Terms */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans text-text-muted">
           <span>
-            © {currentYear} Turfzo Technologies Pvt Ltd. All rights reserved.
+            © {currentYear} Turfzo Sports Technologies Pvt. Ltd. All rights reserved.
           </span>
           <div className="flex items-center gap-6">
-            <a href="/terms" className="hover:text-text-main transition-colors">Terms of Service</a>
+            <Link href="/terms" className="hover:text-text-main transition-colors">Terms of Service</Link>
             <a href="/sitemap.xml" className="hover:text-text-main transition-colors">Sitemap</a>
           </div>
         </div>

@@ -207,15 +207,6 @@ export default function HowItWorksPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>How It Works | Book a Turf in 2 Minutes | Turfzo</title>
-        <meta name="description" content="Learn how to book a football turf, cricket ground, or sports venue on Turfzo. Search, select your slot, pay online, and show up to play. It takes 2 minutes." />
-        <link rel="canonical" href="https://turfzo.app/how-it-works" />
-        <meta property="og:title" content="How It Works | Turfzo" />
-        <meta property="og:description" content="Book a turf in 2 minutes. Search, pick a slot, pay online, and show up to play." />
-        <meta property="og:url" content="https://turfzo.app/how-it-works" />
-      </head>
-      
       <HowToSchema
         name="How to Book a Turf on Turfzo"
         description="Book a football turf, cricket ground, or sports venue in 2 minutes on Turfzo. Search, select your slot, pay online, and show up to play."
