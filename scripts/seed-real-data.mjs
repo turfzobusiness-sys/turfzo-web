@@ -30,7 +30,29 @@ if (!deploymentUrl) {
   process.exit(1);
 }
 
+// Refuse to touch production unless the operator says so explicitly. This
+// script uploads images and runs seeding mutations against whatever
+// .env.local names, and .env.local in this repo points at the production
+// deployment — so the default is the dangerous one.
+const PRODUCTION_DEPLOYMENT_MARKER = "dependable-donkey-330";
+const confirmedProduction = process.argv.includes("--confirm-production");
+
+if (deploymentUrl.includes(PRODUCTION_DEPLOYMENT_MARKER) && !confirmedProduction) {
+  console.error(
+    `\nRefusing to seed PRODUCTION deployment (${deploymentUrl}).\n\n` +
+      "This script uploads files and writes seed records. To run it against\n" +
+      "production anyway, re-run with:\n\n" +
+      "  npm run seed -- --confirm-production\n\n" +
+      "To seed a non-production deployment instead, point\n" +
+      "NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL in .env.local at that deployment.\n",
+  );
+  process.exit(1);
+}
+
 console.log(`Connecting to Convex deployment: ${deploymentUrl}`);
+if (confirmedProduction) {
+  console.log("PRODUCTION target confirmed via --confirm-production.");
+}
 
 // Helper to invoke a Convex function
 async function invokeConvex(type, funcPath, args = {}) {
