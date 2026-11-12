@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tournaments | Turfzo",
+  title: "Tournaments — Host & Join",
   description: "Discover and register for upcoming sports tournaments in your city.",
   alternates: { canonical: "https://turfzo.app/tournaments" },
 };

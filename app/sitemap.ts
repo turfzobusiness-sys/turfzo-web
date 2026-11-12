@@ -1,5 +1,10 @@
 import { MetadataRoute } from "next";
 import { convexClient } from "@/lib/convex";
+import {
+  CITY_PAGES_INDEXABLE,
+  VENUE_PAGES_INDEXABLE,
+  isTestVenue,
+} from "@/lib/seo";
 import type { Turf } from "@/lib/types";
 
 const SITE_URL = "https://turfzo.app";
@@ -30,7 +35,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/explore`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.9 },
     { url: `${SITE_URL}/how-it-works`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${SITE_URL}/owners`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${SITE_URL}/owners/register`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${SITE_URL}/tournaments`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
     { url: `${SITE_URL}/contact`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
@@ -46,22 +50,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  const cityPages = CITIES.map((city) => ({
-    url: `${SITE_URL}/cities/${city}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.9,
-  }));
-
-  const citySportPages = [];
-  for (const city of CITIES) {
-    for (const sport of SPORTS) {
-      citySportPages.push({
-        url: `${SITE_URL}/cities/${city}/${sport}`,
+  // Testing phase: city pages are noindex until a city has a real, bookable
+  // venue (see lib/seo.ts). A sitemap must only list indexable URLs, so keep
+  // them out while the flag is false.
+  const cityPages: MetadataRoute.Sitemap = CITY_PAGES_INDEXABLE
+    ? CITIES.map((city) => ({
+        url: `${SITE_URL}/cities/${city}`,
         lastModified: new Date(),
         changeFrequency: "weekly" as const,
-        priority: 0.8,
-      });
+        priority: 0.9,
+      }))
+    : [];
+
+  const citySportPages: MetadataRoute.Sitemap = [];
+  if (CITY_PAGES_INDEXABLE) {
+    for (const city of CITIES) {
+      for (const sport of SPORTS) {
+        citySportPages.push({
+          url: `${SITE_URL}/cities/${city}/${sport}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly" as const,
+          priority: 0.8,
+        });
+      }
     }
   }
 
@@ -70,23 +81,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // build time, an empty base URL would self-fetch the Next server ("/api/query")
   // and return zero venues — so skip venue URLs with a LOUD warning instead of
   // silently producing a sitemap that looks complete but is missing venues.
-  let venuePages: { url: string; lastModified: Date; changeFrequency: "daily"; priority: number }[] = [];
+  let venuePages: MetadataRoute.Sitemap = [];
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL ?? "";
-  if (!convexUrl) {
+  if (!VENUE_PAGES_INDEXABLE) {
+    // Testing phase: no real partner venues yet. Venue pages also send
+    // noindex (see app/venues/[venueId]/page.tsx).
+  } else if (!convexUrl) {
     console.warn(
       "[sitemap] NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL is empty at build time — " +
-        "returning static/blog/city routes ONLY. Venue pages are OMITTED " +
+        "returning non-venue routes ONLY. Venue pages are OMITTED " +
         "(incomplete by design, not silently complete)."
     );
   } else {
     try {
       const turfs = await convexClient.query<Turf[]>("turfs:getAvailable", {});
-      venuePages = turfs.map((turf) => ({
-        url: `${SITE_URL}/venues/${turf._id}`,
-        lastModified: new Date(),
-        changeFrequency: "daily" as const,
-        priority: 0.8,
-      }));
+      venuePages = turfs
+        .filter((turf) => !isTestVenue(turf))
+        .map((turf) => ({
+          url: `${SITE_URL}/venues/${turf._id}`,
+          lastModified: new Date(),
+          changeFrequency: "daily" as const,
+          priority: 0.8,
+        }));
     } catch (error) {
       console.error("Failed to fetch turfs for sitemap:", error);
     }

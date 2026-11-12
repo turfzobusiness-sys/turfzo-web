@@ -86,7 +86,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       { tournamentId },
     );
     if (!t) return { title: "Tournament Not Found" };
-    const title = `${t.name} | ${t.sport_type} Tournament | Turfzo`;
+    const title = `${t.name} — ${t.sport_type} Tournament`;
     const description = `${t.name} — ${t.tournament_type} tournament. Entry ₹${t.entry_fee}, prize pool ${t.prize_pool ? `₹${t.prize_pool.toLocaleString()}` : "Trophy"}. Register on the Turfzo app.`;
     return {
       title,

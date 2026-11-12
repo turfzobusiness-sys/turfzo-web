@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Explore Turfs Near You | Book Football, Cricket & More | Turfzo",
+  title: "Explore Turfs Near You — Book by City & Sport",
   description:
-    "Browse 50+ verified football turfs, cricket grounds, and sports venues across India. Filter by sport, price, and amenities. Real-time availability, instant booking, and secure online payment.",
+    "Browse football turfs, cricket grounds, badminton courts and tennis venues across India on Turfzo. Filter by city, sport and price, then book an available slot online.",
   alternates: {
     canonical: "https://turfzo.app/explore",
   },
   openGraph: {
-    title: "Explore Turfs Near You | Turfzo",
+    title: "Explore Turfs Near You",
     description:
-      "Browse 50+ verified turfs across India. Book football, cricket, badminton, and tennis venues instantly.",
+      "Browse football, cricket, badminton and tennis venues across India. Filter by city, sport and price.",
     url: "https://turfzo.app/explore",
     type: "website",
   },

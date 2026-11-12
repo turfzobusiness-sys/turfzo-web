@@ -201,7 +201,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Post Not Found" };
 
   return {
-    title: `${post.title} | Turfzo Blog`,
+    title: { absolute: `${post.title} | Turfzo Blog` },
     description: post.excerpt,
     alternates: { canonical: `https://turfzo.app/blog/${slug}` },
     openGraph: {

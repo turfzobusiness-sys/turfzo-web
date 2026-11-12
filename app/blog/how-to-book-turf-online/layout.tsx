@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "How to Book Turf Online | Turfzo",
+  title: "How to Book Turf Online",
   description: "A step-by-step guide to booking your favorite sports turf online quickly and securely.",
   alternates: { canonical: "https://turfzo.app/blog/how-to-book-turf-online" },
 };

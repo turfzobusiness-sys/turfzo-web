@@ -4,7 +4,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Turfzo",
+  title: "Terms of Service",
   description:
     "Terms of Service for using Turfzo — India's premium turf and sports venue booking platform.",
   alternates: { canonical: "https://turfzo.app/terms" },
