@@ -421,15 +421,15 @@ export default function Hero() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-[#09090b] text-white hover:bg-black/90 h-11 min-w-[135px] px-3.5 rounded-lg transition-all border border-white/10 shadow-sm shrink-0"
               >
-                <svg className="w-5 h-5 shrink-0 select-none" viewBox="0 0 16 16">
+                <svg className="w-5 h-5 shrink-0 select-none" viewBox="0 0 24 24" aria-hidden="true">
                   {/* Left Blue Segment */}
-                  <path fill="#00c0ff" d="M1 13.396V2.603L6.846 8 1 13.396z" />
-                  {/* Top Red Segment */}
-                  <path fill="#ff3c3c" d="M1.03 1.27l6.553 6.05 3.044-2.81L3.333.215C2.39-.341 1.231.24 1.03 1.27z" />
+                  <path fill="#4285F4" d="M1.337.924a1.486 1.486 0 0 0-.112.568v21.017c0 .217.045.419.124.6l11.155-11.087L1.337.924z" />
+                  {/* Top Green Segment */}
+                  <path fill="#34A853" d="M12.207 10.065l3.258-3.238L3.45.195a1.466 1.466 0 0 0-.946-.179l11.04 10.973z" />
                   {/* Right Yellow Segment */}
-                  <path fill="#ffb300" d="M14.222 9.374c1.037-.61 1.037-2.137 0-2.748L11.528 5.04 8.32 8l3.207 2.96z" />
-                  {/* Bottom Green Segment */}
-                  <path fill="#00e25b" d="M10.627 11.49L7.583 8.68 1.03 14.73c.201 1.029 1.36 1.61 2.303 1.055l7.294-4.275z" />
+                  <path fill="#FBBC04" d="M22.018 13.298l-3.919 2.218-3.515-3.493 3.543-3.521 3.891 2.202a1.49 1.49 0 0 1 0 2.594z" />
+                  {/* Bottom Red Segment */}
+                  <path fill="#EA4335" d="M12.207 12.132l-11 10.933c.298.036.612-.016.906-.183l13.324-7.54-3.23-3.21z" />
                 </svg>
                 <div className="flex flex-col items-start leading-none gap-0.5">
                   <span className="text-[8px] font-sans uppercase font-semibold text-white/75 tracking-tight whitespace-nowrap">Get it on</span>
@@ -439,12 +439,12 @@ export default function Hero() {
 
               {/* App Store (not yet live) */}
               <button
+                type="button"
                 onClick={() => setShowComingSoon(true)}
                 className="flex items-center gap-2 bg-[#09090b] text-white hover:bg-black/90 h-11 min-w-[135px] px-3.5 rounded-lg transition-all border border-white/10 shadow-sm shrink-0"
               >
-                <svg className="w-5 h-5 shrink-0 select-none" viewBox="0 0 24 24">
-                  <rect width="24" height="24" rx="5" fill="#007AFF" />
-                  <path fill="#ffffff" d="M12 5.5c-.3 0-.6.1-.8.4l-3.3 6.9c-.3.4-.1 1 .4 1.2.4.3 1 .1 1.2-.4l.7-1.4h5.6l.7 1.4c.2.3.5.5.8.5.2 0 .3 0 .5-.1.5-.3.6-.9.4-1.3l-3.3-6.9c-.2-.2-.5-.4-.8-.4zm-1.5 5.5l1.5-3.1 1.5 3.1h-3.0z" />
+                <svg className="w-5 h-5 shrink-0 select-none fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
                 </svg>
                 <div className="flex flex-col items-start leading-none gap-0.5">
                   <span className="text-[8px] font-sans uppercase font-semibold text-white/75 tracking-tight whitespace-nowrap">Download on the</span>
