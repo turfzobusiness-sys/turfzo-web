@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { MapPin, Info, ArrowLeft, ArrowRight, Loader2, IndianRupee, Layers, Clock, Users } from "lucide-react";
+import { MapPin, ArrowLeft, ArrowRight, Loader2, IndianRupee, Layers, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/ui/image-uploader";
 

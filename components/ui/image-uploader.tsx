@@ -129,7 +129,7 @@ export function ImageUploader({ value = [], onChange, maxFiles = 5, className }:
         <div className="flex flex-col items-center text-center space-y-3 pointer-events-none">
           {isUploading ? (
             <>
-              <Loader2 className="w-10 h-10 text-brand-lime animate-spin" />
+              <Loader2 className="w-10 h-10 text-brand-text animate-spin" />
               <div className="space-y-1">
                 <p className="font-sans font-medium text-text-main">Uploading images...</p>
                 <p className="font-sans text-xs text-text-muted">Please wait</p>
@@ -138,7 +138,7 @@ export function ImageUploader({ value = [], onChange, maxFiles = 5, className }:
           ) : (
             <>
               <div className="w-12 h-12 rounded-full bg-brand-lime/10 flex items-center justify-center">
-                <UploadCloud className="w-6 h-6 text-brand-lime" />
+                <UploadCloud className="w-6 h-6 text-brand-text" />
               </div>
               <div className="space-y-1">
                 <p className="font-sans font-medium text-text-main">
@@ -185,6 +185,7 @@ function ImagePreview({ storageId, onRemove }: { storageId: string; onRemove: ()
   return (
     <div className="group relative aspect-video rounded-lg overflow-hidden border border-border-default bg-surface flex items-center justify-center">
       {url ? (
+        // eslint-disable-next-line @next/next/no-img-element -- preview of a just-uploaded Convex storage URI (or a local blob: URL); next/image cannot optimize blob: and this is not an LCP element.
         <img src={url} alt="Uploaded venue" className="w-full h-full object-cover" />
       ) : (
         <Loader2 className="w-5 h-5 text-text-muted animate-spin" />

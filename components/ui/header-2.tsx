@@ -199,7 +199,7 @@ export function Header() {
                 scrolled && !open ? "text-lg lg:text-xl" : "text-xl lg:text-2xl"
               )}
             >
-              turf<span className="text-brand-lime">zo</span>
+              turf<span className="text-brand-text">zo</span>
             </span>
           </Link>
 
@@ -228,19 +228,19 @@ export function Header() {
             })}
             {isAuthed && (
               <Link
-                href="/tournaments/manage"
-                aria-current={isActive(pathname, "/tournaments/manage") ? "page" : undefined}
+                href="/owners/dashboard"
+                aria-current={isActive(pathname, "/owners/dashboard") ? "page" : undefined}
                 className={cn(
                   "relative flex shrink-0 items-center justify-center whitespace-nowrap font-sans font-medium rounded-full transition-all duration-200",
                   scrolled && !open
                     ? "h-8 px-3 text-[13px]"
                     : "h-11 px-4 text-sm",
-                  isActive(pathname, "/tournaments/manage")
+                  isActive(pathname, "/owners/dashboard")
                     ? "text-text-main bg-elevated font-semibold shadow-2xs"
                     : "text-text-muted hover:text-text-main hover:bg-elevated/60"
                 )}
               >
-                My Tournaments
+                Owner Dashboard
               </Link>
             )}
           </div>
@@ -400,10 +400,10 @@ export function Header() {
             })}
             {isAuthed && (
               <Link
-                href="/tournaments/manage"
+                href="/owners/dashboard"
                 onClick={() => setOpen(false)}
                 aria-current={
-                  isActive(pathname, "/tournaments/manage") ? "page" : undefined
+                  isActive(pathname, "/owners/dashboard") ? "page" : undefined
                 }
                 className={cn(
                   buttonVariants({
@@ -411,12 +411,12 @@ export function Header() {
                     className: "justify-start",
                   }),
                   "h-14 px-4 text-base",
-                  isActive(pathname, "/tournaments/manage")
+                  isActive(pathname, "/owners/dashboard")
                     ? "text-text-main bg-surface"
                     : "text-text-muted"
                 )}
               >
-                My Tournaments
+                Owner Dashboard
               </Link>
             )}
           </div>
