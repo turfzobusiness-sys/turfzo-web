@@ -147,7 +147,7 @@ export default function Hero() {
 
           {/* Subheading */}
           <p className="mt-4 text-base sm:text-lg text-text-secondary font-sans font-normal max-w-lg mx-auto lg:mx-0 leading-relaxed text-left">
-            Real-time hourly slots, upfront pricing, and instant confirmation for verified football, cricket, badminton, and tennis grounds.
+            Turfzo gives you real-time hourly slots, upfront pricing, and instant confirmation for verified football, cricket, badminton, and tennis grounds.
           </p>
 
           {/* ======================================================== */}

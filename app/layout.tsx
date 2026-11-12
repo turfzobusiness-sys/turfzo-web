@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | Turfzo",
   },
   description:
-    "Turfzo is India's premium turf booking platform. Book football turfs, cricket grounds, badminton courts, and sports venues instantly across 9 cities. Real-time availability, secure payments, and instant confirmation.",
+    "Turfzo is India's turf and sports venue booking platform. Find football turfs, cricket grounds, badminton courts and tennis venues with per-hour pricing and live availability.",
   keywords: [
     "turf booking",
     "football turf near me",
@@ -57,12 +57,11 @@ export const metadata: Metadata = {
     siteName: "Turfzo",
     title: "Turfzo | Book Premium Turfs & Sports Venues Instantly",
     description:
-      "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly across 9 cities.",
+      "India's turf and sports venue booking platform. Find football turfs, cricket grounds and badminton courts with per-hour pricing.",
     images: [
       {
-        // TODO: /og-cover.jpg binary does not exist yet — generate it from
-        // turfzo_mascot.svg artwork at exactly 1200x630 (raster JPG, not SVG:
-        // crawlers reject SVG OG images and require absolute URLs).
+        // 1200x630 raster JPG generated from the stadium artwork. Crawlers
+        // reject SVG OG images and require an absolute URL.
         url: `${SITE_URL}/og-cover.jpg`,
         width: 1200,
         height: 630,
@@ -74,7 +73,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Turfzo | Book Premium Turfs & Sports Venues Instantly",
     description:
-      "India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly.",
+      "India's turf and sports venue booking platform. Find football turfs, cricket grounds and badminton courts.",
     images: [`${SITE_URL}/og-cover.jpg`],
   },
   robots: {
@@ -87,9 +86,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  verification: {
-    // Add when available: google: "your-google-verification-code",
   },
 };
 
@@ -111,7 +107,7 @@ export default function RootLayout({
           name="Turfzo"
           url={SITE_URL}
           logo={`${SITE_URL}/turfzo_mascot.svg`}
-          description="India's premium turf booking platform. Book football turfs, cricket grounds, and sports venues instantly across 9 cities."
+          description="India's turf and sports venue booking platform. Find football turfs, cricket grounds, badminton courts and tennis venues with per-hour pricing and live availability."
           sameAs={[
             "https://instagram.com/turfzo",
             "https://twitter.com/turfzo",

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Blog | Turfzo",
+  title: "Blog",
   description: "Read the latest articles about sports, turf bookings, and tips on Turfzo.",
   alternates: { canonical: "https://turfzo.app/blog" },
 };

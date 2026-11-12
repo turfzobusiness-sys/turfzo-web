@@ -4,7 +4,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Turfzo",
+  title: "Privacy Policy",
   description:
     "How Turfzo collects, uses, and protects your personal data under the DPDP Act 2023.",
   alternates: { canonical: "https://turfzo.app/privacy" },

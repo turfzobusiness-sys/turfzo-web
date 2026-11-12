@@ -5,6 +5,7 @@ import { MapPin, ChevronRight } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
+import { CITY_PAGES_INDEXABLE } from "@/lib/seo";
 
 /** Geography only — see app/cities/[city]/page.tsx for why the venue counts
  *  and average prices were removed. */
@@ -39,11 +40,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const formattedSport = sport.charAt(0).toUpperCase() + sport.slice(1);
 
   return {
-    title: `Book ${formattedSport} Turfs in ${data.name} | Turfzo`,
+    title: `Book ${formattedSport} Turfs in ${data.name} — Prices & Areas`,
     // No invented "starting at ₹X/hr" and no venue count.
-    description: `Looking to play ${formattedSport} in ${data.name}? Browse ${formattedSport} venues on Turfzo with real-time slot availability and per-hour pricing.`,
+    description: `Looking for ${formattedSport.toLowerCase()} in ${data.name}? See every Turfzo listing's hourly rate, amenities and live slot availability, then book online.`,
     keywords: [`${sport} turf booking ${data.name}`, `book ${sport} turf ${data.name}`, `${sport} ground ${data.name}`, `${data.name} ${sport} venue`],
     alternates: { canonical: `https://turfzo.app/cities/${city}/${sport}` },
+    // Testing phase: no real inventory yet, so keep the page out of the index
+    // rather than teach Google it is a thin doorway (see lib/seo.ts).
+    robots: CITY_PAGES_INDEXABLE ? undefined : { index: false, follow: true },
   };
 }
 
@@ -114,6 +118,25 @@ export default async function CitySportPage({ params }: Props) {
               </div>
             </div>
           </div>
+
+          {!CITY_PAGES_INDEXABLE && (
+            <div className="mb-10 rounded-xl border border-brand-lime/30 bg-brand-lime/5 p-5 text-sm font-sans text-text-main">
+              <span className="font-bold">
+                Turfzo is onboarding {formattedSport.toLowerCase()} venues in {data.name}.
+              </span>{" "}
+              <span className="text-text-muted">
+                Browse what is live on{" "}
+                <Link href={`/explore?city=${city}&sport=${sport}`} className="text-brand-lime hover:underline">
+                  Explore
+                </Link>
+                , or{" "}
+                <Link href="/owners" className="text-brand-lime hover:underline">
+                  list your turf
+                </Link>{" "}
+                to be one of the first venues in the city.
+              </span>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 flex flex-col gap-6">

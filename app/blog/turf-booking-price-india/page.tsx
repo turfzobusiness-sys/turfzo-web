@@ -12,85 +12,60 @@ import Footer from "@/components/Footer";
 import { FAQPageSchema, ArticleSchema } from "@/lib/schema";
 
 const cityPricing = [
-  { city: "Bangalore", min: 700, max: 2000, avg: 1100, turfs: "50+" },
-  { city: "Mumbai", min: 800, max: 2500, avg: 1300, turfs: "40+" },
-  { city: "Delhi", min: 600, max: 1800, avg: 1000, turfs: "35+" },
-  { city: "Hyderabad", min: 500, max: 1500, avg: 850, turfs: "30+" },
-  { city: "Pune", min: 500, max: 1500, avg: 800, turfs: "25+" },
-  { city: "Chennai", min: 500, max: 1400, avg: 750, turfs: "20+" },
-  { city: "Kolkata", min: 400, max: 1200, avg: 650, turfs: "15+" },
-  { city: "Ahmedabad", min: 400, max: 1200, avg: 650, turfs: "15+" },
+  { city: "Bangalore", min: 700, max: 2000, avg: 1100 },
+  { city: "Mumbai", min: 800, max: 2500, avg: 1300 },
+  { city: "Delhi", min: 600, max: 1800, avg: 1000 },
+  { city: "Hyderabad", min: 500, max: 1500, avg: 850 },
+  { city: "Pune", min: 500, max: 1500, avg: 800 },
+  { city: "Chennai", min: 500, max: 1400, avg: 750 },
+  { city: "Kolkata", min: 400, max: 1200, avg: 650 },
+  { city: "Ahmedabad", min: 400, max: 1200, avg: 650 },
 ];
 
 const faqItems = [
   {
     question: "What is the average turf booking price in India?",
     answer:
-      "The average turf booking price in India is ₹800-1200 per hour for football. Budget turfs start at ₹400/hr in smaller cities, while premium turfs in Mumbai cost up to ₹2500/hr. Prices vary by city, sport, and amenities.",
+      "Most football turfs list at ₹800 to ₹1,200 per hour. Budget turfs can start around ₹400/hr in smaller cities, while premium turfs in Mumbai can reach ₹2,500/hr. Prices vary by city, sport, and amenities.",
   },
   {
     question: "Which city has the cheapest turf booking in India?",
     answer:
-      "Kolkata and Ahmedabad have the cheapest turf booking in India, with prices starting from ₹400/hr. Hyderabad and Pune also offer affordable options starting from ₹500/hr.",
+      "Kolkata and Ahmedabad tend to have the lowest listed rates, often starting around ₹400/hr. Hyderabad and Pune are also relatively affordable, with many options starting around ₹500/hr.",
   },
   {
     question: "Which city has the most expensive turf booking?",
     answer:
-      "Mumbai has the most expensive turf booking in India, with premium turfs costing up to ₹2500/hr. Bangalore is second with prices reaching ₹2000/hr for premium floodlit venues.",
+      "Mumbai tends to have the highest listed rates, with premium turfs reaching ₹2,500/hr. Bangalore is close behind, with premium floodlit venues reaching ₹2,000/hr.",
   },
   {
     question: "How much does cricket ground booking cost in India?",
     answer:
-      "Cricket ground booking in India ranges from ₹500 to ₹2000 per hour. Indoor cricket nets cost ₹300-800/hr, while outdoor grounds cost ₹800-2000/hr depending on the city.",
+      "Cricket ground booking typically ranges from ₹500 to ₹2,000 per hour. Indoor cricket nets usually cost ₹300-800/hr, while outdoor grounds cost ₹800-2,000/hr depending on the city.",
   },
   {
     question: "Are there any hidden charges in turf booking?",
     answer:
-      "Most turf bookings on Turfzo include the base fare and a small convenience fee (1.8%). GST (18%) is added at checkout. There are no hidden charges — the price shown is the final price.",
+      "The price shown on the venue page includes the base fare. A small convenience fee and GST are shown at checkout before you pay. There are no hidden charges.",
   },
   {
     question: "Can I get a discount on turf booking?",
     answer:
-      "Yes, many turfs offer discounts for weekday bookings, morning slots, and bulk bookings. Turfzo also runs seasonal promotions and offers for new users. Check the explore page for current deals.",
+      "Many turfs offer discounts for weekday bookings, morning slots, and bulk bookings. Check the venue page or the explore page for the current price before you book.",
   },
   {
     question: "How much does badminton court booking cost in India?",
     answer:
-      "Badminton court booking in India ranges from ₹300 to ₹800 per hour. Indoor courts with wooden flooring cost ₹500-800/hr, while outdoor synthetic courts cost ₹300-500/hr.",
+      "Badminton court booking typically ranges from ₹300 to ₹800 per hour. Indoor courts with wooden flooring usually cost ₹500-800/hr, while outdoor synthetic courts cost ₹300-500/hr.",
   },
 ];
 
 export default function TurfBookingPriceIndia() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>
-          Turf Booking Price in India [2026 Data] | City-wise Pricing | Turfzo
-        </title>
-        <meta
-          name="description"
-          content="How much does turf booking cost in India? We analyzed 50+ turfs across 9 cities with real pricing data. Football, cricket, badminton prices from ₹400/hr."
-        />
-        <link
-          rel="canonical"
-          href="https://turfzo.app/blog/turf-booking-price-india"
-        />
-        <meta
-          property="og:title"
-          content="Turf Booking Price in India [2026 Data] | Turfzo"
-        />
-        <meta
-          property="og:description"
-          content="Real turf booking prices across 9 Indian cities. Football, cricket, and badminton pricing data from ₹400/hr."
-        />
-        <meta
-          property="og:url"
-          content="https://turfzo.app/blog/turf-booking-price-india"
-        />
-      </head>
       <ArticleSchema
-        name="Turf Booking Price in India [2026 Data]"
-        description="How much does turf booking cost in India? Real pricing data from 50+ turfs across 9 cities."
+        name="Turf Booking Price in India [2026 Guide]"
+        description="Typical turf booking prices in India for football, cricket and badminton, with city-wise ranges."
         datePublished="2026-05-31"
         dateModified="2026-05-31"
         author={{ "@type": "Organization", name: "Turfzo" }}
@@ -124,10 +99,10 @@ export default function TurfBookingPriceIndia() {
               <span className="text-[10px] text-text-muted font-sans">May 2026 · 6 min read</span>
             </div>
             <h1 className="font-sans text-3xl sm:text-4xl font-extrabold text-text-main leading-tight">
-              Turf Booking Price in India [2026 Data]
+              Turf Booking Price in India [2026 Guide]
             </h1>
             <p className="mt-4 text-text-muted text-sm font-sans leading-relaxed">
-              We analyzed 50+ turfs across 9 major Indian cities to give you real pricing data for football, cricket, and badminton venues. This guide breaks down costs by city, sport, and time of day so you know exactly what to expect before booking.
+              This guide breaks down typical hourly rates across major Indian cities so you know what to expect before booking. Prices are indicative market ranges, not a quote, and vary by venue, facilities, and time slot.
             </p>
             <div className="mt-4 flex items-center gap-4 text-xs text-text-muted font-sans">
               <span>By Turfzo Team</span>
@@ -156,7 +131,6 @@ export default function TurfBookingPriceIndia() {
                     <th className="text-left py-3 px-4 text-text-main font-sans font-bold">Min Price</th>
                     <th className="text-left py-3 px-4 text-text-main font-sans font-bold">Max Price</th>
                     <th className="text-left py-3 px-4 text-text-main font-sans font-bold">Average</th>
-                    <th className="text-left py-3 px-4 text-text-main font-sans font-bold">Turfs Available</th>
                   </tr>
                 </thead>
                 <tbody className="text-text-muted">
@@ -166,12 +140,15 @@ export default function TurfBookingPriceIndia() {
                       <td className="py-3 px-4">₹{row.min}/hr</td>
                       <td className="py-3 px-4">₹{row.max}/hr</td>
                       <td className="py-3 px-4 font-bold text-brand-lime">₹{row.avg}/hr</td>
-                      <td className="py-3 px-4">{row.turfs}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+            <p className="mt-3 text-[10px] text-text-muted font-sans">
+              Indicative market ranges, not Turfzo quotes. Check the venue page
+              for the live price.
+            </p>
           </div>
 
           {/* Price by Sport */}

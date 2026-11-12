@@ -4,7 +4,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Refund & Cancellation Policy | Turfzo",
+  title: "Refund & Cancellation Policy",
   description:
     "Turfzo's refund and cancellation policy for turf bookings and tournament registrations.",
   alternates: { canonical: "https://turfzo.app/refund-policy" },

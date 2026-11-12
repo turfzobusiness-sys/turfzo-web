@@ -5,6 +5,7 @@ import { MapPin, ChevronRight, Trophy, CheckCircle2 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, BreadcrumbListSchema } from "@/lib/schema";
+import { CITY_PAGES_INDEXABLE } from "@/lib/seo";
 
 /**
  * Geography only — city name, state and well-known locality names used as
@@ -49,15 +50,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = CITY_DATA[city.toLowerCase()];
   if (!data) return { title: "City Not Found" };
   return {
-    title: `Book Turfs in ${data.name} | Football, Cricket & More | Turfzo`,
+    title: `Turf Booking in ${data.name} — Areas & Prices`,
     // No venue count and no invented "starting at" price — both were
     // fabricated and were being published as page metadata.
-    description: `Book football turfs, cricket grounds, and sports venues in ${data.name} on Turfzo. Browse live availability and transparent per-hour pricing across ${data.name}.`,
+    description: `Find football, cricket, badminton and tennis venues in ${data.name} on Turfzo. Every listing shows its hourly rate, amenities and live slot availability.`,
     keywords: [`turf booking ${data.name}`, `football turf ${data.name}`, `cricket ground ${data.name}`, `book turf ${data.name}`, `${data.name} sports venue`],
     alternates: { canonical: `https://turfzo.app/cities/${city}` },
+    // Testing phase: no real inventory yet, so keep the page out of the index
+    // rather than teach Google it is a thin doorway (see lib/seo.ts).
+    robots: CITY_PAGES_INDEXABLE ? undefined : { index: false, follow: true },
     openGraph: {
-      title: `Book Turfs in ${data.name} | Turfzo`,
-      description: `Browse ${SUPPORTED_SPORTS} in ${data.name} with real-time availability.`,
+      title: `Turf Booking in ${data.name}`,
+      description: `Browse ${SUPPORTED_SPORTS} in ${data.name} with per-hour pricing and live availability.`,
       url: `https://turfzo.app/cities/${city}`,
       type: "website",
     },
@@ -126,6 +130,23 @@ export default async function CityPage({ params }: Props) {
               </div>
             </div>
           </div>
+
+          {!CITY_PAGES_INDEXABLE && (
+            <div className="mb-10 rounded-xl border border-brand-lime/30 bg-brand-lime/5 p-5 text-sm font-sans text-text-main">
+              <span className="font-bold">Turfzo is onboarding venues in {data.name}.</span>{" "}
+              <span className="text-text-muted">
+                Browse what is live on{" "}
+                <Link href={`/explore?city=${city}`} className="text-brand-lime hover:underline">
+                  Explore
+                </Link>
+                , or{" "}
+                <Link href="/owners" className="text-brand-lime hover:underline">
+                  list your turf
+                </Link>{" "}
+                to be one of the first venues in the city.
+              </span>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 flex flex-col gap-6">

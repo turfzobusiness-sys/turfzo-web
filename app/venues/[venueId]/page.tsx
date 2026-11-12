@@ -7,6 +7,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { BreadcrumbListSchema, SportsActivityLocationSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
+import { VENUE_PAGES_INDEXABLE, isTestVenue } from "@/lib/seo";
 import { FavoriteButton } from "@/components/ui/favorite-button";
 import type { Turf } from "@/lib/types";
 import { getLocalTurfImage } from "@/lib/turf-images";
@@ -32,14 +33,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const sport = turf.sport_type || "Sports";
     const city = turf.city || "India";
-    const title = `${turf.name} | Book ${sport} Turf in ${city} | Turfzo`;
-    const description = `Book ${turf.name} for ${sport}. Located in ${turf.address || city}. Instant booking, real-time availability, and verified reviews. Starts at ₹${turf.price_per_hour}/hr.`;
+    const title = `${turf.name} — ${sport} Turf in ${city}`;
+    const description = `Book ${turf.name} for ${sport} in ${city}. See hourly rates, amenities and live slot availability. Starts at ₹${turf.price_per_hour}/hr.`;
+    // Testing phase: no real partner venues yet. Keep venue pages out of the
+    // index, and never index a seed venue even after the flag flips.
+    const indexable = VENUE_PAGES_INDEXABLE && !isTestVenue(turf);
 
     return {
       title,
       description,
       keywords: [`${turf.name}`, `${sport} turf ${city}`, `book ${turf.name}`, `turf booking near me`],
       alternates: { canonical: `https://turfzo.app/venues/${venueId}` },
+      robots: indexable ? undefined : { index: false, follow: true },
     };
   } catch {
     return { title: "Venue Not Found" };

@@ -5,9 +5,50 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 
 // Server component: metadata (incl. canonical) comes from app/blog/layout.tsx
-// via the Next metadata API. Slugs here must stay in sync with
-// app/blog/[slug]/page.tsx generateStaticParams and app/sitemap.ts.
+// via the Next metadata API. Slugs here include both the dynamic
+// app/blog/[slug]/page.tsx posts and the static app/blog/<slug>/ guides, and
+// must stay in sync with app/sitemap.ts.
 const blogPosts = [
+  {
+    slug: "how-to-book-turf-online",
+    title: "How to Book a Turf Online in India (Step-by-Step)",
+    excerpt:
+      "A step-by-step guide to finding a ground, checking live slots, paying online, and getting your confirmation. No phone calls.",
+    category: "For Players",
+    readTime: "6 min read",
+    date: "May 2026",
+    image: "/players_playing_football_1781975762157.webp",
+  },
+  {
+    slug: "turf-booking-price-india",
+    title: "Turf Booking Price in India [2026 Guide]",
+    excerpt:
+      "Typical hourly rates for football, cricket, and badminton across major Indian cities, plus the factors that move the price.",
+    category: "Pricing",
+    readTime: "6 min read",
+    date: "May 2026",
+    image: "/images/marketing/explore/football-card.webp",
+  },
+  {
+    slug: "best-football-turfs-bangalore",
+    title: "Football Turf Booking in Bangalore [2026 Guide]",
+    excerpt:
+      "What football turf booking costs in Bangalore, which areas have the densest clusters, and how to compare live availability.",
+    category: "City Guide",
+    readTime: "8 min read",
+    date: "May 2026",
+    image: "/images/marketing/explore/football-card.webp",
+  },
+  {
+    slug: "turf-vs-ground",
+    title: "Turf vs Ground: Which Should You Book?",
+    excerpt:
+      "A practical comparison of artificial turf and natural ground for football and cricket, including cost, surface, and injury considerations.",
+    category: "Educational",
+    readTime: "5 min read",
+    date: "May 2026",
+    image: "/turf_quality_closeup_1781976182142.webp",
+  },
   {
     slug: "book-football-turf-instantly",
     title: "Tired of Calling? How to Book the Best Turfs Instantly",

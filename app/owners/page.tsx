@@ -414,7 +414,7 @@ export default function OwnersPage() {
               <div className="flex items-center gap-2 mb-6">
                 <span className="w-1.5 h-1.5 rounded-xs bg-brand-lime" />
                 <span className="text-[11px] sm:text-xs font-mono font-bold text-text-muted uppercase tracking-wider">
-                  For Venue Owners &amp; Arena Managers
+                  Turf Booking Software for Venue Owners
                 </span>
               </div>
 
@@ -425,7 +425,7 @@ export default function OwnersPage() {
               </h1>
 
               <p className="font-sans text-base sm:text-lg lg:text-xl text-text-muted leading-relaxed mb-8 sm:mb-10 max-w-xl">
-                Turn empty slots into revenue. Replace phone calls, double bookings, and manual bookkeeping with Turfzo&apos;s automated partner platform.
+                Turn empty slots into revenue with turf booking software that replaces phone calls, double bookings, and manual bookkeeping.
               </p>
 
               {/* Action Buttons */}
