@@ -44,6 +44,7 @@ Turfzo is an Indian sports venue and turf booking platform where players discove
 - Multipurpose Venues: https://turfzo.app/sports/multipurpose
 
 ## Guides & Articles
+- https://turfzo.app/blog/turf-booking-chhatrapati-sambhajinagar-csn-aurangabad
 - https://turfzo.app/blog/how-to-book-turf-online
 - https://turfzo.app/blog/turf-booking-price-india
 - https://turfzo.app/blog/best-football-turfs-bangalore

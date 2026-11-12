@@ -24,6 +24,7 @@ const LEGAL_PAGE_LASTMOD = new Date("2026-06-08T00:00:00Z");
 // app/blog/<slug>/page.tsx routes. Every slug here is also linked from
 // app/blog/page.tsx.
 const BLOG_POSTS: Array<{ slug: string; lastModified: string }> = [
+  { slug: "turf-booking-chhatrapati-sambhajinagar-csn-aurangabad", lastModified: "2026-11-12T00:00:00Z" },
   { slug: "book-football-turf-instantly", lastModified: "2026-06-01T00:00:00Z" },
   { slug: "organize-local-sports-tournaments", lastModified: "2026-06-01T00:00:00Z" },
   { slug: "maximize-turf-roi-booking-management", lastModified: "2026-06-01T00:00:00Z" },

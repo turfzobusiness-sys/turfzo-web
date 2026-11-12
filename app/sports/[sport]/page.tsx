@@ -417,7 +417,9 @@ export default async function SportLandingPage({ params }: Props) {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
               {INDEXABLE_CITY_SLUGS.map((citySlug) => {
                 const label =
-                  citySlug.charAt(0).toUpperCase() + citySlug.slice(1);
+                  citySlug === "aurangabad"
+                    ? "CSN (Aurangabad)"
+                    : citySlug.charAt(0).toUpperCase() + citySlug.slice(1);
                 const hasLiveSportCity = liveCitySportSlugs.has(`${citySlug}/${key}`);
                 const hasLiveCity = liveCitySlugs.has(citySlug);
                 const href = hasLiveSportCity
@@ -438,6 +440,26 @@ export default async function SportLandingPage({ params }: Props) {
                 );
               })}
             </div>
+            {(key === "football" || key === "cricket") && (
+              <div className="mt-5 flex flex-wrap gap-3 text-xs font-sans">
+                <Link
+                  href="/blog/turf-booking-chhatrapati-sambhajinagar-csn-aurangabad"
+                  className="text-brand-lime hover:underline inline-flex items-center gap-1"
+                >
+                  Chhatrapati Sambhajinagar (CSN / Aurangabad) {data.name} Guide{" "}
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+                {key === "football" && (
+                  <Link
+                    href="/blog/best-football-turfs-bangalore"
+                    className="text-brand-lime hover:underline inline-flex items-center gap-1"
+                  >
+                    Bangalore Football Turf Guide{" "}
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                )}
+              </div>
+            )}
           </section>
 
           <section>

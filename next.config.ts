@@ -123,6 +123,30 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  async redirects() {
+    return [
+      {
+        source: "/cities/csn",
+        destination: "/cities/aurangabad",
+        permanent: true,
+      },
+      {
+        source: "/cities/csn/:sport",
+        destination: "/cities/aurangabad/:sport",
+        permanent: true,
+      },
+      {
+        source: "/cities/chhatrapati-sambhajinagar",
+        destination: "/cities/aurangabad",
+        permanent: true,
+      },
+      {
+        source: "/cities/chhatrapati-sambhajinagar/:sport",
+        destination: "/cities/aurangabad/:sport",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

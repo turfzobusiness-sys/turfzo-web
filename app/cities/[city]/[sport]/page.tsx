@@ -25,7 +25,13 @@ export const revalidate = 300;
  *  and average prices were removed. */
 const CITY_DATA: Record<
   string,
-  { name: string; state: string; highlights: string[] }
+  {
+    name: string;
+    displayName?: string;
+    extraKeywords?: string[];
+    state: string;
+    highlights: string[];
+  }
 > = {
   bangalore: { name: "Bangalore", state: "Karnataka", highlights: ["HSR Layout", "Koramangala", "Indiranagar", "Whitefield", "Marathahalli"] },
   mumbai: { name: "Mumbai", state: "Maharashtra", highlights: ["Andheri", "Bandra", "Powai", "Lower Parel", "Goregaon"] },
@@ -35,7 +41,18 @@ const CITY_DATA: Record<
   chennai: { name: "Chennai", state: "Tamil Nadu", highlights: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "OMR"] },
   kolkata: { name: "Kolkata", state: "West Bengal", highlights: ["Salt Lake", "Park Street", "Ballygunge", "New Town", "Howrah"] },
   ahmedabad: { name: "Ahmedabad", state: "Gujarat", highlights: ["Satellite", "Bodakdev", "Vastrapur", "SG Highway", "Prahlad Nagar"] },
-  aurangabad: { name: "Aurangabad", state: "Maharashtra", highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"] },
+  aurangabad: {
+    name: "Chhatrapati Sambhajinagar",
+    displayName: "Chhatrapati Sambhajinagar (Aurangabad / CSN)",
+    extraKeywords: [
+      "turf in csn",
+      "football turf in csn",
+      "turf booking aurangabad",
+      "box cricket in csn",
+    ],
+    state: "Maharashtra",
+    highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"],
+  },
 };
 
 /**
@@ -54,16 +71,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = CITY_DATA[citySlug];
   if (!data || !SPORTS.includes(sportSlug)) notFound();
   const formattedSport = sportSlug.charAt(0).toUpperCase() + sportSlug.slice(1);
+  const label = data.displayName ?? data.name;
 
   const indexable = await isCitySportIndexable(citySlug, sportSlug);
-  const title = `Book ${formattedSport} Turfs in ${data.name} — Prices & Areas`;
-  const description = `Looking for ${formattedSport.toLowerCase()} in ${data.name}? See every Turfzo listing's hourly rate, amenities and live slot availability, then book online.`;
+  const title = `Book ${formattedSport} Turfs in ${label} — Prices & Areas`;
+  const description = `Looking for ${formattedSport.toLowerCase()} in ${label}? See every Turfzo listing's hourly rate, amenities and live slot availability, then book online.`;
 
   return {
     title,
     // No invented "starting at ₹X/hr" and no venue count.
     description,
-    keywords: [`${sportSlug} turf booking ${data.name}`, `book ${sportSlug} turf ${data.name}`, `${sportSlug} ground ${data.name}`, `${data.name} ${sportSlug} venue`],
+    keywords: [
+      `${sportSlug} turf booking ${data.name}`,
+      `book ${sportSlug} turf ${data.name}`,
+      `${sportSlug} ground ${data.name}`,
+      `${data.name} ${sportSlug} venue`,
+      ...(data.extraKeywords ?? []),
+    ],
     alternates: { canonical: `https://turfzo.app/cities/${citySlug}/${sportSlug}` },
     // Auto-indexes per (city, sport) once Convex has 1+ real non-mock venue matching both.
     robots: indexable ? undefined : { index: false, follow: true },
@@ -149,10 +173,10 @@ export default async function CitySportPage({ params }: Props) {
                 <span className="text-text-main font-semibold">{formattedSport}</span>
               </nav>
               <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main leading-tight tracking-tight">
-                Book {formattedSport} Turfs in <span>{data.name}</span>
+                Book {formattedSport} Turfs in <span>{data.displayName ?? data.name}</span>
               </h1>
               <p className="mt-3 text-text-muted text-sm sm:text-base font-sans max-w-2xl leading-relaxed">
-                Browse {formattedSport.toLowerCase()} venues across {data.name}{" "}
+                Browse {formattedSport.toLowerCase()} venues across {data.displayName ?? data.name}{" "}
                 with real-time slot availability. Every venue sets its own
                 hourly rate, shown on its card.
               </p>
@@ -170,14 +194,27 @@ export default async function CitySportPage({ params }: Props) {
           {!indexable && (
             <div className="mb-10 rounded-xl border border-brand-lime/30 bg-brand-lime/5 p-5 text-sm font-sans text-text-main">
               <span className="font-bold">
-                Turfzo is onboarding {formattedSport.toLowerCase()} venues in {data.name}.
+                Turfzo is onboarding {formattedSport.toLowerCase()} venues in {data.displayName ?? data.name}.
               </span>{" "}
               <span className="text-text-muted">
                 Browse live venues on{" "}
                 <Link href="/explore" className="text-brand-lime hover:underline">
                   Explore
                 </Link>
-                , or{" "}
+                ,{" "}
+                {citySlug === "aurangabad" && (
+                  <>
+                    read our{" "}
+                    <Link
+                      href="/blog/turf-booking-chhatrapati-sambhajinagar-csn-aurangabad"
+                      className="text-brand-lime hover:underline font-medium"
+                    >
+                      Chhatrapati Sambhajinagar (CSN / Aurangabad) Turf Guide
+                    </Link>
+                    ,{" "}
+                  </>
+                )}
+                or{" "}
                 <Link href="/owners" className="text-brand-lime hover:underline">
                   list your turf
                 </Link>{" "}

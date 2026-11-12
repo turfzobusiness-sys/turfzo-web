@@ -35,7 +35,13 @@ export const revalidate = 300;
  */
 const CITY_DATA: Record<
   string,
-  { name: string; state: string; highlights: string[] }
+  {
+    name: string;
+    displayName?: string;
+    extraKeywords?: string[];
+    state: string;
+    highlights: string[];
+  }
 > = {
   bangalore: { name: "Bangalore", state: "Karnataka", highlights: ["HSR Layout", "Koramangala", "Indiranagar", "Whitefield", "Marathahalli"] },
   mumbai: { name: "Mumbai", state: "Maharashtra", highlights: ["Andheri", "Bandra", "Powai", "Lower Parel", "Goregaon"] },
@@ -45,7 +51,19 @@ const CITY_DATA: Record<
   chennai: { name: "Chennai", state: "Tamil Nadu", highlights: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "OMR"] },
   kolkata: { name: "Kolkata", state: "West Bengal", highlights: ["Salt Lake", "Park Street", "Ballygunge", "New Town", "Howrah"] },
   ahmedabad: { name: "Ahmedabad", state: "Gujarat", highlights: ["Satellite", "Bodakdev", "Vastrapur", "SG Highway", "Prahlad Nagar"] },
-  aurangabad: { name: "Aurangabad", state: "Maharashtra", highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"] },
+  aurangabad: {
+    name: "Chhatrapati Sambhajinagar",
+    displayName: "Chhatrapati Sambhajinagar (Aurangabad / CSN)",
+    extraKeywords: [
+      "turf in csn",
+      "football turf in csn",
+      "turf booking aurangabad",
+      "football turf in aurangabad",
+      "box cricket csn",
+    ],
+    state: "Maharashtra",
+    highlights: ["CIDCO", "Osmanpura", "Garkheda", "Jalna Road", "Beed Bypass"],
+  },
 };
 
 /** Sports the product actually supports booking for. */
@@ -62,24 +80,33 @@ type Props = { params: Promise<{ city: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { city } = await params;
-  const data = CITY_DATA[city.toLowerCase()];
+  const citySlug = city.toLowerCase();
+  const data = CITY_DATA[citySlug];
   if (!data) notFound();
-  const indexable = await isCityIndexable(city);
-  const title = `Turf Booking in ${data.name} — Areas & Prices`;
-  const description = `Find football, cricket, badminton and tennis venues in ${data.name} on Turfzo. Every listing shows its hourly rate, amenities and live slot availability.`;
+  const indexable = await isCityIndexable(citySlug);
+  const label = data.displayName ?? data.name;
+  const title = `Turf Booking in ${label} — Areas & Prices`;
+  const description = `Find football, cricket, badminton and tennis venues in ${label} on Turfzo. Every listing shows its hourly rate, amenities and live slot availability.`;
   return {
     title,
     // No venue count and no invented "starting at" price — both were
     // fabricated and were being published as page metadata.
     description,
-    keywords: [`turf booking ${data.name}`, `football turf ${data.name}`, `cricket ground ${data.name}`, `book turf ${data.name}`, `${data.name} sports venue`],
-    alternates: { canonical: `https://turfzo.app/cities/${city}` },
+    keywords: [
+      `turf booking ${data.name}`,
+      `football turf ${data.name}`,
+      `cricket ground ${data.name}`,
+      `book turf ${data.name}`,
+      `${data.name} sports venue`,
+      ...(data.extraKeywords ?? []),
+    ],
+    alternates: { canonical: `https://turfzo.app/cities/${citySlug}` },
     // Auto-indexes per city once Convex has 1+ real non-mock venue in that city.
     robots: indexable ? undefined : { index: false, follow: true },
     openGraph: buildOpenGraph({
-      title: `Turf Booking in ${data.name}`,
-      description: `Browse ${SUPPORTED_SPORTS} in ${data.name} with per-hour pricing and live availability.`,
-      url: `https://turfzo.app/cities/${city}`,
+      title: `Turf Booking in ${label}`,
+      description: `Browse ${SUPPORTED_SPORTS} in ${label} with per-hour pricing and live availability.`,
+      url: `https://turfzo.app/cities/${citySlug}`,
     }),
   };
 }
@@ -153,12 +180,12 @@ export default async function CityPage({ params }: Props) {
                 <span className="text-text-main font-semibold">{data.name}</span>
               </nav>
               <h1 className="font-sans text-4xl sm:text-5xl font-extrabold text-text-main leading-tight tracking-tight">
-                Book Turfs in {data.name}
+                Book Turfs in {data.displayName ?? data.name}
               </h1>
               <p className="mt-3 text-text-muted text-sm sm:text-base font-sans max-w-2xl leading-relaxed">
                 Browse football turfs, cricket grounds and sports venues across{" "}
-                {data.name} with real-time slot availability and transparent
-                per-hour pricing.
+                {data.displayName ?? data.name} with real-time slot availability
+                and transparent per-hour pricing.
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Link href={`/explore?city=${citySlug}`} rel="nofollow" className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-3 px-6 rounded-md inline-flex items-center gap-1.5 transition-all">
@@ -173,13 +200,28 @@ export default async function CityPage({ params }: Props) {
 
           {!indexable && (
             <div className="mb-10 rounded-xl border border-brand-lime/30 bg-brand-lime/5 p-5 text-sm font-sans text-text-main">
-              <span className="font-bold">Turfzo is onboarding venues in {data.name}.</span>{" "}
+              <span className="font-bold">
+                Turfzo is onboarding venues in {data.displayName ?? data.name}.
+              </span>{" "}
               <span className="text-text-muted">
                 Browse what is live on{" "}
                 <Link href="/explore" className="text-brand-lime hover:underline">
                   Explore
                 </Link>
-                , or{" "}
+                ,{" "}
+                {citySlug === "aurangabad" && (
+                  <>
+                    read our{" "}
+                    <Link
+                      href="/blog/turf-booking-chhatrapati-sambhajinagar-csn-aurangabad"
+                      className="text-brand-lime hover:underline font-medium"
+                    >
+                      Chhatrapati Sambhajinagar (CSN / Aurangabad) Turf Guide
+                    </Link>
+                    ,{" "}
+                  </>
+                )}
+                or{" "}
                 <Link href="/owners" className="text-brand-lime hover:underline">
                   list your turf
                 </Link>{" "}

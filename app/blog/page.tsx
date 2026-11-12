@@ -11,6 +11,16 @@ import { ItemListSchema } from "@/lib/schema";
 // must stay in sync with app/sitemap.ts.
 const blogPosts = [
   {
+    slug: "turf-booking-chhatrapati-sambhajinagar-csn-aurangabad",
+    title: "Turf Booking in Chhatrapati Sambhajinagar (CSN / Aurangabad) [2026 Guide]",
+    excerpt:
+      "Book football turfs, box cricket nets, and badminton courts in Chhatrapati Sambhajinagar (CSN / Aurangabad). Compare CIDCO, Osmanpura, Garkheda & Jalna Road hubs and transparent hourly pricing.",
+    category: "City Guide",
+    readTime: "7 min read",
+    date: "November 2026",
+    image: "/images/marketing/explore/football-card.webp",
+  },
+  {
     slug: "how-to-book-turf-online",
     title: "How to Book a Turf Online in India (Step-by-Step)",
     excerpt:
