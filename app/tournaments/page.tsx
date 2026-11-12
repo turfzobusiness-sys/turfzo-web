@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, Suspense } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -970,9 +971,9 @@ export default function TournamentsPage() {
                   <div className="w-9 h-9 rounded-xl bg-brand-lime/15 flex items-center justify-center">
                     <Trophy className="w-4.5 h-4.5 text-brand-lime" />
                   </div>
-                  <h3 className="text-base font-bold text-text-main">
+                  <h2 className="text-base font-bold text-text-main">
                     Organize Your Tournament
-                  </h3>
+                  </h2>
                 </div>
                 <ul className="space-y-1.5 text-[13px] text-text-secondary">
                   {[
@@ -1379,6 +1380,78 @@ export default function TournamentsPage() {
                   })}
                 </div>
               )}
+
+              <section
+                aria-label="Tournament hosting guide"
+                className="mt-16 pt-12 border-t border-border-default space-y-8"
+              >
+                <div className="max-w-3xl">
+                  <span className="text-xs font-semibold tracking-wider uppercase text-brand-lime">
+                    Community Competitions
+                  </span>
+                  <h2 className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-text-main mt-2">
+                    How local turf tournaments work on Turfzo
+                  </h2>
+                  <p className="mt-3 text-sm sm:text-base text-text-muted leading-relaxed">
+                    Whether you are joining a weekend 5v5 football cup or
+                    hosting a corporate box cricket knockout, Turfzo keeps team
+                    registrations, entry fees, and match brackets in one place.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="rounded-xl border border-border-default bg-surface p-5">
+                    <h3 className="font-sans font-bold text-sm text-text-main">
+                      Verified team &amp; solo entries
+                    </h3>
+                    <p className="text-xs text-text-muted leading-relaxed mt-2">
+                      Browse open tournaments by sport, check squad size caps
+                      and prize pools, and register directly with instant
+                      confirmation.
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-border-default bg-surface p-5">
+                    <h3 className="font-sans font-bold text-sm text-text-main">
+                      Automated knockout brackets
+                    </h3>
+                    <p className="text-xs text-text-muted leading-relaxed mt-2">
+                      Organizers can generate single-elimination brackets,
+                      update match results live, and keep every squad on the
+                      same schedule.
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-border-default bg-surface p-5">
+                    <h3 className="font-sans font-bold text-sm text-text-main">
+                      Digital fee collection
+                    </h3>
+                    <p className="text-xs text-text-muted leading-relaxed mt-2">
+                      Collect tournament entry fees online via Cashfree without
+                      chasing scattered UPI screenshots across WhatsApp groups.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold">
+                  <Link
+                    href="/explore"
+                    className="text-text-main hover:text-brand-lime transition-colors"
+                  >
+                    Explore bookable turfs
+                  </Link>
+                  <Link
+                    href="/blog/organize-local-sports-tournaments"
+                    className="text-text-main hover:text-brand-lime transition-colors"
+                  >
+                    Read the tournament organizing guide
+                  </Link>
+                  <Link
+                    href="/owners"
+                    className="text-text-main hover:text-brand-lime transition-colors"
+                  >
+                    Host at your venue
+                  </Link>
+                </div>
+              </section>
             </div>
           )}
 

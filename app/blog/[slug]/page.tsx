@@ -27,9 +27,11 @@ function ArticleSchema({ article }: { article: ArticleSchemaArticle }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }} />;
 }
 
-const blogPosts: Record<string, { title: string; category: string; readTime: string; date: string; image: string; content: React.ReactNode; excerpt: string }> = {
+const blogPosts: Record<string, { title: string; seoTitle: string; metaDescription: string; category: string; readTime: string; date: string; image: string; content: React.ReactNode; excerpt: string }> = {
   "book-football-turf-instantly": {
     title: "Tired of Calling? How to Book the Best Turfs Instantly",
+    seoTitle: "How to Book Football Turfs Instantly Online",
+    metaDescription: "Stop calling turfs one by one. Compare real-time slots, transparent hourly pricing, and get instant booking confirmation on Turfzo.",
     excerpt: "Wasting time calling multiple turfs, dealing with double bookings, and navigating lack of pricing transparency? Learn how to find and secure the best sports venues in your city instantly. Turfzo guarantees a seamless, confirmed booking every time.",
     category: "For Players",
     readTime: "5 min read",
@@ -67,6 +69,8 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
   },
   "organize-local-sports-tournaments": {
     title: "How to Organize the Perfect Local Sports Tournament",
+    seoTitle: "How to Organize a Local Sports Tournament",
+    metaDescription: "Plan 5v5 football or box cricket tournaments without spreadsheet chaos. Learn venue selection, fee collection, and scheduling tips.",
     excerpt: "Struggling to find teammates or coordinate matches? Discover the best ways to bring your community together through sports, organize 5v5 tournaments, and foster local growth. Turfzo empowers community leaders with the right tools.",
     category: "For Community",
     readTime: "7 min read",
@@ -107,6 +111,8 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
   },
   "maximize-turf-roi-booking-management": {
     title: "Maximizing Your Turf's ROI: The Ultimate Management Guide",
+    seoTitle: "Maximize Turf ROI with Smart Slot Management",
+    metaDescription: "Fill off-peak turf hours and cut manual booking errors. Learn how dynamic pricing, slot analytics, and online settlements boost ROI.",
     excerpt: "Are empty slots, complex booking management, and high marketing costs hurting your business? Learn how to increase bookings during off-peak hours. Turfzo partners with owners to streamline operations and maximize revenue.",
     category: "For Owners",
     readTime: "6 min read",
@@ -138,6 +144,8 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
   },
   "future-of-amateur-sports-india": {
     title: "The Future of Amateur Sports Infrastructure in India",
+    seoTitle: "Future of Amateur Sports Infrastructure in India",
+    metaDescription: "Explore how pay-and-play turfs and online booking platforms are expanding access to football, cricket, and badminton across India.",
     excerpt: "As grassroots sports rapidly expand across India, the demand for high-quality, accessible playing facilities has never been higher. Explore how Turfzo is democratizing access to premium sports infrastructure in top metro cities.",
     category: "Industry",
     readTime: "8 min read",
@@ -161,6 +169,8 @@ const blogPosts: Record<string, { title: string; category: string; readTime: str
   },
   "turf-vs-ground-injury-prevention": {
     title: "Turf Quality & Injury Prevention: What Players Need to Know",
+    seoTitle: "Turf Quality & Injury Prevention Guide",
+    metaDescription: "Learn how 3G/4G artificial turf, shock pads, rubber infill, and the right turf boots reduce joint stress and prevent common injuries.",
     excerpt: "Not all artificial turfs are created equal. Understand the difference between FIFA-certified 3G/4G pitches and subpar surfaces, and learn why Turfzo stringently verifies every venue for player safety and optimal performance.",
     category: "Educational",
     readTime: "6 min read",
@@ -201,12 +211,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Post Not Found" };
 
   return {
-    title: { absolute: `${post.title} | Turfzo Blog` },
-    description: post.excerpt,
+    title: { absolute: `${post.seoTitle} | Turfzo` },
+    description: post.metaDescription,
     alternates: { canonical: `https://turfzo.app/blog/${slug}` },
     openGraph: {
       title: post.title,
-      description: post.excerpt,
+      description: post.metaDescription,
       type: "article",
     }
   };
@@ -223,9 +233,6 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <link rel="canonical" href={`https://turfzo.app/blog/${slug}`} />
-      </head>
       <ArticleSchema article={post} />
       <Header />
 
