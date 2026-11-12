@@ -7,6 +7,7 @@ import {
   SITE_URL,
   VENUE_PAGES_INDEXABLE,
   getLiveCitySlugs,
+  getLiveCitySportSlugs,
   isTestVenue,
 } from "@/lib/seo";
 import type { Turf } from "@/lib/types";
@@ -70,11 +71,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
-  // Per-city indexing: only list cities that actually have 1+ real non-mock
-  // venue in Convex (or all cities when CITY_PAGES_INDEXABLE is flipped).
+  // Per-city & per-sport indexing: only list cities (and city+sport pairs)
+  // that actually have 1+ real non-mock venue in Convex (or all combinations
+  // when CITY_PAGES_INDEXABLE is flipped).
   const activeCities = CITY_PAGES_INDEXABLE
     ? [...INDEXABLE_CITY_SLUGS]
     : [...(await getLiveCitySlugs())];
+  const liveCitySports = CITY_PAGES_INDEXABLE
+    ? null
+    : await getLiveCitySportSlugs();
 
   const cityPages: MetadataRoute.Sitemap = activeCities.map((city) => ({
     url: `${SITE_URL}/cities/${city}`,
@@ -86,6 +91,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const citySportPages: MetadataRoute.Sitemap = [];
   for (const city of activeCities) {
     for (const sport of INDEXABLE_SPORT_SLUGS) {
+      if (liveCitySports && !liveCitySports.has(`${city}/${sport}`)) continue;
       citySportPages.push({
         url: `${SITE_URL}/cities/${city}/${sport}`,
         lastModified: STATIC_PAGE_LASTMOD,

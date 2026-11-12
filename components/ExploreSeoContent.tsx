@@ -71,8 +71,8 @@ export default function ExploreSeoContent({
           Use the filters above to search sports venues by city, sport, date,
           price range, and amenities like floodlights, parking, or indoor
           courts. Turfzo is onboarding verified ground partners city by city,
-          starting with Bangalore, so every bookable slot reflects real
-          availability.
+          starting with Mumbai and expanding across major Indian cities, so
+          every bookable slot reflects real availability.
         </p>
       </div>
 

@@ -322,6 +322,7 @@ export default async function TournamentPage({ params }: Props) {
                 ) : (
                   <Link
                     href={`/tournaments?id=${tournamentId}`}
+                    rel="nofollow"
                     className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-md transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
                   >
                     {isTeamEvent ? "Register Team" : "Register"}

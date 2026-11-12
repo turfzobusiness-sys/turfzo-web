@@ -27,7 +27,7 @@ export const HOME_FAQ_ITEMS = [
   {
     question: "Does Turfzo operate in my city?",
     answer:
-      "Turfzo is launching city by city. Bangalore is the first focus. Check the explore page for the current live venues, or contact us to request your city.",
+      "Turfzo is launching city by city across India — with active venues in Mumbai and upcoming partner rollouts across Bangalore, Delhi NCR, Hyderabad, and Pune. Check the explore page for live venues, or contact us to request your city.",
   },
   {
     question: "How do I list my turf on Turfzo?",

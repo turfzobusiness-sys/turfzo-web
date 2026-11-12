@@ -21,6 +21,8 @@ import {
   INDEXABLE_CITY_SLUGS,
   INDEXABLE_SPORT_SLUGS,
   buildOpenGraph,
+  getLiveCitySlugs,
+  getLiveCitySportSlugs,
   isTestVenue,
 } from "@/lib/seo";
 import { convexClient } from "@/lib/convex";
@@ -232,6 +234,11 @@ export default async function SportLandingPage({ params }: Props) {
   const data = SPORT_DATA[key];
   if (!data) notFound();
 
+  const [liveCitySlugs, liveCitySportSlugs] = await Promise.all([
+    getLiveCitySlugs(),
+    getLiveCitySportSlugs(),
+  ]);
+
   let liveVenues: Turf[] = [];
   if (process.env.NEXT_PUBLIC_CONVEX_DEPLOYMENT_URL) {
     try {
@@ -283,6 +290,7 @@ export default async function SportLandingPage({ params }: Props) {
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <Link
                 href={`/explore?sport=${encodeURIComponent(data.name)}`}
+                rel="nofollow"
                 className="inline-flex items-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm px-6 py-3 rounded-md transition-all"
               >
                 Check Live {data.name} Slots
@@ -343,6 +351,7 @@ export default async function SportLandingPage({ params }: Props) {
                 </h2>
                 <Link
                   href={`/explore?sport=${encodeURIComponent(data.name)}`}
+                  rel="nofollow"
                   className="text-sm font-semibold text-brand-lime hover:underline inline-flex items-center gap-1"
                 >
                   View all <ChevronRight className="w-4 h-4" />
@@ -354,7 +363,7 @@ export default async function SportLandingPage({ params }: Props) {
                     key={v._id}
                     className="bg-surface border border-border-default rounded-xl overflow-hidden flex flex-col"
                   >
-                    <div className="relative aspect-[4/3] bg-elevated">
+                    <Link href={`/venues/${v._id}`} className="relative aspect-[4/3] bg-elevated block">
                       <Image
                         src={getLocalTurfImage(v)}
                         alt={`${v.name} — ${data.name} venue in ${v.city || "India"}`}
@@ -362,7 +371,7 @@ export default async function SportLandingPage({ params }: Props) {
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover"
                       />
-                    </div>
+                    </Link>
                     <div className="p-4 flex-1 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between text-xs text-text-muted mb-1">
@@ -385,10 +394,10 @@ export default async function SportLandingPage({ params }: Props) {
                       </div>
                       <div className="mt-4 pt-3 border-t border-border-default flex items-center justify-between">
                         <Link
-                          href={`/explore?sport=${encodeURIComponent(data.name)}&turfId=${encodeURIComponent(v._id)}`}
+                          href={`/venues/${v._id}`}
                           className="text-xs font-semibold text-brand-lime hover:underline"
                         >
-                          Book slot
+                          View slots &amp; book
                         </Link>
                         <span className="text-sm font-bold text-text-main tabular-nums">
                           ₹{v.price_per_hour.toLocaleString("en-IN")}/hr
@@ -409,10 +418,18 @@ export default async function SportLandingPage({ params }: Props) {
               {INDEXABLE_CITY_SLUGS.map((citySlug) => {
                 const label =
                   citySlug.charAt(0).toUpperCase() + citySlug.slice(1);
+                const hasLiveSportCity = liveCitySportSlugs.has(`${citySlug}/${key}`);
+                const hasLiveCity = liveCitySlugs.has(citySlug);
+                const href = hasLiveSportCity
+                  ? `/cities/${citySlug}/${key}`
+                  : hasLiveCity
+                    ? `/cities/${citySlug}`
+                    : `/explore?city=${citySlug}&sport=${key}`;
                 return (
                   <Link
                     key={citySlug}
-                    href={`/explore?city=${citySlug}&sport=${key}`}
+                    href={href}
+                    rel={hasLiveSportCity || hasLiveCity ? undefined : "nofollow"}
                     className="bg-surface border border-border-default hover:border-brand-lime/40 rounded-lg px-3.5 py-2.5 text-xs font-semibold text-text-main hover:text-brand-lime transition-colors flex items-center justify-between"
                   >
                     <span>{label}</span>
