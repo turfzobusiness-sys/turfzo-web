@@ -11,7 +11,12 @@ import { FavoriteButton } from "@/components/ui/favorite-button";
 import type { Turf } from "@/lib/types";
 import { getLocalTurfImage } from "@/lib/turf-images";
 
-type Props = { params: Promise<{ venueId: string }> };
+type Props = {
+  params: Promise<{ venueId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+const VENUE_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 // React.cache dedupes this per request, so generateMetadata and the page
 // body share one backend call instead of two.
@@ -41,8 +46,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function VenuePage({ params }: Props) {
+export default async function VenuePage({ params, searchParams }: Props) {
   const { venueId } = await params;
+  // Owner slot posters link here with ?date=YYYY-MM-DD&start=<ISO instant>.
+  // Forward only validated values into the booking view, which re-fetches
+  // live availability and preselects the slot only if it still exists.
+  const { date: dateRaw, start: startRaw } = await searchParams;
+  const dateParam =
+    typeof dateRaw === "string" && VENUE_DATE_RE.test(dateRaw.trim())
+      ? dateRaw.trim()
+      : null;
+  const startParam =
+    typeof startRaw === "string" &&
+    startRaw.trim() !== "" &&
+    Number.isFinite(Date.parse(startRaw))
+      ? startRaw.trim()
+      : null;
+
+  const bookingQuery = new URLSearchParams({ turfId: venueId });
+  if (dateParam) bookingQuery.set("date", dateParam);
+  if (startParam) bookingQuery.set("start", startParam);
+  const bookingHref = `/explore?${bookingQuery.toString()}`;
   
   let turf: Turf | null = null;
   try {
@@ -158,7 +182,7 @@ export default async function VenuePage({ params }: Props) {
                   <span className="text-3xl font-extrabold text-text-main tabular-nums">₹{turf.price_per_hour}</span>
                   <span className="text-text-muted text-sm"> / hour</span>
                 </div>
-                <Link href={`/explore?turfId=${venueId}`} className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-4 px-6 rounded-md flex justify-center items-center gap-2 transition-all">
+                <Link href={bookingHref} className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-4 px-6 rounded-md flex justify-center items-center gap-2 transition-all">
                   Check Availability & Book
                   <ChevronRight className="w-4 h-4 stroke-[2.5]" />
                 </Link>

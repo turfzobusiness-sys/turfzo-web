@@ -184,6 +184,23 @@ export function classifyError(err: unknown): AppError {
     });
   }
 
+  // --- Cancelled / timed-out requests ---
+  // The Convex client aborts on a 20s timeout or when the caller unmounts.
+  // Without this, both surfaced as UNKNOWN, so a slow backend looked like a
+  // random bug and the timeout branch never retried.
+  if (
+    raw.name === "AbortError" ||
+    raw.name === "TimeoutError" ||
+    msg.includes("aborted") ||
+    msg.includes("The operation was aborted")
+  ) {
+    return new AppError(
+      "CONVEX_TIMEOUT",
+      "The request took too long. Please try again.",
+      { severity: "warning", cause: raw },
+    );
+  }
+
   // --- Network errors ---
   if (
     msg.includes("Failed to fetch") ||

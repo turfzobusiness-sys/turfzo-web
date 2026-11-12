@@ -1,5 +1,8 @@
 import { datadogRum } from "@datadog/browser-rum";
-import { nextjsPlugin } from "@datadog/browser-rum-nextjs";
+import {
+  nextjsPlugin,
+  onRouterTransitionStart as captureRouterTransitionUrl,
+} from "@datadog/browser-rum-nextjs";
 
 const appId = process.env.NEXT_PUBLIC_DD_APPLICATION_ID;
 const clientToken = process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN;
@@ -7,13 +10,28 @@ const site = process.env.NEXT_PUBLIC_DD_SITE || "us5.datadoghq.com";
 const service = process.env.NEXT_PUBLIC_DD_SERVICE || "turfzo-web";
 const env = process.env.NEXT_PUBLIC_DD_ENV || process.env.NODE_ENV || "development";
 
+/**
+ * Next.js calls this export on every client-side navigation. The nextjs
+ * plugin uses the URL so manually-tracked views keep the pre-pushState
+ * pathname (React renders before history updates).
+ */
+export function onRouterTransitionStart(url: string) {
+  captureRouterTransitionUrl(url);
+}
+
+// `datadogRum.init()` is internally async (session manager, deflate worker),
+// so `getInternalContext()` stays empty for a tick. Two calls in that window
+// (React StrictMode double-effect, Fast Refresh remount) both passed the
+// context check and the second one logged "DD_RUM is already initialized".
+// This synchronous latch makes re-entry impossible.
+let initRequested = false;
+
 export function initDatadog() {
   if (typeof window === "undefined" || !appId || !clientToken) return;
-  // Only initialize if not already initialized
-  if (datadogRum.getInternalContext()) return;
+  if (initRequested || datadogRum.getInternalContext()) return;
+  initRequested = true;
 
   const start = () => {
-    if (datadogRum.getInternalContext()) return;
     datadogRum.init({
       applicationId: appId,
       clientToken: clientToken,

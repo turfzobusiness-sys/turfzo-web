@@ -91,10 +91,18 @@ interface MyRegistration {
 
 interface TournamentDocNested {
   _id: string;
+  // Canonical aliases — `getTournamentById` now returns these alongside the
+  // raw columns, so the detail and list endpoints share one vocabulary.
+  title?: string;
+  sport?: string;
+  format?: string;
+  venue?: string;
+  city?: string | null;
   name: string;
   sport_type: string;
   tournament_type: string;
   entry_fee: number;
+  prize_pool?: number;
   max_participants: number;
   min_team_size?: number;
   max_team_size?: number | null;
@@ -298,11 +306,10 @@ export default function TournamentsPage() {
       }
     }
     let cancelled = false;
-    // `getTournamentById` returns the RAW tournaments document — the fields
-    // are name / sport_type / tournament_type / max_participants, NOT the
-    // title / sport / format / max_teams shape that only `getOpen` produces.
-    // The old mapping read venue/city/current_participants off it, all of
-    // which do not exist there, so the deep-linked card showed blanks.
+    // `getTournamentById` returns the raw document PLUS the same canonical
+    // aliases `getOpen` produces (title / sport / format / venue / city), so
+    // this mapping no longer needs to know which endpoint it came from.
+    // Only the participant count still needs a second call.
     convexClient
       .query<TournamentDocNested | null>("tournaments:getTournamentById", {
         tournamentId: targetTournamentId,
@@ -327,18 +334,17 @@ export default function TournamentsPage() {
         const mapped: Tournament = {
           _id: t._id,
           _creationTime: Date.now(),
-          title: t.name,
-          sport: t.sport_type,
-          format: t.tournament_type,
+          title: t.title ?? t.name,
+          sport: t.sport ?? t.sport_type,
+          format: t.format ?? t.tournament_type,
           description: t.description,
           start_date: t.start_date,
           end_date: t.end_date,
-          // No venue is resolvable from this document — say so instead of
-          // inventing a stadium.
-          venue: "Venue TBA",
-          city: null,
+          venue: t.venue ?? "Venue TBA",
+          city: t.city ?? null,
           entry_fee: t.entry_fee,
-          prize_pool: "Trophy",
+          // Same rendering rule as getOpen: money when set, "Trophy" when not.
+          prize_pool: t.prize_pool ? `₹${t.prize_pool.toLocaleString()}` : "Trophy",
           max_teams: t.max_participants,
           registered_teams: registered,
           status:

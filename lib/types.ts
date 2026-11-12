@@ -31,7 +31,8 @@ export interface Turf {
   location_name?: string;
   latitude?: number;
   longitude?: number;
-  operating_hours?: Record<string, { open: string; close: string }>;
+  /** Backend `operatingHoursValidator`: a single open/close pair, not per-day. */
+  operating_hours?: { open?: string; close?: string };
   max_players?: number;
   has_floodlights?: boolean;
   has_free_parking?: boolean;
@@ -194,6 +195,27 @@ export interface OwnerDashboardSummary {
   cancelledBookings: number;
   completionRate: number;
   turfCount: number;
+  /** Owner's share already paid out to their bank account. */
+  withdrawnTotal?: number;
+  /** How many booking rows the server scan covered. */
+  bookingsScanned?: number;
+  /** True when the server's read budget cut the scan short. */
+  truncated?: boolean;
+}
+
+/** A today booking from owner_dashboard:getSnapshot (`todayBookings`). */
+export interface DayBooking {
+  _id: string;
+  turf_id: string;
+  turf_name?: string;
+  booking_code?: string;
+  start_time: string;
+  end_time: string;
+  total_price: number;
+  status: string;
+  payment_status?: string;
+  payment_method?: string;
+  sport_type?: string;
 }
 
 // =====================================================================
