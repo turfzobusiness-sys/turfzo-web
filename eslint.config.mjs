@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     ".open-next/**",
     // Auto-generated Convex stubs (overwritten by `npx convex dev`).
     "convex/_generated/**",
+    // Cross-repo contract checkout in CI (`actions/checkout` path: turfzo-backend).
+    "turfzo-backend/**",
     // Tooling scripts (preflight, env-diff, vercel sync) — run with node, not the app.
     "scripts/**",
   ]),
