@@ -19,19 +19,15 @@ Canonical URL: https://turfzo.app
 - Tennis Courts: https://turfzo.app/sports/tennis
 - Multipurpose Venues: https://turfzo.app/sports/multipurpose
 
-## Browse by City (Live Availability)
+## Browse by City (Live Availability & City Guides)
+- Live City Explorer: https://turfzo.app/explore
 - Mumbai (Active City Hub): https://turfzo.app/cities/mumbai
-- Bangalore: https://turfzo.app/explore?city=bangalore
-- Delhi: https://turfzo.app/explore?city=delhi
-- Hyderabad: https://turfzo.app/explore?city=hyderabad
-- Pune: https://turfzo.app/explore?city=pune
-- Chennai: https://turfzo.app/explore?city=chennai
-- Kolkata: https://turfzo.app/explore?city=kolkata
-- Ahmedabad: https://turfzo.app/explore?city=ahmedabad
-- Aurangabad: https://turfzo.app/explore?city=aurangabad
+- Chhatrapati Sambhajinagar (CSN / Aurangabad) Guide: https://turfzo.app/blog/turf-booking-chhatrapati-sambhajinagar-csn-aurangabad
+- Bangalore Football Guide: https://turfzo.app/blog/best-football-turfs-bangalore
 
 ## Guides & Blog
 - Blog Index: https://turfzo.app/blog
+- Turf Booking in Chhatrapati Sambhajinagar (CSN / Aurangabad): https://turfzo.app/blog/turf-booking-chhatrapati-sambhajinagar-csn-aurangabad
 - How to Book a Turf Online in India: https://turfzo.app/blog/how-to-book-turf-online
 - Turf Booking Price in India (2026 Guide): https://turfzo.app/blog/turf-booking-price-india
 - Football Turf Booking in Bangalore: https://turfzo.app/blog/best-football-turfs-bangalore

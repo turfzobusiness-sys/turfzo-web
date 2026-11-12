@@ -43,8 +43,11 @@ export function launchCityQueryFor(value: string | null | undefined): string {
     case "delhi ncr":
       return "Delhi";
     case "aurangabad":
+    case "csn":
     case "sambhajinagar":
     case "chh. sambhajinagar":
+    case "chhatrapati sambhajinagar":
+    case "chhatrapati-sambhajinagar":
       return "Aurangabad";
   }
   return first;

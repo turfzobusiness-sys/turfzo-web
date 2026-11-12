@@ -525,18 +525,12 @@ const EXPLORE_SPORT_IDS = [
 const EXPLORE_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function ExploreQuerySync({
-  currentCity,
-  currentSport,
-  currentDate,
   onCity,
   onSport,
   onDate,
   onTurfId,
   onStart,
 }: {
-  currentCity: string;
-  currentSport: string;
-  currentDate: string;
   onCity: (city: string) => void;
   onSport: (sport: string) => void;
   onDate: (date: string) => void;
@@ -544,6 +538,8 @@ function ExploreQuerySync({
   onStart: (startIso: string) => void;
 }) {
   const searchParams = useSearchParams();
+  const queryKey = searchParams.toString();
+  const lastSyncedKeyRef = useRef<string | null>(null);
   const citySlug = (searchParams.get("city") ?? "").trim().toLowerCase();
   const sportSlug = (searchParams.get("sport") ?? "").trim().toLowerCase();
   const turfIdParam = (
@@ -557,23 +553,26 @@ function ExploreQuerySync({
   // after fresh availability loads — the poster never holds a slot.
   const startParam = (searchParams.get("start") ?? "").trim();
   useEffect(() => {
+    if (lastSyncedKeyRef.current === queryKey) return;
+    lastSyncedKeyRef.current = queryKey;
+
     if (citySlug) {
-      // Alias-aware ("bengaluru" → "Bangalore", "sambhajinagar" → "Aurangabad")
+      // Alias-aware ("bengaluru" → "Bangalore", "csn"/"sambhajinagar" → "Aurangabad")
       // then resolved back to the chip label users see.
       const query = launchCityQueryFor(citySlug);
       const label =
         LAUNCH_CITIES.find((c) => c.label.toLowerCase() === citySlug)?.label ??
         LAUNCH_CITIES.find((c) => c.query.toLowerCase() === query.toLowerCase())
           ?.label;
-      if (label && label !== currentCity) onCity(label);
+      if (label) onCity(label);
     }
     if (sportSlug) {
       const match = EXPLORE_SPORT_IDS.find(
         (id) => id.toLowerCase() === sportSlug,
       );
-      if (match && match !== currentSport) onSport(match);
+      if (match) onSport(match);
     }
-    if (EXPLORE_DATE_RE.test(dateParam) && dateParam !== currentDate) {
+    if (EXPLORE_DATE_RE.test(dateParam)) {
       onDate(dateParam);
     }
     if (turfIdParam) {
@@ -583,14 +582,12 @@ function ExploreQuerySync({
       onStart(startParam);
     }
   }, [
+    queryKey,
     citySlug,
     sportSlug,
     dateParam,
     turfIdParam,
     startParam,
-    currentCity,
-    currentSport,
-    currentDate,
     onCity,
     onSport,
     onDate,
@@ -1575,9 +1572,6 @@ export default function ExploreClient({
       <FAQPageSchema items={exploreFaqItems} />
       <Suspense fallback={null}>
         <ExploreQuerySync
-          currentCity={selectedCity}
-          currentSport={selectedSport}
-          currentDate={searchDate}
           onCity={setSelectedCity}
           onSport={setSelectedSport}
           onDate={(d) => {
@@ -1917,41 +1911,188 @@ export default function ExploreClient({
                 </div>
               )}
 
-              {/* Empty warning state */}
-              {!loading && filteredTurfs.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-24 gap-4 bg-surface border border-border-default rounded-xl text-center p-8">
-                  <SlidersHorizontal
-                    className="w-12 h-12 text-text-muted"
-                    strokeWidth={1.2}
-                  />
-                  <div>
-                    <h3 className="font-bold text-lg text-text-main">
-                      No venues found
-                    </h3>
-                    <p className="text-sm text-text-muted mt-1 max-w-sm">
-                      We couldn&apos;t find any sports venues matching your
-                      exact filters. Adjust your queries and slide max price.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setSelectedSport("all");
-                      setSelectedCity("All");
-                      setSearchLocation("");
-                      setFilterFormat("all");
-                      setFilterMinPrice(500);
-                      setFilterMaxPrice(3000);
-                      setMinInputVal("500");
-                      setMaxInputVal("3000");
-                      setFilterAmenities([]);
-                      setSortBy("Popular");
-                    }}
-                    className="mt-2 bg-text-main hover:bg-text-main/90 text-bg text-xs font-semibold px-5 py-2.5 rounded-xl transition-all cursor-pointer"
-                  >
-                    Reset Filters
-                  </button>
-                </div>
-              )}
+              {/* Empty filter state — avoid "No venues found" soft-404 signal; show onboarding + live venues */}
+              {!loading &&
+                filteredTurfs.length === 0 &&
+                (() => {
+                  const resetAllFilters = () => {
+                    setSelectedSport("all");
+                    setSelectedCity("All");
+                    setSearchLocation("");
+                    setFilterFormat("all");
+                    setFilterMinPrice(500);
+                    setFilterMaxPrice(3000);
+                    setMinInputVal("500");
+                    setMaxInputVal("3000");
+                    setFilterAmenities([]);
+                    setSortBy("Popular");
+                    router.replace("/explore", { scroll: false });
+                  };
+                  const fallbackTurfs = allTurfs.slice(0, 6);
+                  const headline =
+                    selectedCity !== "All"
+                      ? `Turfzo is onboarding${selectedSport !== "all" ? ` ${selectedSport.toLowerCase()}` : ""} venues in ${selectedCity}`
+                      : "No venues matched your current filters";
+                  const subtitle =
+                    selectedCity !== "All"
+                      ? `Online bookings for ${selectedCity}${selectedSport !== "all" ? ` (${selectedSport})` : ""} are opening soon as local grounds complete verification. Explore live open venues below or list your own turf.`
+                      : "Adjust your filters or explore all currently open Turfzo sports venues below.";
+                  return (
+                    <div className="space-y-8">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 bg-surface border border-border-default rounded-xl p-6 sm:p-8">
+                        <div className="flex items-start gap-4">
+                          <div className="w-11 h-11 rounded-xl bg-brand-lime/10 flex items-center justify-center text-brand-lime shrink-0">
+                            <MapPin className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-base sm:text-lg text-text-main">
+                              {headline}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-text-muted mt-1 max-w-xl leading-relaxed">
+                              {subtitle}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3 shrink-0">
+                          <button
+                            onClick={resetAllFilters}
+                            className="bg-text-main hover:bg-text-main/90 text-bg text-xs font-semibold px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+                          >
+                            {selectedCity !== "All"
+                              ? "Show All Live Cities"
+                              : "Reset Filters"}
+                          </button>
+                          <Link
+                            href="/owners"
+                            className="bg-elevated border border-border-default hover:border-brand-lime/40 text-text-main text-xs font-semibold px-4 py-2.5 rounded-xl transition-all"
+                          >
+                            List Your Turf
+                          </Link>
+                        </div>
+                      </div>
+
+                      {fallbackTurfs.length > 0 && (
+                        <div>
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-sans font-bold text-lg text-text-main">
+                              Live venues currently open on Turfzo
+                            </h3>
+                            <span className="text-xs text-text-muted">
+                              Showing {fallbackTurfs.length} of{" "}
+                              {allTurfs.length} live venue
+                              {allTurfs.length === 1 ? "" : "s"}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {fallbackTurfs.map((turf) => (
+                              <motion.div
+                                key={turf.id}
+                                initial={false}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="bg-surface border border-border-default rounded-xl overflow-hidden hover:shadow-sm hover:border-border-strong transition-all duration-300 group flex flex-col h-full relative"
+                              >
+                                <button
+                                  onClick={(e) => toggleWishlist(turf.id, e)}
+                                  className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all"
+                                  aria-label="Wishlist"
+                                >
+                                  <Heart
+                                    className={`w-4 h-4 ${wishlist.includes(turf.id) ? "fill-brand-lime text-brand-lime" : "text-white"}`}
+                                  />
+                                </button>
+
+                                <div
+                                  onClick={() => handleOpenSlots(turf)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                      handleOpenSlots(turf);
+                                    }
+                                  }}
+                                  tabIndex={0}
+                                  role="button"
+                                  aria-label={`View slots for ${turf.name}`}
+                                  className="cursor-pointer flex flex-col flex-grow focus-visible:outline-2 focus-visible:outline-brand-lime focus-visible:outline-offset-2"
+                                >
+                                  <div className="relative w-full h-48 bg-elevated overflow-hidden shrink-0">
+                                    <Image
+                                      src={turf.image}
+                                      alt={turf.name}
+                                      fill
+                                      sizes="(max-width: 640px) 100vw, 33vw"
+                                      className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+                                    />
+                                    <div className="absolute top-4 left-4 flex gap-2">
+                                      {turf.premium ? (
+                                        <span className="bg-brand-lime text-white dark:text-black text-[10px] font-extrabold px-2.5 py-1 rounded-md">
+                                          Premium
+                                        </span>
+                                      ) : turf.rating >= 4.7 ? (
+                                        <span className="bg-bg text-text-main text-[10px] font-bold px-2.5 py-1 rounded-md border border-border-default">
+                                          Guest Favorite
+                                        </span>
+                                      ) : null}
+                                    </div>
+                                  </div>
+
+                                  <div className="p-5 pb-3 flex-grow">
+                                    <div className="flex items-center gap-1.5 text-xs text-text-muted mb-2">
+                                      <MapPin className="w-3.5 h-3.5 text-brand-lime shrink-0" />
+                                      <span className="truncate">
+                                        {turf.location}
+                                      </span>
+                                    </div>
+
+                                    <h3 className="text-lg font-bold text-text-main leading-tight mb-2 group-hover:text-brand-lime transition-colors duration-200">
+                                      {turf.name}
+                                    </h3>
+
+                                    <p className="text-xs text-text-muted">
+                                      {turf.sport} · {turf.size} format matches
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="px-5 pb-5">
+                                  <div className="border-t border-border-default pt-4 flex items-center justify-between gap-2">
+                                    <div>
+                                      <span className="block text-[9px] text-text-muted uppercase tracking-wider font-semibold">
+                                        Hourly Rate
+                                      </span>
+                                      <span className="text-lg font-bold text-text-main tabular-nums">
+                                        {formatPrice(turf.price)}
+                                        <span className="text-xs text-text-muted font-normal ml-0.5">
+                                          /hr
+                                        </span>
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <Link
+                                        href={`/venues/${turf.id}`}
+                                        className="text-xs font-semibold text-brand-lime hover:underline"
+                                      >
+                                        Venue details
+                                      </Link>
+                                      <div className="flex items-center gap-1">
+                                        <Star className="w-3.5 h-3.5 fill-text-main text-text-main" />
+                                        <span className="text-xs font-bold text-text-main">
+                                          {turf.rating > 0
+                                            ? turf.rating.toFixed(2)
+                                            : "New"}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
               {/* Turfs Cards Grid */}
               {!loading && filteredTurfs.length > 0 && (
