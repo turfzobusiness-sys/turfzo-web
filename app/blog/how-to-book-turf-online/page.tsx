@@ -41,7 +41,7 @@ const faqItems = [
   {
     question: "Can I cancel my booking?",
     answer:
-      "Yes, you can cancel up to 6 hours before your booking time for a full refund. Cancellations within 6 hours receive a 50% refund.",
+      "Yes. Cancel 24+ hours before the slot for a full refund of the slot price, 6–24 hours before for a 50% refund. Cancellations under 6 hours are non-refundable. The service fee is retained in every case.",
   },
   {
     question: "What happens after I book?",

@@ -4,8 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import {
-  MapPin,
-  Star,
   CheckCircle2,
   ArrowRight,
   ChevronDown,
@@ -14,75 +12,6 @@ import {
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FAQPageSchema, ArticleSchema } from "@/lib/schema";
-
-const turfs = [
-  {
-    name: "Olympic Arena",
-    location: "HSR Layout, Bengaluru",
-    rating: 4.8,
-    reviews: 230,
-    price: 1200,
-    sport: "Football",
-    facilities: ["Floodlights", "Changing Rooms", "Parking", "Water"],
-    premium: true,
-    image: "/images/marketing/explore/football-card.webp",
-  },
-  {
-    name: "Green Valley Turf",
-    location: "Koramangala, Bengaluru",
-    rating: 4.7,
-    reviews: 180,
-    price: 1000,
-    sport: "Football",
-    facilities: ["Floodlights", "Parking", "Cafeteria"],
-    premium: false,
-    image: "/images/marketing/explore/football-card.webp",
-  },
-  {
-    name: "Bangalore Football Arena",
-    location: "Indiranagar, Bengaluru",
-    rating: 4.9,
-    reviews: 120,
-    price: 1500,
-    sport: "Football",
-    facilities: ["Floodlights", "Changing Rooms", "Parking", "Water"],
-    premium: true,
-    image: "/images/marketing/explore/football-card.webp",
-  },
-  {
-    name: "Whitefield Kickers",
-    location: "Whitefield, Bengaluru",
-    rating: 4.5,
-    reviews: 95,
-    price: 800,
-    sport: "Football",
-    facilities: ["Floodlights", "Parking"],
-    premium: false,
-    image: "/images/marketing/explore/football-card.webp",
-  },
-  {
-    name: "JP Nagar Sports Hub",
-    location: "JP Nagar, Bengaluru",
-    rating: 4.6,
-    reviews: 150,
-    price: 900,
-    sport: "Football",
-    facilities: ["Floodlights", "Changing Rooms", "Water"],
-    premium: false,
-    image: "/images/marketing/explore/football-card.webp",
-  },
-  {
-    name: "Electronic City Turf",
-    location: "Electronic City, Bengaluru",
-    rating: 4.4,
-    reviews: 82,
-    price: 700,
-    sport: "Football",
-    facilities: ["Floodlights", "Parking"],
-    premium: false,
-    image: "/images/marketing/explore/football-card.webp",
-  },
-];
 
 const faqItems = [
   {
@@ -202,7 +131,7 @@ export default function BestFootballTurfsBangalore() {
               Best Football Turfs in Bangalore [2026 Guide]
             </h1>
             <p className="mt-4 text-text-muted text-sm font-sans leading-relaxed">
-              Bangalore has 50+ football turfs across the city, from budget-friendly options in Electronic City to premium floodlit venues in Indiranagar. This guide lists the top-rated turfs with real pricing, amenities, and direct booking links so you can find and book the perfect pitch for your next game.
+              Bangalore has one of the densest football-turf markets in India, from budget-friendly options in Electronic City to premium floodlit venues in Indiranagar. Prices vary by area, amenities, and time of day — this guide explains what to expect and how to compare live availability before you book.
             </p>
             <div className="mt-4 flex items-center gap-4 text-xs text-text-muted font-sans">
               <span>By Turfzo Team</span>
@@ -236,56 +165,41 @@ export default function BestFootballTurfsBangalore() {
               Why is Bangalore the Best City for Football Turfs?
             </h2>
             <p className="text-sm text-text-muted font-sans leading-relaxed mb-6">
-              Bangalore has the highest concentration of football turfs in India, with over 50 verified venues across the city. The city&apos;s tech-savvy population, pleasant weather, and strong football culture have driven demand for quality playing surfaces. Most turfs offer floodlights for evening games, making it easy to play after work or on weekends.
+              Bangalore has a high concentration of football turfs, and the number of live venues on Turfzo grows as new partners onboard. The city&apos;s tech-savvy population, pleasant weather, and strong football culture have driven demand for quality playing surfaces. Most turfs offer floodlights for evening games, making it easy to play after work or on weekends.
             </p>
 
             <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mt-12 mb-4">
-              Top Football Turfs in Bangalore by Area
+              Where to Play Football in Bangalore
             </h2>
 
-            {/* Turf Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-8">
-              {turfs.map((turf) => (
-                <div
-                  key={turf.name}
-                  className="bg-surface border border-border-default rounded-xl p-4 hover:border-border-strong transition-all"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-sans font-bold text-sm text-text-main">
-                      {turf.name}
-                    </h3>
-                    {turf.premium && (
-                      <span className="text-[9px] bg-brand-lime/10 text-brand-lime font-bold px-2 py-0.5 rounded-md">
-                        Premium
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[10px] text-text-muted font-sans flex items-center gap-1 mb-2">
-                    <MapPin className="w-3 h-3 text-brand-lime" />{" "}
-                    {turf.location}
-                  </p>
-                  <div className="flex items-center gap-3 text-[10px] text-text-muted font-sans mb-3">
-                    <span className="flex items-center gap-0.5">
-                      <Star className="w-3 h-3 text-brand-lime fill-brand-lime" />{" "}
-                      {turf.rating} ({turf.reviews} reviews)
-                    </span>
-                    <span className="font-bold text-text-main tabular-nums">
-                      ₹{turf.price}/hr
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {turf.facilities.map((f) => (
-                      <span
-                        key={f}
-                        className="text-[9px] bg-elevated text-text-muted px-2 py-0.5 rounded border border-border-subtle flex items-center gap-1"
-                      >
-                        <CheckCircle2 className="w-2.5 h-2.5 text-brand-lime" />{" "}
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            <p className="text-sm text-text-muted font-sans leading-relaxed mb-6">
+              We don&apos;t publish static venue lists — venue quality,
+              pricing, and availability change week to week, and a list that
+              was right last month is wrong tomorrow. Instead, every turf on
+              Turfzo shows its live rating, real hourly price, and bookable
+              slots straight from the source.
+            </p>
+
+            <div className="bg-surface border border-border-default rounded-xl p-4 my-8">
+              <p className="text-xs text-text-muted font-sans leading-relaxed">
+                <span className="font-bold text-text-main">Popular areas:</span>{" "}
+                HSR Layout, Koramangala, and Indiranagar have the densest
+                football-turf clusters. Premium floodlit venues cluster in
+                Indiranagar; budget options are common in Electronic City and
+                Whitefield. Filter by area, price, and floodlights on
+                Turfzo&apos;s explore page to compare what&apos;s actually
+                open for your date and time.
+              </p>
+            </div>
+
+            <div className="flex justify-center my-8">
+              <Link
+                href="/explore"
+                className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm px-6 py-3 rounded-xl transition-all inline-flex items-center gap-2"
+              >
+                Browse live football turfs in Bangalore
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
 
             <h2 className="font-sans font-bold text-xl text-text-main tracking-tight mt-12 mb-4">

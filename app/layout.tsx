@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/lib/theme-context";
 import { OrganizationSchema, WebSiteSchema, SiteNavigationSchema } from "@/lib/schema";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { AuthModal } from "@/components/ui/auth-modal";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { DatadogAppRouter } from "@datadog/browser-rum-nextjs";
 
 const nunito = Nunito({

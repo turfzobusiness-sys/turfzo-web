@@ -46,9 +46,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.tsscratch/
 
-# Agent and documentation files
-AGENTS.md
-DEPLOYMENT.md
-SETUP.md
+# Agent and local config files
 .claude/
 !*.enc
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
+/.graft/
