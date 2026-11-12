@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import {
   CheckCircle2,
   ArrowRight,
@@ -11,7 +8,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { FAQPageSchema, ArticleSchema } from "@/lib/schema";
+import { FAQPageSchema, ArticleSchema, BreadcrumbListSchema } from "@/lib/schema";
 
 const faqItems = [
   {
@@ -54,6 +51,13 @@ const faqItems = [
 export default function BestFootballTurfsBangalore() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
+      <BreadcrumbListSchema
+        items={[
+          { name: "Home", url: "https://turfzo.app" },
+          { name: "Blog", url: "https://turfzo.app/blog" },
+          { name: "Football Turf Booking in Bangalore", url: "https://turfzo.app/blog/best-football-turfs-bangalore" },
+        ]}
+      />
       <ArticleSchema
         name="Football Turf Booking in Bangalore [2026 Guide]"
         description="Football turf booking in Bangalore: typical prices, popular areas, and how to compare live availability."
@@ -88,11 +92,7 @@ export default function BestFootballTurfsBangalore() {
           </nav>
 
           {/* Article Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
-          >
+          <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-brand-lime/10 text-brand-lime font-sans font-bold text-[10px] px-2.5 py-1 rounded-md">
                 City Guide
@@ -111,7 +111,7 @@ export default function BestFootballTurfsBangalore() {
               <span>By Turfzo Team</span>
               <span>Updated May 2026</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* Featured Image */}
           <div className="relative rounded-xl overflow-hidden mb-12 h-64 sm:h-80">

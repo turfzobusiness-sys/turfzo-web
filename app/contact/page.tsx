@@ -15,7 +15,7 @@ import {
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import { FaqAccordion } from "@/components/ui/faq-accordion";
-import { FAQPageSchema } from "@/lib/schema";
+import { FAQPageSchema, ContactPageSchema } from "@/lib/schema";
 import { convexClient } from "@/lib/convex";
 import { useAuth } from "@/lib/auth-context";
 import { getErrorMessage } from "@/lib/errors";
@@ -100,6 +100,12 @@ export default function ContactPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
+      <ContactPageSchema
+        name="Contact Turfzo Support & Partnerships"
+        description="Get in touch with the Turfzo team for booking support, venue owner onboarding, or partnership inquiries."
+        url="https://turfzo.app/contact"
+        email={SUPPORT_EMAIL}
+      />
       <FAQPageSchema items={contactFaqItems} />
       <Header />
 

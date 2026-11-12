@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthModal, type AuthMode } from "@/lib/auth-modal-context";
 import { safeRedirectTarget } from "@/lib/redirect";
 
-export function AuthModalRedirect({ mode }: { mode: AuthMode }) {
+function AuthModalRedirectInner({ mode }: { mode: AuthMode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { openAuthModal } = useAuthModal();
@@ -17,4 +17,12 @@ export function AuthModalRedirect({ mode }: { mode: AuthMode }) {
   }, [mode, openAuthModal, router, searchParams]);
 
   return null;
+}
+
+export function AuthModalRedirect({ mode }: { mode: AuthMode }) {
+  return (
+    <React.Suspense fallback={null}>
+      <AuthModalRedirectInner mode={mode} />
+    </React.Suspense>
+  );
 }

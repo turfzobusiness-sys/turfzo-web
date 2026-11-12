@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildOpenGraph } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Explore Turfs Near You — Book by City & Sport",
@@ -7,13 +8,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://turfzo.app/explore",
   },
-  openGraph: {
+  openGraph: buildOpenGraph({
     title: "Explore Turfs Near You",
     description:
       "Browse football, cricket, badminton and tennis venues across India. Filter by city, sport and price.",
     url: "https://turfzo.app/explore",
-    type: "website",
-  },
+  }),
 };
 
 export default function ExploreLayout({

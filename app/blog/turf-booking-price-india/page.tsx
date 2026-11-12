@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   ArrowRight,
   ChevronDown,
@@ -9,7 +6,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { FAQPageSchema, ArticleSchema } from "@/lib/schema";
+import { FAQPageSchema, ArticleSchema, BreadcrumbListSchema } from "@/lib/schema";
 
 const cityPricing = [
   { city: "Bangalore", min: 700, max: 2000, avg: 1100 },
@@ -46,7 +43,7 @@ const faqItems = [
   {
     question: "Are there any hidden charges in turf booking?",
     answer:
-      "The price shown on the venue page includes the base fare. A small convenience fee and GST are shown at checkout before you pay. There are no hidden charges.",
+      "The price shown on the venue page includes the base hourly rate. A flat 5% platform service fee is shown clearly at checkout before you pay. There are no hidden charges.",
   },
   {
     question: "Can I get a discount on turf booking?",
@@ -63,6 +60,13 @@ const faqItems = [
 export default function TurfBookingPriceIndia() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
+      <BreadcrumbListSchema
+        items={[
+          { name: "Home", url: "https://turfzo.app" },
+          { name: "Blog", url: "https://turfzo.app/blog" },
+          { name: "Turf Booking Price India", url: "https://turfzo.app/blog/turf-booking-price-india" },
+        ]}
+      />
       <ArticleSchema
         name="Turf Booking Price in India [2026 Guide]"
         description="Typical turf booking prices in India for football, cricket and badminton, with city-wise ranges."
@@ -89,11 +93,7 @@ export default function TurfBookingPriceIndia() {
             <span className="text-text-main">Turf Booking Price India</span>
           </nav>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
-          >
+          <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-brand-lime/10 text-brand-lime font-sans font-bold text-[10px] px-2.5 py-1 rounded-md">Research</span>
               <span className="text-[10px] text-text-muted font-sans">May 2026 · 6 min read</span>
@@ -108,7 +108,7 @@ export default function TurfBookingPriceIndia() {
               <span>By Turfzo Team</span>
               <span>Updated May 2026</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* Quick Answer */}
           <div className="bg-surface border border-brand-lime/10 rounded-md p-6 mb-12">

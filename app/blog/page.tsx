@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
+import { ItemListSchema } from "@/lib/schema";
 
 // Server component: metadata (incl. canonical) comes from app/blog/layout.tsx
 // via the Next metadata API. Slugs here include both the dynamic
@@ -104,6 +105,15 @@ const blogPosts = [
 export default function BlogIndex() {
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
+      <ItemListSchema
+        name="Turfzo Guides & Blog"
+        url="https://turfzo.app/blog"
+        items={blogPosts.map((post) => ({
+          name: post.title,
+          url: `https://turfzo.app/blog/${post.slug}`,
+          description: post.excerpt,
+        }))}
+      />
       <Header />
 
       <main className="flex-grow pt-24 pb-16">

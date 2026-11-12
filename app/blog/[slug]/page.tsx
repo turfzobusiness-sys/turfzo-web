@@ -5,27 +5,17 @@ import Image from "next/image";
 import { Calendar, Clock, ChevronRight } from "lucide-react";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
-import { safeJsonLd } from "@/lib/schema";
+import { ArticleSchema, BreadcrumbListSchema } from "@/lib/schema";
+import { buildOpenGraph } from "@/lib/seo";
 
-// We define our schema component locally for the blog Article
-type ArticleSchemaArticle = { title: string; image: string };
-
-function ArticleSchema({ article }: { article: ArticleSchemaArticle }) {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": article.title,
-    "image": [`https://turfzo.app${article.image}`],
-    "datePublished": "2026-05-01T08:00:00+08:00",
-    "dateModified": "2026-05-01T08:00:00+08:00",
-    "author": [{
-        "@type": "Organization",
-        "name": "Turfzo",
-        "url": "https://turfzo.app"
-      }]
-  };
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }} />;
-}
+const RELATED_GUIDES = [
+  { slug: "how-to-book-turf-online", title: "How to Book a Turf Online in India" },
+  { slug: "turf-booking-price-india", title: "Turf Booking Price in India [2026 Guide]" },
+  { slug: "turf-vs-ground", title: "Turf vs Ground: Which Should You Book?" },
+  { slug: "book-football-turf-instantly", title: "How to Book Football Turfs Instantly" },
+  { slug: "organize-local-sports-tournaments", title: "How to Organize Local Sports Tournaments" },
+  { slug: "maximize-turf-roi-booking-management", title: "Maximizing Your Turf's ROI" },
+];
 
 const blogPosts: Record<string, { title: string; seoTitle: string; metaDescription: string; category: string; readTime: string; date: string; image: string; content: React.ReactNode; excerpt: string }> = {
   "book-football-turf-instantly": {
@@ -208,17 +198,20 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = blogPosts[slug];
-  if (!post) return { title: "Post Not Found" };
+  if (!post) notFound();
 
   return {
     title: { absolute: `${post.seoTitle} | Turfzo` },
     description: post.metaDescription,
     alternates: { canonical: `https://turfzo.app/blog/${slug}` },
-    openGraph: {
+    openGraph: buildOpenGraph({
       title: post.title,
       description: post.metaDescription,
+      url: `https://turfzo.app/blog/${slug}`,
       type: "article",
-    }
+      image: post.image,
+      alt: post.title,
+    }),
   };
 }
 
@@ -231,9 +224,33 @@ export default async function BlogPostPage({ params }: Props) {
   const post = blogPosts[slug];
   if (!post) notFound();
 
+  const related = RELATED_GUIDES.filter((g) => g.slug !== slug).slice(0, 3);
+
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <ArticleSchema article={post} />
+      <BreadcrumbListSchema
+        items={[
+          { name: "Home", url: "https://turfzo.app" },
+          { name: "Blog", url: "https://turfzo.app/blog" },
+          { name: post.title, url: `https://turfzo.app/blog/${slug}` },
+        ]}
+      />
+      <ArticleSchema
+        name={post.title}
+        description={post.metaDescription}
+        datePublished="2026-06-01T09:00:00+05:30"
+        dateModified="2026-06-01T09:00:00+05:30"
+        author={{ "@type": "Organization", name: "Turfzo" }}
+        publisher={{
+          "@type": "Organization",
+          name: "Turfzo",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://turfzo.app/turfzo_mascot.svg",
+          },
+        }}
+        image={`https://turfzo.app${post.image}`}
+      />
       <Header />
 
       <main className="flex-grow pt-24 pb-16">
@@ -271,11 +288,30 @@ export default async function BlogPostPage({ params }: Props) {
             {post.content}
           </div>
 
-          <div className="mt-16 pt-8 border-t border-border-default text-center">
-            <h3 className="font-sans font-bold text-xl text-text-main mb-4">Ready to play?</h3>
-            <Link href="/explore" className="inline-flex items-center justify-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-3 px-8 rounded-md transition-all">
-              Book a Turf Now <ChevronRight className="w-4 h-4 stroke-[2.5]" />
-            </Link>
+          <div className="mt-12 pt-8 border-t border-border-default">
+            <h2 className="font-sans font-bold text-lg text-text-main mb-4">Related Turfzo Guides</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
+              {related.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={`/blog/${item.slug}`}
+                  className="bg-surface border border-border-default hover:border-brand-lime/40 rounded-lg p-4 text-xs font-semibold text-text-main hover:text-brand-lime transition-colors"
+                >
+                  {item.title}
+                </Link>
+              ))}
+            </div>
+            <div className="text-center">
+              <h3 className="font-sans font-bold text-xl text-text-main mb-4">Ready to play?</h3>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <Link href="/explore" className="inline-flex items-center justify-center gap-2 bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-sans font-bold text-sm py-3 px-8 rounded-md transition-all">
+                  Book a Turf Now <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+                </Link>
+                <Link href="/owners" className="inline-flex items-center justify-center gap-2 bg-surface border border-border-default hover:border-brand-lime/30 text-text-main font-sans font-semibold text-sm py-3 px-6 rounded-md transition-all">
+                  List Your Turf
+                </Link>
+              </div>
+            </div>
           </div>
         </article>
       </main>

@@ -419,9 +419,9 @@ export default function OwnersPage() {
               </div>
 
               <h1 className="font-sans text-4xl sm:text-5xl lg:text-[3.75rem] xl:text-7xl font-extrabold tracking-tight text-text-main leading-[1.05] mb-5 sm:mb-6">
-                Your Courts.{" "}
+                List Your Turf.{" "}
                 <br className="hidden sm:block" />
-                <span className="text-text-main">Fully Booked.</span>
+                <span className="text-text-main">Keep Every Court Booked.</span>
               </h1>
 
               <p className="font-sans text-base sm:text-lg lg:text-xl text-text-muted leading-relaxed mb-8 sm:mb-10 max-w-xl">

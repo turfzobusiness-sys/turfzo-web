@@ -26,7 +26,9 @@ export interface OrganizationSchemaProps {
     addressCountry: string;
   };
   contactPoint?: {
-    telephone: string;
+    telephone?: string;
+    email?: string;
+    url?: string;
     contactType: string;
     availableLanguage?: string[];
     areaServed?: string;
@@ -330,6 +332,157 @@ export function SiteNavigationSchema({ items }: SiteNavigationSchemaProps) {
       "@id": `${item.url}#nav`,
       "name": item.name,
       "url": item.url,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
+    />
+  );
+}
+
+export interface SportsEventSchemaProps {
+  name: string;
+  description: string;
+  startDate: string;
+  endDate?: string;
+  url: string;
+  sport: string;
+  entryFee: number;
+  image?: string;
+  eventStatus?: string;
+  locationName?: string;
+  city?: string | null;
+}
+
+export function SportsEventSchema({
+  name,
+  description,
+  startDate,
+  endDate,
+  url,
+  sport,
+  entryFee,
+  image,
+  eventStatus,
+  locationName,
+  city,
+}: SportsEventSchemaProps) {
+  const mappedStatus =
+    eventStatus === "cancelled"
+      ? "https://schema.org/EventCancelled"
+      : "https://schema.org/EventScheduled";
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "SportsEvent",
+    name,
+    description,
+    sport,
+    startDate,
+    ...(endDate && { endDate }),
+    url,
+    eventStatus: mappedStatus,
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: {
+      "@type": "Place",
+      name: locationName || "Turfzo Partner Venue",
+      ...(city && {
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: city,
+          addressCountry: "IN",
+        },
+      }),
+    },
+    offers: {
+      "@type": "Offer",
+      price: entryFee,
+      priceCurrency: "INR",
+      url,
+      availability:
+        eventStatus === "cancelled" || eventStatus === "completed"
+          ? "https://schema.org/SoldOut"
+          : "https://schema.org/InStock",
+    },
+    organizer: {
+      "@type": "Organization",
+      name: "Turfzo",
+      url: "https://turfzo.app",
+    },
+    ...(image && { image }),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
+    />
+  );
+}
+
+export interface ContactPageSchemaProps {
+  name: string;
+  description: string;
+  url: string;
+  email?: string;
+}
+
+export function ContactPageSchema({
+  name,
+  description,
+  url,
+  email,
+}: ContactPageSchemaProps) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name,
+    description,
+    url,
+    mainEntity: {
+      "@type": "Organization",
+      name: "Turfzo",
+      url: "https://turfzo.app",
+      ...(email && { email }),
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
+    />
+  );
+}
+
+export interface ItemListEntry {
+  name: string;
+  url: string;
+  description?: string;
+}
+
+export interface ItemListSchemaProps {
+  name: string;
+  url: string;
+  items: ItemListEntry[];
+}
+
+export function ItemListSchema({ name, url, items }: ItemListSchemaProps) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    url,
+    numberOfItems: items.length,
+    itemListElement: items.map((item, idx) => ({
+      "@type": "ListItem",
+      position: idx + 1,
+      name: item.name,
+      url: item.url,
+      ...(item.description && { description: item.description }),
     })),
   };
 

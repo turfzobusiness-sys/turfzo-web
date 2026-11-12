@@ -1,0 +1,55 @@
+# Turfzo — Complete Platform Reference for AI Systems
+
+Canonical domain: https://turfzo.app
+Contact: support@turfzo.app | owners@turfzo.app | partnerships@turfzo.app
+
+## Overview
+Turfzo is an Indian sports venue and turf booking platform where players discover and book hourly slots for football turfs, cricket grounds and nets, badminton courts, tennis courts, and multipurpose arenas. Venue owners manage slot schedules, dynamic pricing rules, promotions, walk-in cash bookings, tournaments, and payouts from a unified Partner Dashboard.
+
+## For Players
+- Explore & Book (`https://turfzo.app/explore`): Filter venues by city, sport, date, price, and facilities (floodlights, parking, changing rooms, drinking water, first aid).
+- Booking Rules: Whole-hour slots (1 to 4 hours) aligned to the hour, bookable up to 7 days in advance within venue operating hours.
+- Checkout & Confirmation: Pay online via UPI, cards, or net banking (powered by Cashfree) or pay at the venue where supported. Confirmed bookings issue a QR pass.
+- Cancellation & Refunds (`https://turfzo.app/refund-policy`):
+  - 24+ hours before slot start: 100% refund of the slot price.
+  - 6 to 24 hours before slot start: 50% refund of the slot price.
+  - Less than 6 hours before slot start: non-refundable.
+  - The 5% platform service fee is retained on cancellations.
+- Tournaments (`https://turfzo.app/tournaments`): Discover local single-elimination team and individual tournaments, track standings, and register.
+
+## For Venue Owners (`https://turfzo.app/owners`)
+- Cost to List: ₹0 upfront or monthly subscription fee.
+- Revenue Share: Owners keep 95% of completed online bookings; Turfzo charges a flat 5% platform commission.
+- Payouts: Direct settlement to verified UPI ID or bank account (NEFT/IMPS) with a 24-hour payout SLA.
+- Operations Tools: Atomic server-side slot locking to prevent double bookings, bulk slot blocks for coaching or maintenance, dynamic pricing rules by hour/day, custom promo codes, tournament bracket hosting, and player analytics.
+
+## Public Routes
+- Home: https://turfzo.app/
+- Explore Turfs: https://turfzo.app/explore
+- How It Works: https://turfzo.app/how-it-works
+- Tournaments: https://turfzo.app/tournaments
+- Venue Owner Software & Onboarding: https://turfzo.app/owners
+- About: https://turfzo.app/about
+- Contact: https://turfzo.app/contact
+- Blog: https://turfzo.app/blog
+- Terms of Service: https://turfzo.app/terms
+- Privacy Policy: https://turfzo.app/privacy
+- Refund & Cancellation Policy: https://turfzo.app/refund-policy
+
+## Browse by Sport
+- Football Turfs: https://turfzo.app/sports/football
+- Cricket Grounds & Nets: https://turfzo.app/sports/cricket
+- Badminton Courts: https://turfzo.app/sports/badminton
+- Tennis Courts: https://turfzo.app/sports/tennis
+- Multipurpose Venues: https://turfzo.app/sports/multipurpose
+
+## Guides & Articles
+- https://turfzo.app/blog/how-to-book-turf-online
+- https://turfzo.app/blog/turf-booking-price-india
+- https://turfzo.app/blog/best-football-turfs-bangalore
+- https://turfzo.app/blog/turf-vs-ground
+- https://turfzo.app/blog/book-football-turf-instantly
+- https://turfzo.app/blog/organize-local-sports-tournaments
+- https://turfzo.app/blog/maximize-turf-roi-booking-management
+- https://turfzo.app/blog/future-of-amateur-sports-india
+- https://turfzo.app/blog/turf-vs-ground-injury-prevention

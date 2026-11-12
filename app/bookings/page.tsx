@@ -378,14 +378,6 @@ export default function BookingsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg text-text-main">
-      <head>
-        <title>My Bookings | Turfzo</title>
-        <meta
-          name="description"
-          content="View and manage your turf bookings on Turfzo. See upcoming slots, past bookings, and download tickets."
-        />
-        <link rel="canonical" href="https://turfzo.app/bookings" />
-      </head>
       <Header />
 
       <main className="flex-grow pt-24 pb-16">

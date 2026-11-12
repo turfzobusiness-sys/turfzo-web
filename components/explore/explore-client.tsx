@@ -1,0 +1,3545 @@
+"use client";
+
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+  Suspense,
+} from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  MapPin,
+  ChevronDown,
+  ChevronLeft,
+  Star,
+  Award,
+  SlidersHorizontal,
+  Check,
+  Heart,
+  ShieldCheck,
+  X,
+  Loader2,
+  Download,
+  ArrowLeft,
+  AlertCircle,
+  Smartphone,
+  Sparkles,
+  Info,
+  Calendar,
+  Wifi,
+  Zap,
+  Droplet,
+  Coffee,
+  Home,
+  Sun,
+  Sunrise,
+  Moon,
+  ParkingCircle,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  GiSoccerBall,
+  GiCricketBat,
+  GiShuttlecock,
+  GiTennisRacket,
+  GiAmericanFootballBall,
+} from "react-icons/gi";
+import { Header } from "@/components/ui/header-2";
+import { getLocalTurfImage } from "@/lib/turf-images";
+import Footer from "@/components/Footer";
+import { convexClient } from "@/lib/convex";
+import { LAUNCH_CITIES, launchCityQueryFor } from "@/lib/launch-cities";
+import { useAuth } from "@/lib/auth-context";
+import { toast } from "sonner";
+import { openCashfreeCheckout, CashfreeCheckoutError } from "@/lib/cashfree";
+import { isViewOnlyMode } from "@/lib/env";
+import { AppError } from "@/lib/errors";
+import type {
+  Turf as ConvexTurf,
+  Booking,
+  FavoriteWithTurf,
+} from "@/lib/types";
+import { FAQPageSchema } from "@/lib/schema";
+import { captureProductEvent } from "@/lib/posthog";
+import ExploreSeoContent from "@/components/ExploreSeoContent";
+
+const exploreFaqItems = [
+  {
+    question: "How do I find a football turf near me?",
+    answer:
+      "Visit turfzo.app/explore, select your city, and browse available football turfs. You can filter by location, price, amenities, and availability. Real-time slots are shown for each venue.",
+  },
+  {
+    question: "What is the average turf booking price in India?",
+    answer:
+      "Turf booking prices typically range from ₹800 to ₹1,500 per hour for football turfs, ₹500 to ₹1,500 for cricket grounds, and ₹300 to ₹800 for badminton courts. Exact rates depend on the venue, facilities, and time slot.",
+  },
+  {
+    question: "Can I book a turf for tonight?",
+    answer:
+      "Yes, Turfzo shows real-time availability. If a turf has open slots for tonight, you can book it instantly and receive a confirmation with a QR code ticket.",
+  },
+  {
+    question: "Which cities are available on Turfzo?",
+    answer:
+      "Turfzo is onboarding venues city by city, starting with Bangalore. Check the explore page for currently live venues, or contact us to request your city.",
+  },
+  {
+    question: "What sports can I book on Turfzo?",
+    answer:
+      "Turfzo supports football, cricket, badminton, tennis, and multipurpose sports venues. Each sport has dedicated filters to help you find the right venue.",
+  },
+  {
+    question: "Is there a cancellation policy?",
+    answer:
+      "Yes. Cancellations more than 24 hours before the scheduled slot receive a 100% slot refund, 6 to 24 hours before receive a 50% slot refund, and cancellations under 6 hours are non-refundable. The service fee is retained in every case.",
+  },
+];
+
+const SPORT_CATEGORIES = [
+  { id: "all", label: "All Sports", icon: TrophyIcon },
+  { id: "Football", label: "Football", icon: GiSoccerBall },
+  { id: "Cricket", label: "Cricket", icon: GiCricketBat },
+  { id: "Badminton", label: "Badminton", icon: GiShuttlecock },
+  { id: "Tennis", label: "Tennis", icon: GiTennisRacket },
+  { id: "Multipurpose", label: "Multipurpose", icon: GiAmericanFootballBall },
+];
+
+function TrophyIcon(props: React.ComponentProps<typeof Award>) {
+  return <Award {...props} />;
+}
+
+interface TurfDisplay {
+  id: string;
+  name: string;
+  location: string;
+  rating: number;
+  reviews: number;
+  price: number;
+  sport: string;
+  size: string;
+  premium: boolean;
+  facilities: string[];
+  image: string;
+  city?: string;
+  /** Owner's own description of the venue (may be absent). */
+  description?: string;
+  /** Owner's uploaded photos, if any. */
+  imageGallery?: string[];
+  /** Turf-local UTC offset (min); backend default 330 when absent. */
+  timezoneOffsetMinutes?: number;
+  hasFloodlights?: boolean;
+  hasFreeParking?: boolean;
+  hasChangingRoom?: boolean;
+  hasDrinkingWater?: boolean;
+  hasFirstAid?: boolean;
+  isIndoor?: boolean;
+  /** Real headcount cap the owner set; drives the attendee stepper. */
+  maxPlayers?: number;
+  /** Number of playable grounds the venue has (info only — the booking
+      model has no pitch field, so we never claim a specific one). */
+  groundCount?: number;
+}
+
+function mapTurf(t: ConvexTurf): TurfDisplay {
+  const location = [t.city, t.state].filter(Boolean).join(", ");
+  return {
+    id: t._id,
+    name: t.name,
+    location: location || t.address || "Location not set",
+    rating: t.rating ?? 0,
+    reviews: t.review_count ?? 0,
+    price: t.price_per_hour,
+    sport: t.sport_type ?? "Multipurpose",
+    size: t.format ?? "N/A",
+    premium: t.tier === "premium",
+    facilities: t.amenities ?? [],
+    image: getLocalTurfImage(t),
+    city: t.city,
+    description: t.description,
+    imageGallery: t.image_gallery,
+    timezoneOffsetMinutes: t.timezone_offset_minutes,
+    hasFloodlights: t.has_floodlights,
+    hasFreeParking: t.has_free_parking,
+    hasChangingRoom: t.has_changing_room,
+    hasDrinkingWater: t.has_drinking_water,
+    hasFirstAid: t.has_first_aid,
+    isIndoor: t.is_indoor,
+    maxPlayers: t.max_players,
+    groundCount: t.ground_count,
+  };
+}
+
+type FlowStep = "listing" | "checkout" | "processing" | "confirmed" | "error";
+
+interface SlotInfo {
+  time: string;
+  available: boolean;
+  // Absolute instants supplied by `turfs:getAvailableSlots`. The backend
+  // owns the turf's operating hours and timezone offset, so the client must
+  // never re-derive these from the "HH:MM" label.
+  start_time: string;
+  end_time: string;
+}
+
+interface BookingPricePreview {
+  subtotal: number;
+  /**
+   * Promo discount the backend already applied to `subtotal`. The backend
+   * (bookings:calculatePreview → pricing.applyPromoToSubtotal) returns
+   * `subtotal` POST-discount, so without this field a promo rendered a
+   * pre-discount-looking base next to a post-discount grand total.
+   */
+  discount: number;
+  serviceFee: number;
+  grandTotal: number;
+}
+
+function toDateKey(d: Date, offsetMinutes?: number) {
+  // Turf-local day, not browser-local: backend maps the day via
+  // turf.timezone_offset_minutes, so build the key in that zone.
+  const offset = offsetMinutes ?? 330;
+  const shifted = new Date(d.getTime() + offset * 60_000);
+  return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, "0")}-${String(shifted.getUTCDate()).padStart(2, "0")}`;
+}
+
+function formatPrice(amount: number) {
+  return `₹${amount.toLocaleString("en-IN")}`;
+}
+
+// Headcount bounds. The lower bound is 2 (a 1-person "booking" is a walk-in,
+// not a slot) and the upper bound comes from the TURF's real max_players.
+// The backend accepts 1..100, so a turf with no max_players set falls back
+// to that documented ceiling rather than an invented 14/22 split.
+const MIN_ATTENDEES = 2;
+const FALLBACK_MAX_ATTENDEES = 100;
+
+function attendeeCeiling(maxPlayers?: number): number {
+  if (
+    !maxPlayers ||
+    !Number.isFinite(maxPlayers) ||
+    maxPlayers < MIN_ATTENDEES
+  ) {
+    return FALLBACK_MAX_ATTENDEES;
+  }
+  return Math.min(Math.round(maxPlayers), FALLBACK_MAX_ATTENDEES);
+}
+
+function clampAttendees(value: number, maxPlayers?: number): number {
+  const ceiling = attendeeCeiling(maxPlayers);
+  if (!Number.isFinite(value)) return Math.min(10, ceiling);
+  return Math.min(Math.max(MIN_ATTENDEES, Math.round(value)), ceiling);
+}
+
+function formatDisplayDate(dateStr: string) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+/* ── Accordion FAQ Item ── */
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="bg-surface border border-border-default rounded-xl overflow-hidden mb-3">
+      <button
+        className="w-full flex items-center justify-between p-4 font-semibold text-text-main text-left cursor-pointer hover:bg-elevated transition-colors"
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span>{question}</span>
+        <ChevronDown
+          className={`w-4 h-4 text-text-muted transition-transform duration-200 ${open ? "rotate-180 text-brand-lime" : ""}`}
+        />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: "hidden" }}
+          >
+            <div className="p-4 pt-0 text-text-muted text-sm border-t border-border-default bg-elevated/20 leading-relaxed">
+              {answer}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ── Custom Select Dropdown ── */
+function CustomSelect({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+    const handleClick = (e: MouseEvent) => {
+      if (!node.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative inline-flex items-center">
+      <button
+        className="bg-surface border border-border-default text-xs font-bold text-text-main px-3 py-1.5 rounded-xl cursor-pointer hover:border-border-strong transition-all flex items-center gap-1 focus:outline-none"
+        onClick={() => setOpen((v) => !v)}
+      >
+        {value}
+        <ChevronDown className="w-3.5 h-3.5 text-text-muted shrink-0" />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full right-0 mt-1.5 min-w-[160px] bg-surface border border-border-default rounded-xl shadow-sm z-50 p-1.5 overflow-hidden"
+          >
+            {options.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+                className={`w-full block text-left px-3 py-2 text-xs rounded-lg cursor-pointer transition-colors focus:outline-none
+                  ${opt === value ? "bg-brand-lime/10 text-brand-lime font-semibold" : "text-text-main hover:bg-elevated"}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ── Calendar Picker — Airbnb-style month grid ── */
+function CalendarPicker({
+  selected,
+  onSelect,
+  onClose,
+  offsetMinutes,
+}: {
+  selected: string;
+  onSelect: (v: string) => void;
+  onClose?: () => void;
+  /** Turf-local UTC offset for day keys; defaults to IST (330). */
+  offsetMinutes?: number;
+}) {
+  const todayRef = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+  // Booking window: slots are only bookable 7 days out (today..today+6,
+  // enforced by the backend) — the calendar mirrors it so no dead-end
+  // dates are shown.
+  const maxRef = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 6);
+    return d;
+  }, []);
+  const [viewMonth, setViewMonth] = useState(() => {
+    const d = new Date(selected);
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
+
+  const monthLabel = viewMonth.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+  const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+  const days = useMemo(() => {
+    const year = viewMonth.getFullYear();
+    const month = viewMonth.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const result: {
+      date: Date;
+      key: string;
+      disabled: boolean;
+      isToday: boolean;
+      label: number;
+    }[] = [];
+    for (let i = 0; i < firstDay; i++) {
+      result.push({
+        date: new Date(year, month, -firstDay + i + 1),
+        key: `pad-${i}`,
+        disabled: true,
+        isToday: false,
+        label: -firstDay + i + 1,
+      });
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dt = new Date(year, month, d);
+      dt.setHours(0, 0, 0, 0);
+      const key = toDateKey(dt, offsetMinutes);
+      result.push({
+        date: dt,
+        key,
+        disabled: dt < todayRef || dt.getTime() > maxRef.getTime(),
+        isToday: dt.getTime() === todayRef.getTime(),
+        label: d,
+      });
+    }
+    return result;
+  }, [viewMonth, todayRef, maxRef, offsetMinutes]);
+
+  const canGoPrev =
+    viewMonth.getFullYear() > todayRef.getFullYear() ||
+    (viewMonth.getFullYear() === todayRef.getFullYear() &&
+      viewMonth.getMonth() > todayRef.getMonth());
+  const canGoNext = viewMonth.getTime() < maxRef.getTime();
+
+  return (
+    <div className="w-[280px]">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <button
+          disabled={!canGoPrev}
+          onClick={() =>
+            setViewMonth(
+              new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1),
+            )
+          }
+          className="w-8 h-8 rounded-full border-none bg-elevated hover:bg-border-default disabled:opacity-30 disabled:cursor-default flex items-center justify-center cursor-pointer transition-all duration-200"
+        >
+          <ChevronLeft className="w-4 h-4 text-text-main" />
+        </button>
+        <span className="text-sm font-bold text-text-main">{monthLabel}</span>
+        <button
+          disabled={!canGoNext}
+          onClick={() =>
+            setViewMonth(
+              new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1),
+            )
+          }
+          className="w-8 h-8 rounded-full border-none bg-elevated hover:bg-border-default flex items-center justify-center cursor-pointer transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft className="w-4 h-4 text-text-main rotate-180" />
+        </button>
+      </div>
+
+      {/* Weekday headers */}
+      <div className="grid grid-cols-7 mb-1">
+        {weekdays.map((wd) => (
+          <div
+            key={wd}
+            className="text-center text-[10px] font-bold text-text-muted py-1"
+          >
+            {wd}
+          </div>
+        ))}
+      </div>
+
+      {/* Day grid */}
+      <div className="grid grid-cols-7 gap-0.5">
+        {days.map((day) => {
+          const isSelected = day.key === selected;
+          const isCurrentMonth = day.key.startsWith(
+            `${viewMonth.getFullYear()}-${String(viewMonth.getMonth() + 1).padStart(2, "0")}`,
+          );
+          return (
+            <button
+              key={day.key}
+              disabled={day.disabled || !isCurrentMonth}
+              onClick={() => {
+                if (!day.disabled && isCurrentMonth) {
+                  onSelect(day.key);
+                  if (onClose) onClose();
+                }
+              }}
+              className={`w-8 h-8 rounded-full border-none p-0 mx-auto text-xs flex items-center justify-center transition-all duration-150
+                ${
+                  isSelected
+                    ? "bg-text-main text-bg font-bold"
+                    : day.disabled || !isCurrentMonth
+                      ? "text-text-muted/40 cursor-default"
+                      : "text-text-main hover:bg-elevated cursor-pointer"
+                } ${day.isToday && !isSelected ? "ring-1 ring-brand-lime" : ""}`}
+            >
+              {day.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Error codes meaning "we could not get a definitive answer" (transport/
+// server-side) rather than "the payment definitively failed" — mirrors the
+// app's isTransientConvexError. For these the outcome is UNKNOWN: the money
+// may have been collected, so NEVER cancel the booking in response.
+function isTransientPaymentError(err: unknown): boolean {
+  if (err instanceof CashfreeCheckoutError) {
+    return err.outcome === "unknown";
+  }
+  const code = err instanceof AppError ? err.code : "";
+  return [
+    "NETWORK_ERROR",
+    "CONVEX_SERVER_ERROR",
+    "CONVEX_RATE_LIMITED",
+    "CONVEX_INVALID_RESPONSE",
+  ].includes(code);
+}
+
+// Preselects filters from /cities deep links (/explore?city=<slug>&sport=<slug>).
+// Isolated in its own component so the useSearchParams hook sits under a
+// Suspense boundary (required by Next for prerendered routes) while the rest
+// of the page is untouched. Unknown values are ignored — existing filter
+// behavior is preserved.
+const EXPLORE_SPORT_IDS = [
+  "Football",
+  "Cricket",
+  "Badminton",
+  "Tennis",
+  "Multipurpose",
+];
+
+const EXPLORE_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function ExploreQuerySync({
+  currentCity,
+  currentSport,
+  currentDate,
+  onCity,
+  onSport,
+  onDate,
+  onTurfId,
+  onStart,
+}: {
+  currentCity: string;
+  currentSport: string;
+  currentDate: string;
+  onCity: (city: string) => void;
+  onSport: (sport: string) => void;
+  onDate: (date: string) => void;
+  onTurfId: (turfId: string) => void;
+  onStart: (startIso: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  const citySlug = (searchParams.get("city") ?? "").trim().toLowerCase();
+  const sportSlug = (searchParams.get("sport") ?? "").trim().toLowerCase();
+  const turfIdParam = (
+    searchParams.get("turfId") ??
+    searchParams.get("id") ??
+    ""
+  ).trim();
+  // The home hero sends ?date=YYYY-MM-DD for Today / Tomorrow / This Weekend.
+  const dateParam = (searchParams.get("date") ?? "").trim();
+  // Owner slot posters add ?start=<ISO instant>. The slot is only preselected
+  // after fresh availability loads — the poster never holds a slot.
+  const startParam = (searchParams.get("start") ?? "").trim();
+  useEffect(() => {
+    if (citySlug) {
+      // Alias-aware ("bengaluru" → "Bangalore", "sambhajinagar" → "Aurangabad")
+      // then resolved back to the chip label users see.
+      const query = launchCityQueryFor(citySlug);
+      const label =
+        LAUNCH_CITIES.find((c) => c.label.toLowerCase() === citySlug)?.label ??
+        LAUNCH_CITIES.find((c) => c.query.toLowerCase() === query.toLowerCase())
+          ?.label;
+      if (label && label !== currentCity) onCity(label);
+    }
+    if (sportSlug) {
+      const match = EXPLORE_SPORT_IDS.find(
+        (id) => id.toLowerCase() === sportSlug,
+      );
+      if (match && match !== currentSport) onSport(match);
+    }
+    if (EXPLORE_DATE_RE.test(dateParam) && dateParam !== currentDate) {
+      onDate(dateParam);
+    }
+    if (turfIdParam) {
+      onTurfId(turfIdParam);
+    }
+    if (startParam && Number.isFinite(Date.parse(startParam))) {
+      onStart(startParam);
+    }
+  }, [
+    citySlug,
+    sportSlug,
+    dateParam,
+    turfIdParam,
+    startParam,
+    currentCity,
+    currentSport,
+    currentDate,
+    onCity,
+    onSport,
+    onDate,
+    onTurfId,
+    onStart,
+  ]);
+  return null;
+}
+
+export default function ExploreClient({
+  initialTurfs,
+}: {
+  initialTurfs?: ConvexTurf[];
+}) {
+  const router = useRouter();
+  const { status, firebaseUser, convexUser, getFreshToken } = useAuth();
+  const viewOnly = isViewOnlyMode();
+
+  // Synchronous double-submit guard: setFlowStep("processing") only shields
+  // the button after a re-render, so two clicks in the same frame would
+  // otherwise create two pending bookings.
+  const payInFlight = useRef(false);
+
+  const [flowStep, setFlowStep] = useState<FlowStep>("listing");
+  const [viewMode, setViewMode] = useState<"list" | "details">("list");
+  const [selectedTurf, setSelectedTurf] = useState<TurfDisplay | null>(null);
+  const [targetTurfId, setTargetTurfId] = useState<string | null>(null);
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [allTurfs, setAllTurfs] = useState<TurfDisplay[]>(() =>
+    initialTurfs ? initialTurfs.map(mapTurf) : [],
+  );
+  const [loading, setLoading] = useState(() => !initialTurfs);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(
+    null,
+  );
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+  const [downloadQrUrl, setDownloadQrUrl] = useState<string>("");
+
+  const [searchLocation, setSearchLocation] = useState("");
+  // Launch-city chip filter ("All" = no city restriction). Labels come
+  // from the shared launch list — same nine cities as the mobile app.
+  const [selectedCity, setSelectedCity] = useState<string>("All");
+  const [searchDate, setSearchDate] = useState(() => toDateKey(new Date()));
+  const [whenCalendarOpen, setWhenCalendarOpen] = useState(false);
+  const [sportDropdownOpen, setSportDropdownOpen] = useState(false);
+  const [selectedSport, setSelectedSport] = useState("all");
+  const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
+  const [filterFormat, setFilterFormat] = useState("all");
+  const [filterMinPrice, setFilterMinPrice] = useState(500);
+  const [filterMaxPrice, setFilterMaxPrice] = useState(3000);
+  const [filterAmenities, setFilterAmenities] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("Popular");
+
+  const [hoveredSlider, setHoveredSlider] = useState<"min" | "max" | null>(
+    null,
+  );
+  const [activeSlider, setActiveSlider] = useState<"min" | "max" | null>(null);
+  const [minInputVal, setMinInputVal] = useState("500");
+  const [maxInputVal, setMaxInputVal] = useState("3000");
+
+  const [selectedDate, setSelectedDate] = useState<string>(
+    toDateKey(new Date()),
+  );
+  const [availableSlots, setAvailableSlots] = useState<SlotInfo[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
+  // Poster deep links (?start=ISO): select the matching slot once fresh
+  // availability for the requested day has loaded. Cleared on the first
+  // slot-load completion, whether or not the advertised slot survived.
+  const pendingSlotStartRef = useRef<string | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<
+    "upi" | "card" | "netbanking" | "pay_at_venue"
+  >("upi");
+  const [attendees, setAttendees] = useState(10);
+  const [showCalendarBooking, setShowCalendarBooking] = useState(false);
+  const [pricePreview, setPricePreview] = useState<BookingPricePreview | null>(
+    null,
+  );
+  const [promoCode] = useState("");
+  const [holdSeconds, setHoldSeconds] = useState<number | null>(null);
+
+  const groupedSlots = useMemo(() => {
+    const groups: { title: string; icon: LucideIcon; slots: SlotInfo[] }[] = [
+      { title: "Morning", icon: Sunrise, slots: [] },
+      { title: "Evening", icon: Sun, slots: [] },
+      { title: "Night", icon: Moon, slots: [] },
+    ];
+    availableSlots.forEach((slot) => {
+      const startHourStr = slot.time.split(" ")[0].split(":")[0];
+      const hour = parseInt(startHourStr, 10);
+      if (hour < 12) groups[0].slots.push(slot);
+      else if (hour < 18) groups[1].slots.push(slot);
+      else groups[2].slots.push(slot);
+    });
+    return groups.filter((g) => g.slots.length > 0);
+  }, [availableSlots]);
+
+  // Resolve the selected label back to the server-supplied slot so every
+  // downstream call uses the backend's instants. Goes null while a date
+  // change is refetching, which correctly gates the checkout button.
+  const selectedSlot = useMemo(
+    () => availableSlots.find((s) => s.time === selectedTimeSlot) ?? null,
+    [availableSlots, selectedTimeSlot],
+  );
+
+  const format12HourRange = (timeStr: string) => {
+    if (!timeStr) return "";
+    const parts = timeStr.split(" - ");
+    if (parts.length !== 2) return timeStr;
+    const formatTime = (t: string) => {
+      const [h, m] = t.split(":");
+      const hour = parseInt(h, 10);
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${m} ${ampm}`;
+    };
+    return `${formatTime(parts[0])} - ${formatTime(parts[1])}`;
+  };
+
+  const hasInitialTurfs = Boolean(initialTurfs);
+
+  useEffect(() => {
+    async function fetchTurfs() {
+      try {
+        const data = await convexClient.query<ConvexTurf[]>(
+          "turfs:getAvailable",
+          {},
+        );
+        void captureProductEvent("discovery.loaded", {
+          results_count: data.length,
+        });
+        setAllTurfs(data.map(mapTurf));
+      } catch (err) {
+        console.error("Failed to fetch turfs:", err);
+        if (!hasInitialTurfs) {
+          setLoadError(
+            "Could not load turfs. Please check your connection and try again.",
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTurfs();
+  }, [hasInitialTurfs]);
+
+  // Load the user's saved turfs from the backend so the heart reflects the
+  // same favorites as the app and the profile page (persisted, not local).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (status !== "authenticated" || !convexUser?._id) {
+        if (!cancelled) setWishlist([]);
+        return;
+      }
+      try {
+        const data = await convexClient.query<FavoriteWithTurf[]>(
+          "favorites:getByUser",
+          { user_id: convexUser._id, limit: 50 },
+        );
+        if (!cancelled) {
+          setWishlist(data?.map((f) => f.turf_id) ?? []);
+        }
+      } catch (err) {
+        console.error("Failed to load favorites:", err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [status, convexUser?._id]);
+
+  useEffect(() => {
+    if (viewMode === "details" && selectedTurf) {
+      let cancelled = false;
+      const fetchSlots = async () => {
+        setLoadingSlots(true);
+        try {
+          const slots = await convexClient.query<SlotInfo[]>(
+            "turfs:getAvailableSlots",
+            { turf_id: selectedTurf.id, date: selectedDate },
+          );
+          if (cancelled) return;
+          // NOTE: no mock fallback here — in mock mode the mock client
+          // supplies the slots; in live mode an empty list means the
+          // turf is closed/fully booked for that date.
+          const loadedSlots = slots ?? [];
+          setAvailableSlots(loadedSlots);
+          // Owner poster intent: preselect the advertised instant only if the
+          // fresh `getAvailableSlots` payload still contains it as available.
+          const pendingStart = pendingSlotStartRef.current;
+          if (pendingStart) {
+            pendingSlotStartRef.current = null;
+            const target = Date.parse(pendingStart);
+            const match = Number.isFinite(target)
+              ? loadedSlots.find(
+                  (s) => s.available && Date.parse(s.start_time) === target,
+                )
+              : undefined;
+            if (match) setSelectedTimeSlot(match.time);
+          }
+          setLoadingSlots(false);
+        } catch (err) {
+          console.error("Failed to fetch slots:", err);
+          if (!cancelled) {
+            setAvailableSlots([]);
+            pendingSlotStartRef.current = null;
+            setLoadingSlots(false);
+          }
+        }
+      };
+      fetchSlots();
+      return () => {
+        cancelled = true;
+      };
+    }
+  }, [viewMode, selectedTurf, selectedDate]);
+
+  useEffect(() => {
+    if (!selectedTurf || !selectedSlot) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const preview = await convexClient.query<BookingPricePreview>(
+          "bookings:calculatePreview",
+          {
+            turf_id: selectedTurf.id,
+            start_time: selectedSlot.start_time,
+            end_time: selectedSlot.end_time,
+            ...(promoCode.trim()
+              ? { promo_code: promoCode.trim().toUpperCase() }
+              : {}),
+          },
+        );
+        if (!cancelled) {
+          setPricePreview(preview);
+        }
+      } catch {
+        if (!cancelled) {
+          setPricePreview(null);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedTurf, selectedSlot, promoCode]);
+
+  // 7-min hold countdown once checkout starts.
+  useEffect(() => {
+    if (holdSeconds === null) return;
+    if (holdSeconds <= 0) return;
+    const t = setTimeout(() => setHoldSeconds((s) => (s ?? 1) - 1), 1000);
+    return () => clearTimeout(t);
+  }, [holdSeconds]);
+
+  useEffect(() => {
+    const handleOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("[data-when-calendar]")) {
+        setWhenCalendarOpen(false);
+      }
+      if (!target.closest("[data-sport-dropdown]")) {
+        setSportDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, []);
+
+  const filteredTurfs = useMemo(() => {
+    let result = allTurfs;
+    if (selectedSport !== "all") {
+      result = result.filter(
+        (t) => t.sport.toLowerCase() === selectedSport.toLowerCase(),
+      );
+    }
+    if (selectedCity !== "All") {
+      // Canonical backend city for the label ("CSN (Aurangabad)" →
+      // "Aurangabad").
+      const cityQuery = launchCityQueryFor(selectedCity);
+      result = result.filter((t) => t.city === cityQuery);
+    }
+    if (searchLocation) {
+      // Free-text match is alias-aware too — typing "CSN" or
+      // "Sambhajinagar" still finds Aurangabad turfs.
+      const typedQuery = launchCityQueryFor(searchLocation).toLowerCase();
+      const typedRaw = searchLocation.toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.location.toLowerCase().includes(typedRaw) ||
+          (t.city && t.city.toLowerCase().includes(typedRaw)) ||
+          (t.city && t.city.toLowerCase().includes(typedQuery)) ||
+          (t.city &&
+            launchCityQueryFor(t.city).toLowerCase().includes(typedQuery)),
+      );
+    }
+    if (filterFormat !== "all") {
+      result = result.filter(
+        (t) => t.size.toLowerCase() === filterFormat.toLowerCase(),
+      );
+    }
+    result = result.filter(
+      (t) => t.price >= filterMinPrice && t.price <= filterMaxPrice,
+    );
+    if (filterAmenities.length > 0) {
+      result = result.filter((t) => {
+        return filterAmenities.every((amenityId) => {
+          if (amenityId === "instant")
+            return (
+              t.premium ||
+              t.facilities.some(
+                (f) =>
+                  f.toLowerCase().includes("instant") ||
+                  f.toLowerCase().includes("confirm"),
+              )
+            );
+          if (amenityId === "wifi")
+            return t.facilities.some(
+              (f) =>
+                f.toLowerCase().includes("wifi") ||
+                f.toLowerCase().includes("internet"),
+            );
+          if (amenityId === "parking")
+            return (
+              t.hasFreeParking ||
+              t.facilities.some((f) => f.toLowerCase().includes("parking"))
+            );
+          if (amenityId === "floodlight")
+            return (
+              t.hasFloodlights ||
+              t.facilities.some(
+                (f) =>
+                  f.toLowerCase().includes("flood") ||
+                  f.toLowerCase().includes("light"),
+              )
+            );
+          if (amenityId === "water")
+            return (
+              t.hasDrinkingWater ||
+              t.facilities.some((f) => f.toLowerCase().includes("water"))
+            );
+          if (amenityId === "changing")
+            return (
+              t.hasChangingRoom ||
+              t.facilities.some(
+                (f) =>
+                  f.toLowerCase().includes("changing") ||
+                  f.toLowerCase().includes("restroom") ||
+                  f.toLowerCase().includes("shower") ||
+                  f.toLowerCase().includes("washroom"),
+              )
+            );
+          if (amenityId === "rental")
+            return t.facilities.some(
+              (f) =>
+                f.toLowerCase().includes("rental") ||
+                f.toLowerCase().includes("equipment") ||
+                f.toLowerCase().includes("bat") ||
+                f.toLowerCase().includes("ball"),
+            );
+          if (amenityId === "first-aid")
+            return (
+              t.hasFirstAid ||
+              t.facilities.some(
+                (f) =>
+                  f.toLowerCase().includes("first aid") ||
+                  f.toLowerCase().includes("medical") ||
+                  f.toLowerCase().includes("safety"),
+              )
+            );
+          if (amenityId === "cafeteria")
+            return t.facilities.some(
+              (f) =>
+                f.toLowerCase().includes("cafe") ||
+                f.toLowerCase().includes("food") ||
+                f.toLowerCase().includes("refreshment") ||
+                f.toLowerCase().includes("canteen"),
+            );
+          if (amenityId === "indoor")
+            return (
+              t.isIndoor ||
+              t.facilities.some((f) => f.toLowerCase().includes("indoor"))
+            );
+          if (amenityId === "outdoor")
+            return (
+              !t.isIndoor ||
+              t.facilities.some((f) => f.toLowerCase().includes("outdoor"))
+            );
+          return false;
+        });
+      });
+    }
+    if (sortBy === "Popular") {
+      result = [...result].sort((a, b) => b.rating - a.rating);
+    } else if (sortBy === "Price: Low to High") {
+      result = [...result].sort((a, b) => a.price - b.price);
+    } else if (sortBy === "Price: High to Low") {
+      result = [...result].sort((a, b) => b.price - a.price);
+    }
+    return result;
+  }, [
+    allTurfs,
+    selectedSport,
+    searchLocation,
+    selectedCity,
+    filterFormat,
+    filterMinPrice,
+    filterMaxPrice,
+    filterAmenities,
+    sortBy,
+  ]);
+
+  useEffect(() => {
+    void captureProductEvent("discovery.results_viewed", {
+      results_count: filteredTurfs.length,
+      city: selectedCity,
+      sport: selectedSport,
+      sort: sortBy,
+      active_filter_count:
+        Number(selectedCity !== "All") +
+        Number(selectedSport !== "all") +
+        Number(filterFormat !== "all") +
+        Number(filterAmenities.length > 0) +
+        Number(filterMinPrice > 500 || filterMaxPrice < 3000),
+    });
+  }, [
+    filteredTurfs.length,
+    selectedCity,
+    selectedSport,
+    sortBy,
+    filterFormat,
+    filterAmenities.length,
+    filterMinPrice,
+    filterMaxPrice,
+  ]);
+
+  const toggleWishlist = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (status !== "authenticated" || !convexUser?._id) {
+      router.push("/auth/login?redirect=/explore");
+      return;
+    }
+    const isFavorited = wishlist.includes(id);
+    setWishlist((prev) =>
+      isFavorited ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+    // Favorites are authenticated writes: send a fresh token and retry once
+    // on 401 (token raced expiry), mirroring the dashboard's withAuthRetry.
+    const withFavAuthRetry = async (
+      path: string,
+      args: Record<string, unknown>,
+      token: string | undefined,
+    ): Promise<void> => {
+      try {
+        await convexClient.mutation(path, args, token);
+      } catch (err) {
+        const code = (err as { code?: string })?.code;
+        if (code === "CONVEX_UNAUTHORIZED") {
+          const retryToken = await getFreshToken().catch(() => undefined);
+          await convexClient.mutation(path, args, retryToken);
+          return;
+        }
+        throw err;
+      }
+    };
+    try {
+      const token = await getFreshToken().catch(() => undefined);
+      if (isFavorited) {
+        await withFavAuthRetry("favorites:remove", { turf_id: id }, token);
+      } else {
+        await withFavAuthRetry("favorites:add", { turf_id: id }, token);
+      }
+    } catch (err) {
+      console.error("Failed to update favorite:", err);
+      setWishlist((prev) =>
+        isFavorited ? [...prev, id] : prev.filter((x) => x !== id),
+      );
+      const { getErrorMessage } = await import("@/lib/errors");
+      toast.error(getErrorMessage(err, "Could not update favourite."));
+    }
+  };
+
+  const handleOpenSlots = useCallback(
+    (turf: TurfDisplay) => {
+      void captureProductEvent("discovery.turf_opened", {
+        sport: turf.sport,
+        city: turf.city ?? "unknown",
+      });
+      setSelectedTurf(turf);
+      // Seed the headcount from the venue's real cap instead of a hardcoded
+      // premium/standard guess, and never exceed it.
+      setAttendees((prev) => clampAttendees(prev, turf.maxPlayers));
+      setSelectedDate(searchDate);
+      setViewMode("details");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [searchDate],
+  );
+
+  useEffect(() => {
+    if (!targetTurfId) return;
+    if (allTurfs.length > 0) {
+      const found = allTurfs.find((t) => t.id === targetTurfId);
+      if (found) {
+        const timer = setTimeout(() => {
+          handleOpenSlots(found);
+          setTargetTurfId(null);
+        }, 0);
+        return () => clearTimeout(timer);
+      }
+    }
+    let cancelled = false;
+    convexClient
+      .query<ConvexTurf | null>("turfs:getById", { turfId: targetTurfId })
+      .then((t) => {
+        if (!cancelled && t) {
+          handleOpenSlots(mapTurf(t));
+          setTargetTurfId(null);
+        }
+      })
+      .catch((e) => console.error("Could not load direct turf link:", e));
+    return () => {
+      cancelled = true;
+    };
+  }, [targetTurfId, allTurfs, handleOpenSlots]);
+
+  const handleProceedToCheckout = () => {
+    if (viewOnly) return;
+    if (!selectedTimeSlot) return;
+    if (status !== "authenticated") {
+      router.push("/auth/login?redirect=/explore");
+      return;
+    }
+    setBookingError(null);
+    void captureProductEvent("booking.checkout_started", {
+      sport: selectedTurf?.sport ?? "unknown",
+      city: selectedTurf?.city ?? "unknown",
+      payment_method: selectedPayment,
+    });
+    setFlowStep("checkout");
+  };
+
+  // Derived price preview: null whenever the current selection is invalid,
+  // so a stale preview from a previous slot is never shown. The effect above
+  // only fetches fresh previews for a valid selection (no synchronous
+  // setState-in-effect).
+  const effectivePricePreview =
+    !selectedTurf || !selectedSlot ? null : pricePreview;
+
+  const getPricingDetails = () => {
+    if (!selectedTurf)
+      return {
+        subtotal: 0,
+        discount: 0,
+        serviceFee: 0,
+        convenience: 0,
+        gst: 0,
+        total: 0,
+        totalPaise: 0,
+      };
+    const subtotal = effectivePricePreview?.subtotal ?? selectedTurf.price;
+    // Fail-closed: the backend's service fee (total_price + service_fee) is
+    // the real charge — never synthesize a fee client-side when the preview
+    // hasn't loaded, or the breakdown won't match what the booking actually
+    // charges. Pay is blocked until the preview arrives (see handlePayNow
+    // guard below).
+    const serviceFee = effectivePricePreview?.serviceFee ?? 0;
+    const discount = effectivePricePreview?.discount ?? 0;
+    const total = effectivePricePreview?.grandTotal ?? subtotal;
+    return {
+      subtotal,
+      discount,
+      serviceFee,
+      convenience: 0,
+      gst: 0,
+      total,
+      totalPaise: total * 100,
+    };
+  };
+
+  const handlePayNow = async () => {
+    if (viewOnly) return;
+    if (payInFlight.current) return;
+    if (!selectedTurf || !selectedTimeSlot || !firebaseUser) {
+      setBookingError("Missing booking details. Please try again.");
+      return;
+    }
+    if (!selectedSlot) {
+      setBookingError("Invalid time slot selected.");
+      return;
+    }
+    // Fail-closed: never charge from a client-guessed total. The backend
+    // preview (calculatePreview) is the only price authority.
+    if (!effectivePricePreview) {
+      setBookingError(
+        "Price preview is still loading. Please wait a moment and try again.",
+      );
+      return;
+    }
+    payInFlight.current = true;
+    setFlowStep("processing");
+    setBookingError(null);
+    setHoldSeconds(6 * 60);
+
+    // Track the pending booking ID so we can cancel it on failure / abort,
+    // freeing the slot for other users (abandonment cleanup).
+    let pendingBookingId: string | null = null;
+
+    try {
+      // Force-refresh the auth token before any payment calls
+      const token = await getFreshToken();
+
+      // Revalidate the slot right before reserving — the grid may be stale
+      // after sitting on checkout. Fail early instead of after Cashfree.
+      const fresh = await convexClient.query<boolean>(
+        "bookings:isSlotAvailable",
+        {
+          turfId: selectedTurf.id,
+          startTime: selectedSlot.start_time,
+          endTime: selectedSlot.end_time,
+        },
+        token,
+      );
+      if (!fresh) {
+        throw new Error("That slot was just taken. Please pick another time.");
+      }
+
+      // ── Step 1: Create a pending booking (reserves the slot) ──
+      const pendingBooking = await convexClient.mutation<Booking>(
+        "bookings:createPending",
+        {
+          turf_id: selectedTurf.id,
+          start_time: selectedSlot.start_time,
+          end_time: selectedSlot.end_time,
+          attendees,
+          // MUST be sent: the stale-booking cron only spares bookings whose
+          // payment_method is "cash". Omitting it made every pay-at-venue
+          // booking self-destruct after 7 minutes ("Payment timeout"),
+          // even though the user was holding a downloaded ticket.
+          payment_method:
+            selectedPayment === "pay_at_venue" ? "cash" : selectedPayment,
+          ...(promoCode.trim()
+            ? { promo_code: promoCode.trim().toUpperCase() }
+            : {}),
+        },
+        token,
+      );
+      pendingBookingId = pendingBooking._id;
+      setHoldSeconds(null);
+
+      // ── Pay-at-venue: no online payment, the venue collects on arrival ──
+      if (selectedPayment === "pay_at_venue") {
+        // Render exactly what the backend stored — do not fabricate
+        // status/payment_status client-side. A cash booking is only
+        // "confirmed" when the owner's auto-approve setting is on; otherwise
+        // the server returns `pending` and the venue must approve it, so no
+        // admission pass may be shown.
+        setConfirmedBooking(pendingBooking);
+        if (pendingBooking.status === "confirmed") {
+          const qrPayload = JSON.stringify({
+            code: pendingBooking.booking_code,
+            turf: selectedTurf.name,
+            date: selectedDate,
+            slot: selectedTimeSlot,
+          });
+          const { default: QRCode } = await import("qrcode");
+          const qrDataUrl = await QRCode.toDataURL(qrPayload, {
+            width: 256,
+            margin: 1,
+            color: { dark: "#000000", light: "#FFFFFF" },
+          });
+          setQrCodeUrl(qrDataUrl);
+          setDownloadQrUrl(qrDataUrl);
+        } else {
+          // Not admitted yet — no gate-scan QR.
+          setQrCodeUrl("");
+          setDownloadQrUrl("");
+        }
+        setFlowStep("confirmed");
+        void captureProductEvent("booking.created", {
+          payment_method: "pay_at_venue",
+          status: pendingBooking.status,
+        });
+        return;
+      }
+
+      // ── Step 2: Create the Cashfree order (amount is computed server-side) ──
+      const order = await convexClient.action<{
+        success: boolean;
+        cf_order_id: string;
+        payment_session_id: string;
+        order_amount: number;
+        error?: string;
+      }>(
+        "payments:createCashfreeOrder",
+        {
+          booking_id: pendingBooking._id,
+          customer_name:
+            convexUser?.full_name ?? firebaseUser.displayName ?? undefined,
+          customer_email: convexUser?.email ?? firebaseUser.email ?? undefined,
+          customer_phone:
+            convexUser?.phone_number ?? firebaseUser.phoneNumber ?? undefined,
+        },
+        token,
+      );
+
+      if (!order.success) {
+        throw new Error(order.error || "Failed to initialize payment session.");
+      }
+
+      if (!order.payment_session_id) {
+        throw new Error("Failed to initialize payment session.");
+      }
+
+      // ── Step 3: Open the Cashfree checkout modal ──
+      await openCashfreeCheckout({
+        paymentSessionId: order.payment_session_id,
+      });
+
+      // ── Step 4: Verify the payment server-side (single source of truth) ──
+      const verifyResult = await convexClient.action<{
+        success: boolean;
+        payment_verified: boolean;
+        payment_id?: string;
+        order_id?: string;
+        booking_id?: string;
+        error?: string;
+      }>(
+        "payments:verifyCashfreePayment",
+        {
+          cf_order_id: order.cf_order_id,
+        },
+        token,
+      );
+
+      if (!verifyResult.success || !verifyResult.payment_verified) {
+        throw new Error(verifyResult.error || "Payment verification failed.");
+      }
+
+      // verifyCashfreePayment already set status="confirmed" & payment_status="paid"
+      // on the booking server-side. Construct the confirmed booking for the UI.
+      const confirmedBooking: Booking = {
+        ...pendingBooking,
+        status: "confirmed",
+        payment_status: "paid",
+        pg_order_id: verifyResult.order_id,
+        pg_payment_id: verifyResult.payment_id,
+      };
+      setConfirmedBooking(confirmedBooking);
+
+      const qrPayload = JSON.stringify({
+        code: confirmedBooking.booking_code,
+        turf: selectedTurf.name,
+        date: selectedDate,
+        slot: selectedTimeSlot,
+      });
+      const { default: QRCode } = await import("qrcode");
+      const qrDataUrl = await QRCode.toDataURL(qrPayload, {
+        width: 256,
+        margin: 1,
+        color: { dark: "#000000", light: "#FFFFFF" },
+      });
+      setQrCodeUrl(qrDataUrl);
+      setDownloadQrUrl(qrDataUrl);
+      setFlowStep("confirmed");
+      void captureProductEvent("booking.created", {
+        payment_method: "online",
+        status: confirmedBooking.status,
+      });
+    } catch (err) {
+      // Transport-level failure (network blip, 5xx, rate limit): the
+      // outcome is UNKNOWN, not failed — the money may have been
+      // collected. Never cancel; if a booking exists it stays payable and
+      // the server-side crons reconcile within the 7-minute window. Same
+      // contract as the app's PaymentOutcomeStatus.unavailable.
+      if (isTransientPaymentError(err)) {
+        void captureProductEvent("booking.payment_outcome_unknown", {
+          payment_method: selectedPayment,
+        });
+        setBookingError(
+          "We couldn't confirm your payment. Nothing was double-charged — " +
+            "check your bookings in a few minutes to see the final status.",
+        );
+        setFlowStep("error");
+        return;
+      }
+
+      // ── Abandonment cleanup: release the slot if a booking was created ──
+      if (pendingBookingId) {
+        // SECURITY (T11): the re-check-then-cancel pair runs ATOMICALLY in
+        // bookings:cancelIfUnpaid — a payment landing between check and
+        // cancel can no longer strand a paid booking (the mutation either
+        // sees paid and refuses, or the late payment hits the cancelled
+        // booking and the backend auto-refunds).
+        let outcome: { cancelled: boolean; reason?: string } | null = null;
+        try {
+          const cleanupToken = await getFreshToken().catch(() => undefined);
+          outcome = await convexClient.mutation<{
+            cancelled: boolean;
+            reason?: string;
+          }>(
+            "bookings:cancelIfUnpaid",
+            {
+              bookingId: pendingBookingId,
+              reason: "Payment failed or cancelled by user.",
+            },
+            cleanupToken,
+          );
+        } catch (cancelErr) {
+          console.error(
+            "Failed to cancel pending booking after payment failure:",
+            cancelErr,
+          );
+        }
+
+        if (outcome && !outcome.cancelled && outcome.reason === "PAID") {
+          // The payment DID land — show the real ticket instead of a blank
+          // confirmed screen. If hydration itself fails, fall back to an
+          // honest error rather than an empty shell.
+          try {
+            const hydrateToken = await getFreshToken().catch(() => undefined);
+            const paid = await convexClient.query<Booking>(
+              "bookings:getById",
+              { bookingId: pendingBookingId },
+              hydrateToken,
+            );
+            if (paid) {
+              setConfirmedBooking(paid);
+              const qrPayload = JSON.stringify({
+                code: paid.booking_code,
+                turf: selectedTurf!.name,
+                date: selectedDate,
+                slot: selectedTimeSlot!,
+              });
+              const { default: QRCode } = await import("qrcode");
+              const qrDataUrl = await QRCode.toDataURL(qrPayload, {
+                width: 256,
+                margin: 1,
+                color: { dark: "#000000", light: "#FFFFFF" },
+              });
+              setQrCodeUrl(qrDataUrl);
+              setDownloadQrUrl(qrDataUrl);
+              setFlowStep("confirmed");
+              return;
+            }
+          } catch (hydrateErr) {
+            console.error("Failed to hydrate paid booking:", hydrateErr);
+          }
+          setBookingError(
+            "Your payment went through, but we couldn't load your ticket " +
+              "here. Check My Bookings in a moment — nothing was double-charged.",
+          );
+          setFlowStep("error");
+          return;
+        }
+      }
+      const { getErrorMessage } = await import("@/lib/errors");
+      void captureProductEvent("booking.checkout_error", {
+        payment_method: selectedPayment,
+        error_code:
+          typeof err === "object" && err !== null && "code" in err
+            ? String((err as { code?: unknown }).code ?? "unknown")
+            : "unknown",
+      });
+      setBookingError(getErrorMessage(err));
+      setFlowStep("error");
+    } finally {
+      payInFlight.current = false;
+    }
+  };
+
+  const handleDownloadTicket = () => {
+    if (!confirmedBooking) return;
+    const link = document.createElement("a");
+    link.href = downloadQrUrl;
+    link.download = `turfzo-ticket-${confirmedBooking.booking_code}.png`;
+    link.click();
+  };
+
+  const pricing = getPricingDetails();
+
+  // Owner's own words, or nothing — never a marketing paragraph about a
+  // "premium court" that the turf record does not contain.
+  const turfDescription = selectedTurf?.description?.trim() || "";
+
+  // Venue photos: the primary image plus any gallery the owner uploaded.
+  // No stock substitutes — a venue with one photo shows one photo.
+  const photoGallery = useMemo(() => {
+    if (!selectedTurf) return [] as string[];
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const src of [
+      selectedTurf.image,
+      ...(selectedTurf.imageGallery ?? []),
+    ]) {
+      if (typeof src !== "string") continue;
+      const trimmed = src.trim();
+      if (!trimmed || seen.has(trimmed)) continue;
+      seen.add(trimmed);
+      out.push(trimmed);
+    }
+    return out;
+  }, [selectedTurf]);
+
+  // Amenity list built strictly from the selected turf's boolean flags and
+  // its free-text `amenities` array. Undeclared amenities are omitted.
+  const turfAmenities = useMemo(() => {
+    if (!selectedTurf) return [] as { label: string; icon: React.ReactNode }[];
+    const declared = new Set(
+      (selectedTurf.facilities ?? []).map((a) => a.trim().toLowerCase()),
+    );
+    const items: { label: string; icon: React.ReactNode }[] = [];
+    if (selectedTurf.hasFloodlights) {
+      items.push({
+        label: "Floodlights",
+        icon: <Award className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.hasFreeParking) {
+      items.push({
+        label: "Free parking",
+        icon: <SlidersHorizontal className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.hasDrinkingWater) {
+      items.push({
+        label: "Drinking water",
+        icon: <Info className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.hasChangingRoom) {
+      items.push({
+        label: "Changing rooms",
+        icon: <Check className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.hasFirstAid) {
+      items.push({
+        label: "First-aid kit on site",
+        icon: <ShieldCheck className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    if (selectedTurf.isIndoor) {
+      items.push({
+        label: "Indoor court",
+        icon: <Home className="w-4 h-4 text-text-muted" />,
+      });
+    } else if (selectedTurf.isIndoor === false) {
+      items.push({
+        label: "Outdoor field",
+        icon: <Sun className="w-4 h-4 text-text-muted" />,
+      });
+    }
+    // Free-text amenities the owner typed that are not already covered by a
+    // boolean flag (e.g. "Equipment rental", "Cafeteria").
+    for (const raw of selectedTurf.facilities ?? []) {
+      const label = raw.trim();
+      if (!label) continue;
+      const lower = label.toLowerCase();
+      const covered = items.some((i) => i.label.toLowerCase() === lower);
+      if (!covered && declared.has(lower)) {
+        items.push({
+          label,
+          icon: <Check className="w-4 h-4 text-text-muted" />,
+        });
+      }
+    }
+    return items;
+  }, [selectedTurf]);
+
+  // A price filter that hides turfs the user never touched must be visible,
+  // otherwise the default 500–3000 range silently shrinks the results.
+  const isPriceFilterActive = filterMinPrice > 500 || filterMaxPrice < 3000;
+
+  return (
+    <div className="flex flex-col min-h-screen bg-bg text-text-main">
+      <FAQPageSchema items={exploreFaqItems} />
+      <Suspense fallback={null}>
+        <ExploreQuerySync
+          currentCity={selectedCity}
+          currentSport={selectedSport}
+          currentDate={searchDate}
+          onCity={setSelectedCity}
+          onSport={setSelectedSport}
+          onDate={(d) => {
+            setSearchDate(d);
+            // Keep the booking view in step with the search bar so opening a
+            // venue lands on the requested day, not on today.
+            setSelectedDate(d);
+          }}
+          onTurfId={setTargetTurfId}
+          onStart={(iso) => {
+            pendingSlotStartRef.current = iso;
+          }}
+        />
+      </Suspense>
+
+      <Header />
+
+      <main className="flex-grow pt-24 pb-16">
+        {/* ========================================================
+            VIEW 1: TURFS LISTING BROWSER
+            ======================================================== */}
+        {viewMode === "list" && flowStep === "listing" && (
+          <div>
+            {/* Full Bleed Search Header Section */}
+            <motion.section
+              initial={false}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="relative -mt-24 overflow-visible min-h-[340px] sm:min-h-[380px] flex flex-col items-start justify-end mb-6 border-b border-border-default"
+            >
+              {/* Authentic sports turf background image */}
+              <div className="absolute inset-0 overflow-hidden z-0 select-none pointer-events-none">
+                {/* Light mode: crisp daylight sports turf pitch */}
+                <Image
+                  src="/stadium_light_bg.webp"
+                  alt="Sports turf stadium pitch"
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover object-center opacity-85 dark:hidden"
+                />
+                {/* Dark mode: floodlit evening sports turf pitch */}
+                <Image
+                  src="/stadium_cinematic_bg.webp"
+                  alt="Floodlit sports turf pitch"
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover object-[center_65%] opacity-45 hidden dark:block"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent dark:from-bg dark:via-bg/50 dark:to-transparent z-10" />
+              </div>
+
+              <div className="relative z-10 px-6 md:px-10 lg:px-20 max-w-[1760px] mx-auto w-full pt-28 sm:pt-32 pb-10 sm:pb-12">
+                <h1 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-extrabold text-text-main tracking-tight mb-2">
+                  Find &amp; book sports turfs near you
+                </h1>
+                <p className="text-text-muted text-sm sm:text-base max-w-xl mb-6">
+                  Check real-time slots, secure bookings in under 60 seconds,
+                  and play on 100% verified fields.
+                </p>
+
+                {/* Structured Architectural Search Bar */}
+                <div className="w-full max-w-3xl bg-surface border border-border-default rounded-xl shadow-xs h-[64px] flex items-center focus-within:border-border-strong transition-all duration-200 relative z-20">
+                  {/* Segment 1: Where */}
+                  <div className="flex flex-col justify-center px-6 h-full rounded-l-xl cursor-pointer hover:bg-elevated/50 transition-colors flex-[1.3] min-w-0">
+                    <span className="text-[10px] font-bold tracking-wider text-text-muted uppercase">
+                      Where
+                    </span>
+                    <input
+                      type="text"
+                      value={searchLocation}
+                      onChange={(e) => setSearchLocation(e.target.value)}
+                      placeholder="Search destinations/cities"
+                      className="text-xs text-text-main placeholder-text-muted bg-transparent border-none outline-none w-full mt-0.5 font-semibold"
+                    />
+                  </div>
+
+                  {/* Segment 2: When */}
+                  <div
+                    data-when-calendar
+                    className="flex flex-col justify-center px-6 h-full cursor-pointer hover:bg-elevated/50 border-l border-border-default transition-colors relative flex-[0.9] min-w-0"
+                    onClick={() => {
+                      setWhenCalendarOpen((v) => !v);
+                      setSportDropdownOpen(false);
+                    }}
+                  >
+                    <span className="text-[10px] font-bold tracking-wider text-text-muted uppercase">
+                      When
+                    </span>
+                    <span className="text-xs text-text-main font-semibold mt-0.5 truncate">
+                      {formatDisplayDate(searchDate)}
+                    </span>
+
+                    {/* Calendar Popover */}
+                    <AnimatePresence>
+                      {whenCalendarOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                          transition={{ duration: 0.2 }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-xl shadow-sm p-5 w-[calc(100vw-2rem)] max-w-[320px]"
+                        >
+                          <CalendarPicker
+                            selected={searchDate}
+                            onSelect={(v) => {
+                              setSearchDate(v);
+                              setWhenCalendarOpen(false);
+                            }}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Segment 3: Sport */}
+                  <div
+                    data-sport-dropdown
+                    className="flex flex-col justify-center px-6 h-full cursor-pointer hover:bg-elevated/50 border-l border-border-default transition-colors relative flex-[0.8] min-w-0"
+                    onClick={() => {
+                      setSportDropdownOpen((v) => !v);
+                      setWhenCalendarOpen(false);
+                    }}
+                  >
+                    <span className="text-[10px] font-bold tracking-wider text-text-muted uppercase">
+                      Sport
+                    </span>
+                    <span className="text-xs text-text-main font-semibold mt-0.5 truncate">
+                      {selectedSport === "all" ? "All Sports" : selectedSport}
+                    </span>
+
+                    {/* Sport Dropdown Popover */}
+                    <AnimatePresence>
+                      {sportDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                          transition={{ duration: 0.2 }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 z-50 bg-surface border border-border-default rounded-xl shadow-sm p-2 min-w-[200px]"
+                        >
+                          <div className="flex flex-col gap-1">
+                            {SPORT_CATEGORIES.map((s) => {
+                              const Icon = s.icon;
+                              const isActive = selectedSport === s.id;
+                              return (
+                                <button
+                                  key={s.id}
+                                  onClick={() => {
+                                    setSelectedSport(s.id);
+                                    setSportDropdownOpen(false);
+                                  }}
+                                  className={`flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-xl transition-colors text-left cursor-pointer
+                                    ${isActive ? "bg-brand-lime/10 text-brand-lime" : "text-text-main hover:bg-elevated"}`}
+                                >
+                                  <Icon className="w-4 h-4 shrink-0" />
+                                  <span>{s.label}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Filters trigger — the Where/When/Sport segments filter
+                      the list live, so a separate no-op "Search" button was
+                      misleading. This opens the real filter controls. */}
+                  <button
+                    onClick={() => setIsFiltersModalOpen(true)}
+                    aria-label="Open filters"
+                    className="h-10 px-4 rounded-lg bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-bold text-xs flex items-center justify-center gap-1.5 mr-2.5 ml-auto shrink-0 transition-all cursor-pointer"
+                  >
+                    <SlidersHorizontal className="w-4 h-4" strokeWidth={2.5} />
+                    <span className="hidden sm:inline">Filters</span>
+                  </button>
+                </div>
+              </div>
+            </motion.section>
+
+            <div className="max-w-[1280px] mx-auto px-6 md:px-10 w-full">
+              {/* Launch-city chips */}
+              <div className="flex gap-2 overflow-x-auto scrollbar-none py-3 mb-2">
+                {["All", ...LAUNCH_CITIES.map((c) => c.label)].map((city) => {
+                  const isActive = selectedCity === city;
+                  return (
+                    <button
+                      key={city}
+                      onClick={() => setSelectedCity(city)}
+                      className={`px-3.5 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap cursor-pointer transition-all ${
+                        isActive
+                          ? "bg-text-main text-bg border-text-main"
+                          : "border-border-default text-text-muted hover:border-border-strong hover:text-text-main"
+                      }`}
+                    >
+                      {city === "All" ? "All Cities" : city}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Category Strip Row */}
+              <div className="border-b border-border-default mt-2 mb-6">
+                <div className="flex gap-10 overflow-x-auto scrollbar-none pb-0 justify-start sm:justify-center items-center">
+                  {SPORT_CATEGORIES.map((s) => {
+                    const Icon = s.icon;
+                    const isActive = selectedSport === s.id;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => setSelectedSport(s.id)}
+                        className={`flex flex-col items-center gap-2 pb-3.5 cursor-pointer border-b-2 transition-all duration-200 relative -mb-[2px]
+                          ${
+                            isActive
+                              ? "border-text-main text-text-main opacity-100 font-semibold"
+                              : "border-transparent text-text-secondary hover:text-text-main"
+                          }`}
+                      >
+                        <Icon className="w-7 h-7 shrink-0" />
+                        <span className="text-[11px] font-medium tracking-wide">
+                          {s.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Sub-Filters and Count Row */}
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="text-sm text-text-muted font-medium">
+                  {filteredTurfs.length} turf
+                  {filteredTurfs.length !== 1 ? "s" : ""} available
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {/* Sort filter */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-text-muted whitespace-nowrap">
+                      Sort by:
+                    </span>
+                    <CustomSelect
+                      value={sortBy}
+                      onChange={setSortBy}
+                      options={[
+                        "Popular",
+                        "Price: Low to High",
+                        "Price: High to Low",
+                      ]}
+                    />
+                  </div>
+
+                  {/* Filters Button */}
+                  <button
+                    onClick={() => setIsFiltersModalOpen(true)}
+                    className="flex items-center gap-2 bg-surface border border-border-default hover:border-border-strong text-text-main text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer h-[38px] shrink-0"
+                  >
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-brand-lime" />{" "}
+                    Filters
+                  </button>
+                </div>
+              </div>
+
+              {/* Active-filter chips — a narrowed price range used to hide
+                  turfs with no visible sign it was applied. */}
+              {(isPriceFilterActive ||
+                filterFormat !== "all" ||
+                filterAmenities.length > 0) && (
+                <div className="flex flex-wrap items-center gap-2 mb-6">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                    Filters:
+                  </span>
+                  {isPriceFilterActive && (
+                    <button
+                      onClick={() => {
+                        setFilterMinPrice(500);
+                        setFilterMaxPrice(3000);
+                        setMinInputVal("500");
+                        setMaxInputVal("3000");
+                      }}
+                      className="px-3 py-1 rounded-lg bg-text-main text-bg text-[11px] font-semibold flex items-center gap-1.5"
+                    >
+                      {formatPrice(filterMinPrice)} –{" "}
+                      {formatPrice(filterMaxPrice)}
+                      /hr
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  {filterFormat !== "all" && (
+                    <button
+                      onClick={() => setFilterFormat("all")}
+                      className="px-3 py-1 rounded-lg bg-text-main text-bg text-[11px] font-semibold flex items-center gap-1.5"
+                    >
+                      {filterFormat} pitch
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  {filterAmenities.map((id) => (
+                    <button
+                      key={id}
+                      onClick={() =>
+                        setFilterAmenities((prev) =>
+                          prev.filter((x) => x !== id),
+                        )
+                      }
+                      className="px-3 py-1 rounded-lg bg-text-main text-bg text-[11px] font-semibold flex items-center gap-1.5"
+                    >
+                      {id.replace(/-/g, " ")}
+                      <X className="w-3 h-3" />
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => {
+                      setFilterFormat("all");
+                      setFilterMinPrice(500);
+                      setFilterMaxPrice(3000);
+                      setMinInputVal("500");
+                      setMaxInputVal("3000");
+                      setFilterAmenities([]);
+                    }}
+                    className="px-3 py-1 text-[11px] font-semibold text-text-muted hover:text-text-main underline"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
+
+              {/* Error warning state */}
+              {loadError && (
+                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/25 rounded-xl flex items-center gap-3 text-red-400 text-sm">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <p>{loadError}</p>
+                </div>
+              )}
+
+              {/* Empty warning state */}
+              {!loading && filteredTurfs.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-24 gap-4 bg-surface border border-border-default rounded-xl text-center p-8">
+                  <SlidersHorizontal
+                    className="w-12 h-12 text-text-muted"
+                    strokeWidth={1.2}
+                  />
+                  <div>
+                    <h3 className="font-bold text-lg text-text-main">
+                      No venues found
+                    </h3>
+                    <p className="text-sm text-text-muted mt-1 max-w-sm">
+                      We couldn&apos;t find any sports venues matching your
+                      exact filters. Adjust your queries and slide max price.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSelectedSport("all");
+                      setSelectedCity("All");
+                      setSearchLocation("");
+                      setFilterFormat("all");
+                      setFilterMinPrice(500);
+                      setFilterMaxPrice(3000);
+                      setMinInputVal("500");
+                      setMaxInputVal("3000");
+                      setFilterAmenities([]);
+                      setSortBy("Popular");
+                    }}
+                    className="mt-2 bg-text-main hover:bg-text-main/90 text-bg text-xs font-semibold px-5 py-2.5 rounded-xl transition-all cursor-pointer"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              )}
+
+              {/* Turfs Cards Grid */}
+              {!loading && filteredTurfs.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredTurfs.map((turf) => (
+                    <motion.div
+                      key={turf.id}
+                      initial={false}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="bg-surface border border-border-default rounded-xl overflow-hidden hover:shadow-sm hover:border-border-strong transition-all duration-300 group flex flex-col h-full relative"
+                    >
+                      {/* Heart Save button */}
+                      <button
+                        onClick={(e) => toggleWishlist(turf.id, e)}
+                        className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all"
+                        aria-label="Wishlist"
+                      >
+                        <Heart
+                          className={`w-4 h-4 ${wishlist.includes(turf.id) ? "fill-brand-lime text-brand-lime" : "text-white"}`}
+                        />
+                      </button>
+
+                      <div
+                        onClick={() => handleOpenSlots(turf)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleOpenSlots(turf);
+                          }
+                        }}
+                        tabIndex={0}
+                        role="button"
+                        aria-label={`View slots for ${turf.name}`}
+                        className="cursor-pointer flex flex-col flex-grow focus-visible:outline-2 focus-visible:outline-brand-lime focus-visible:outline-offset-2"
+                      >
+                        {/* Image banner */}
+                        <div className="relative w-full h-48 bg-elevated overflow-hidden shrink-0">
+                          <Image
+                            src={turf.image}
+                            alt={turf.name}
+                            fill
+                            sizes="(max-width: 640px) 100vw, 33vw"
+                            className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+                          />
+                          <div className="absolute top-4 left-4 flex gap-2">
+                            {turf.premium ? (
+                              <span className="bg-brand-lime text-white dark:text-black text-[10px] font-extrabold px-2.5 py-1 rounded-md">
+                                Premium
+                              </span>
+                            ) : turf.rating >= 4.7 ? (
+                              <span className="bg-bg text-text-main text-[10px] font-bold px-2.5 py-1 rounded-md border border-border-default">
+                                Guest Favorite
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+
+                        {/* Card headline & location */}
+                        <div className="p-5 pb-3 flex-grow">
+                          <div className="flex items-center gap-1.5 text-xs text-text-muted mb-2">
+                            <MapPin className="w-3.5 h-3.5 text-brand-lime shrink-0" />
+                            <span className="truncate">{turf.location}</span>
+                          </div>
+
+                          <h3 className="text-lg font-bold text-text-main leading-tight mb-2 group-hover:text-brand-lime transition-colors duration-200">
+                            {turf.name}
+                          </h3>
+
+                          <p className="text-xs text-text-muted">
+                            {turf.sport} · {turf.size} format matches
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Card Footer */}
+                      <div className="px-5 pb-5">
+                        <div className="border-t border-border-default pt-4 flex items-center justify-between gap-2">
+                          <div>
+                            <span className="block text-[9px] text-text-muted uppercase tracking-wider font-semibold">
+                              Hourly Rate
+                            </span>
+                            <span className="text-lg font-bold text-text-main tabular-nums">
+                              {formatPrice(turf.price)}
+                              <span className="text-xs text-text-muted font-normal ml-0.5">
+                                /hr
+                              </span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Link
+                              href={`/venues/${turf.id}`}
+                              className="text-xs font-semibold text-brand-lime hover:underline"
+                            >
+                              Venue details
+                            </Link>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-3.5 h-3.5 fill-text-main text-text-main" />
+                              <span className="text-xs font-bold text-text-main">
+                                {turf.rating > 0 ? turf.rating.toFixed(2) : "New"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+
+              <ExploreSeoContent faqs={exploreFaqItems} />
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            VIEW 2: PREMIUM AIRBNB-STYLE DETAILS VIEW
+            ======================================================== */}
+        {viewMode === "details" && selectedTurf && flowStep === "listing" && (
+          <div className="max-w-[1280px] mx-auto px-6 md:px-10 w-full">
+            {/* Top Navigation breadcrumbs */}
+            <div className="flex items-center justify-between pb-6">
+              <button
+                onClick={() => setViewMode("list")}
+                className="flex items-center gap-2 text-sm font-semibold text-text-main hover:text-brand-lime transition-colors group cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />{" "}
+                Back to all venues
+              </button>
+              <div className="flex items-center gap-4 text-sm font-semibold">
+                <button className="flex items-center gap-1.5 text-text-main hover:text-brand-lime transition-colors">
+                  <Heart
+                    className={`w-4 h-4 ${wishlist.includes(selectedTurf.id) ? "fill-brand-lime text-brand-lime" : ""}`}
+                    onClick={(e) => toggleWishlist(selectedTurf.id, e)}
+                  />
+                  {wishlist.includes(selectedTurf.id) ? "Saved" : "Save"}
+                </button>
+              </div>
+            </div>
+
+            {/* Title Header */}
+            <div className="pb-6">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-text-main tracking-tight leading-tight">
+                {selectedTurf.name}
+              </h1>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text-muted mt-2">
+                {/* No rating invented for an unrated venue — say "New". */}
+                {selectedTurf.rating > 0 && (
+                  <>
+                    <span className="flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 fill-text-main text-text-main" />{" "}
+                      {selectedTurf.rating.toFixed(2)}
+                    </span>
+                    <span>·</span>
+                    <span>
+                      {selectedTurf.reviews}{" "}
+                      {selectedTurf.reviews === 1 ? "review" : "reviews"}
+                    </span>
+                    <span>·</span>
+                  </>
+                )}
+                <span className="flex items-center gap-1 font-semibold text-text-main">
+                  <MapPin className="w-3.5 h-3.5 text-brand-lime" />{" "}
+                  {selectedTurf.location}
+                </span>
+              </div>
+            </div>
+
+            {/* Photos Grid Gallery — built from the venue's own uploaded
+                photos only. Stock photos of a different pitch were shown
+                here before, so nothing is rendered when a venue has one. */}
+            <div
+              className={`grid gap-3 rounded-xl overflow-hidden bg-elevated relative ${
+                photoGallery.length > 1
+                  ? "grid-cols-1 md:grid-cols-3 h-[300px] md:h-[420px]"
+                  : "grid-cols-1 h-[300px] md:h-[420px]"
+              }`}
+            >
+              {/* Left Large main photo */}
+              <div
+                className={`relative h-full w-full overflow-hidden group ${
+                  photoGallery.length > 1 ? "md:col-span-2" : ""
+                }`}
+              >
+                <Image
+                  src={photoGallery[0]}
+                  alt={selectedTurf.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 66vw"
+                  className="object-cover group-hover:brightness-95 transition-all duration-300"
+                />
+              </div>
+              {/* Right stacked photos — real gallery entries only */}
+              {photoGallery.length > 1 && (
+                <div className="hidden md:flex flex-col gap-3 h-full">
+                  {photoGallery.slice(1, 3).map((src) => (
+                    <div
+                      key={src}
+                      className="relative flex-1 w-full overflow-hidden group"
+                    >
+                      <Image
+                        src={src}
+                        alt={`${selectedTurf.name} photo`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover group-hover:brightness-95 transition-all duration-300"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Split Content columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12 mt-8 items-start">
+              {/* LEFT COLUMN: Overview features, ratings, FAQs */}
+              <div className="space-y-6">
+                <div className="pb-6 border-b border-border-default">
+                  <h2 className="text-xl sm:text-2xl font-bold text-text-main">
+                    {selectedTurf.sport} court managed by Turfzo
+                  </h2>
+                  {/* Every fact below is read from the selected turf's own
+                      record — nothing is asserted when the field is unset. */}
+                  <p className="text-text-muted mt-1 text-sm">
+                    {[
+                      selectedTurf.size !== "N/A"
+                        ? `${selectedTurf.size} format`
+                        : null,
+                      selectedTurf.maxPlayers
+                        ? `Plays up to ${selectedTurf.maxPlayers} players`
+                        : null,
+                      selectedTurf.groundCount
+                        ? `${selectedTurf.groundCount} ground${selectedTurf.groundCount === 1 ? "" : "s"}`
+                        : null,
+                      selectedTurf.isIndoor === true
+                        ? "Indoor"
+                        : selectedTurf.isIndoor === false
+                          ? "Outdoor"
+                          : null,
+                      selectedTurf.hasFloodlights ? "Floodlights" : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ") || "Venue details are still being added."}
+                  </p>
+                </div>
+
+                {/* Bullet checklist highlights — Turfzo policy statements
+                    only. No invented host identity, inspection claim or
+                    "superhost" badge. */}
+                <div className="pb-6 border-b border-border-default space-y-5">
+                  <div className="flex items-start gap-4">
+                    <ShieldCheck className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-text-main text-sm">
+                        Owner-listed venue
+                      </h4>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        The owner manages this venue&apos;s slots and pricing
+                        directly on Turfzo.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <Check className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-text-main text-sm">
+                        No double bookings
+                      </h4>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        Availability is reserved on the server the moment you
+                        pay, so a slot can only be held once.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <Info className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-text-main text-sm">
+                        Flexible Cancellations
+                      </h4>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        Cancel up to 24 hours in advance for a full refund of
+                        the slot price. The service fee is non-refundable.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description text — the owner's own words, or nothing. */}
+                {turfDescription && (
+                  <div className="pb-6 border-b border-border-default">
+                    <h3 className="text-lg font-bold text-text-main mb-3">
+                      About this venue
+                    </h3>
+                    <p className="text-text-muted text-sm leading-relaxed whitespace-pre-line">
+                      {turfDescription}
+                    </p>
+                  </div>
+                )}
+
+                {/* Amenities — built from the turf's own amenity/flag
+                    fields. Anything the venue has not declared is omitted
+                    rather than assumed present. */}
+                {turfAmenities.length > 0 && (
+                  <div className="pb-6 border-b border-border-default">
+                    <h3 className="text-lg font-bold text-text-main mb-4">
+                      What this turf offers
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6">
+                      {turfAmenities.map((item) => (
+                        <div
+                          key={item.label}
+                          className="flex items-center gap-3 text-sm text-text-main"
+                        >
+                          {item.icon}
+                          <span>{item.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Venue rating — only the aggregate the backend stores. The
+                    old fixed sub-scores (bounce/lighting/cleanliness/staff)
+                    were invented; there is no per-aspect rating in the data. */}
+                {selectedTurf.rating > 0 && (
+                  <div className="pb-6 border-b border-border-default">
+                    <h3 className="text-lg font-bold text-text-main flex items-center gap-1.5 mb-2">
+                      <Star className="w-5 h-5 fill-text-main text-text-main" />{" "}
+                      {selectedTurf.rating.toFixed(2)} · Venue Rating
+                    </h3>
+                    <p className="text-xs text-text-muted">
+                      {selectedTurf.reviews > 0
+                        ? `Based on ${selectedTurf.reviews} review${selectedTurf.reviews === 1 ? "" : "s"} from players who booked this venue.`
+                        : "Based on reviews from players who booked this venue."}
+                    </p>
+                  </div>
+                )}
+
+                {/* Frequently Asked Questions */}
+                <div>
+                  <h3 className="text-lg font-bold text-text-main mb-6 text-center">
+                    Frequently asked questions
+                  </h3>
+                  <div className="flex flex-col gap-2">
+                    {exploreFaqItems.map((item, idx) => (
+                      <FaqItem
+                        key={idx}
+                        question={item.question}
+                        answer={item.answer}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN: Sticky booking selectors (Airbnb-style) */}
+              <div className="sticky top-28 bg-surface border border-border-default rounded-xl p-6 shadow-sm space-y-4">
+                <div className="flex items-baseline justify-between">
+                  <div>
+                    <span className="text-2xl font-extrabold text-text-main tabular-nums">
+                      {formatPrice(selectedTurf.price)}
+                    </span>
+                    <span className="text-sm text-text-muted font-medium ml-1">
+                      / hour
+                    </span>
+                  </div>
+                  {selectedTurf.rating > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-text-muted">
+                      <Star className="w-3 h-3 fill-text-main text-text-main" />{" "}
+                      {selectedTurf.rating.toFixed(2)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Select Date popup box selector */}
+                <div className="border border-border-strong rounded-xl overflow-visible text-xs bg-bg relative">
+                  {/* Top split */}
+                  <div className="grid grid-cols-2 border-b border-border-strong overflow-visible">
+                    {" "}
+                    <div
+                      className="p-3 border-r border-border-strong cursor-pointer hover:bg-elevated/25"
+                      onClick={() =>
+                        setShowCalendarBooking(!showCalendarBooking)
+                      }
+                    >
+                      <label className="block text-[8px] uppercase font-bold text-text-muted">
+                        Select Date
+                      </label>
+                      <span className="font-semibold text-text-main mt-0.5 block truncate flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-brand-lime" />{" "}
+                        {formatDisplayDate(selectedDate)}
+                      </span>
+                    </div>
+                    <div className="p-3">
+                      <label className="block text-[8px] uppercase font-bold text-text-muted">
+                        Format size
+                      </label>
+                      <span className="font-semibold text-text-main mt-0.5 block truncate">
+                        {selectedTurf.size}
+                      </span>
+                    </div>
+                    {/* Inline Calendar Popover */}
+                    <AnimatePresence>
+                      {showCalendarBooking && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          className="absolute top-12 left-2 z-50 bg-surface border border-border-default rounded-xl shadow-sm p-5"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <CalendarPicker
+                            selected={selectedDate}
+                            offsetMinutes={
+                              selectedTurf?.timezoneOffsetMinutes ?? 330
+                            }
+                            onSelect={(v) => {
+                              // The old slot's instants belong to the
+                              // PREVIOUS day — keeping them selected would let
+                              // checkout book yesterday's slot. Clear the
+                              // selection and its price preview before the
+                              // refetch lands.
+                              setSelectedDate(v);
+                              setSelectedTimeSlot(null);
+                              pendingSlotStartRef.current = null;
+                              setPricePreview(null);
+                              setShowCalendarBooking(false);
+                            }}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+
+                {/* Available time slots section */}
+                <div className="space-y-3">
+                  <label className="block text-[9px] uppercase font-bold text-text-muted">
+                    Available time slots
+                  </label>
+                  {loadingSlots ? (
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="w-5 h-5 animate-spin text-brand-lime" />
+                    </div>
+                  ) : availableSlots.length === 0 ? (
+                    <div className="text-center py-2 bg-elevated/40 rounded-xl px-4">
+                      <p className="text-xs text-text-muted">
+                        No slots available. Try another date.
+                      </p>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const token = await getFreshToken().catch(
+                              () => undefined,
+                            );
+                            // Waitlist the WHOLE selected day in turf-local
+                            // time — the same day window the slot grid above
+                            // renders. The backend offers freed slots to any
+                            // waiter whose window overlaps the freed slot
+                            // (waitlists:offerSlot matches on overlap), so a
+                            // day waiter is notified whichever hour opens.
+                            const offsetMinutes =
+                              selectedTurf.timezoneOffsetMinutes ?? 330;
+                            const [y, m, d] = selectedDate
+                              .split("-")
+                              .map(Number);
+                            const dayStartMs =
+                              Date.UTC(y, m - 1, d) - offsetMinutes * 60_000;
+                            const dayStart = new Date(dayStartMs);
+                            const dayEnd = new Date(dayStartMs + 86_400_000);
+                            await convexClient.mutation(
+                              "waitlists:join",
+                              {
+                                turf_id: selectedTurf.id,
+                                start_time: dayStart.toISOString(),
+                                end_time: dayEnd.toISOString(),
+                              },
+                              token,
+                            );
+                            toast.success(
+                              "You're on the waitlist — we'll notify you if any slot opens this day.",
+                            );
+                          } catch (err) {
+                            const { getErrorMessage } =
+                              await import("@/lib/errors");
+                            toast.error(
+                              getErrorMessage(err, "Could not join waitlist."),
+                            );
+                          }
+                        }}
+                        className="mt-2 text-xs font-bold text-brand-lime hover:underline"
+                      >
+                        Join waitlist for this day
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="max-h-[280px] overflow-y-auto pr-1 space-y-4">
+                      {groupedSlots.map((group) => {
+                        const Icon = group.icon;
+                        return (
+                          <div key={group.title}>
+                            <div className="flex items-center gap-1.5 mb-2 text-text-main">
+                              <Icon className="w-3.5 h-3.5 text-brand-lime" />
+                              <span className="text-[10px] font-bold uppercase tracking-wider">
+                                {group.title}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-1.5">
+                              {group.slots.map((slot) => {
+                                const isSelected =
+                                  selectedTimeSlot === slot.time;
+                                return (
+                                  <button
+                                    key={slot.time}
+                                    disabled={!slot.available}
+                                    onClick={() =>
+                                      setSelectedTimeSlot(slot.time)
+                                    }
+                                    className={`py-1.5 text-[10px] font-medium border rounded-md transition-all text-center sm:text-xs
+                                      ${
+                                        isSelected
+                                          ? "border-text-main bg-text-main text-bg font-bold"
+                                          : !slot.available
+                                            ? "opacity-30 cursor-not-allowed border-border-subtle line-through"
+                                            : "border-border-default text-text-main hover:border-border-strong cursor-pointer"
+                                      }`}
+                                  >
+                                    {format12HourRange(slot.time)}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* CTA Action button */}
+                {viewOnly ? (
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://play.google.com/store/apps/details?id=com.turfzo.app"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99] inline-flex items-center justify-center gap-2"
+                    >
+                      <Smartphone className="w-4 h-4" />
+                      Book on the Turfzo App
+                    </a>
+                    <p className="text-center text-xs text-text-muted">
+                      Turf bookings are available on the Turfzo app only.
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    disabled={!selectedTimeSlot}
+                    onClick={handleProceedToCheckout}
+                    className="w-full bg-brand-lime hover:bg-brand-lime-hover disabled:bg-border-default disabled:text-text-muted text-white dark:text-black font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm disabled:cursor-not-allowed active:scale-[0.99]"
+                  >
+                    Book Turf
+                  </button>
+                )}
+
+                {/* Fee calculation breakdown */}
+                {selectedTimeSlot && (
+                  <div className="border-t border-border-default pt-4 space-y-2.5 text-sm text-text-muted">
+                    <div className="flex justify-between">
+                      <span className="underline">Base fare</span>
+                      <span className="text-text-main tabular-nums">
+                        {formatPrice(pricing.subtotal)}
+                      </span>
+                    </div>
+                    {pricing.discount > 0 && (
+                      <div className="flex justify-between">
+                        <span className="underline">Promo discount</span>
+                        <span className="text-brand-lime tabular-nums">
+                          −{formatPrice(pricing.discount)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      {/* Amount from the backend's preview; the rate is not
+                          hardcoded here so a backend rate change shows up
+                          automatically. */}
+                      <span className="underline">Service fee</span>
+                      <span className="text-text-main tabular-nums">
+                        {formatPrice(pricing.serviceFee)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between font-bold text-text-main border-t border-border-default pt-2.5 text-base">
+                      <span>Total</span>
+                      <span className="tabular-nums">
+                        {formatPrice(pricing.total)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* ========================================================
+          BOOKING SUMMARY CHECKOUT MODALS
+          ======================================================== */}
+      <AnimatePresence>
+        {flowStep === "checkout" && selectedTurf && selectedTimeSlot && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Scrim backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"
+              onClick={() => {
+                setFlowStep("listing");
+                setViewMode("details");
+              }}
+            />
+
+            {/* Checkout Form Modal Card */}
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="relative bg-surface border border-border-default rounded-xl max-w-md w-full p-6 shadow-sm z-10 flex flex-col gap-4 text-left"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-border-default">
+                <h3 className="text-lg font-bold text-text-main">
+                  Request to Book
+                </h3>
+                <button
+                  onClick={() => {
+                    setFlowStep("listing");
+                    setViewMode("details");
+                  }}
+                  className="p-1 hover:bg-elevated rounded-full border border-border-default transition-colors text-text-muted hover:text-text-main"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Summary details card */}
+              <div className="bg-transparent border border-border-default rounded-xl p-4 text-xs font-semibold space-y-3">
+                <div className="flex justify-between border-b border-border-strong pb-2">
+                  <div>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                      Venue Turf
+                    </span>
+                    <span className="font-bold text-text-main text-sm">
+                      {selectedTurf.name}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                      Booking Date
+                    </span>
+                    <span className="font-semibold text-text-main text-xs">
+                      {formatDisplayDate(selectedDate)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold">
+                      Time Slot
+                    </span>
+                    <span className="font-semibold text-text-main text-xs">
+                      {format12HourRange(selectedTimeSlot)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] text-text-muted uppercase tracking-wider font-bold mb-1">
+                      Attendees count
+                    </span>
+                    <div className="relative w-[100px]">
+                      <input
+                        type="number"
+                        min={MIN_ATTENDEES}
+                        max={attendeeCeiling(selectedTurf.maxPlayers)}
+                        value={attendees}
+                        onChange={(e) =>
+                          setAttendees(
+                            clampAttendees(
+                              Number(e.target.value),
+                              selectedTurf.maxPlayers,
+                            ),
+                          )
+                        }
+                        className="w-full bg-elevated border border-border-strong rounded-lg pl-3 pr-2 py-1.5 text-text-main text-xs font-semibold focus:outline-none focus:border-brand-lime transition-all"
+                      />
+                    </div>
+                    {selectedTurf.maxPlayers ? (
+                      <span className="block text-[9px] text-text-muted mt-1">
+                        Venue max {selectedTurf.maxPlayers} players
+                      </span>
+                    ) : (
+                      <span className="block text-[9px] text-text-muted mt-1">
+                        This venue has not set a player limit
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment selection list */}
+              <div>
+                <label className="block text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">
+                  Select Payment Method
+                </label>
+                <div className="flex flex-col gap-2">
+                  {[
+                    {
+                      key: "upi" as const,
+                      label: "UPI Payments (GPay, PhonePe, Paytm)",
+                      sub: "Instant slot confirmation pass",
+                    },
+                    {
+                      key: "card" as const,
+                      label: "Credit & Debit Cards (Visa, MasterCard)",
+                      sub: "Major international banks supported",
+                    },
+                    {
+                      key: "netbanking" as const,
+                      label: "NetBanking Bank Access",
+                      sub: "Redirect to official netbanking portal",
+                    },
+                    {
+                      key: "pay_at_venue" as const,
+                      label: "Pay at Venue",
+                      sub: "Pay directly at the turf before your game",
+                    },
+                  ].map((method) => {
+                    const isSelected = selectedPayment === method.key;
+                    return (
+                      <div
+                        key={method.key}
+                        onClick={() => setSelectedPayment(method.key)}
+                        className={`flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition-all duration-200
+                          ${isSelected ? "border-brand-lime bg-transparent" : "border-border-default hover:bg-elevated"}`}
+                      >
+                        <div
+                          className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 mt-0.5
+                          ${isSelected ? "border-brand-lime" : "border-border-strong"}`}
+                        >
+                          {isSelected && (
+                            <div className="w-2 h-2 rounded-full bg-brand-lime" />
+                          )}
+                        </div>
+                        <div>
+                          <span className="block text-xs font-bold text-text-main leading-none">
+                            {method.label}
+                          </span>
+                          <span className="block text-[10px] text-text-muted mt-1 leading-tight">
+                            {method.sub}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Pricing breakdown summary */}
+              <div className="bg-transparent border border-border-default rounded-xl p-4 flex flex-col gap-2 text-xs text-text-muted">
+                <div className="flex justify-between">
+                  <span>Base slot price</span>
+                  <span className="text-text-main tabular-nums">
+                    {formatPrice(pricing.subtotal)}
+                  </span>
+                </div>
+                {pricing.discount > 0 && (
+                  <div className="flex justify-between">
+                    <span>Promo discount</span>
+                    <span className="text-brand-lime tabular-nums">
+                      −{formatPrice(pricing.discount)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  {/* Rate comes from the backend's fee calculation — the
+                      label must not hardcode a percentage that can drift. */}
+                  <span>Service fee</span>
+                  <span className="text-text-main tabular-nums">
+                    {formatPrice(pricing.serviceFee)}
+                  </span>
+                </div>
+                <div className="flex justify-between border-t border-border-strong pt-2.5 font-bold text-text-main text-sm">
+                  <span>Grand Total</span>
+                  <span className="tabular-nums">
+                    {formatPrice(pricing.total)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2.5 mt-1">
+                <button
+                  onClick={handlePayNow}
+                  className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold text-sm py-3.5 rounded-xl transition-all duration-200 text-center cursor-pointer shadow-sm active:scale-[0.99]"
+                >
+                  {selectedPayment === "pay_at_venue"
+                    ? `Book & Pay at Venue · ${formatPrice(pricing.total)}`
+                    : `Pay Now · ${formatPrice(pricing.total)}`}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================
+          PROCESSING CHECKOUT LOADER
+          ======================================================== */}
+      <AnimatePresence>
+        {flowStep === "processing" && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <Loader2 className="w-10 h-10 animate-spin text-brand-lime" />
+              <div>
+                <h3 className="text-lg font-bold text-text-main">
+                  Securing Your Slot
+                </h3>
+                <p className="text-xs text-text-muted mt-1 max-w-[280px]">
+                  Confirming your payment signature and locking slot times.
+                  Please do not refresh.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================
+          CHECKOUT ERROR MODAL
+          ======================================================== */}
+      <AnimatePresence>
+        {flowStep === "error" && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              className="bg-surface border border-border-default rounded-xl max-w-sm w-full p-6 shadow-sm text-center flex flex-col items-center gap-4"
+            >
+              <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 border border-red-500/25">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-text-main">
+                Payment Failed
+              </h3>
+              <p className="text-xs text-text-muted leading-relaxed">
+                {bookingError ||
+                  "Something went wrong during checkout. Please try again."}
+              </p>
+              <div className="flex gap-3 mt-4 w-full justify-center text-xs font-semibold">
+                <button
+                  onClick={() => setFlowStep("checkout")}
+                  className="bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-bold px-6 py-3 rounded-xl transition-all cursor-pointer"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={() => {
+                    setFlowStep("listing");
+                    setViewMode("list");
+                  }}
+                  className="bg-elevated border border-border-default text-text-main px-6 py-3 rounded-xl transition-colors cursor-pointer"
+                >
+                  Browse Turfs
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================
+          BOOKING CONFIRMED PASS VIEW (Airbnb Style)
+          ======================================================== */}
+      <AnimatePresence>
+        {flowStep === "confirmed" &&
+          confirmedBooking &&
+          selectedTurf &&
+          selectedTimeSlot &&
+          (() => {
+            // A pass is only an ADMISSION PASS when the server says the
+            // booking is confirmed. Pending (venue must approve) and
+            // pay-at-venue bookings get an honest "payment due" state with
+            // no gate-scan QR.
+            const isAdmitted = confirmedBooking.status === "confirmed";
+            const isCash =
+              selectedPayment === "pay_at_venue" ||
+              confirmedBooking.payment_method === "cash";
+            return (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-sm overflow-y-auto">
+                <motion.div
+                  initial={{ scale: 0.96, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.96, opacity: 0 }}
+                  className="bg-surface border border-border-default rounded-xl max-w-md w-full p-6 shadow-sm z-10 text-center my-8"
+                >
+                  <div
+                    className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border ${
+                      isAdmitted
+                        ? "bg-brand-lime/10 border-brand-lime/20"
+                        : "bg-amber-500/10 border-amber-500/25"
+                    }`}
+                  >
+                    {isAdmitted ? (
+                      <Check
+                        className="w-8 h-8 text-brand-lime"
+                        strokeWidth={3}
+                      />
+                    ) : (
+                      <AlertCircle className="w-8 h-8 text-amber-500" />
+                    )}
+                  </div>
+                  <h3 className="text-xl font-extrabold text-text-main">
+                    {isAdmitted
+                      ? "Booking Confirmed!"
+                      : "Awaiting Venue Approval"}
+                  </h3>
+                  <p className="text-xs text-text-muted mt-1">
+                    {isAdmitted
+                      ? isCash
+                        ? "Your slot is reserved. Pay at the venue before your game — the admission pass unlocks once the venue approves the booking."
+                        : "Your pitch reservation has been successfully booked."
+                      : "Your slot is held while the venue reviews this request. Payment is due at the venue once it is approved — no admission pass is issued yet."}
+                  </p>
+
+                  {/* Ticket receipt box */}
+                  <div className="relative mt-6 rounded-xl overflow-hidden shadow-sm border border-border-default bg-surface">
+                    {/* Top Section */}
+                    <div
+                      className={`p-5 text-white ${
+                        isAdmitted
+                          ? "bg-gradient-to-br from-brand-lime to-green-600"
+                          : "bg-gradient-to-br from-amber-500 to-amber-700"
+                      }`}
+                    >
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-0.5">
+                            Venue
+                          </span>
+                          <span className="font-extrabold text-lg">
+                            {selectedTurf.name}
+                          </span>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-1.5">
+                            Status
+                          </span>
+                          <span className="font-black text-xs uppercase px-2 py-0.5 bg-bg text-text-main rounded-md shadow-sm">
+                            {isCash ? "Pay at Venue" : "Paid"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-0.5">
+                            Date
+                          </span>
+                          <span className="font-semibold text-sm">
+                            {formatDisplayDate(selectedDate)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="block text-[10px] uppercase font-bold opacity-80 tracking-widest mb-0.5">
+                            Time
+                          </span>
+                          <span className="font-semibold text-sm">
+                            {format12HourRange(selectedTimeSlot)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Perforated separator */}
+                    <div className="relative h-6 flex items-center justify-between z-10 px-[-16px]">
+                      <div
+                        className="w-6 h-6 rounded-full bg-black/60 dark:bg-black/85 absolute -left-3 shadow-inner"
+                        style={{ backdropFilter: "blur(4px)" }}
+                      ></div>
+                      <div className="w-full border-t-[3px] border-dashed border-border-strong mx-5 opacity-50"></div>
+                      <div
+                        className="w-6 h-6 rounded-full bg-black/60 dark:bg-black/85 absolute -right-3 shadow-inner"
+                        style={{ backdropFilter: "blur(4px)" }}
+                      ></div>
+                    </div>
+
+                    {/* Bottom Section */}
+                    <div className="bg-surface p-5 pt-2 text-left">
+                      <div className="grid grid-cols-2 gap-y-4 gap-x-2 mb-5">
+                        <div>
+                          <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">
+                            Booking ID
+                          </span>
+                          <span className="font-bold text-text-main text-sm">
+                            {confirmedBooking.booking_code}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="block text-[9px] uppercase font-bold text-text-muted tracking-widest mb-0.5">
+                            Attendees
+                          </span>
+                          <span className="font-bold text-text-main text-sm">
+                            {confirmedBooking.attendees ?? attendees} Players
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Amount breakdown — the service fee is charged
+                        (total_price + service_fee), so it is shown. */}
+                      <div className="border-t border-border-default pt-4 space-y-2 text-xs text-text-muted">
+                        <div className="flex justify-between">
+                          <span>Slot price</span>
+                          <span className="text-text-main tabular-nums">
+                            {formatPrice(confirmedBooking.total_price)}
+                          </span>
+                        </div>
+                        {pricing.discount > 0 && (
+                          <div className="flex justify-between">
+                            <span>Promo discount</span>
+                            <span className="text-brand-lime tabular-nums">
+                              −{formatPrice(pricing.discount)}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span>Service fee</span>
+                          <span className="text-text-main tabular-nums">
+                            {formatPrice(confirmedBooking.service_fee ?? 0)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between font-bold text-text-main border-t border-border-default pt-2 text-sm">
+                          <span>Total payable</span>
+                          <span className="tabular-nums">
+                            {formatPrice(
+                              (confirmedBooking.total_price ?? 0) +
+                                (confirmedBooking.service_fee ?? 0),
+                            )}
+                          </span>
+                        </div>
+                        {isCash && (
+                          <p className="text-[10px] text-text-muted pt-1">
+                            Payable at the venue on arrival.
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="border-t border-border-default pt-5 flex flex-col items-center gap-3">
+                        {isAdmitted ? (
+                          <>
+                            {qrCodeUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={qrCodeUrl}
+                                alt="Booking QR Pass"
+                                className="w-24 h-24 rounded-xl bg-white p-1.5 shadow-sm"
+                              />
+                            ) : (
+                              <div className="w-24 h-24 bg-elevated animate-pulse rounded-xl" />
+                            )}
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-text-muted">
+                              Scan at entrance gate
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-24 h-24 border border-dashed border-border-strong rounded-xl flex items-center justify-center">
+                              <AlertCircle className="w-8 h-8 text-text-muted" />
+                            </div>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-text-muted">
+                              Admission pass issued after approval
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 mt-6">
+                    {isAdmitted && (
+                      <button
+                        onClick={handleDownloadTicket}
+                        className="w-full bg-elevated border border-border-default hover:bg-bg text-text-main font-semibold py-3 rounded-xl flex items-center justify-center gap-2 text-sm transition-colors cursor-pointer"
+                      >
+                        <Download className="w-4 h-4" /> Download Ticket Pass
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setFlowStep("listing");
+                        setViewMode("list");
+                      }}
+                      className="w-full bg-brand-lime hover:bg-brand-lime-hover text-white dark:text-black font-extrabold py-3 rounded-xl text-sm transition-all cursor-pointer"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            );
+          })()}
+      </AnimatePresence>
+
+      {/* ========================================================
+          AIRBNB FILTERS MODAL
+          ======================================================== */}
+      <AnimatePresence>
+        {isFiltersModalOpen &&
+          (() => {
+            const isMinOnTop =
+              activeSlider === "min" ||
+              (activeSlider !== "max" && hoveredSlider === "min");
+            return (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                {/* Scrim backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"
+                  onClick={() => setIsFiltersModalOpen(false)}
+                />
+
+                {/* Modal Card */}
+                <motion.div
+                  initial={{ scale: 0.96, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.96, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="relative bg-surface border border-border-default rounded-xl max-w-xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-sm z-10"
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-border-default shrink-0">
+                    <button
+                      onClick={() => setIsFiltersModalOpen(false)}
+                      className="p-1 hover:bg-elevated rounded-full border border-border-default transition-colors text-text-muted hover:text-text-main cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <h3 className="text-base font-bold text-text-main">
+                      Filters
+                    </h3>
+                    <div className="w-6 h-6" /> {/* Spacer */}
+                  </div>
+
+                  {/* Scrollable content body */}
+                  <div className="p-6 overflow-y-auto space-y-8 flex-grow">
+                    {/* Section 1: Recommended for you */}
+                    <div className="pb-8 border-b border-border-default mb-8">
+                      <h4 className="text-base font-bold text-text-main mb-4">
+                        Recommended for you
+                      </h4>
+                      <div className="grid grid-cols-4 gap-3">
+                        {[
+                          {
+                            id: "instant",
+                            label: "Instant Book",
+                            icon: Zap,
+                            color:
+                              "text-amber-500 bg-amber-500/10 border-amber-500/20",
+                          },
+                          {
+                            id: "wifi",
+                            label: "Spectator Wifi",
+                            icon: Wifi,
+                            color:
+                              "text-blue-500 bg-blue-500/10 border-blue-500/20",
+                          },
+                          {
+                            id: "parking",
+                            label: "Free parking",
+                            icon: ParkingCircle,
+                            color:
+                              "text-green-500 bg-green-500/10 border-green-500/20",
+                          },
+                          {
+                            id: "floodlight",
+                            label: "Floodlights",
+                            icon: Sparkles,
+                            color:
+                              "text-brand-lime bg-brand-lime/10 border-brand-lime/20",
+                          },
+                        ].map((card) => {
+                          const isChecked = filterAmenities.includes(card.id);
+                          const Icon = card.icon;
+                          return (
+                            <button
+                              key={card.id}
+                              onClick={() => {
+                                setFilterAmenities((prev) =>
+                                  isChecked
+                                    ? prev.filter((x) => x !== card.id)
+                                    : [...prev, card.id],
+                                );
+                              }}
+                              className={`flex flex-col items-center justify-center p-4 border rounded-xl cursor-pointer transition-all duration-200 aspect-square select-none
+                              ${
+                                isChecked
+                                  ? "border-text-main bg-elevated/40 ring-1 ring-text-main"
+                                  : "border-border-default hover:border-border-strong hover:bg-elevated/10"
+                              }`}
+                            >
+                              <div
+                                className={`w-10 h-10 rounded-full flex items-center justify-center mb-2.5 border ${card.color}`}
+                              >
+                                <Icon className="w-5 h-5 shrink-0" />
+                              </div>
+                              <span className="text-[11px] font-bold text-text-main text-center leading-tight">
+                                {card.label}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Section 2: Type of place */}
+                    <div className="pb-8 border-b border-border-default mb-8">
+                      <h4 className="text-base font-bold text-text-main mb-3">
+                        Type of turf
+                      </h4>
+                      <div className="flex border border-border-default rounded-xl p-1 bg-elevated/40 select-none w-full justify-between gap-1">
+                        {[
+                          { id: "all", label: "Any format" },
+                          { id: "5v5", label: "5v5 Pitch" },
+                          { id: "7v7", label: "7v7 Pitch" },
+                          { id: "11v11", label: "11v11 Pitch" },
+                        ].map((fmt) => {
+                          const isActive = filterFormat === fmt.id;
+                          return (
+                            <button
+                              key={fmt.id}
+                              onClick={() => setFilterFormat(fmt.id)}
+                              className={`flex-1 py-2.5 text-xs font-bold text-center rounded-lg transition-all cursor-pointer focus:outline-none
+                              ${
+                                isActive
+                                  ? "bg-surface border border-border-strong text-text-main shadow-xs"
+                                  : "text-text-muted hover:bg-elevated hover:text-text-main"
+                              }`}
+                            >
+                              {fmt.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Section 3: Price range */}
+                    <div className="pb-8 border-b border-border-default mb-8">
+                      <h4 className="text-base font-bold text-text-main mb-1">
+                        Price range
+                      </h4>
+                      <p className="text-xs text-text-muted mb-6 font-medium">
+                        Hourly rate for turf pitch bookings, including all taxes
+                      </p>
+
+                      {/* Airbnb-style Decorative Price Density Histogram */}
+                      <div className="flex items-end justify-between gap-[2px] h-12 px-4 relative select-none">
+                        {[
+                          15, 20, 30, 25, 40, 55, 70, 85, 95, 80, 65, 50, 45,
+                          60, 75, 80, 60, 40, 30, 25, 35, 45, 55, 60, 50, 35,
+                          20, 15, 10, 8,
+                        ].map((height, i) => {
+                          // Calculate if this bar is within the current min/max price range
+                          const barPercentage = (i / 30) * 100;
+                          const minPercentage =
+                            ((filterMinPrice - 500) / 2500) * 100;
+                          const maxPercentage =
+                            ((filterMaxPrice - 500) / 2500) * 100;
+                          const isHighlighted =
+                            barPercentage >= minPercentage &&
+                            barPercentage <= maxPercentage;
+                          return (
+                            <div
+                              key={i}
+                              className="flex-1 rounded-t-sm transition-all duration-300"
+                              style={{
+                                height: `${height}%`,
+                                backgroundColor: isHighlighted
+                                  ? "var(--brand-lime, #4ADE80)"
+                                  : "var(--border-strong, #3f3f46)",
+                                opacity: isHighlighted ? 1 : 0.25,
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+
+                      {/* Custom Dual Range Slider */}
+                      <div className="relative w-full h-8 flex items-center mb-4 select-none">
+                        <div className="relative w-full mx-4 h-full flex items-center">
+                          {/* Track line background */}
+                          <div className="absolute left-0 right-0 h-1 bg-border-default rounded-full" />
+                          {/* Highlighted track line between thumbs */}
+                          <div
+                            className="absolute h-1 bg-brand-lime rounded-full"
+                            style={{
+                              left: `${((filterMinPrice - 500) / 2500) * 100}%`,
+                              right: `${100 - ((filterMaxPrice - 500) / 2500) * 100}%`,
+                            }}
+                          />
+
+                          {/* Minimum Range Slider Input */}
+                          <input
+                            type="range"
+                            min={500}
+                            max={3000}
+                            step={100}
+                            value={filterMinPrice}
+                            onMouseEnter={() => setHoveredSlider("min")}
+                            onMouseLeave={() => setHoveredSlider(null)}
+                            onMouseDown={() => setActiveSlider("min")}
+                            onMouseUp={() => setActiveSlider(null)}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              if (val <= filterMaxPrice) {
+                                setFilterMinPrice(val);
+                                setMinInputVal(val.toString());
+                              }
+                            }}
+                            className={`absolute left-0 right-0 w-full h-1 pointer-events-none appearance-none bg-transparent outline-none focus:outline-none
+                            ${isMinOnTop ? "z-40" : "z-30"}
+                            [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-border-strong [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:cursor-pointer
+                            [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-surface [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-border-strong [&::-moz-range-thumb]:shadow-sm [&::-moz-range-thumb]:cursor-pointer`}
+                          />
+
+                          {/* Maximum Range Slider Input */}
+                          <input
+                            type="range"
+                            min={500}
+                            max={3000}
+                            step={100}
+                            value={filterMaxPrice}
+                            onMouseEnter={() => setHoveredSlider("max")}
+                            onMouseLeave={() => setHoveredSlider(null)}
+                            onMouseDown={() => setActiveSlider("max")}
+                            onMouseUp={() => setActiveSlider(null)}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              if (val >= filterMinPrice) {
+                                setFilterMaxPrice(val);
+                                setMaxInputVal(val.toString());
+                              }
+                            }}
+                            className={`absolute left-0 right-0 w-full h-1 pointer-events-none appearance-none bg-transparent outline-none focus:outline-none
+                            ${isMinOnTop ? "z-30" : "z-40"}
+                            [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-surface [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-border-strong [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:cursor-pointer
+                            [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-surface [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-border-strong [&::-moz-range-thumb]:shadow-sm [&::-moz-range-thumb]:cursor-pointer`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Dual price inputs */}
+                      <div className="grid grid-cols-2 gap-4 items-center">
+                        {/* Min Price Box */}
+                        <div className="border border-border-default focus-within:border-text-main focus-within:ring-1 focus-within:ring-text-main rounded-xl px-4 py-2.5 bg-bg flex flex-col justify-center">
+                          <label className="text-[9px] font-bold uppercase tracking-wider text-text-muted">
+                            Minimum
+                          </label>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <span className="text-sm font-bold text-text-muted">
+                              ₹
+                            </span>
+                            <input
+                              type="text"
+                              value={minInputVal}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (/^\d*$/.test(val)) {
+                                  setMinInputVal(val);
+                                }
+                              }}
+                              onBlur={() => {
+                                let num = Number(minInputVal);
+                                if (isNaN(num) || num < 500) num = 500;
+                                if (num > filterMaxPrice) num = filterMaxPrice;
+                                setFilterMinPrice(num);
+                                setMinInputVal(num.toString());
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  let num = Number(minInputVal);
+                                  if (isNaN(num) || num < 500) num = 500;
+                                  if (num > filterMaxPrice)
+                                    num = filterMaxPrice;
+                                  setFilterMinPrice(num);
+                                  setMinInputVal(num.toString());
+                                  e.currentTarget.blur();
+                                }
+                              }}
+                              className="w-full text-sm font-bold text-text-main bg-transparent border-none outline-none focus:ring-0 p-0"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Max Price Box */}
+                        <div className="border border-border-default focus-within:border-text-main focus-within:ring-1 focus-within:ring-text-main rounded-xl px-4 py-2.5 bg-bg flex flex-col justify-center">
+                          <label className="text-[9px] font-bold uppercase tracking-wider text-text-muted">
+                            Maximum
+                          </label>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <span className="text-sm font-bold text-text-muted">
+                              ₹
+                            </span>
+                            <input
+                              type="text"
+                              value={maxInputVal}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (/^\d*$/.test(val)) {
+                                  setMaxInputVal(val);
+                                }
+                              }}
+                              onBlur={() => {
+                                let num = Number(maxInputVal);
+                                if (isNaN(num) || num > 3000) num = 3000;
+                                if (num < filterMinPrice) num = filterMinPrice;
+                                setFilterMaxPrice(num);
+                                setMaxInputVal(num.toString());
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  let num = Number(maxInputVal);
+                                  if (isNaN(num) || num > 3000) num = 3000;
+                                  if (num < filterMinPrice)
+                                    num = filterMinPrice;
+                                  setFilterMaxPrice(num);
+                                  setMaxInputVal(num.toString());
+                                  e.currentTarget.blur();
+                                }
+                              }}
+                              className="w-full text-sm font-bold text-text-main bg-transparent border-none outline-none focus:ring-0 p-0"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section 4: Amenities (Pills) */}
+                    <div className="pb-8 border-b border-border-default mb-8">
+                      <h4 className="text-base font-bold text-text-main mb-3">
+                        Facilities
+                      </h4>
+                      <div className="flex flex-wrap gap-2.5">
+                        {[
+                          {
+                            id: "water",
+                            label: "Drinking water",
+                            icon: Droplet,
+                          },
+                          {
+                            id: "changing",
+                            label: "Changing rooms",
+                            icon: Info,
+                          },
+                          {
+                            id: "rental",
+                            label: "Equipment rental",
+                            icon: Award,
+                          },
+                          {
+                            id: "first-aid",
+                            label: "First Aid kit",
+                            icon: ShieldCheck,
+                          },
+                          {
+                            id: "cafeteria",
+                            label: "Snacks / Cafe",
+                            icon: Coffee,
+                          },
+                        ].map((amenity) => {
+                          const isChecked = filterAmenities.includes(
+                            amenity.id,
+                          );
+                          const Icon = amenity.icon;
+                          return (
+                            <button
+                              key={amenity.id}
+                              onClick={() => {
+                                setFilterAmenities((prev) =>
+                                  isChecked
+                                    ? prev.filter((x) => x !== amenity.id)
+                                    : [...prev, amenity.id],
+                                );
+                              }}
+                              className={`flex items-center gap-2 border px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 select-none
+                              ${
+                                isChecked
+                                  ? "border-text-main ring-1 ring-text-main text-text-main bg-elevated"
+                                  : "border-border-default text-text-main hover:border-border-strong bg-surface"
+                              }`}
+                            >
+                              <Icon
+                                className={`w-3.5 h-3.5 shrink-0 ${isChecked ? "text-text-main" : "text-text-muted"}`}
+                              />
+                              <span>{amenity.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Section 5: Booking Options (Pills) */}
+                    <div>
+                      <h4 className="text-base font-bold text-text-main mb-3">
+                        Booking options
+                      </h4>
+                      <div className="flex flex-wrap gap-2.5">
+                        {[
+                          { id: "instant", label: "Instant Book", icon: Zap },
+                          {
+                            id: "changing",
+                            label: "Free cancellation",
+                            icon: Calendar,
+                          },
+                          { id: "indoor", label: "Indoor Court", icon: Home },
+                          { id: "outdoor", label: "Outdoor Field", icon: Sun },
+                        ].map((option) => {
+                          const isChecked = filterAmenities.includes(option.id);
+                          const Icon = option.icon;
+                          return (
+                            <button
+                              key={option.id}
+                              onClick={() => {
+                                setFilterAmenities((prev) =>
+                                  isChecked
+                                    ? prev.filter((x) => x !== option.id)
+                                    : [...prev, option.id],
+                                );
+                              }}
+                              className={`flex items-center gap-2 border px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all duration-200 select-none
+                              ${
+                                isChecked
+                                  ? "border-text-main ring-1 ring-text-main text-text-main bg-elevated"
+                                  : "border-border-default text-text-main hover:border-border-strong bg-surface"
+                              }`}
+                            >
+                              <Icon
+                                className={`w-3.5 h-3.5 shrink-0 ${isChecked ? "text-text-main" : "text-text-muted"}`}
+                              />
+                              <span>{option.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sticky Footer */}
+                  <div className="px-6 py-4 border-t border-border-default flex items-center justify-between shrink-0 bg-surface">
+                    <button
+                      onClick={() => {
+                        setFilterFormat("all");
+                        setFilterMinPrice(500);
+                        setFilterMaxPrice(3000);
+                        setMinInputVal("500");
+                        setMaxInputVal("3000");
+                        setFilterAmenities([]);
+                      }}
+                      className="text-xs font-bold text-text-main hover:text-text-main hover:underline cursor-pointer bg-transparent border-none outline-none underline decoration-solid"
+                    >
+                      Clear all
+                    </button>
+                    <button
+                      onClick={() => setIsFiltersModalOpen(false)}
+                      className="bg-text-main hover:bg-text-main/90 text-bg font-extrabold text-xs py-3 px-6 rounded-xl transition-all cursor-pointer"
+                    >
+                      Show {filteredTurfs.length} turf
+                      {filteredTurfs.length !== 1 ? "s" : ""}
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            );
+          })()}
+      </AnimatePresence>
+
+      <Footer />
+    </div>
+  );
+}

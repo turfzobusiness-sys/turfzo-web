@@ -98,13 +98,13 @@ export function AuthModal() {
                   />
                 </motion.div>
 
-                <h1
+                <h2
                   id="auth-modal-title"
                   className="mt-4 font-sans font-bold text-2xl tracking-tight leading-none"
                 >
                   <span className="text-text-main">turf</span>
                   <span className="text-brand-text">zo</span>
-                </h1>
+                </h2>
                 <p className="mt-2 font-sans text-xs text-text-muted">
                   Book sports venues instantly.
                 </p>
